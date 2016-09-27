@@ -27,7 +27,7 @@ To install this package, start R and enter:
 - [All release](https://github.com/iagomosqueira/mse/releases/)
 
 ## License
-Copyright (c) 2016 European Union. European Commission Joint Research Centre G.03. Released under the [EUPL 1.1](http://ec.europa.eu/idabc/eupl).
+Copyright (c) 2016 European Union. European Commission Joint Research Centre D.02. Released under the [EUPL 1.1](http://ec.europa.eu/idabc/eupl).
 
 ## Contact
 You are welcome to:
