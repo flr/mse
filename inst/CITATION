@@ -1,7 +1,7 @@
-citHeader("To cite FLPKG in a publication, please use:")
+citHeader("To cite mse in a publication, please use:")
 
 citEntry(
-  entry="Article/Report",
+  entry="Article",
   title="",
   author=personList(
 		person("A.A.", "Aaaa"),

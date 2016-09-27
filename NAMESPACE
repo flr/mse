@@ -1,6 +1,6 @@
 import("methods")
 import("data.table")
 import("FLCore")
-import("FLFishery")
 import("foreach")
+import("ggplot2")
 exportPattern("^[^\\.]")

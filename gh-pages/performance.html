@@ -1,0 +1,152 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+<title>performance. mse 0.0.1.9000</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="
+Iago Mosqueira, EC JRC
+">
+
+<script   src="https://code.jquery.com/jquery-3.1.0.min.js"   integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="   crossorigin="anonymous"></script>
+
+<!-- Latest compiled and minified CSS -->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<!-- from staticdocs -->
+<link href="css/highlight.css" rel="stylesheet">
+<link href="css/staticdocs.css" rel="stylesheet">
+ 
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+  </head>
+
+  <body>
+        <div class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">      
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                      </button>   
+                <div><a href="index.html" class="navbar-brand">mse 0.0.1.9000</a></div>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="reference.html">Reference</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            
+        </header>
+        <h1>Compute performance indicators</h1>
+
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-9">
+    <h2>Usage</h2>
+    <pre><span class="functioncall"><a href='performance.html'>performance</a></span><span class="keyword">(</span><span class="symbol">x</span><span class="keyword">,</span> <span class="symbol">...</span><span class="keyword">)</span></pre>
+    
+    <h2>Arguments</h2>
+    <dl>
+      <dt>run</dt>
+      <dd>Object holding the results of forward projections, as a named <code>FLQuants</code></dd>
+      <dt>refpts</dt>
+      <dd>Reference points for calculations, <code>list</code></dd>
+      <dt>indicators</dt>
+      <dd>Indicators to be computed, as formula, name and description, <code>list</code></dd>
+      <dt>years</dt>
+      <dd>Years on which indicators should be computed, defaults to last year of input FLQuants</dd>
+    </dl>
+    
+    <div class="Value">
+      <h2>Value</h2>
+      
+      <p><dl>
+data.frame Results of computing performance indicators
+</dl></p>
+  
+    </div>
+
+    <div class="Description">
+      <h2>Description</h2>
+      
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
+odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
+libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
+Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id 
+nunc euismod ante fringilla lobortis. Aliquam ullamcorper in diam non placerat.</p>
+  
+    </div>
+
+    <div class="Details">
+      <h2>Details</h2>
+      
+      <p>Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa, 
+vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in 
+mi. Sed sodales mollis arcu, sit amet venenatis lorem fringilla vel. Vivamus vitae 
+ipsum sem. Donec malesuada purus at libero bibendum accumsan. Donec ipsum sapien, 
+feugiat blandit arcu in, dapibus dictum felis.</p>
+  
+    </div>
+    
+    <h2 id="examples">Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class="functioncall"><a href='http://www.rdocumentation.org/packages/utils/topics/data'>data</a></span><span class="keyword">(</span><span class="symbol">om</span><span class="keyword">)</span></div>
+<strong class='warning'>Warning message:
+data set ‘om’ not found</strong>
+<div class='input'><span class="functioncall"><a href='http://www.rdocumentation.org/packages/utils/topics/data'>data</a></span><span class="keyword">(</span><span class="symbol">indicators</span><span class="keyword">)</span></div>
+<strong class='warning'>Warning message:
+data set ‘indicators’ not found</strong>
+<div class='input'><span class="symbol">run</span> <span class="assignement">&lt;-</span> <span class="functioncall"><a href='http://www.rdocumentation.org/packages/stats/topics/window'>window</a></span><span class="keyword">(</span><span class="symbol">om</span><span class="keyword">,</span> <span class="argument">start</span><span class="argument">=</span><span class="number">2003</span><span class="keyword">)</span></div>
+<strong class='error'>Error in window(om, start = 2003): object &#39;om&#39; not found</strong>
+<div class='input'><span class="functioncall"><a href='performance.html'>performance</a></span><span class="keyword">(</span><span class="symbol">run</span><span class="keyword">,</span> <span class="symbol">refpts</span><span class="keyword">,</span> <span class="symbol">indicators</span><span class="keyword">)</span></div>
+<strong class='error'>Error in performance(run, refpts, indicators): object &#39;run&#39; not found</strong></pre>
+  </div>
+  <div class="col-xs-12 col-sm-6 col-md-3">
+    <!-- <ul>
+      <li>performance</li>
+    </ul>
+    <ul>
+      <li>utilities</li>
+    </ul> -->
+      
+    <h2>See also</h2>
+    <p><code><a href='http://www.rdocumentation.org/packages/FLCore/topics/FLQuants'>FLQuants</a></code></p>
+
+    
+
+    <h2>Author</h2>
+    
+Iago Mosqueira, EC JRC
+
+    
+  </div>
+</div>     
+        <footer>
+            <p class="pull-right"><a href="#">Back to top</a></p>
+<p>Built by <a href="https://github.com/hadley/staticdocs">staticdocs</a>. Styled with <a href="http://getbootstrap.com">Bootstrap 3</a>.</p>
+        </footer>                  
+   </div>  
+
+  </body>
+</html>

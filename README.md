@@ -1,38 +1,37 @@
-# FLPKG
-- Version: 0.0.0
-- Date: 0001-01-01
-- Author: %USER%
-- Maintainer: %USER2% <me@my.com>
-- Repository: <https://github.com/flr/FLPKG/>
-- Bug reports: <https://github.com/flr/FLPKG/issues>
+# mse
+- Version: 0.0.1.9000
+- Date: 2016-09-27
+- Author: Iago Mosqueira, EC JRC.
+- Maintainer: Iago Mosqueira, EC JRC.
+- Repository: <https://github.com/iagomosqueira/mse/>
+- Bug reports: <https://github.com/iagomosqueira/mse/issues>
 
 ## Overview
-ONE LINE OVERVIEW, SAME AS IN DESCRIPTION
+Tools for running Management Strategy Evaluations using FLR
 
 To install this package, start R and enter:
 
-	install.packages("FLPKG", repos="http:///flr-project.org/R")
-
-or download from the [FLPKG releases page](https://github.com/flr/FLPKG/releases/)
+  library(devtools)
+  install_github("iagomosqueira/mse")
 
 ## Documentation
-- [Help pages](http://flr-project.org/FLPKG)
+- Help pages
 - Vignette
 
 ## Build Status
-[![Travis Build Status](https://travis-ci.org/flr/FLPKG.svg?branch=master)](https://travis-ci.org/flr/FLPKG)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/flr/FLPKG?branch=master&svg=true)](https://ci.appveyor.com/project/flr/FLPKG)
+[![Travis Build Status](https://travis-ci.org/iagomosqueira/mse.svg?branch=master)](https://travis-ci.org/iagomosqueira/mse)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/iagomosqueira/mse?branch=master&svg=true)](https://ci.appveyor.com/project/iagomosqueira/mse)
 
 ## Releases
-- [Latest release](https://github.com/flr/FLPKG/releases/tag/)
-- [All release](https://github.com/flr/FLPKG/releases/)
+- [Latest release](https://github.com/iagomosqueira/mse/releases/tag/)
+- [All release](https://github.com/iagomosqueira/mse/releases/)
 
 ## License
-Copyright (c) %YEAR% Somebody. Released under the [%LICENCE%](%LICENCEURL%).
+Copyright (c) 2016 European Union. European Commission Joint Research Centre G.03. Released under the [EUPL 1.1](http://ec.europa.eu/idabc/eupl).
 
 ## Contact
 You are welcome to:
 
-- Submit suggestions and bug-reports at: <https://github.com/flr/FLPKG/issues>
-- Send a pull request on: <https://github.com/flr/FLPKG/>
-- Compose a friendly e-mail to: <me@my.com>
+- Submit suggestions and bug-reports at: <https://github.com/iagomosqueira/mse/issues>
+- Send a pull request on: <https://github.com/iagomosqueira/mse/>
+- Compose a friendly e-mail to: <iago.mosqueira@jrc.ec.europa.eu>

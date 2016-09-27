@@ -1,5 +1,5 @@
 library(testthat)
 
-library(FLPKG)
+library(mse)
 
-test_check(FLPKG)
+# test_check("mse")
