@@ -40,15 +40,16 @@ globalVariables("indicator")
 #' @keywords utilities
 #' @examples
 #'
-#' data(om)
-#' data(indicators)
-#' run <- window(om, start=2003)
-#' performance(run, refpts, indicators)
+#' data(cod)
+#' indicators <- list(T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
+#'   name="mean(C_t / C_t-1)", desc="Mean absolute proportional change in catch"))
+#' run <- window(cod, start=20)
+#' performance(run, indicators, refpts=FLPar(MSY=0))
 
 setGeneric("performance", function(x, ...) standardGeneric("performance"))
 
 setMethod("performance", signature(x="FLStock"),
-  function(x, refpts, indicators, years=dims(x[[1]])$maxyear) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear) {
   
     # TODO Generalize
     x <- metrics(x, SB=ssb, B=stock, C=catch, F=fbar)
@@ -58,7 +59,7 @@ setMethod("performance", signature(x="FLStock"),
 )
 
 setMethod("performance", signature(x="FLQuants"),
-  function(x, refpts, indicators, years=dims(x[[1]])$maxyear,
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90)) {
   
     # CREATE years list, numeric names
@@ -93,10 +94,10 @@ setMethod("performance", signature(x="FLQuants"),
 )
 
 setMethod("performance", signature(x="FLStocks"),
-  function(x, refpts, indicators, years=dims(x[[1]])$maxyear) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear) {
 
     return(data.table::rbindlist(lapply(x, performance,
-      refpts, indicators, years), idcol='run'))
+      indicators, refpts, years), idcol='run'))
   }
 ) # }}}
 

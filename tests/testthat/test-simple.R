@@ -65,7 +65,7 @@ runs <- doRuns(basic, grid=grid, omp=cop, sr=cos, years=years)
 refpts <- FLPar(SBMSY=c(refpts(cob)["msy","ssb"]))
 inds <- list(I1=list(~yearMeans(SB/SBMSY), name="mean(SB/SBMSY)", desc="Mean SB / SBMSY"))
 
-perf <- rbindlist(lapply(runs$runs, performance, refpts=refpts, indicators=inds),
+perf <- rbindlist(lapply(runs$runs, performance, indicators=inds, refpts=refpts),
   idcol="run")
 
 perf[,dist:=data - 1]

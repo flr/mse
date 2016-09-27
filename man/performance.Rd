@@ -34,10 +34,11 @@ feugiat blandit arcu in, dapibus dictum felis.
 }
 \examples{
 
-data(om)
-data(indicators)
-run <- window(om, start=2003)
-performance(run, refpts, indicators)
+data(cod)
+indicators <- list(T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
+  name="mean(C_t / C_t-1)", desc="Mean absolute proportional change in catch"))
+run <- window(cod, start=20)
+performance(run, indicators, refpts=FLPar(MSY=0))
 }
 \author{
 Iago Mosqueira, EC JRC
