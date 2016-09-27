@@ -1,0 +1,68 @@
+---
+title: "Vignette Title"
+author:
+  - "Name SURNAME"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+bibliography: bibliography.bib
+tags: FLPKG FLR
+license: Creative Commons Attribution-ShareAlike 4.0 International
+---
+
+```{r, pkgs, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(collapse = T, comment = "#>")
+library(FLCore)
+# LOAD other packages, including FLPKG, here
+```
+
+**FLPKG** is an open-source R package that imnplements/provides ... It makes use of the S4 classes and 
+methods developed by the **FLR** project (<http://flr-project.org/R>, [@FLR_KellMG2007]), which simplify the development, testing and use of statistical and simulation models for fisheries management advice.
+[...]
+The package and documentation are available at <http://flr-project.org/FLPKG>.
+
+# Introduction
+
+
+
+# Background / Methods
+
+This summation expression $\sum_{i=1}^n X_i$ appears inline.
+
+This summation expression is in display form.
+
+$$\sum_{i=1}^n X_i$$
+
+# Using the FLPKG package
+
+## Example / Workflow 1
+
+## Example / Workflow 2
+
+# More information
+
+* You can submit bug reports, questions or suggestions on `FLPKG` at the `FLPKG` issue page ^[<https://github.com/flr/FLPKG/issues>], or on the *FLR* mailing list.
+* Or send a pull request to <https://github.com/flr/FLPKG/>
+* For more information on the FLR Project for Quantitative Fisheries Science in R, visit the FLR webpage ^[<http://flr-project.org>].
+* The latest version of `FLPKG` can always be installed using the `devtools` package, by calling
+```{r, devtools, echo=TRUE, eval=FALSE}
+	library(devtools)
+	install_github('flr/FLPKG')
+```
+
+## Software Versions
+
+* `r version$version.string`
+* FLCore: `r packageVersion('FLCore')`
+* FLPKG: `r # packageVersion('FLPKG')`
+* **Compiled**: `r date()`
+* **Git Hash**: `r system("git log --pretty=format:'%h' -n 1", intern=TRUE)`
+
+## Author information
+
+**Name SURNAME**. Affiliation. Address, Locality (RE) Country.
+
+# References

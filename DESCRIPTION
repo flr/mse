@@ -1,0 +1,27 @@
+Package: mse
+Title: Tools for running Management Strategy Evaluations using FLR
+Version: 0.0.1.9000
+Date: 20160927
+Authors@R: c(person(given = 'Iago', family = 'Mosqueira', role = c('aut'),
+            email = 'iago.mosqueira@jrc.ec.europa.eu'))
+Maintainer: Iago Mosqueira, EC JRC <iago.mosqueira@jrc.ec.europa.eu>
+Description: A set of functions and methods to simplify the development and
+  running of Managamenet Strategy Evaluation (MSE) exercises using the FLR
+  packages and classes.
+Depends:
+  methods,
+  FLCore,
+  data.table
+Imports:
+  FLFishery,
+  foreach
+Additional_repositories: http://flr-project.org/R
+Suggests:
+    testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+License: file LICENSE
+LazyLoad: Yes
+LazyData: No
+BugReports: https://github.com/iagomosqueira/mse/issues

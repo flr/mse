@@ -1,0 +1,13 @@
+citHeader("To cite FLPKG in a publication, please use:")
+
+citEntry(
+  entry="Article/Report",
+  title="",
+  author=personList(
+		person("A.A.", "Aaaa"),
+    person("B.B.", "Bbbb")),
+  journal="",
+  year="",
+  volume="",
+  pages="",
+  textVersion="Aaaa, A.A., Bbbb, B.B. YYYY Title. Journal, Issue: Pages.")
