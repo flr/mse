@@ -10,8 +10,7 @@ Description: A set of functions and methods to simplify the development and
 Depends:
   methods,
   FLCore,
-  data.table,
-  ggplot2
+  data.table
 Imports:
   foreach
 Additional_repositories: http://flr-project.org/R

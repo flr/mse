@@ -9,7 +9,7 @@
 globalVariables("i")
 
 # tune {{{
-tune <- function(mp, grid, refpts, indicators, ...) {
+tune <- function(mp, grid, indicators, refpts, ...) {
 
 
   # PARSE args
@@ -34,7 +34,7 @@ tune <- function(mp, grid, refpts, indicators, ...) {
     # CALL mp
     run <- do.call(mp, c(args, as.list(df[i,][, !"run", with=FALSE])))
 
-    cbind(performance(run, refpts, indicators), df[i,])
+    cbind(performance(run, indicators=indicators, refpts=refpts), df[i,])
   }
 
   close(pb) 

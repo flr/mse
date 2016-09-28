@@ -42,7 +42,9 @@ globalVariables("indicator")
 #'
 #' data(cod)
 #' indicators <- list(T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
-#'   name="mean(C_t / C_t-1)", desc="Mean absolute proportional change in catch"))
+#'   name="mean(C_t / C_t-1)", desc="Mean absolute proportional change in catch"),
+#'   T2=list(~yearVars(C), name="var(C)", desc="Variance in catch"),
+#'   T3=list(~yearVars(F), name="var(F)", desc="Variance in fishing mortality"))
 #' run <- window(cod, start=20)
 #' performance(run, indicators, refpts=FLPar(MSY=0))
 

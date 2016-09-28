@@ -2,12 +2,11 @@ citHeader("To cite mse in a publication, please use:")
 
 citEntry(
   entry="Article",
-  title="",
+  title="The mse package",
   author=personList(
-		person("A.A.", "Aaaa"),
-    person("B.B.", "Bbbb")),
-  journal="",
-  year="",
-  volume="",
-  pages="",
-  textVersion="Aaaa, A.A., Bbbb, B.B. YYYY Title. Journal, Issue: Pages.")
+		person("I.", "Mosqueira")),
+  journal="Joyurnal of Open Source Software",
+  year="2016",
+  volume="X",
+  pages="XX",
+  textVersion="Mosqueira, I. 2016. The mse package. JOSS, X:XX.")
