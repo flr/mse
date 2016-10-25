@@ -86,7 +86,7 @@ setMethod("performance", signature(x="FLQuants"),
 
     res <- merge(res, inds, by='indicator')
 
-    # TODO Return quantiles is asked, NULL or FALSE for full?
+    # TODO Return quantiles if asked, NULL or FALSE for full?
 #    if(length(probs) > 0)
 #      res <- res[, as.list(quantile(data, probs=probs, na.rm=TRUE)),
 #  keyby=list(indicator, name, year)]

@@ -64,27 +64,20 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar), ...
   # CREATE run index
   df <- df[ , run := .GRP, by = key(df)]
 
-  # Progress Bar
-  pb <- utils::txtProgressBar(min = 0, max = nrow(df),
-      initial = 0, style=3)
-  
   # LOOP over grid rows
   out <- foreach(i = seq(nrow(df))) %dopar% {
+
+    cat(paste0("[", i, "]"), "\n")
 
     # CALL mp
     run <- do.call(mp, c(args, as.list(df[i,][, !"run", with=FALSE])))
 
-    # UPDATE pb
-    setTxtProgressBar(pb, i)
-
     do.call('metrics', c(list(x=run), metrics))
   }
-
-  close(pb) 
 
   # NAMES out
   names(out) <- paste0("R", df$run)
 
-  return(list(grid=df, runs=out))
+  return(out)
 
 } # }}}
