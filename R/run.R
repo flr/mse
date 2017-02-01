@@ -53,7 +53,7 @@ tune <- function(mp, grid, indicators, refpts, ...) {
 } # }}}
 
 # doRuns {{{
-doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar), ...) {
+doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=rec), ...) {
   
   # PARSE args
   args <- list(...)
@@ -70,13 +70,17 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar), ...
     cat(paste0("[", i, "]"), "\n")
 
     # CALL mp
-    run <- do.call(mp, c(args, as.list(df[i,][, !"run", with=FALSE])))
+    do.call(mp, c(args, as.list(df[i,][, !"run", with=FALSE])))
 
-    do.call('metrics', c(list(x=run), metrics))
+    # do.call('metrics', c(list(x=run), metrics))
   }
 
   # NAMES out
   names(out) <- paste0("R", df$run)
+
+  # getPlural
+  if(exists(getPlural(out[[1]]), mode="function"))
+    out <- do.call(getPlural(out[[1]]), out)
 
   return(out)
 

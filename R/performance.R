@@ -51,12 +51,13 @@ globalVariables("indicator")
 setGeneric("performance", function(x, ...) standardGeneric("performance"))
 
 setMethod("performance", signature(x="FLStock"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL) {
   
     # TODO Generalize
     x <- metrics(x, SB=ssb, B=stock, C=catch, F=fbar)
 
-    return(performance(x, refpts=refpts, indicators=indicators, years=years))
+    return(performance(x, refpts=refpts, indicators=indicators,
+      years=years, probs=probs))
   }
 )
 
@@ -86,6 +87,10 @@ setMethod("performance", signature(x="FLQuants"),
 
     res <- merge(res, inds, by='indicator')
 
+    if(!is.null(probs))
+      res <- res[, as.list(quantile(data, probs=probs, na.rm=TRUE)),
+        keyby=list(indicator, name, year)]
+
     # TODO Return quantiles if asked, NULL or FALSE for full?
 #    if(length(probs) > 0)
 #      res <- res[, as.list(quantile(data, probs=probs, na.rm=TRUE)),
@@ -96,10 +101,10 @@ setMethod("performance", signature(x="FLQuants"),
 )
 
 setMethod("performance", signature(x="FLStocks"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL) {
 
     return(data.table::rbindlist(lapply(x, performance,
-      indicators, refpts, years), idcol='run'))
+      indicators, refpts, years, probs), idcol='run'))
   }
 ) # }}}
 
