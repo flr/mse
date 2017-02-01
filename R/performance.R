@@ -48,8 +48,6 @@ globalVariables("indicator")
 #' run <- window(cod, start=20)
 #' performance(run, indicators, refpts=FLPar(MSY=0))
 
-setGeneric("performance", function(x, ...) standardGeneric("performance"))
-
 setMethod("performance", signature(x="FLStock"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL) {
   
@@ -109,8 +107,6 @@ setMethod("performance", signature(x="FLStocks"),
 ) # }}}
 
 # metrics {{{
-setGeneric("metrics", function(x, ...) standardGeneric("metrics"))
-
 setMethod("metrics", signature(x="FLStock"),
   function(x, ...) {
     

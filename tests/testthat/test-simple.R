@@ -63,7 +63,7 @@ registerDoMC(6)
 
 runs <- doRuns(basic, grid=grid, omp=cop, sr=cos, years=years)
 
-save(runs, refpts, file="runs.RData")
+save(R0, runs, refpts, file="runs.RData")
 
 # PERFORMANCE
 
@@ -76,15 +76,11 @@ perf <- performance(runs, indicators=inds, refpts=refpts, years=c(10, 20))
 perq <- performance(runs, indicators=inds, refpts=refpts, years=c(10, 20),
   probs=c(0.1, 0.25, 0.50, 0.75, 0.90))
 
-
 # PLOTS
 
 # Trade-off plot for multiple runs
-
-plotTOs(perq, "I1", "I2", "20", colkey="run")
+plotTOs(perq, "I1", "I2", year="20", colkey="run")
 
 # Plot of OM + RUNS
-
-plotOMR(cod, runs)
-
-plotOMR(cod, runs, refpts["SBMSY",])
+plotOMR(cod, window(runs, start=25))
+plotOMR(cod, window(runs, start=25), refpts["SBMSY",])
