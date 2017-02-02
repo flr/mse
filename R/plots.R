@@ -2,16 +2,9 @@
 # ioalbmse/R/plots.R
 
 # Copyright European Union, 2015-2016
-# Author: Iago Mosqueira (EC JRC) <iago.mosqueira@jrc.ec.europa.eu>
+# Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
-
-globalVariables("indicators")
-
-# labr {{{
-labr <- function(variable, value) {
-  return(paste(value, lapply(indicators, "[[", "name")[value]))
-} # }}}
 
 # plotTOs {{{
 
@@ -77,35 +70,6 @@ plotOMR <- function(om, runs, refpts, qname="ssb",
 
   p2 <- plot(quas) + facet_wrap(~qname) + ylab(ylab) +
     geom_vline(xintercept=as.numeric(ISOdate(dims(qua)$maxyear,1,1)), linetype=2, colour='darkgrey')
-
-  if(!missing(refpts)) {
-    p1 <- p1 + geom_hline(aes(yintercept=1), linetype=2) 
-    p2 <- p2 + geom_hline(aes(yintercept=1), linetype=2) 
-  }
-
-  # TODO DO with grid.arrange
-  grid::pushViewport(grid::viewport(layout = grid::grid.layout(4, 2)))
-  vplayout <- function(x, y) grid::viewport(layout.pos.row = x, layout.pos.col = y)
-  print(p1, vp = vplayout(1, 1:2))
-  print(p2, vp = vplayout(2:4, 1:2))
-
-  invisible()
-} # }}}
-
-# plotOMRF {{{
-plotOMRF <- function(om, runs, refpts, qname="ssb",
-  ylab=paste0(toupper(qname), " (", units(om), ")")) {
-  
-  if(!missing(refpts)) {
-    om <- om %/% refpts
-    runs <- lapply(runs, `%/%`, refpts)
-  }
-
-  p1 <- plot(om) + ylab(ylab) +
-    geom_vline(xintercept=as.numeric(ISOdate(dims(om)$maxyear,1,1)), linetype=2, colour='darkgrey')
-
-  p2 <- plot(FLQuants(runs)) + facet_wrap(~qname) + ylab(ylab) +
-    geom_vline(xintercept=as.numeric(ISOdate(dims(om)$maxyear,1,1)), linetype=2, colour='darkgrey')
 
   if(!missing(refpts)) {
     p1 <- p1 + geom_hline(aes(yintercept=1), linetype=2) 
