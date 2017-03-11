@@ -43,10 +43,10 @@ mseEMP<-function(
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
   ## Limit on capacity, add to fwd(om) if you want
-  maxF=mean(apply(fbar(window(om,end=start)),6,max)*maxF)
+  maxF=apply(fbar(window(om,end=start)),6,max)*maxF
   
   ## Observation Error (OEM) setup 
-  pGrp=range(mp)["plusgroup"]
+  pGrp=range(om)["plusgroup"]
   
   smp=setPlusGroup(om,pGrp)
   cpue=window(stock.n(smp),end=start)
@@ -54,7 +54,8 @@ mseEMP<-function(
   
   ## Loop round years
   for (iYr in seq(start,end,interval)){
-    cat('\n===================', iYr, '===================\n')
+    #cat('\n===================', iYr, '===================\n')
+    cat('\t', iYr)
     
     ## Observation Error, using data from last year back to the last assessment
     ## CPUE
@@ -64,10 +65,10 @@ mseEMP<-function(
     #### Management Procedure
     tac=hcrSBT1(apply(cpue,c(2,6),mean),catch(om)[,ac(iYr-1)])
     
-    print(tac)
+    #print(tac)
       
     #### Operating Model update
-    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev) 
+    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=maxF) 
     }
   
   return(om)}
