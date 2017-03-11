@@ -1,9 +1,9 @@
-mseXSA<-function(
+mseMPB<-function(
   #OM as FLStock and FLBRP
   om,eql,
   
   #MP, this could be an XSA, biodyn etc,
-  mp,rf,control,
+  mp,
   
   #years over which to run MSE, doesnt work if interval==1, this is a bug
   start=range(om)["maxyear"]-30,interval=3,end=range(om)["maxyear"]-interval,
@@ -27,14 +27,14 @@ mseXSA<-function(
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
   ## Limit on capacity, add to fwd(om) if you want
-  maxF=apply(fbar(window(om,end=start)),6,max)*maxF
+  maxF=mean(apply(fbar(window(om,end=start)),6,max)*maxF)
   
   ## Observation Error (OEM) setup 
   pGrp=range(mp)["plusgroup"]
   
   smp=setPlusGroup(om,pGrp)
   cpue=window(stock.n(smp),end=start)[seq(dim(mp)[1]-1)]
-  cpue=cpue%*%uDev[dimnames(cpue)$age,dimnames(cpue)$year]
+  cpue=cpue%*%uDev[,dimnames(cpue)$year]
   
   ## MP, no need to add biological parameters, catch as these are already there, 
   ## rather get rid of stuff that has to be added by OEM and fit
@@ -42,14 +42,12 @@ mseXSA<-function(
   
   ## Loop round years
   for (iYr in seq(start,end,interval)){
-    #cat('\n===================', iYr, '===================\n')
-    cat('\t', iYr)
+    cat('\n===================', iYr, '===================\n')
     
     ## Observation Error, using data from last year back to the last assessment
     ## CPUE
     cpue=window(cpue,end=iYr-1)
-    cpue[,ac(iYr-(interval:1))]=stock.n(om)[dimnames(cpue)$age,ac(iYr-(interval:1))]%*%
-                                  uDev[dimnames(cpue)$age,ac(iYr-(interval:1))]
+    cpue[,ac(iYr-(interval:1))]=stock.n(om)[dimnames(cpue)$age,ac(iYr-(interval:1))]%*%uDev[,ac(iYr-(interval:1))]
     
     ## Update and fill in biological parameters
     mp=fwdWindow(mp,end=iYr-1,rf)
@@ -95,8 +93,7 @@ mseXSA<-function(
     print(tac)
       
     #### Operating Model update
-    print(maxF)
-    om=fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=mean(maxF)) 
+    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev) 
     }
   
   return(om)}
