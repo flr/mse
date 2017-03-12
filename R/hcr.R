@@ -104,6 +104,12 @@ hcrFn=function(object,refs,
     ## TACs for target F
     object=fwdWindow(object, end=max(as.numeric(hcrYrs)),rf)
     object=fwd(object,f=fbar(object)[,ac(min(as.numeric(hcrYrs)-1))],sr=rf)
+    object<<-object
+    hvt<<-hvt
+    hcrYrs<<-hcrYrs
+    
+    save(object, hvt,rf,hcrYrs,file="/home/laurie/Desktop/tmp/t.RData")
+    
     rtn   = catch(fwd(object, f=hvt,sr=rf))[,ac(hcrYrs)]
     
     rtn[]=rep(c(apply(rtn,c(3:6),mean)),each=dim(rtn)[2])

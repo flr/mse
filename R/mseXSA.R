@@ -27,7 +27,7 @@ mseXSA<-function(
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
   ## Limit on capacity, add to fwd(om) if you want
-  maxF=apply(fbar(window(om,end=start)),6,max)*maxF
+  maxF=FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF
   
   ## Observation Error (OEM) setup 
   pGrp=range(mp)["plusgroup"]
@@ -91,12 +91,12 @@ mseXSA<-function(
               hcrYrs=iYr+seq(interval),
               bndTac=c(0.85,1.15),
               tac =TRUE)
-    
-    print(tac)
       
     #### Operating Model update
-    print(maxF)
-    om=fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=mean(maxF)) 
+    om=fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=maxF) 
+    mp<<-mp
+    rf<<-rf
+    om<<-om
     }
   
   return(om)}

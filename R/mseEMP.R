@@ -43,7 +43,7 @@ mseEMP<-function(
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
   ## Limit on capacity, add to fwd(om) if you want
-  maxF=apply(fbar(window(om,end=start)),6,max)*maxF
+  maxF=FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF
   
   ## Observation Error (OEM) setup 
   pGrp=range(om)["plusgroup"]
