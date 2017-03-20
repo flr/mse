@@ -105,22 +105,3 @@ setMethod("performance", signature(x="FLStocks"),
       indicators, refpts, years, probs), idcol='run'))
   }
 ) # }}}
-
-# metrics {{{
-setMethod("metrics", signature(x="FLStock"),
-  function(x, ...) {
-    
-    args <- list(...)
-
-    return(FLQuants(lapply(args, function(y)
-      if(is(y, "formula"))
-        if(is(y[[length(y)]], "name"))
-          do.call(as.character(y[[length(y)]]), list(x))
-        else
-          eval(y[[length(y)]], list(x))
-      else if (is(y, "function"))
-        do.call(y, list(x))
-      else
-        stop("metrics expression cannot be evaluated"))))
-  }
-) # }}}

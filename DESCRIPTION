@@ -12,7 +12,9 @@ Depends:
   FLCore,
   data.table
 Imports:
-  foreach
+  foreach,
+  FLBRP,
+  mpb
 Additional_repositories: http://flr-project.org/R
 Suggests:
   testthat,
@@ -23,4 +25,4 @@ License: file LICENSE
 LazyLoad: Yes
 LazyData: No
 BugReports: https://github.com/iagomosqueira/mse/issues
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.0
