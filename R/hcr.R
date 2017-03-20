@@ -18,12 +18,12 @@ setMethod('hcr', signature(object="FLStock",refs='FLBRP'),
   hcrFn(object,refs,
                 params,stkYrs,refYrs,hcrYrs,tac,bndF,bndTac,maxF,...))
 
-setMethod('hcr', signature(object="biodyn",refs='missing'), 
-  function(object,refs,
-           params=hcrParam(ftar =0.70*fmsy(refs),
-                           btrig=0.80*bmsy(refs),
-                           fmin =0.01*fmsy(refs),
-                           blim =0.40*bmsy(refs)),
+setMethod('hcr', signature(object="biodyn",refs='FLPar'), 
+  function(object,refs=hcrParam(ftar =0.70*mpb:::fmsy(refs),
+                                btrig=0.80*mpb:::bmsy(refs),
+                                fmin =0.01*mpb:::fmsy(refs),
+                                blim =0.40*mpb:::bmsy(refs)),
+           params=refs,
            stkYrs=max(as.numeric(dimnames(stock(object))$year)),
            refYrs=max(as.numeric(dimnames(catch(object))$year)),
            hcrYrs=max(as.numeric(dimnames(stock(object))$year)),                             
@@ -35,7 +35,7 @@ setMethod('hcr', signature(object="biodyn",refs='missing'),
   hcrFn(object,refs,
         params,stkYrs,refYrs,hcrYrs,tac,bndF,bndTac,maxF,...))
 
-hcrFn=function(object,refs, 
+hcrFn=function(object,refs=NULL, 
                params=hcrParam(ftar =0.70*refpts(object)['fmsy'],
                                btrig=0.80*refpts(object)['bmsy'],
                                fmin =0.01*refpts(object)['fmsy'],
@@ -60,7 +60,7 @@ hcrFn=function(object,refs,
   # bug 
   #val=(SSB%*%a) %+% b
   # bug stock for biomass
-  stk=FLCore::apply(ssb(object)[,ac(stkYrs)],6,mean)
+  stk=FLCore::apply(stock(object)[,ac(stkYrs)],6,mean)
   
   rtn=(stk%*%a)  
   rtn=FLCore::sweep(rtn,2:6,b,'+')
@@ -104,6 +104,12 @@ hcrFn=function(object,refs,
     ## TACs for target F
     object=fwdWindow(object, end=max(as.numeric(hcrYrs)),rf)
     object=fwd(object,f=fbar(object)[,ac(min(as.numeric(hcrYrs)-1))],sr=rf)
+    object<<-object
+    hvt<<-hvt
+    hcrYrs<<-hcrYrs
+    
+    save(object, hvt,rf,hcrYrs,file="/home/laurie/Desktop/tmp/t.RData")
+    
     rtn   = catch(fwd(object, f=hvt,sr=rf))[,ac(hcrYrs)]
     
     rtn[]=rep(c(apply(rtn,c(3:6),mean)),each=dim(rtn)[2])

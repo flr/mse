@@ -1,11 +1,21 @@
 setGeneric('fmsy',     function(object,...) standardGeneric('fmsy'))
 setGeneric('bmsy',     function(object,...) standardGeneric('bmsy'))
 
-setMethod('fmsy', signature(object='FLBRP'), function(object,...)                             
-  computeRefpts(object)["msy","harvest"])
-setMethod('bmsy', signature(object='FLBRP'), function(object,...)                             
-  computeRefpts(object)["msy","ssb"])
-
+setMethod('fmsy', signature(object='FLBRP'), function(object,...) {                            
+  rtn=computeRefpts(object)["msy","harvest"]
+  
+  if (any(is.na(rtn)))
+    rtn[is.na(rtn)]=computeRefpts(object)["f0.1","harvest"][is.na(rtn)]
+  
+  rtn})
+  
+setMethod('bmsy', signature(object='FLBRP'), function(object,...) {                            
+  rtn=computeRefpts(object)["msy","ssb"]
+  
+  if (any(is.na(rtn)))
+    rtn[is.na(rtn)]=computeRefpts(object)["f0.1","ssb"][is.na(rtn)]
+  
+  rtn})
 
 hcrParam=function(ftar,btrig,fmin,blim){
   
