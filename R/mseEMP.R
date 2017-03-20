@@ -66,9 +66,9 @@ mseEMP<-function(
     tac=hcrSBT1(apply(cpue,c(2,6),mean),catch(om)[,ac(iYr-1)])
     
     #print(tac)
-      
+    
     #### Operating Model update
     om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=maxF) 
-    }
+  }
   
   return(om)}

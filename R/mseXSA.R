@@ -87,7 +87,7 @@ mseXSA<-function(
                     btrig=0.80*bmsy(rf),
                     fmin =0.10*fmsy(rf), 
                     blim =0.40*bmsy(rf))
-    tac=hcr(mp,rf,hcrPar,
+    tac=hcr(mp,hcrPar,
               hcrYrs=iYr+seq(interval),
               bndTac=c(0.85,1.15),
               tac =TRUE)
