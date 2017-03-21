@@ -39,10 +39,14 @@ hcrparams <- FLPar(Btrigger=600, Blim=200)
 refpts <- FLPar(FMSY=0.15)
 
 
-mseMP <- function(omp, sr, index, years, refpts,
-  # hcr:
+mseMP <- function(
+  # OM: FLStock + SR + RPs + index
+  omp, sr, refpts, index,
+  # years
+  years,
+  # hcr
   hcr=~pmax(Fmin, pmin(Ftarget, ssb * (Ftarget / (Btrigger - Blim)))),
-  # hcrparams:
+  # hcrparams
   hcrparams=FLPar(Fmin=0, Ftarget=refpts$Fmsy),
   # lags
   dlag=1, mlag=1, 
@@ -61,22 +65,17 @@ mseMP <- function(omp, sr, index, years, refpts,
 
     # INDICATOR
 
-
-
     # HCR
 
     ftarget <- hcr(ple4[,'2000'], params=FLPar(btrigger=215000, fmsy=0.35))[[1]]
-
 
     # DECISION + error
 
     finalf <- ftarget
 
-
     # FWD
 
     res <- fwd(ple4, sr=p4sr, f=expand(ftarget, year=2001:2008))
-
 
   return(TRUE)
   }
