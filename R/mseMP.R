@@ -34,16 +34,16 @@ omp <- cod
 sr <- codsr
 index <- stock(cod)
 years <- seq(20, 30, by=2)
-hcr <- ~pmin(FMSY, ssb * (FMSY / (Btrigger - Blim))),
-hcrparams <- FLPar(Btrigger=600, Blim=200)
-refpts <- FLPar(FMSY=0.15)
+hcr <- ~pmax(Fmin, pmin(Ftarget, ssb * (Ftarget / (Btrigger - Blim))))
+hcrparams <- FLPar(Btrigger=600, Blim=200, Ftarget=refpts$Fmsy, Fmin=0.05)
+refpts <- FLPar(Fmsy=0.15)
 
 
 mseMP <- function(
   # OM: FLStock + SR + RPs + index
   omp, sr, refpts, index,
   # years
-  years,
+  years, verbose=FALSE,
   # hcr
   hcr=~pmax(Fmin, pmin(Ftarget, ssb * (Ftarget / (Btrigger - Blim)))),
   # hcrparams
@@ -55,6 +55,11 @@ mseMP <- function(
 
   # SETUP
 
+  # MESSAGES
+  if(verbose)
+    pb <- utils::txtProgressBar(min = years[1], max = years[length(years)],
+      initial = 1, style=3, title="Years:")
+
   # LOOP
   for (y in years) {
 
@@ -64,6 +69,7 @@ mseMP <- function(
     cpue <- window(quantSums((stock.n(omp) * stock.wt(omp))[fages[1]:fages[2]]), end=y-dlag)
 
     # INDICATOR
+    evalPredictModel(omp[,ac(y-1)], predictModel(model=hcr, params=rbind(refpts, hcrparams)))
 
     # HCR
 
@@ -76,6 +82,10 @@ mseMP <- function(
     # FWD
 
     res <- fwd(ple4, sr=p4sr, f=expand(ftarget, year=2001:2008))
+
+    # PRINT
+    if(verbose)
+      setTxtProgressBar(pb, y)
 
   return(TRUE)
   }
