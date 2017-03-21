@@ -2,7 +2,7 @@
 title: "M MSE"
 author: "Laurence Kell"
 date: "21/07/2014"
-output: pdf_document
+output: html_document
 ---
   
 ```{r knitr, echo=FALSE}
@@ -11,7 +11,7 @@ library(knitr)
 opts_chunk$set(comment=NA, 
                fig.width =6, 
                fig.height=6,
-               fig.path  ="../tex/mse",
+               fig.path  ="tex/mse",
                warning=FALSE, 
                message=FALSE, 
                error  =FALSE, 
@@ -53,6 +53,9 @@ fbar(eql)=FLBRP:::refpts(eql)["msy","harvest"]*FLQuant(c(rep(.1,19),
                                                          seq(.1,2,length.out=40),
                                                          seq(2,.7,length.out=11)[-1],
                                                          rep(.7,61)))
+
+save(eql,file="/home/laurie/Desktop/flr/FLRP/data/eql.RData")
+
 srDev=rlnorm(nits,fbar(eql)[,-1,,,,1]*0,.3)
 om =propagate(fwd(eql),nits)
 oms=FLStocks("Perfect"=fwd(om,f=fbar(om)[,-1],sr.residuals=rlnorm(nits,fbar(om)[,-1,,,,1]*0,.3),sr=eql))
@@ -179,7 +182,7 @@ oms[["EMP Red Noise in M"]]=mseEMP(oms[["EMP Red Noise in M"]],eql,srDev=srDev,u
 save(oms,file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
 ```
 
-```{r summary-ssb}
+```{r summary, eval=FALSE}
 source('~/Desktop/flr/mse/R/mseMPB.R')
 uDev=rlnorm(nits,stock.n(oms[["Perfect"]])[,,,,,1]*0,.2)
 
