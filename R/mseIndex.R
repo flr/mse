@@ -1,12 +1,12 @@
-# mseMP.R - DESC
-# /mseMP.R
+# mseIndex.R - DESC
+# /mseIndex.R
 
 # Copyright European Union, 2017
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-# mseMP {{{
+# mseIndex {{{
 
 #' An example function to carry out an MSE run for a given MP
 #'
@@ -58,21 +58,21 @@
 #' years <- seq(32, 50, by=2)
 #' 
 #' # example
-#' r0 <- mseMP(omp=com, sr=codsr, refpts=refpts, index=NA,
+#' r0 <- mseIndex(omp=com, sr=codsr, refpts=refpts, index=NA,
 #'   years=seq(30, 50, by=2), oemparams=NA, imparams=NA, verbose=TRUE)
 #' 
 #' plot(r0)
 #' 
 
-mseMP <- function(
+mseIndex <- function(
   # OM: FLStock + SR + RPs + index
   omp, sr, refpts, index,
   # years
   years, verbose=FALSE,
   # hcr
-  hcr=~pmax(Fmin, pmin(Ftarget, ssb * (Ftarget / (Btrigger - Blim)))),
+  hcr=~tac * (1 + lambda * slope),
   # hcrparams
-  hcrparams=FLPar(Fmin=0, Ftarget=refpts$Fmsy, Btrigger=refpts$Bmsy),
+  hcrparams=FLPar(lambda=1),
   # lags
   dlag=1, mlag=1, 
   # oem, imp
@@ -90,11 +90,13 @@ mseMP <- function(
 
     # OBSERVATION
     # - catch + E
-    stk <- window(omp, end=c(y-1))
+    stk <- window(omp, end=c(y-dlag))
     # - cpue + E
     cpue <- mpb::oem(stk, sel=harvest(stk)[,1]) # %*% FLife::rlnoise(1, stk)
 
     # INDICATOR (SA)
+    dat <- data.table(as.data.frame(cpue[, ac(seq(y-dlag-4, y-dlag))], drop=TRUE))
+    slope <- dat[, {coef(lm(log(data)~year))[2]}, by = iter]$V1
 
     # DECISION + error
     dec <- evalPredictModel(window(stk, start=y-1),
