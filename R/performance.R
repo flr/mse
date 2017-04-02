@@ -52,7 +52,7 @@ setMethod("performance", signature(x="FLStock"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL) {
   
     # TODO Generalize
-    x <- metrics(x, SB=ssb, B=stock, C=catch, F=fbar)
+    x <- metrics(x, list(SB=ssb, B=stock, C=catch, F=fbar))
 
     return(performance(x, refpts=refpts, indicators=indicators,
       years=years, probs=probs))

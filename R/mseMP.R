@@ -97,11 +97,10 @@ mseMP <- function(
     # INDICATOR (SA)
 
     # DECISION + error
-    dec <- evalPredictModel(window(stk, start=y-1),
+    dec <- evalPredictModel(window(stk, start=y-dlag),
       predictModel(model=hcr, params=rbind(refpts, hcrparams)))
 
-    ftarget <- FLQuant(dec, 
-      dimnames=list(iter=dim(omp)[6]))
+    ftarget <- FLQuant(dec, dimnames=list(iter=dim(omp)[6]))
 
     # FWD
     omp <- fwd(omp, sr=codsr, f=expand(ftarget, year=seq(y + mlag, length=3)))
