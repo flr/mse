@@ -128,6 +128,6 @@ mseIndex <- function(
   }
 
   # END
-  return(list(omp=omp, tac=tac))
+  return(list(omp=window(omp, start=years[1] - dlag - 1), tac=tac))
 
 } # }}}
