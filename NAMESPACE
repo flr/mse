@@ -1,7 +1,6 @@
 import("methods")
 import("data.table")
 import("FLCore")
-import("mpb")
 import("FLBRP")
 import("foreach")
 exportPattern("^[^\\.]")

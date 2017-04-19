@@ -39,8 +39,9 @@
 #' data(cod)
 #'
 #' # Trim down for speed
-#' cod <- iter(cod, 1:20)
-#' codsr <- iter(codsr, 1:20)
+#' cod <- cod[,,,,,1:20]
+#' codsr <- codsr[,,,,,1:20]
+#' codsr@params <- codsr@params[,1:20]
 #'
 #' # FLBRP
 #' codrp <- brp(FLBRP(cod, sr=codsr))
@@ -48,10 +49,10 @@
 #' years <- seq(30, 50, by=2)
 #'
 #' # Expand om
-#' com <- fwdWindow(cod, codrp, end=53)
+#' com <- fwdWindow(cod, codrp, end=52)
 #' 
 #' # example
-#' r0 <- mseIndex(omp=com, sr=codsr, index=NA,
+#' r0 <- mseIndex(omp=com, sr=codsr,
 #'   hcrparams=FLPar(lambda=5, ny=5, dtac=0.15),
 #'   years=years, oemparams=NA, imparams=NA, verbose=TRUE)
 #' 
@@ -60,8 +61,8 @@
 #' tune(mseIndex, grid=list(lambda=seq(-2, 10)), indicators, refpts, ...)
 
 mseIndex <- function(
-  # OM: FLStock + SR + RPs + index
-  omp, sr, index,
+  # OM: FLStock + SR + RPs + cpue
+  omp, sr, cpue=stock(stk),
   # years
   years, verbose=FALSE,
   # hcr
@@ -87,21 +88,30 @@ mseIndex <- function(
   # LOOP
   for (y in years) {
 
-    # OBSERVATION
-    # - catch + E
+    # CATCH
+    # TODO + E
     stk <- window(omp, end=c(y - dlag))
-    # - cpue +
+    
+    # CPUE
     # TODO sel by iter
-    cpue <- quantSums(oem(stk, sel=harvest(stk)[,1], mass=TRUE)) %*%
-      # E: LN(0, 0.3) + b
-      # TODO b from history
-      # TODO sd from OM or actual value
-      rlnoise(1, FLQuant(0, dimnames=dimnames(stock(stk))[-6]), sd=0.3, b=0)
+    cpue <- window(cpue, end=c(y - dlag))
 
-    # INDICATOR (SA)
-    dat <- data.table(as.data.frame(cpue[, ac(seq(y-dlag-4, y-dlag))], drop=FALSE))
-    slope <- dat[year %in% seq(y - dlag - hcrparams$ny, y - dlag),
-      {coef(lm(log(data)~year))[2]}, by = iter]$V1
+    # oem w/ selectivity[,y - dlag] in weight
+    obs <- quantSums(oem(stk[,ac(seq(y - dlag - freq, y - dlag))],
+        sel=harvest(stk)[,ac(y - dlag)], mass=TRUE))
+
+    # EXTEND cpue from delta(obs)
+    cpue[, ac(seq(y - dlag - freq + 1, y - dlag))] <- 
+      cpue[, ac(y - dlag - freq)] %*% obs[,-1] / obs[, -dim(obs)[2]] %*%
+      # E: LN(0, 0.3) + b
+      # TODO b from history, sd from OM or actual value
+      rlnoise(1, FLQuant(0, dimnames=dimnames(obs[,-1])[-6]), sd=0.3, b=0)
+
+    # INDICATOR
+    dat <- data.table(as.data.frame(cpue[,
+      ac(seq(y - dlag - hcrparams$ny - 1, y - dlag))], drop=FALSE))
+    dat[is.na(data), data:=0.0001]
+    slope <- dat[, {coef(lm(log(data)~year, na.action=na.exclude))[2]}, by = iter]$V1
 
     # DECISION
     ytac <- eval(hcr[[2]], c(as(hcrparams, 'list'),
@@ -114,13 +124,10 @@ mseIndex <- function(
     # LOG tac
     tac[, ac(seq(y + mlag, length=freq))] <- rep(ytac, each=freq)
 
-    # DEBUG
-    print(paste(y, ytac/ptac, sep=" - "))
-    
-    # FWD w/ERROR + SR residuals
+    # FWD w/IMP. ERROR + SR residuals
     # TODO get rec var in history
     omp <- fwd(omp, sr=sr,
-      catch=FLQuant(c(ytac), dimnames=list(year=seq(y + mlag, length=freq))))
+      catch=FLQuant(c(ytac), dimnames=dimnames(tac[, ac(seq(y + mlag, length=freq))])))
 
     # DONE
     if(verbose)
