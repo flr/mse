@@ -71,7 +71,7 @@ mseIndex <- function(
   # lags
   dlag=1, mlag=1, 
   # oem, imp
-  oemparams=FLPar(sd=0, b=0), imparams) {
+  oemparams=FLPar(sd=0, b=0), imparams, tune=FALSE) {
 
   # VARIABLES
   freq <- years[2] - years[1]
@@ -134,6 +134,8 @@ mseIndex <- function(
     cat("\n")
 
   # END
+  if(tune)
+    return(window(omp, start=years[1] - dlag - 1))
   return(list(omp=window(omp, start=years[1] - dlag - 1), tac=tac, cpue=cpue))
 
 } # }}}

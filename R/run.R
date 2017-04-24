@@ -33,7 +33,7 @@ tune <- function(mp, grid, indicators, refpts, ...) {
 
     # CALL mp
     run <- do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE], 'FLPar'))))
-
+    
     cbind(performance(run, indicators=indicators, refpts=refpts), df[i,])
   }
 
@@ -74,7 +74,7 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=re
 
     # do.call('metrics', c(list(x=run), metrics))
   }
-
+  
   # NAMES out
   names(out) <- paste0("R", df$run)
 

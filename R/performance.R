@@ -62,19 +62,21 @@ setMethod("performance", signature(x="FLStock"),
 setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90)) {
-  
+    
     # CREATE years list, numeric names
     years <- as.list(years)
     names(years) <- unlist(years)
 
     # LOOP over years
-    res <- data.table::rbindlist(lapply(years, function(i)
+    res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over indicators
-      data.table::rbindlist(lapply(indicators, function(j)
+      data.table::rbindlist(lapply(indicators, function(j) {
         # EVAL indicator
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
-          c(window(x, end=i), as(refpts, 'list'))), drop=TRUE)),
-          idcol="indicator")), idcol="year")
+          c(window(x, end=i), as(refpts, 'list'))))
+      }), idcol="indicator")[,c("indicator", "data")]
+    }), idcol="year")
+
     # Set DT keys
     setkey(res, indicator, year)
     
