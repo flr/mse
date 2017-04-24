@@ -39,9 +39,8 @@
 #' data(cod)
 #'
 #' # Trim down for speed
-#' cod <- cod[,,,,,1:20]
-#' codsr <- codsr[,,,,,1:20]
-#' codsr@params <- codsr@params[,1:20]
+#' cod <- iter(cod, 1:20)
+#' codsr <- iter(codsr,1:20)
 #'
 #' # FLBRP
 #' codrp <- brp(FLBRP(cod, sr=codsr))
@@ -72,7 +71,7 @@ mseIndex <- function(
   # lags
   dlag=1, mlag=1, 
   # oem, imp
-  oemparams, imparams) {
+  oemparams=FLPar(sd=0, b=0), imparams) {
 
   # VARIABLES
   freq <- years[2] - years[1]
@@ -80,7 +79,7 @@ mseIndex <- function(
   # MESSAGES
   if(verbose)
     pb <- utils::txtProgressBar(min = years[1], max = years[length(years)],
-      initial = 1, style=3, title="Years:")
+      initial = 1, style=3)
   
   # TAC
   tac <- catch(omp)[, ac(seq(years[1] - dlag, years[length(years)] + freq))]
@@ -92,20 +91,16 @@ mseIndex <- function(
     # TODO + E
     stk <- window(omp, end=c(y - dlag))
     
-    # CPUE
-    # TODO sel by iter
-    cpue <- window(cpue, end=c(y - dlag))
-
-    # oem w/ selectivity[,y - dlag] in weight
+    # oem w/ selectivity[, y - dlag] in weight
     obs <- quantSums(oem(stk[,ac(seq(y - dlag - freq, y - dlag))],
-        sel=harvest(stk)[,ac(y - dlag)], mass=TRUE))
+      sel=sel(stk)[,ac(y - dlag)], mass=TRUE))
 
     # EXTEND cpue from delta(obs)
     cpue[, ac(seq(y - dlag - freq + 1, y - dlag))] <- 
       cpue[, ac(y - dlag - freq)] %*% obs[,-1] / obs[, -dim(obs)[2]] %*%
       # E: LN(0, 0.3) + b
       # TODO b from history, sd from OM or actual value
-      rlnoise(1, FLQuant(0, dimnames=dimnames(obs[,-1])[-6]), sd=0.3, b=0)
+      rlnoise(1, FLQuant(0, dimnames=dimnames(obs[,-1])[-6]), sd=c(oemparams$sd), b=c(oemparams$b))
 
     # INDICATOR
     dat <- data.table(as.data.frame(cpue[,
@@ -125,16 +120,20 @@ mseIndex <- function(
     tac[, ac(seq(y + mlag, length=freq))] <- rep(ytac, each=freq)
 
     # FWD w/IMP. ERROR + SR residuals
-    # TODO get rec var in history
+    # TODO ADD rec residuals
+    # TODO ADD imp error
     omp <- fwd(omp, sr=sr,
       catch=FLQuant(c(ytac), dimnames=dimnames(tac[, ac(seq(y + mlag, length=freq))])))
 
     # DONE
     if(verbose)
-      setTxtProgressBar(pb, y)
+      utils::setTxtProgressBar(pb, y)
   }
 
+  if(verbose)
+    cat("\n")
+
   # END
-  return(list(omp=window(omp, start=years[1] - dlag - 1), tac=tac))
+  return(list(omp=window(omp, start=years[1] - dlag - 1), tac=tac, cpue=cpue))
 
 } # }}}

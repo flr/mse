@@ -32,7 +32,7 @@ tune <- function(mp, grid, indicators, refpts, ...) {
     setTxtProgressBar(pb, i)
 
     # CALL mp
-    run <- do.call(mp, c(args, as.list(df[i,][, !"run", with=FALSE])))
+    run <- do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE], 'FLPar'))))
 
     cbind(performance(run, indicators=indicators, refpts=refpts), df[i,])
   }
