@@ -11,7 +11,6 @@ globalVariables("i")
 # tune {{{
 tune <- function(mp, grid, indicators, refpts, ...) {
 
-
   # PARSE args
   args <- list(...)
 
@@ -28,12 +27,12 @@ tune <- function(mp, grid, indicators, refpts, ...) {
   # LOOP over grid rows
   out <- foreach(i = seq(nrow(df))) %dopar% {
     
+    # CALL mp
+    run <- do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE], 'FLPar'), tune=TRUE)))
+    
     # UPDATE pb
     setTxtProgressBar(pb, i)
 
-    # CALL mp
-    run <- do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE], 'FLPar'))))
-    
     cbind(performance(run, indicators=indicators, refpts=refpts), df[i,])
   }
 

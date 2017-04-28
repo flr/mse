@@ -39,8 +39,8 @@
 #' data(cod)
 #'
 #' # Trim down for speed
-#' cod <- iter(cod, 1:20)
-#' codsr <- iter(codsr,1:20)
+#' cod <- FLCore::iter(cod, 1:20)
+#' codsr <- FLCore::iter(codsr,1:20)
 #'
 #' # FLBRP
 #' codrp <- brp(FLBRP(cod, sr=codsr))
@@ -57,7 +57,9 @@
 #' 
 #' plot(r0$omp) + geom_vline(aes(xintercept=as.numeric(ISOdate(30,1,1))))
 #'
-#' tune(mseIndex, grid=list(lambda=seq(-2, 10)), indicators, refpts, ...)
+#' t0 <- tune(mseIndex, grid=list(lambda=seq(-2, 10), ny=5, dtac=01.5),
+#'   omp=com, sr=codsr, years=years, oemparams=NA, imparams=NA,
+#'   verbose=TRUE, tune=TRUE)
 
 mseIndex <- function(
   # OM: FLStock + SR + RPs + cpue
@@ -67,7 +69,7 @@ mseIndex <- function(
   # hcr
   hcr=~tac * (1 + lambda * slope),
   # hcrparams
-  hcrparams=FLPar(lambda=1.25, ny=5, dtac=0.15),
+  hcrparams=FLPar(lambda=1.25, ny=5, dltac=0.15, dhtac=0.15),
   # lags
   dlag=1, mlag=1, 
   # oem, imp
@@ -109,13 +111,15 @@ mseIndex <- function(
     slope <- dat[, {coef(lm(log(data)~year, na.action=na.exclude))[2]}, by = iter]$V1
 
     # DECISION
+    # TODO GENERALIZE based on formula (e.g. ~ssb)
     ytac <- eval(hcr[[2]], c(as(hcrparams, 'list'),
       list(tac=c(tac[,ac(y - dlag)]), slope=slope)))
     
     # CONSTRAINT in TAC change
     ptac <- c(tac[, ac(y-dlag)])
-    ytac <- pmax(ptac * (1 - hcrparams$dtac), pmin(ptac * (1 + hcrparams$dtac), ytac))
+    ytac <- pmax(ptac * (1 - hcrparams$dltac), pmin(ptac * (1 + hcrparams$dhtac), ytac))
 
+    
     # LOG tac
     tac[, ac(seq(y + mlag, length=freq))] <- rep(ytac, each=freq)
 
@@ -124,6 +128,14 @@ mseIndex <- function(
     # TODO ADD imp error
     omp <- fwd(omp, sr=sr,
       catch=FLQuant(c(ytac), dimnames=dimnames(tac[, ac(seq(y + mlag, length=freq))])))
+
+#    ssr<-sr
+#    ssr$params<-ssr$params[,131]
+#    x <- fwd(iter(omp, 131), sr=ssr,
+#      catch=FLQuant(c(ytac), dimnames=dimnames(tac[, ac(seq(y + mlag, length=freq))]))[,,,,,131])
+    
+#    if(any(c(catch(omp[,ac(seq(y + mlag, length=freq))])) > 100000))
+#      browser()
 
     # DONE
     if(verbose)
@@ -136,6 +148,8 @@ mseIndex <- function(
   # END
   if(tune)
     return(window(omp, start=years[1] - dlag - 1))
-  return(list(omp=window(omp, start=years[1] - dlag - 1), tac=tac, cpue=cpue))
+  else
+    return(list(om=window(omp, start=years[1] - dlag - 1, end=years[length(years)] + mlag),
+      tac=tac, cpue=cpue))
 
 } # }}}

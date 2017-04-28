@@ -74,7 +74,7 @@ setMethod("performance", signature(x="FLQuants"),
         # EVAL indicator
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(window(x, end=i), as(refpts, 'list'))))
-      }), idcol="indicator")[,c("indicator", "data")]
+      }), idcol="indicator")[,c("indicator", "data", "iter")]
     }), idcol="year")
 
     # Set DT keys
@@ -85,16 +85,13 @@ setMethod("performance", signature(x="FLQuants"),
     inds <- data.table(indicator=names(inds), name=unlist(inds))
     setkey(inds, indicator)
 
+    # MERGE
     res <- merge(res, inds, by='indicator')
 
+    # QUANTILES if probs
     if(!is.null(probs))
       res <- res[, as.list(quantile(data, probs=probs, na.rm=TRUE)),
         keyby=list(indicator, name, year)]
-
-    # TODO Return quantiles if asked, NULL or FALSE for full?
-#    if(length(probs) > 0)
-#      res <- res[, as.list(quantile(data, probs=probs, na.rm=TRUE)),
-#  keyby=list(indicator, name, year)]
 
 	  return(res)
   }

@@ -18,7 +18,8 @@ Additional_repositories: http://flr-project.org/R
 Suggests:
   testthat,
   knitr,
-  rmarkdown
+  rmarkdown,
+  doRNG
 VignetteBuilder: knitr
 License: file LICENSE
 LazyLoad: Yes
