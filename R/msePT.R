@@ -1,12 +1,12 @@
-# mseIndex.R - DESC
-# /mseIndex.R
+# msePT.R - DESC
+# /msePT.R
 
 # Copyright European Union, 2017
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-# mseIndex {{{
+# msePT {{{
 
 #' An example function to carry out an MSE run for a given MP
 #'
@@ -35,15 +35,17 @@
 #' @keywords design
 #' @examples
 
-mseIndex <- function(
+msePT <- function(
   # OM: FLStock + SR + RPs + cpue
   omp, sr, cpue=stock(stk),
   # years
   years, verbose=FALSE,
   # hcr
-  hcr=~tac * (1 + lambda * slope),
+  hcr=~ifelse(dep <= Dlimit, 0,
+    ifelse(dep < Dtarget, (lambda * MSY) / (Dtarget - Dlimit) * (dep - Dlimit),
+    lambda * MSY)),
   # hcrparams
-  hcrparams=FLPar(lambda=1.25, ny=5, dltac=0.15, dhtac=0.15),
+  hcrparams=FLPar(Dlimit=0.10, Dtarget=0.40, lambda=1.0, dltac=0.15, dhtac=0.15),
   # lags
   dlag=1, mlag=1, 
   # oem, imp
@@ -63,13 +65,15 @@ mseIndex <- function(
   # LOOP
   for (y in years) {
 
-    # CATCH
-    # TODO + E
+    # CATCH data to y-dlag
     stk <- window(omp, end=c(y - dlag))
     
     # oem w/ selectivity[, y - dlag] in weight
     obs <- quantSums(oem(stk[,ac(seq(y - dlag - freq, y - dlag))],
       sel=sel(stk)[,ac(y - dlag)], mass=TRUE))
+
+    # DEBUG
+    obs <- stock(stk)[,ac(seq(y - dlag - freq, y - dlag))]
 
     # EXTEND cpue from delta(obs)
     cpue[, ac(seq(y - dlag - freq + 1, y - dlag))] <- 
@@ -77,17 +81,22 @@ mseIndex <- function(
       # E: LN(0, 0.3) + b
       # TODO b from history, sd from OM or actual value
       rlnoise(1, FLQuant(0, dimnames=dimnames(obs[,-1])[-6]), sd=c(oemparams$sd), b=c(oemparams$b))
+
+    # DEBUG
+    cpue[, ac(seq(y - dlag - freq + 1, y - dlag))] <- 
+      cpue[, ac(y - dlag - freq)] %*% obs[,-1] / obs[, -dim(obs)[2]]
     
-    # INDICATOR
-    dat <- data.table(as.data.frame(cpue[,
-      ac(seq(y - dlag - hcrparams$ny - 1, y - dlag))], drop=FALSE))
-    dat[is.na(data), data:=0.0001]
-    slope <- dat[, {coef(lm(log(data)~year, na.action=na.exclude))[2]}, by = iter]$V1
+    # SA: (sb, MSY) <- bd(catch, cpue)
+    # DEBUG
+    sb <- window(stock(omp), end=y - dlag)
+    MSY <- rpts$MSY
+
+    dep <- sb[, ac(y - dlag)] / sb[,1]
+
 
     # DECISION
-    # TODO GENERALIZE based on formula (e.g. ~ssb)
     ytac <- eval(hcr[[2]], c(as(hcrparams, 'list'),
-      list(tac=c(tac[,ac(y - dlag)]), slope=slope)))
+      list(dep=dep, MSY=MSY)))
     
     # CONSTRAINT in TAC change
     ptac <- c(tac[, ac(y-dlag)])

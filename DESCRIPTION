@@ -1,7 +1,7 @@
 Package: mse
 Title: Tools for running Management Strategy Evaluations using FLR
-Version: 0.0.1.9012
-Date: 2017-04-19
+Version: 0.0.2
+Date: 2017-05-02
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut", "cre"),
   email = "iago.mosqueira@jrc.ec.europa.eu"))
 Description: A set of functions and methods to simplify the development and
@@ -10,16 +10,16 @@ Description: A set of functions and methods to simplify the development and
 Depends:
   methods,
   FLCore,
-  data.table
+  ggplotFL,
+  data.table,
+  FLasher
 Imports:
-  foreach,
-  FLBRP
+  foreach
 Additional_repositories: http://flr-project.org/R
 Suggests:
   testthat,
   knitr,
-  rmarkdown,
-  doRNG
+  rmarkdown
 VignetteBuilder: knitr
 License: file LICENSE
 LazyLoad: Yes
