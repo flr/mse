@@ -36,7 +36,7 @@
 #' @examples
 
 msePT <- function(
-  # OM: FLStock + SR + RPs + cpue
+  # OM: FLStock + SR + cpue
   omp, sr, cpue=stock(stk),
   # years
   years, verbose=FALSE,
@@ -93,14 +93,13 @@ msePT <- function(
 
     dep <- sb[, ac(y - dlag)] / sb[,1]
 
-
     # DECISION
     ytac <- eval(hcr[[2]], c(as(hcrparams, 'list'),
       list(dep=dep, MSY=MSY)))
     
     # CONSTRAINT in TAC change
     ptac <- c(tac[, ac(y-dlag)])
-    ytac <- pmax(ptac * (1 - hcrparams$dltac), pmin(ptac * (1 + hcrparams$dhtac), ytac))
+    ytac <- pmax(ptac * (1 - hcrparams$dltac), pmin(ptac * (1 + hcrparams$dhtac), c(ytac)))
 
     # LOG tac
     tac[, ac(seq(y + mlag, length=freq))] <- rep(ytac, each=freq)

@@ -1,7 +1,7 @@
 Package: mse
 Title: Tools for running Management Strategy Evaluations using FLR
-Version: 0.0.2
-Date: 2017-05-02
+Version: 0.0.3.9001
+Date: 2017-05-04
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut", "cre"),
   email = "iago.mosqueira@jrc.ec.europa.eu"))
 Description: A set of functions and methods to simplify the development and

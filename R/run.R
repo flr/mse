@@ -6,7 +6,7 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-globalVariables("i")
+utils::globalVariables("i")
 
 # tune {{{
 tune <- function(mp, grid, indicators, refpts, ...) {
@@ -69,11 +69,9 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=re
     cat(paste0("[", i, "]"), "\n")
 
     # CALL mp
-    do.call(mp, c(args, as.list(df[i,][, !"run", with=FALSE])))
-
-    # do.call('metrics', c(list(x=run), metrics))
+    do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE], 'FLPar'), tune=TRUE)))
   }
-  
+
   # NAMES out
   names(out) <- paste0("R", df$run)
 

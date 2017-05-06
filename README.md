@@ -1,6 +1,6 @@
 # mse
-- Version: 0.0.2
-- Date: 2017-05-02
+- Version: 0.0.3.9001
+- Date: 2017-05-04
 - Author: Iago Mosqueira, EC JRC.
 - Maintainer: Iago Mosqueira, EC JRC.
 - Repository: <https://github.com/iagomosqueira/mse/>
