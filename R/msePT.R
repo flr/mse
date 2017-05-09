@@ -35,11 +35,15 @@
 #' @keywords design
 #' @examples
 
+# msePT {{{
 msePT <- function(
-  # OM: FLStock + SR + cpue
-  omp, sr, cpue=stock(stk),
+
+  # OM: FLStock + SR +
+  omp, sr,
+  # CPUE
+  cpue, cpuesel,
   # years
-  years, verbose=FALSE,
+  years,
   # hcr
   hcr=~ifelse(dep <= Dlimit, 0,
     ifelse(dep < Dtarget, (lambda * MSY) / (Dtarget - Dlimit) * (dep - Dlimit),
@@ -49,7 +53,9 @@ msePT <- function(
   # lags
   dlag=1, mlag=1, 
   # oem, imp
-  oemparams=FLPar(sd=0, b=0), imparams, tune=FALSE) {
+  oemparams=FLPar(sd=0, b=0), imparams,
+  # options
+  tune=FALSE, verbose=FALSE) {
 
   # VARIABLES
   freq <- years[2] - years[1]
@@ -63,32 +69,45 @@ msePT <- function(
   tac <- catch(omp)[, ac(seq(years[1] - dlag, years[length(years)] + freq))]
 
   # LOOP
-  for (y in years) {
-
-    # CATCH data to y-dlag
+  for (y in years[-length(years)]) {
+    
+    # CATCH data to y-dlag, NO ERROR
     stk <- window(omp, end=c(y - dlag))
     
     # oem w/ selectivity[, y - dlag] in weight
     obs <- quantSums(oem(stk[,ac(seq(y - dlag - freq, y - dlag))],
-      sel=sel(stk)[,ac(y - dlag)], mass=TRUE))
-
-    # DEBUG
-    obs <- stock(stk)[,ac(seq(y - dlag - freq, y - dlag))]
+      sel=cpuesel, mass=TRUE))
 
     # EXTEND cpue from delta(obs)
     cpue[, ac(seq(y - dlag - freq + 1, y - dlag))] <- 
       cpue[, ac(y - dlag - freq)] %*% obs[,-1] / obs[, -dim(obs)[2]] %*%
-      # E: LN(0, 0.3) + b
-      # TODO b from history, sd from OM or actual value
-      rlnoise(1, FLQuant(0, dimnames=dimnames(obs[,-1])[-6]), sd=c(oemparams$sd), b=c(oemparams$b))
+      # E: LN(0, sd) + b
+      rlnoise(dim(obs)[6], FLQuant(0, dimnames=dimnames(obs[,-1])[-6]),
+        sd=c(oemparams$sd), b=c(oemparams$b))
 
-    # DEBUG
-    cpue[, ac(seq(y - dlag - freq + 1, y - dlag))] <- 
-      cpue[, ac(y - dlag - freq)] %*% obs[,-1] / obs[, -dim(obs)[2]]
-    
     # SA: (sb, MSY) <- bd(catch, cpue)
-    # DEBUG
+    # TODO ADD call to biodyn
+    if(2 < 1) {
+
+    # CREATE bd object
+    bd <- biodyn(catch=catch(stk))
+
+    # Initial GUESS for k
+    params(bd)['k',] <- 20 * mean(catch(bd))
+
+    # SET initial values
+    # bd <- mpb::fwd(bd, catch=catch)
+    bd@stock <- stock(stk)
+    mpb::setParams(bd) <- cpue
+    setControl(bd) <- params(bd)
+
+    # FIT bd
+    res <- fit(bd, cpue)
+    }
+
     sb <- window(stock(omp), end=y - dlag)
+    sb <- sb * rlnoise(dim(sb)[6], FLQuant(0, dimnames=dimnames(sb)[-6]),
+        sd=c(oemparams$sd), b=c(oemparams$b))
     MSY <- rpts$MSY
 
     dep <- sb[, ac(y - dlag)] / sb[,1]
@@ -105,7 +124,7 @@ msePT <- function(
     tac[, ac(seq(y + mlag, length=freq))] <- rep(ytac, each=freq)
 
     # FWD w/IMP. ERROR + SR residuals
-    # TODO ADD rec residuals
+    # TODO ADD SR residuals: sd and rho from ocpue$index.res or eval(sro)
     # TODO ADD imp error
     omp <- fwd(omp, sr=sr,
       control=fwdControl(quant="catch", year=seq(y + mlag, length=freq), value=rep(ytac)))
@@ -120,9 +139,9 @@ msePT <- function(
 
   # END
   if(tune)
-    return(window(omp, start=years[1] - dlag - 1))
+    return(window(omp, start=years[1] - dlag - 1), end=years[length(years)])
   else
-    return(list(om=window(omp, start=years[1] - dlag - 1, end=years[length(years)] + mlag),
+    return(list(om=window(omp, start=years[1] - dlag - 1, end=years[length(years)]),
       tac=tac, cpue=cpue))
 
 } # }}}

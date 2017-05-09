@@ -1,6 +1,6 @@
 # mse
-- Version: 0.0.3.9001
-- Date: 2017-05-04
+- Version: 0.0.3.9004
+- Date: 2017-05-09
 - Author: Iago Mosqueira, EC JRC.
 - Maintainer: Iago Mosqueira, EC JRC.
 - Repository: <https://github.com/iagomosqueira/mse/>
@@ -34,4 +34,4 @@ You are welcome to:
 
 - Submit suggestions and bug-reports at: <https://github.com/iagomosqueira/mse/issues>
 - Send a pull request on: <https://github.com/iagomosqueira/mse/>
-- Compose a friendly e-mail to: <iago.mosqueira@jrc.ec.europa.eu>
+- Compose a friendly e-mail to: <iago.mosqueira@ec.europa.eu>

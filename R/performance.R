@@ -51,7 +51,7 @@ globalVariables("indicator")
 setMethod("performance", signature(x="FLStock"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL) {
   
-    # TODO Generalize
+    # TODO Generalize as argument: metrics= ...
     x <- metrics(x, list(SB=ssb, B=stock, C=catch, F=fbar))
 
     return(performance(x, refpts=refpts, indicators=indicators,
@@ -87,20 +87,32 @@ setMethod("performance", signature(x="FLQuants"),
 
     # MERGE
     res <- merge(res, inds, by='indicator')
-
+    
     # QUANTILES if probs
-    if(!is.null(probs))
+    if(!is.null(probs)) {
       res <- res[, as.list(quantile(data, probs=probs, na.rm=TRUE)),
         keyby=list(indicator, name, year)]
-
-	  return(res)
+    }
+	  
+    return(res)
   }
 )
 
 setMethod("performance", signature(x="FLStocks"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL, grid=missing) {
 
-    return(data.table::rbindlist(lapply(x, performance,
-      indicators, refpts, years, probs), idcol='run'))
+    res <- data.table::rbindlist(lapply(x, performance,
+      indicators, refpts, years, probs), idcol='run')
+    
+    # IF grid, ADD columns
+    if(!missing(grid)) {
+
+        if(is(grid, "list"))
+          dgrid <- data.table(expand.grid(grid))
+        if(!"run" %in% colnames(dgrid))
+          dgrid[, run:=paste0("R", seq(nrow(dgrid)))]
+        res <- merge(res, dgrid, by="run")
+      }
+    return(res)
   }
 ) # }}}
