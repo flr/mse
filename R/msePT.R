@@ -127,7 +127,8 @@ msePT <- function(
     # TODO ADD SR residuals: sd and rho from ocpue$index.res or eval(sro)
     # TODO ADD imp error
     omp <- fwd(omp, sr=sr,
-      control=fwdControl(quant="catch", year=seq(y + mlag, length=freq), value=rep(ytac)))
+      control=fwdControl(quant="catch", year=seq(y + mlag, length=freq), value=rep(ytac)),
+      residuals=osr$residuals)
 
     # DONE
     if(verbose)
