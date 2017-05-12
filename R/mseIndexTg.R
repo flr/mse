@@ -1,12 +1,12 @@
-# mseIndex.R - DESC
-# mse/R/mseIndex.R
+# mseIndexTg.R - DESC
+# mse/R/mseIndexTg.R
 
 # Copyright European Union, 2017
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-# mseIndex {{{
+# mseIndexTg {{{
 
 #' An example function to carry out an MSE run for a given MP
 #'
@@ -35,9 +35,9 @@
 #' @keywords design
 #' @examples
 
-mseIndex <- function(
+mseIndexTg <- function(
   # OM: FLStock + SR + RPs + cpue
-  omp, sr, cpue, cpuesel,
+  omp, sr, cpue=stock(stk),
   # years
   years, verbose=FALSE,
   # hcr
@@ -66,11 +66,11 @@ mseIndex <- function(
     # CATCH
     # TODO + E
     stk <- window(omp, end=c(y - dlag))
-
+    
     # oem w/ selectivity[, y - dlag] in weight
     obs <- quantSums(oem(stk[,ac(seq(y - dlag - freq, y - dlag))],
-      sel=cpuesel, mass=TRUE))
-    
+      sel=sel(stk)[,ac(y - dlag)], mass=TRUE))
+
     # EXTEND cpue from delta(obs)
     cpue[, ac(seq(y - dlag - freq + 1, y - dlag))] <- 
       cpue[, ac(y - dlag - freq)] %*% obs[,-1] / obs[, -dim(obs)[2]] %*%

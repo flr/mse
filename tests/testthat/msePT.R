@@ -11,9 +11,21 @@ library(ioalbmse)
 
 data(oms)
 
-discards.wt(omp) <- landings.wt(omp)
-catch.wt(omp) <- landings.wt(omp)
 
+# --- TEST hcr in msePT works as expected
+
+hcr <- ~ifelse(dep <= Dlimit, 0,
+  ifelse(dep < Dtarget, (lambda * MSY) / (Dtarget - Dlimit) * (dep - Dlimit),
+  lambda * MSY))
+
+hcrparams <- FLPar(Dlimit=0.10, Dtarget=0.40, lambda=1.0, dltac=0.40, dhtac=0.15)
+
+dep <- seq(0.05, 0.50, length=100)
+
+plot(dep, eval(hcr[[2]], c(as(hcrparams, "list"), list(dep=dep, MSY=50000))))
+
+
+# ---
 
 
 system.time(R0 <- msePT(omp, sr=osr, cpue=propagate(window(cpue$index, end=2024), 655),

@@ -63,6 +63,9 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=re
   # CREATE run index
   df <- df[ , run := .GRP, by = key(df)]
 
+  # PRINT message
+  message(paste0("Running grid with ", nrow(df), " combinations."))
+
   # LOOP over grid rows
   out <- foreach(i = seq(nrow(df))) %dopar% {
 

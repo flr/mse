@@ -49,19 +49,19 @@ globalVariables("indicator")
 #' performance(run, indicators, refpts=FLPar(MSY=0))
 
 setMethod("performance", signature(x="FLStock"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL, mp=NULL) {
   
     # TODO Generalize as argument: metrics= ...
     x <- metrics(x, list(SB=ssb, B=stock, C=catch, F=fbar))
 
     return(performance(x, refpts=refpts, indicators=indicators,
-      years=years, probs=probs))
+      years=years, probs=probs, mp=mp))
   }
 )
 
 setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
-    probs=c(0.1, 0.25, 0.50, 0.75, 0.90)) {
+    probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
     
     # CREATE years list, numeric names
     years <- as.list(years)
@@ -93,16 +93,20 @@ setMethod("performance", signature(x="FLQuants"),
       res <- res[, as.list(quantile(data, probs=probs, na.rm=TRUE)),
         keyby=list(indicator, name, year)]
     }
+    
+    # mp if not NULL
+    if(!is.null(mp))
+      res[, mp:=mp]
 	  
     return(res)
   }
 )
 
 setMethod("performance", signature(x="FLStocks"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL, grid=missing) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL, grid=missing, mp=NULL) {
 
     res <- data.table::rbindlist(lapply(x, performance,
-      indicators, refpts, years, probs), idcol='run')
+      indicators, refpts, years, probs=probs, mp=mp), idcol='run')
     
     # IF grid, ADD columns
     if(!missing(grid)) {
