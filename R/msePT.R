@@ -115,7 +115,7 @@ msePT <- function(
       sb[, ac(y - dlag)] <- sb[, ac(y - dlag)] * rlnoise(dim(sb[, ac(y - dlag)])[6],
       FLQuant(0, dimnames=dimnames(sb[, ac(y - dlag)])[-6]),
       sd=c(oemparams$sd), b=c(oemparams$b))
-    MSY <- rpts$MSY
+    MSY <- refpts$MSY
     }
     
     # CALCULATE depletion

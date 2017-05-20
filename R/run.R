@@ -6,7 +6,7 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-utils::globalVariables("i")
+utils::globalVariables(c("i", "run"))
 
 # tune {{{
 tune <- function(mp, grid, indicators, refpts, ...) {

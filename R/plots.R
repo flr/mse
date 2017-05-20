@@ -31,9 +31,9 @@ plotTOs <- function(data, x, y, year=max(data$year), alpha=1, size=0.75, colkey=
   #  geom_linerange(aes_q(ymin=as.name(paste0("25%", y)),
   #    ymax=as.name(paste0("75%", y))), size=1, alpha=alpha) +
     # horizontal lines
-    ggstance::geom_linerangeh(aes_q(xmin=as.name(paste0("10%", x)),
+    geom_linerangeh(aes_q(xmin=as.name(paste0("10%", x)),
       xmax=as.name(paste0("90%", x))), size=size, alpha=alpha) +
-  #  ggstance::geom_linerangeh(aes_q(xmin=as.name(paste0("25%", x)),
+  #  geom_linerangeh(aes_q(xmin=as.name(paste0("25%", x)),
   #    xmax=as.name(paste0("75%", x))), size=1, alpha=alpha) +
     # 50% point
     geom_point(aes_q(fill=as.name(colkey)), shape=21, size=4) + scale_shape(solid=FALSE) +

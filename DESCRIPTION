@@ -1,5 +1,5 @@
 Package: mse
-Title: Tools for running Management Strategy Evaluations using FLR
+Title: Tools for Running Management Strategy Evaluations using FLR
 Version: 0.0.3.9005
 Date: 2017-05-12
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut", "cre"),
@@ -14,7 +14,8 @@ Depends:
   data.table,
   FLasher
 Imports:
-  foreach
+  foreach,
+  ggstance
 Additional_repositories: http://flr-project.org/R
 Suggests:
   testthat,
