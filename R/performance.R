@@ -1,8 +1,8 @@
 # performance.R - DESC
 # ioalbmse/R/performance.R
 
-# Copyright European Union, 2016
-# Author: Iago Mosqueira (EC JRC) <iago.mosqueira@jrc.ec.europa.eu>
+# Copyright European Union, 2016-17
+# Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
@@ -49,24 +49,24 @@ globalVariables("indicator")
 #' performance(run, indicators, refpts=FLPar(MSY=0))
 
 setMethod("performance", signature(x="FLStock"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL, mp=NULL) {
   
     # TODO Generalize as argument: metrics= ...
     x <- metrics(x, list(SB=ssb, B=stock, C=catch, F=fbar))
 
     return(performance(x, refpts=refpts, indicators=indicators,
-      years=years, probs=probs))
+      years=years, probs=probs, mp=mp))
   }
 )
 
 setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
-    probs=c(0.1, 0.25, 0.50, 0.75, 0.90)) {
+    probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
     
     # CREATE years list, numeric names
     years <- as.list(years)
     names(years) <- unlist(years)
-
+    
     # LOOP over years
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over indicators
@@ -93,16 +93,52 @@ setMethod("performance", signature(x="FLQuants"),
       res <- res[, as.list(quantile(data, probs=probs, na.rm=TRUE)),
         keyby=list(indicator, name, year)]
     }
+    
+    # mp if not NULL
+    if(!is.null(mp))
+      res[, mp:=mp]
 	  
     return(res)
   }
 )
 
 setMethod("performance", signature(x="FLStocks"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL, grid=missing) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
+    probs=NULL, grid=missing, mp=NULL) {
 
     res <- data.table::rbindlist(lapply(x, performance,
-      indicators, refpts, years, probs), idcol='run')
+      indicators, refpts, years, probs=probs, mp=mp), idcol='run')
+    
+    # mp=run if not NULL
+    if(is.null(mp))
+      res[, mp:=run]
+    
+    # IF grid, ADD columns
+    if(!missing(grid)) {
+
+        if(is(grid, "list"))
+          dgrid <- data.table(expand.grid(grid))
+        if(!"run" %in% colnames(dgrid))
+          dgrid[, run:=paste0("R", seq(nrow(dgrid)))]
+        res <- merge(res, dgrid, by="run")
+      }
+    return(res)
+  }
+) 
+
+setMethod("performance", signature(x="list"),
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
+    probs=NULL, grid=missing, mp=NULL) {
+
+    if(!is(x[[1]], "FLQuants"))
+      stop("input list must contain objects of class FLQuants")
+
+    res <- data.table::rbindlist(lapply(x, performance,
+      indicators, refpts, years, probs=probs, mp=mp), idcol='run')
+    
+    # mp=run if not NULL
+    if(is.null(mp))
+      res[, mp:=run]
     
     # IF grid, ADD columns
     if(!missing(grid)) {
