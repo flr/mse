@@ -74,7 +74,7 @@ msePT <- function(
     # CATCH data to y-dlag, NO ERROR
     stk <- window(omp, end=c(y - dlag))
     
-  # oem w/ selectivity[, y - dlag] in weight
+    # oem w/ selectivity[, y - dlag] in weight
     obs <- quantSums(oem(stk[,ac(seq(y - dlag - freq, y - dlag))],
       sel=cpuesel, mass=TRUE))
     
@@ -89,6 +89,7 @@ msePT <- function(
     if(sa) {
     
     # CREATE bd object
+      # TODO ADD E (sampling noise) E ~ N(hr*B, sqrt(B*hr*(1-hr)))
     bd <- mpb::biodyn(catch=catch(stk))
 
     # Initial GUESS for k

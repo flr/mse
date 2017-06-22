@@ -130,7 +130,7 @@ setMethod("performance", signature(x="list"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
     probs=NULL, grid=missing, mp=NULL) {
 
-    if(!is(x[[1]], "FLQuants"))
+    if(!all(unlist(lapply(x, is, 'FLQuants'))))
       stop("input list must contain objects of class FLQuants")
 
     res <- data.table::rbindlist(lapply(x, performance,
@@ -143,12 +143,12 @@ setMethod("performance", signature(x="list"),
     # IF grid, ADD columns
     if(!missing(grid)) {
 
-        if(is(grid, "list"))
-          dgrid <- data.table(expand.grid(grid))
-        if(!"run" %in% colnames(dgrid))
-          dgrid[, run:=paste0("R", seq(nrow(dgrid)))]
-        res <- merge(res, dgrid, by="run")
-      }
+      if(is(grid, "list"))
+        dgrid <- data.table(expand.grid(grid))
+      if(!"run" %in% colnames(dgrid))
+        dgrid[, run:=paste0("R", seq(nrow(dgrid)))]
+      res <- merge(res, dgrid, by="run")
+    }
     return(res)
   }
 ) # }}}

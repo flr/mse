@@ -31,7 +31,7 @@
 #' 
 #' @references Ranta and Kaitala 2001 Proc. R. Soc.
 #' vt = b * vt-1 + s * sqrt(1 - b^2)
-#' s is normally distributed random variable with mean = 0
+#' s is a normally distributed random variable with mean = 0
 #' b is the autocorrelation parameter
 #' @export
 #' 
@@ -69,67 +69,86 @@
 #' }
 
 setMethod("rnoise", signature(n='numeric', len="FLQuant"),
-  function(n=n,len=len,sd=0.3,b=0,burn=0,trunc=0,what=c("year","cohort","age")) {
-    
-    len <- propagate(len,n)
-    
+  function(n=n, len=len, sd=1, b=0, burn=0, trunc=0, what=c("year","cohort","age"), seed=NA) {
+ 
+    # CHECK and ADJUST len dims
+    if(!dim(len)[6] %in% c(1, n))
+      stop("len must have 1 or n iters")
+
+    if(dim(len)[6] == 1)
+      res <- propagate(len, n)
+    else
+      res <- len
+
+    # APPLY by dim
     switch(what[1],
       "cohort"={
-        object <- as(len,"FLCohort")
-        res <- apply(object,c(2:6), function(x)
-          t(noiseFn(length(x),sd,b,burn,trunc)))
-        res <- array(res,unlist(laply(dimnames(object),length)),
+        object <- as(len, "FLCohort")
+        res <- apply(object, c(2:6), function(x)
+          t(noiseFn(len=length(x), sd=sd, b=b, burn=burn, trunc=trunc, seed=seed)))
+        res <- array(res, unlist(laply(dimnames(object), length)),
           dimnames=dimnames(object))
-        res <- as(FLCohort(res),"FLQuant")
+        res <- as(FLCohort(res), "FLQuant")
       },
       "year" = {
-        res <- apply(len,c(1,3:6), function(x) noiseFn(length(x),sd,b,burn,trunc))
-        res <- as.FLQuant(res,dimnames=dimnames(len))
+        leng <- prod(dim(len)[-6])
+        # MATRIX with n rows and recycled sd and d
+        res[] <- apply(matrix(c(sd, b), ncol=2, nrow=n), 1,
+          function(x) noiseFn(len=leng, sd=x[1], b=x[2], burn=burn, trunc=trunc, seed=seed))
       },
       "age" = {
-        res <- apply(len,c(2:6), function(x) noiseFn(length(x),sd,b,burn,trunc))
-        res <- as.FLQuant(res,dimnames=dimnames(len))
+        res <- apply(len, c(2:6),
+          function(x) noiseFn(len=length(x), sd=sd, b=b, burn=burn, trunc=trunc, seed=seed))
+        res <- as.FLQuant(res, dimnames=dimnames(len))
       }
     )
-
     return(len + res)
   }
 )
 
 setMethod("rnoise", signature(n='numeric', len="missing"),
-  function(n=n, sd=0.3, b=0, burn=0, trunc=0, what=c("year","cohort","age")) {
-    return(noiseFn(n,sd,b,burn,trunc))
+  function(n=n, sd=1, b=0, burn=0, trunc=0, seed=NA) {
+    return(noiseFn(len=n, sd=sd, b=b, burn=burn, trunc=trunc, seed=seed))
   }
 )
 
 setMethod("rlnoise", signature(n='numeric', len="FLQuant"),
-  function(n=n,len=len,sd=0.3,b=0,burn=0,trunc=0,what=c("year","cohort","age")) {
-    return(exp(rnoise(n, len, sd, b, burn, trunc, what)))
+  function(n=n, len=len, sd=1, b=0, burn=0, trunc=0, what=c("year", "cohort", "age"), seed=NA) {
+    return(exp(rnoise(n=n, len=len, sd=sd, b=b, burn=burn, trunc=trunc, what=what[1], seed=seed)))
   }
 )
 
-# noiseFn
-noiseFn <- function(len, sd=0.3, b=0, burn=0, trunc=0){
+# noiseFn {{{
+noiseFn <- function(len, sd=1, b=0, burn=0, trunc=0, seed=NA) {
 
-  if (burn<0)
-    error("burn must be >=0")
+  # set.seed by call if given
+  if(!is.na(seed))
+    set.seed(seed)
+
+  # CHECK burn >= 0
+  if (burn < 0)
+    stop("burn must be >=0")
   
+  # SET burn + 1
   burn <- burn + 1
 
-  x <- rep(0, len + burn) # going to hack off the first values at the end
+  # OUTPUT vector, will hack off first values at the end
+  x <- rep(0, len + burn)
 
+  # Ranta and Kaitala 2001 Proc. R. Soc.
   s <- rnorm(len + burn, mean=0, sd=sd)
-  
+
   for(i in (1:(len+burn-1))){
     x[i+1] <- b * x[i] + s[i] * sqrt(1 - b^2)
-    if(trunc>0){
-      if (x[i+1] > (1-trunc))  x[i+1] <- ( 1-trunc)
-      if (x[i+1] < (-1+trunc)) x[i+1] <- (-1+trunc)}
+    if(trunc > 0){
+      if (x[i+1] > (1 - trunc))  x[i+1] <- ( 1 - trunc)
+      if (x[i+1] < (-1 + trunc)) x[i+1] <- (-1 + trunc)}
   }
   
-  if (burn<=0) return(x)
+  if (burn <= 0)
+    return(x)
   
-  x<-x[-(seq(burn))]
+  x <- x[-(seq(burn))]
   
   return(x)
-}
+}# }}}

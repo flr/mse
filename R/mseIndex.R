@@ -73,10 +73,15 @@ mseIndex <- function(
     
     # EXTEND cpue from delta(obs)
     cpue[, ac(seq(y - dlag - freq + 1, y - dlag))] <- 
+    # TODO ADD hyperstability
+      # if obs[t] < obs[t-1], then obs[t-1] + E
+    # TODO ADD bias
+      # obs[t] * bias
       cpue[, ac(y - dlag - freq)] %*% obs[,-1] / obs[, -dim(obs)[2]] %*%
       # E: LN(0, 0.3) + b
       # TODO b from history, sd from OM or actual value
       rlnoise(1, FLQuant(0, dimnames=dimnames(obs[,-1])[-6]), sd=c(oemparams$sd), b=c(oemparams$b))
+    # sd ~ sampling + E(stk~cpue)
     
     # INDICATOR
     dat <- data.table(as.data.frame(cpue[,
@@ -98,6 +103,7 @@ mseIndex <- function(
 
     # FWD w/IMP. ERROR + SR residuals
     # TODO ADD imp error
+      # tac + N(tac, sigma)
     omp <- fwd(omp, sr=sr, residuals=sr$residuals,
       control=fwdControl(quant="catch", year=seq(y + mlag, length=freq), value=rep(ytac)))
 
