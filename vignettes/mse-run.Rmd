@@ -1,0 +1,298 @@
+---
+title: "M MSE"
+author: "Laurence Kell"
+date: "21/07/2014"
+output: pdf_document
+---
+  
+```{r knitr, echo=FALSE}
+library(knitr)
+
+opts_chunk$set(comment=NA, 
+               fig.width =6, 
+               fig.height=6,
+               fig.path  ="tex/mse",
+               warning=FALSE, 
+               message=FALSE, 
+               error  =FALSE, 
+               echo   =FALSE, 
+               eval   =TRUE,
+               cache  =TRUE)
+iFig=0
+```
+
+```{r init}
+library(FLCore)
+library(FLash)
+library(FLBRP)
+library(ggplotFL)
+library(FLXSA)
+library(FLife)
+library(mpb)
+library(plyr)
+
+source('~/Desktop/flr/mse/R/msy.R')
+source('~/Desktop/flr/mse/R/hcr.R')
+source('~/Desktop/flr/mse/R/mseXSA.R')
+source('~/Desktop/flr/mse/R/mseEMP.R')
+```
+
+```{r OM, eval=FALSE}
+##Use Life history to generate a stock
+data(teleost)
+
+alb=lhPar(teleost[,"Thunnus alalunga"])
+alb["sl"]=1
+
+nits=100
+mFn<-function(age,...) FLQuant(0.2,dimnames=dimnames(age))
+
+##OM
+eql=lhEql(alb, range=c(min=0,max=10,plusgroup=10,minfbar=5,maxfbar=9))
+fbar(eql)=FLBRP:::refpts(eql)["msy","harvest"]*FLQuant(c(rep(.1,19),
+                                                         seq(.1,2,length.out=40),
+                                                         seq(2,.7,length.out=11)[-1],
+                                                         rep(.7,61)))
+
+srDev=rlnorm(nits,fbar(eql)[,-1,,,,1]*0,.3)
+uDev =rlnorm(nits,setPlusGroup(stock.n(oms[["Perfect"]]),10)[-11,,,,,1]*0,.2)
+
+save(eql,  file="/home/laurie/Desktop/flr/FLRP/data/eql.RData",  compress="xz")
+save(srDev,file="/home/laurie/Desktop/flr/FLRP/data/srDev.RData",compress="xz")
+save(uDev, file="/home/laurie/Desktop/flr/FLRP/data/uDev.RData", compress="xz")
+
+om =propagate(fwd(eql),nits)
+oms=FLStocks("Perfect"=fwd(om,f=fbar(om)[,-1],sr.residuals=rlnorm(nits,fbar(om)[,-1,,,,1]*0,.3),sr=eql))
+```
+
+```{r xsa, eval=FALSE}
+rf=lhEql(alb,range=c(min=0,max=10,plusgroup=10,minfbar=5,maxfbar=9))
+mp=window(setPlusGroup(oms[["Perfect"]],10),end=90)
+
+##Assessment
+control=FLXSA.control(tol    =1e-09,maxit=50, 
+                      min.nse=0.3,  fse  =0.1, 
+                      rage=0,       qage =10, 
+                      shk.n=TRUE,   shk.f   =TRUE, 
+                      shk.yrs=4,    shk.ages=5, 
+                      window=100,   tsrange =10, 
+                      tspower=0,
+                      vpa=FALSE)
+
+idx=FLIndex(index=stock.n(mp)[-11]%*%uDev[,dimnames(stock.n(mp))$year])
+range(idx)[c("plusgroup","startf","endf")]=c(NA,0.1,.2)
+
+xsa=FLXSA(mp,idx,
+          control=control,diag.flag=FALSE)
+range(xsa)[c("min","max","plusgroup")]=range(mp)[c("min","max","plusgroup")]
+mp=mp+xsa
+  
+plot(FLStocks(mp=mp,om=window(oms[["Perfect"]],end=90)))
+```
+
+```{r perfect-noise, eval=FALSE}
+set.seed(6778)
+oms[["Perfect Noise in M"]]=oms[["Perfect"]]
+m(oms[["Perfect Noise in M"]])=FLife:::rlnoise(nits,log(m(oms[["Perfect"]])),0.2,0.0,what="year")
+
+oms[["Perfect Noise in M"]]=fwd(oms[["Perfect Noise in M"]],
+                                      f=fbar(oms[["Perfect"]])[,-1],sr=eql,
+                                      sr.residuals=srDev)
+```
+
+```{r perfect-red-noise, eval=FALSE}
+set.seed(6778)
+oms[["Perfect Red Noise in M"]]=oms[["Perfect"]]
+m(oms[["Perfect Red Noise in M"]])=FLife:::rlnoise(nits,log(m(oms[["Perfect"]])),0.2,0.5,what="year")
+
+oms[["Perfect Red Noise in M"]]=fwd(oms[["Perfect Red Noise in M"]],
+                                      f=fbar(oms[["Perfect"]])[,-1],sr=eql,
+                                      sr.residuals=srDev)
+```
+
+```{r whitebox1, eval=FALSE}
+oms[["White Box"]]=mseXSA(oms[["Perfect"]],
+                          eql,mp,rf,control,srDev=srDev,uDev=uDev,start=75,end=100)
+```
+
+```{r whitebox2, eval=FALSE}
+##Noise in M
+oms[["White Box Noise in M"]]=mseXSA(oms[["Perfect Noise in M"]],
+                                     eql,mp,rf,control,srDev=srDev,uDev=uDev,start=75,end=100)
+```
+
+```{r whitebox3, eval=FALSE}
+##Red noise in M
+oms[["White Box Red Noise in M"]]=mseXSA(oms[["Perfect Red Noise in M"]],
+                               eql,mp,rf,control,srDev=srDev,uDev=uDev,start=75,end=100)
+```
+
+```{r check, eval=FALSE}
+mp=setPlusGroup(window(om,end=100),10)
+idx=FLIndex(index=stock.n(mp)[-11])
+range(idx)[c("startf","endf")]=c(0.5,0.6)
+plot(FLStocks(mp=mp,om=window(om,end=100)))
+  
+xsa=FLXSA(mp,idx,
+            control=control,
+            diag.flag=FALSE)
+range(xsa)[c("min","max","plusgroup")]=range(mp)[c("min","max","plusgroup")]
+  
+i=seq(nits)
+plot(FLStocks(mp=iter(mp+xsa,i),om=iter(window(om,end=100),i)))
+```
+
+```{r blackbox1, eval=FALSE}
+source('~/Desktop/flr/mse/R/mseEMP.R')
+oms[["Black Box"]]=mseEMP(oms[["Perfect"]],eql,srDev=srDev,uDev=uDev,start=75,end=100)
+```
+
+```{r blackbox2, eval=FALSE}
+oms[["Black Box Noise in M"]]=mseEMP(oms[["Perfect Noise in M"]],
+                               eql,srDev=srDev,uDev=uDev,start=75,end=100)
+```
+
+```{r blackbox3, eval=FALSE}
+oms[["Black Box Red Noise in M"]]=mseEMP(oms[["Perfect Red Noise in M"]],
+                                   eql,srDev=srDev,uDev=uDev,start=75,end=100)
+save(oms,file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+```
+
+```{r greybox1}
+source('~/Desktop/flr/mpb/R/biodyn-fit.R')
+library(stringr)
+
+load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+load("/home/laurie/Desktop/flr/FLRP/data/eql.RData")
+load("/home/laurie/Desktop/flr/FLRP/data/uDev.RData")
+load("/home/laurie/Desktop/flr/FLRP/data/srDev.RData")
+
+source('~/Desktop/flr/FLRP/R/mseMPB.R')
+
+## Set up MP
+om=window(oms[["Perfect"]],start=20,end=75)
+mp=window(as(window(om,end=75),"biodyn"),start=20,end=75)
+mp@indices=FLQuants("1"=window(catch(om)%/%fbar(om),start=20,end=75-1))
+
+params(    mp)["r"]=.3
+mp=fwd(    mp,catch=catch(mp))
+setParams( mp)=mp@indices[[1]]
+
+setControl(mp)=params(mp)
+control(   mp)["r",2:4]=c(.1,.3,0.7)
+mp=fit(    mp)
+
+setControl(mp)=params(mp)
+control(   mp)["r",2:4]=c(.1,.3,0.7)
+#mp@priors["r",c("weight","a")]=c(1000,0.3)
+
+##Grey Box
+set.seed(3452)
+oms[["Grey Box"]]=
+  mseMPB(window(oms[["Perfect"]],start=20,end=103),eql,mp,srDev=srDev,uDev=uDev,start=75,end=100)
+save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+```
+
+```{r greybox2}
+##Grey Box Noise in M
+set.seed(3452)
+oms[["Grey Box Noise in M"]]=
+  mseMPB(window(oms[["Perfect Noise in M"]],start=20,end=103),eql,mp,srDev=srDev,uDev=uDev,start=75,end=100)
+save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+```
+
+```{r greybox3}
+##Grey Box Red Noise in M
+set.seed(3452)
+oms[["Grey Box Red Noise in M"]]=
+  mseMPB(window(oms[["Perfect Red Noise in M"]],start=20,end=103),eql,mp,srDev=srDev,uDev=uDev,start=75,end=100)
+save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+```
+
+```{r summary-ssb}
+load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+
+dat=transform(ldply(oms,function(x) as.data.frame(window(ssb(x),start=75,end=100),drop=TRUE)),
+    Scenario=factor(.id,levels=c("White Box","White Box Noise in M","White Box Red Noise in M",
+                                 "Grey Box","Grey Box Noise in M","Grey Box Red Noise in M",
+                                 "Black Box","Black Box Noise in M","Black Box Red Noise in M",
+                                 "Perfect","Perfect Noise in M","Perfect Red Noise in M")))
+dat2=ddply(dat,.(year,Scenario), with, quantile(data,probs=c(0.25,0.5,0.75)))
+
+ggplot()+
+  geom_line(aes(year,data,group=iter),alpha=.1,data=subset(dat,as.numeric(iter)<=50))+
+  geom_vline(xintercept=91,col="black")+
+  geom_line(aes(year,data,group=iter),alpha=.25,data=subset(dat,as.numeric(iter) >50))+
+  geom_line(aes(year,`50%`),data=dat2,col="grey100",size=1.0)+
+  geom_line(aes(year,`25%`),data=dat2,col="grey100",size=0.5)+
+  geom_line(aes(year,`75%`),data=dat2,col="grey100",size=0.5)+
+  facet_wrap(~Scenario,ncol=3)+
+  theme_bw()+
+  theme(legend.position="none")+
+  xlab("Year")+ylab("SSB")
+```
+
+
+```{r summary-F}
+load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+
+dat=transform(ldply(oms,function(x) as.data.frame(window(fbar(x),start=75,end=100),drop=TRUE)),
+    Scenario=factor(.id,levels=c("White Box","White Box Noise in M","White Box Red Noise in M",
+                                 "Grey Box","Grey Box Noise in M","Grey Box Red Noise in M",
+                                 "Black Box","Black Box Noise in M","Black Box Red Noise in M",
+                                 "Perfect","Perfect Noise in M","Perfect Red Noise in M")))
+dat2=ddply(dat,.(year,Scenario), with, quantile(data,probs=c(0.25,0.5,0.75)))
+
+ggplot()+
+  geom_line(aes(year,data,group=iter),alpha=.1,data=subset(dat,as.numeric(iter)<=50))+
+  geom_vline(xintercept=91,col="black")+
+  geom_line(aes(year,data,group=iter),alpha=.25,data=subset(dat,as.numeric(iter) >50))+
+  geom_line(aes(year,`50%`),data=dat2,col="grey100",size=1.0)+
+  geom_line(aes(year,`25%`),data=dat2,col="grey100",size=0.5)+
+  geom_line(aes(year,`75%`),data=dat2,col="grey100",size=0.5)+
+  facet_wrap(~Scenario,ncol=3)+
+  theme_bw()+
+  theme(legend.position="none")+
+  xlab("Year")+ylab("F")+
+  scale_y_continuous(limits=c(0,0.5))
+```
+
+
+```{r summary-yield}
+load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+
+
+dat=transform(ldply(oms,function(x) as.data.frame(window(catch(x),start=75,end=100),drop=TRUE)),
+    Scenario=factor(.id,levels=c("White Box","White Box Noise in M","White Box Red Noise in M",
+                                 "Grey Box","Grey Box Noise in M","Grey Box Red Noise in M",
+                                 "Black Box","Black Box Noise in M","Black Box Red Noise in M",
+                                 "Perfect","Perfect Noise in M","Perfect Red Noise in M")))
+dat2=ddply(dat,.(year,Scenario), with, quantile(data,probs=c(0.25,0.5,0.75)))
+
+ggplot()+
+  geom_line(aes(year,data,group=iter),alpha=.1,data=subset(dat,as.numeric(iter)<=50))+
+  geom_vline(xintercept=91,col="black")+
+  geom_line(aes(year,data,group=iter),alpha=.25,data=subset(dat,as.numeric(iter) >50))+
+  geom_line(aes(year,`50%`),data=dat2,col="grey100",size=1.0)+
+  geom_line(aes(year,`25%`),data=dat2,col="grey100",size=0.5)+
+  geom_line(aes(year,`75%`),data=dat2,col="grey100",size=0.5)+
+  facet_wrap(~Scenario,ncol=3)+
+  theme_bw()+
+  theme(legend.position="none")+
+  xlab("Year")+ylab("Yield")+
+  scale_y_continuous(limits=c(0,200))
+```
+
+```{r spectra, eval=FALSE}
+dat=transform(ldply(oms,function(x) as.data.frame(window(catch(x),start=75,end=100),drop=TRUE)),
+    Scenario=factor(.id,levels=c("White Box","White Box Noise in M","White Box Red Noise in M",
+                                 "Grey Box","Grey Box Noise in M","Grey Box Red Noise in M",
+                                 "Black Box","Black Box Noise in M","Black Box Red Noise in M",
+                                 "Perfect","Perfect Noise in M","Perfect Red Noise in M")))
+spc=ddply(dat,.(Scenario,.id,iter), with, 
+          FLife:::spectra(as.FLQuant(data.frame(data=data,year=year))))
+
+ggplot(subset(spc,f<0.1))+
+  geom_boxplot(aes(factor(f),mx))+
+  facet_wrap(~.id,ncol=3,scale="free")
+```
