@@ -37,7 +37,7 @@ source('~/Desktop/flr/mse/R/mseXSA.R')
 source('~/Desktop/flr/mse/R/mseEMP.R')
 ```
 
-```{r OM, eval=FALSE}
+```{r OM}
 ##Use Life history to generate a stock
 data(teleost)
 
@@ -55,7 +55,7 @@ fbar(eql)=FLBRP:::refpts(eql)["msy","harvest"]*FLQuant(c(rep(.1,19),
                                                          rep(.7,61)))
 
 srDev=rlnorm(nits,fbar(eql)[,-1,,,,1]*0,.3)
-uDev =rlnorm(nits,setPlusGroup(stock.n(oms[["Perfect"]]),10)[-11,,,,,1]*0,.2)
+uDev =rlnorm(nits,setPlusGroup(stock.n(eql),10)*0,.2)
 
 save(eql,  file="/home/laurie/Desktop/flr/FLRP/data/eql.RData",  compress="xz")
 save(srDev,file="/home/laurie/Desktop/flr/FLRP/data/srDev.RData",compress="xz")
@@ -65,7 +65,7 @@ om =propagate(fwd(eql),nits)
 oms=FLStocks("Perfect"=fwd(om,f=fbar(om)[,-1],sr.residuals=rlnorm(nits,fbar(om)[,-1,,,,1]*0,.3),sr=eql))
 ```
 
-```{r xsa, eval=FALSE}
+```{r xsa}
 rf=lhEql(alb,range=c(min=0,max=10,plusgroup=10,minfbar=5,maxfbar=9))
 mp=window(setPlusGroup(oms[["Perfect"]],10),end=90)
 
@@ -79,7 +79,7 @@ control=FLXSA.control(tol    =1e-09,maxit=50,
                       tspower=0,
                       vpa=FALSE)
 
-idx=FLIndex(index=stock.n(mp)[-11]%*%uDev[,dimnames(stock.n(mp))$year])
+idx=FLIndex(index=stock.n(mp)%*%uDev[,dimnames(stock.n(mp))$year])
 range(idx)[c("plusgroup","startf","endf")]=c(NA,0.1,.2)
 
 xsa=FLXSA(mp,idx,
@@ -90,7 +90,7 @@ mp=mp+xsa
 plot(FLStocks(mp=mp,om=window(oms[["Perfect"]],end=90)))
 ```
 
-```{r perfect-noise, eval=FALSE}
+```{r perfect-noise}
 set.seed(6778)
 oms[["Perfect Noise in M"]]=oms[["Perfect"]]
 m(oms[["Perfect Noise in M"]])=FLife:::rlnoise(nits,log(m(oms[["Perfect"]])),0.2,0.0,what="year")
@@ -100,7 +100,7 @@ oms[["Perfect Noise in M"]]=fwd(oms[["Perfect Noise in M"]],
                                       sr.residuals=srDev)
 ```
 
-```{r perfect-red-noise, eval=FALSE}
+```{r perfect-red-noise}
 set.seed(6778)
 oms[["Perfect Red Noise in M"]]=oms[["Perfect"]]
 m(oms[["Perfect Red Noise in M"]])=FLife:::rlnoise(nits,log(m(oms[["Perfect"]])),0.2,0.5,what="year")
@@ -110,24 +110,24 @@ oms[["Perfect Red Noise in M"]]=fwd(oms[["Perfect Red Noise in M"]],
                                       sr.residuals=srDev)
 ```
 
-```{r whitebox1, eval=FALSE}
+```{r whitebox1}
 oms[["White Box"]]=mseXSA(oms[["Perfect"]],
                           eql,mp,rf,control,srDev=srDev,uDev=uDev,start=75,end=100)
 ```
 
-```{r whitebox2, eval=FALSE}
+```{r whitebox2}
 ##Noise in M
 oms[["White Box Noise in M"]]=mseXSA(oms[["Perfect Noise in M"]],
                                      eql,mp,rf,control,srDev=srDev,uDev=uDev,start=75,end=100)
 ```
 
-```{r whitebox3, eval=FALSE}
+```{r whitebox3}
 ##Red noise in M
 oms[["White Box Red Noise in M"]]=mseXSA(oms[["Perfect Red Noise in M"]],
                                eql,mp,rf,control,srDev=srDev,uDev=uDev,start=75,end=100)
 ```
 
-```{r check, eval=FALSE}
+```{r check}
 mp=setPlusGroup(window(om,end=100),10)
 idx=FLIndex(index=stock.n(mp)[-11])
 range(idx)[c("startf","endf")]=c(0.5,0.6)
@@ -142,19 +142,26 @@ i=seq(nits)
 plot(FLStocks(mp=iter(mp+xsa,i),om=iter(window(om,end=100),i)))
 ```
 
-```{r blackbox1, eval=FALSE}
+```{r blackbox1}
+load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+load("/home/laurie/Desktop/flr/FLRP/data/eql.RData")
+load("/home/laurie/Desktop/flr/FLRP/data/srDev.RData")
+load("/home/laurie/Desktop/flr/FLRP/data/uDev.RData")
+
 source('~/Desktop/flr/mse/R/mseEMP.R')
+
 oms[["Black Box"]]=mseEMP(oms[["Perfect"]],eql,srDev=srDev,uDev=uDev,start=75,end=100)
 ```
 
-```{r blackbox2, eval=FALSE}
+```{r blackbox2}
 oms[["Black Box Noise in M"]]=mseEMP(oms[["Perfect Noise in M"]],
                                eql,srDev=srDev,uDev=uDev,start=75,end=100)
 ```
 
-```{r blackbox3, eval=FALSE}
+```{r blackbox3}
 oms[["Black Box Red Noise in M"]]=mseEMP(oms[["Perfect Red Noise in M"]],
                                    eql,srDev=srDev,uDev=uDev,start=75,end=100)
+
 save(oms,file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
 ```
 
@@ -283,7 +290,7 @@ ggplot()+
   scale_y_continuous(limits=c(0,200))
 ```
 
-```{r spectra, eval=FALSE}
+```{r spectra}
 dat=transform(ldply(oms,function(x) as.data.frame(window(catch(x),start=75,end=100),drop=TRUE)),
     Scenario=factor(.id,levels=c("White Box","White Box Noise in M","White Box Red Noise in M",
                                  "Grey Box","Grey Box Noise in M","Grey Box Red Noise in M",
@@ -295,4 +302,27 @@ spc=ddply(dat,.(Scenario,.id,iter), with,
 ggplot(subset(spc,f<0.1))+
   geom_boxplot(aes(factor(f),mx))+
   facet_wrap(~.id,ncol=3,scale="free")
+```
+
+```{r}
+f=fbar(oms[["Perfect"]])[,-1]
+f[]=eql@refpts["msy","harvest"]
+
+oms[["Ref"]]=fwd(oms[["Perfect"]],f=f,sr=eql,sr.residuals=srDev)
+oms[["Ref Noise in M"]]=fwd(oms[["Perfect Noise in M"]],f=f,sr=eql,sr.residuals=srDev)
+oms[["Ref Red Noise in M"]]=fwd(oms[["Perfect Red Noise in M"]],f=f,sr=eql,sr.residuals=srDev)
+
+save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+```
+
+```{r}
+plot(FLStocks(llply(oms[sort(names(oms))[seq(1,15,3)]],function(x) x[,ac(75:100)])))
+```
+
+```{r}
+plot(FLStocks(llply(oms[sort(names(oms))[seq(2,15,3)]],function(x) x[,ac(75:100)])))
+```
+
+```{r}
+plot(FLStocks(llply(oms[sort(names(oms))[seq(3,15,3)]],function(x) x[,ac(75:100)])))
 ```

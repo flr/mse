@@ -52,9 +52,9 @@ mseEMP<-function(
   cpue=cpue%*%uDev[,dimnames(cpue)$year]
   
   ## Loop round years
+  cat('\n==')
   for (iYr in seq(start,end,interval)){
-    #cat('\n===================', iYr, '===================\n')
-    cat('\t', iYr)
+    cat(iYr,", ",sep="")
     
     ## Observation Error, using data from last year back to the last assessment
     ## CPUE
@@ -69,5 +69,6 @@ mseEMP<-function(
     #### Operating Model update
     om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=maxF) 
   }
+  cat('==\n')
   
   return(om)}

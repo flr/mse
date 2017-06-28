@@ -100,10 +100,10 @@ mseMPB<-function(
   cpue=cpue%*%uDev[,dimnames(cpue)$year]
   
   ## Loop round years
+  cat('\n==')
   for (iYr in seq(start,range(om,'maxyear')-interval,interval)){
       #iYr = seq(start+rcvPeriod,range(om,'maxyear')-interval,interval)[1]
-      cat('\n===================', iYr, '===================\n')
-      cat(iYr, '\t')
+      cat(iYr,", ",sep="")
     
       ## use data from last year
       cpue=window(cpue,end=iYr-1)
@@ -161,7 +161,8 @@ mseMPB<-function(
                          model.frame(refpts(bd))[,-4],
                          hcr))
     }
-    
+  cat("==\n")
+  
   return(om)}
 
 if (FALSE){
