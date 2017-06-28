@@ -111,6 +111,8 @@ oms[["Perfect Red Noise in M"]]=fwd(oms[["Perfect Red Noise in M"]],
 ```
 
 ```{r whitebox1}
+source('~/Desktop/flr/mse/R/mseXSA.R')
+
 oms[["White Box"]]=mseXSA(oms[["Perfect"]],
                           eql,mp,rf,control,srDev=srDev,uDev=uDev,start=75,end=100)
 ```
@@ -173,8 +175,6 @@ load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
 load("/home/laurie/Desktop/flr/FLRP/data/eql.RData")
 load("/home/laurie/Desktop/flr/FLRP/data/uDev.RData")
 load("/home/laurie/Desktop/flr/FLRP/data/srDev.RData")
-
-source('~/Desktop/flr/FLRP/R/mseMPB.R')
 
 ## Set up MP
 om=window(oms[["Perfect"]],start=20,end=75)
