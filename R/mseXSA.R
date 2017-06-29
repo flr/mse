@@ -11,7 +11,7 @@ mseXSA<-function(#OM as FLStock and FLBRP
                  blim =0.40,
                  
                  #Bounds on TAC changes
-                 bndTac=c(0.8,1.2),
+                 bndTac=c(0.01,100),
                  
                  #years over which to run MSE, doesnt work if interval==1, this is a bug
                  start=range(om)["maxyear"]-30,interval=3,end=range(om)["maxyear"]-interval,
@@ -34,8 +34,8 @@ mseXSA<-function(#OM as FLStock and FLBRP
   if (nits['om']==1) stock(om)=propagate(stock(om),max(nits))
   
   ## Limit on capacity, add to fwd(om,maxF=maxF) so catches dont go stuoid 
-  maxF=mean(apply(fbar(window(om,end=start)),6,max)*maxF)
-  
+  maxF=FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF
+
   ## Observation Error (OEM) setup before looping through years 
   pGrp=range(mp)["plusgroup"]
   
@@ -101,7 +101,7 @@ mseXSA<-function(#OM as FLStock and FLBRP
     
     ## in year update
     mp=fwdWindow(mp,end=iYr,rf)
-    mp=fwd(mp,catch=catch(om)[,ac(iYr)],sr=rf)
+    mp=fwd(mp,catch=catch(om)[,ac(iYr)],sr=rf,maxF=mean(maxF))
     
     ## HCR
     hcrPar=hcrParam(ftar =ftar*fmsy(rf),
@@ -110,13 +110,13 @@ mseXSA<-function(#OM as FLStock and FLBRP
                     blim =blim*bmsy(rf))
     tac=hcr(mp,rf,hcrPar,
               hcrYrs=iYr+seq(interval),
-              bndTac=c(0.85,1.15),
+              bndTac=bndTac,
               tac =TRUE)
     
-    print(tac)
+    #print(tac)
       
     #### Operating Model update
-    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=maxF) 
+    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=mean(maxF)) 
   }
   cat("==\n")
   

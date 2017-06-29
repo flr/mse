@@ -145,7 +145,7 @@ mseMPB<-function(
       TAC[]=rep(apply(TAC,6,mean)[drop=T],each=interval)
       
       #### Operating Model Projectionfor TAC
-      om =mpb::fwd(om,catch=TAC,maxF=maxF,sr=eql,sr.residuals=srDev)  
+      om =mpb::fwd(om,catch=TAC,sr=eql,sr.residuals=srDev,maxF=maxF[,dimnames(TAC)$year])  
       
       #### Summary Statistics
       ## HCR actions, i.e. is biomass<Btrig?, what is F?, ..

@@ -1,4 +1,4 @@
-hcrSBT1=function(cpue,tac,k1=2.0,k2=3.0,gamma=1,nyrs=5,lag=1,interval=3){
+  hcrSBT1=function(cpue,tac,k1=2.0,k2=3.0,gamma=1,nyrs=5,lag=1,interval=3){
   
   dat=as.data.frame(cpue[,ac(-((nyrs-1):0)+dims(cpue)$maxyear)])
   lambda=as.FLQuant(ddply(dat, .(iter), with,  data.frame(data=coefficients(lm(data~year))[2])))
@@ -67,7 +67,7 @@ mseEMP<-function(
     #print(tac)
     
     #### Operating Model update
-    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=maxF) 
+    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=mean(maxF)) 
   }
   cat('==\n')
   

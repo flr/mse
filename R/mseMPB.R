@@ -26,8 +26,8 @@ mseMPB<-function(
   mp@stock=window(stock(mp),end=70)
 
   ## Cut in capacity
-  maxF=mean(apply(fbar(window(om,end=start)),6,max)*maxF)
-
+  maxF=FLQuant(1,dimnames=dimnames(srDev))%*%apply(fbar(window(om,end=start)),6,max)*maxF
+  maxF.<<-maxF
   #### Observation Error (OEM) setup 
   cpue=window(catch.n(om)%*%catch.wt(om)%/%fbar(om),end=start)[dimnames(uDev)$age,]
   cpue=cpue%*%uDev[,dimnames(cpue)$year]
@@ -59,16 +59,17 @@ mseMPB<-function(
     #bug in window
     catch(mp)[,ac(rev(iYr-seq(interval+1)))]=catch(om)[,ac(rev(iYr-seq(interval+1)))]
     catch(mp)[,ac(iYr)]=catch(om)[,ac(iYr)]
-    mp=fwd(mp,catch=catch(mp)[,ac(iYr)],maxF=maxF)
+    mp=fwd(mp,catch=catch(mp)[,ac(iYr)])
     mp.<<-mp
     
     ## HCR
     tac=hcr(mp,ftar=ftar,btrig=btrig,fmin=fmin,blim=blim,tac=TRUE)
   
     #### Operating Model Projectionfor TAC
-    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=maxF)  
+    om =fwd(om,catch=tac,sr=eql,sr.residuals=srDev,maxF=mean(maxF))  
     
     om.<<-om
     }
   
   return(om)}
+
