@@ -53,8 +53,11 @@ fbar(eql)=FLBRP:::refpts(eql)["msy","harvest"]*FLQuant(c(rep(.1,19),
                                                          seq(.1,2,length.out=40),
                                                          seq(2,.7,length.out=11)[-1],
                                                          rep(.7,61)))
-
-srDev=rlnorm(nits,fbar(eql)[,-1,,,,1]*0,.3)
+set.seed(1233)
+srDev=FLife:::rlnoise(nits,fbar(eql)[,-1,,,,1]*0,.3,b=0.0)
+set.seed(1233)
+srDev6=FLife:::rlnoise(nits,fbar(eql)[,-1,,,,1]*0,.3,b=0.5)
+set.seed(3321)
 uDev =rlnorm(nits,setPlusGroup(stock.n(eql),10)*0,.2)
 
 save(eql,  file="/home/laurie/Desktop/flr/FLRP/data/eql.RData",  compress="xz")
@@ -149,6 +152,7 @@ range(xsa)[c("min","max","plusgroup")]=range(mp)[c("min","max","plusgroup")]
 i=seq(nits)
 plot(FLStocks(mp=iter(mp+xsa,i),om=iter(window(om,end=100),i)))
 ```
+**Figure `r iFig=iFig+1; iFig`**
 
 ```{r blackbox1}
 load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
@@ -184,6 +188,9 @@ load("/home/laurie/Desktop/flr/FLRP/data/eql.RData")
 load("/home/laurie/Desktop/flr/FLRP/data/uDev.RData")
 load("/home/laurie/Desktop/flr/FLRP/data/srDev.RData")
 
+set.seed(1233)
+srDev=FLife:::rlnoise(nits,fbar(eql)[,-1,,,,1]*0,.3,b=0.5)
+
 ## Set up MP
 om=window(oms[["Perfect"]],start=20,end=75)
 mp=window(as(window(om,end=75),"biodyn"),start=20,end=75)
@@ -205,7 +212,6 @@ control(   mp)["r",2:4]=c(.1,.3,0.6)
 ```{r greybox1}
 ##Grey Box
 source('~/Desktop/flr/mse/R/mseMPB.R')
-
 oms[["Grey Box"]]=
   mseMPB(window(oms[["Perfect"]],start=20,end=110),eql,mp,srDev=srDev,uDev=uDev,start=75,end=103)
 save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
@@ -225,15 +231,51 @@ oms[["Grey Box Red Noise in M"]]=
 save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
 ```
 
+```{r greybox1-ar}
+oms[["Grey Box AR"]]=fwd(oms[["Perfect"]],
+                                      f=fbar(oms[["Perfect"]])[,-1],sr=eql,
+                                      sr.residuals=srDev6)
+
+##Grey Box
+source('~/Desktop/flr/mse/R/mseMPB.R')
+oms[["Grey Box AR"]]=
+  mseMPB(window(oms[["Grey Box AR"]],start=20,end=110),eql,mp,srDev=srDev6,uDev=uDev,start=75,end=103)
+save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+```
+
+```{r greybox2-ar}
+##Grey Box Noise in M
+oms[["Grey Box Noise in M AR"]]=fwd(oms[["Perfect Noise in M"]],
+                                      f=fbar(oms[["Perfect Noise in M"]])[,-1],sr=eql,
+                                      sr.residuals=srDev6)
+oms[["Grey Box Noise in M AR"]]=
+  mseMPB(window(oms[["Perfect Noise in M"]],start=20,end=110),eql,mp,srDev=srDev6,uDev=uDev,start=75,end=102)
+save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+```
+
+```{r greybox3-ar}
+##Grey Box Noise in M
+oms[["Grey Box  Red Noise in M AR"]]=fwd(oms[["Perfect Red Noise in M"]],
+                                      f=fbar(oms[["Perfect Red Noise in M"]])[,-1],sr=eql,
+                                      sr.residuals=srDev6)
+
+oms[["Grey Box Red Noise in M AR"]]=
+  mseMPB(window(oms[["Perfect Noise in M"]],start=20,end=110),eql,mp,srDev=srDev6,uDev=uDev,start=75,end=102)
+save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+```
+
 ```{r summary-ssb}
 load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
 
-dat=transform(ldply(oms[1:12],function(x) as.data.frame(window(ssb(x),start=75,end=100),drop=TRUE)),
+dat=transform(ldply(oms[-c(13:15)],function(x) 
+  as.data.frame(window(ssb(x),start=75,end=100),drop=TRUE)),
     Scenario=factor(.id,levels=c("White Box","White Box Noise in M","White Box Red Noise in M",
                                  "Grey Box","Grey Box Noise in M","Grey Box Red Noise in M",
+                                 "Grey Box AR","Grey Box Noise in M AR","Grey Box Red Noise in M AR",
                                  "Black Box","Black Box Noise in M","Black Box Red Noise in M",
                                  "Perfect","Perfect Noise in M","Perfect Red Noise in M")))
 dat2=ddply(dat,.(year,Scenario), with, quantile(data,probs=c(0.25,0.5,0.75)))
+
 
 ggplot()+
   geom_line(aes(year,data,group=iter),alpha=.1,data=subset(dat,as.numeric(iter)<=50))+
@@ -248,16 +290,19 @@ ggplot()+
   xlab("Year")+ylab("SSB")
 ```
 
+**Figure `r iFig=iFig+1; iFig`**
 
 ```{r summary-F}
 load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
 
-dat=transform(ldply(oms[1:12],function(x) as.data.frame(window(fbar(x),start=75,end=100),drop=TRUE)),
+dat=transform(ldply(oms[-c(13:15)],function(x) as.data.frame(window(fbar(x),start=75,end=100),drop=TRUE)),
     Scenario=factor(.id,levels=c("White Box","White Box Noise in M","White Box Red Noise in M",
                                  "Grey Box","Grey Box Noise in M","Grey Box Red Noise in M",
+                                 "Grey Box AR","Grey Box Noise in M AR","Grey Box Red Noise in M AR",
                                  "Black Box","Black Box Noise in M","Black Box Red Noise in M",
                                  "Perfect","Perfect Noise in M","Perfect Red Noise in M")))
 dat2=ddply(dat,.(year,Scenario), with, quantile(data,probs=c(0.25,0.5,0.75)))
+
 
 ggplot()+
   geom_line(aes(year,data,group=iter),alpha=.1,data=subset(dat,as.numeric(iter)<=50))+
@@ -273,17 +318,19 @@ ggplot()+
   scale_y_continuous(limits=c(0,0.5))
 ```
 
+**Figure `r iFig=iFig+1; iFig`**
 
 ```{r summary-yield}
 load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
 
-
-dat=transform(ldply(oms[1:12],function(x) as.data.frame(window(catch(x),start=75,end=100),drop=TRUE)),
+dat=transform(ldply(oms[-c(13:15)],function(x) as.data.frame(window(catch(x),start=75,end=100),drop=TRUE)),
     Scenario=factor(.id,levels=c("White Box","White Box Noise in M","White Box Red Noise in M",
                                  "Grey Box","Grey Box Noise in M","Grey Box Red Noise in M",
+                                 "Grey Box AR","Grey Box Noise in M AR","Grey Box Red Noise in M AR",
                                  "Black Box","Black Box Noise in M","Black Box Red Noise in M",
                                  "Perfect","Perfect Noise in M","Perfect Red Noise in M")))
 dat2=ddply(dat,.(year,Scenario), with, quantile(data,probs=c(0.25,0.5,0.75)))
+
 
 ggplot()+
   geom_line(aes(year,data,group=iter),alpha=.1,data=subset(dat,as.numeric(iter)<=50))+
@@ -299,19 +346,27 @@ ggplot()+
   scale_y_continuous(limits=c(0,200))
 ```
 
+**Figure `r iFig=iFig+1; iFig`**
+
 ```{r spectra}
-dat=transform(ldply(oms[1:12],function(x) as.data.frame(window(catch(x),start=75,end=100),drop=TRUE)),
+load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+
+dat=transform(ldply(oms[-c(13-15)],function(x) as.data.frame(window(catch(x),start=75,end=100),drop=TRUE)),
     Scenario=factor(.id,levels=c("White Box","White Box Noise in M","White Box Red Noise in M",
                                  "Grey Box","Grey Box Noise in M","Grey Box Red Noise in M",
+                                 "Grey Box AR","Grey Box Noise in M AR","Grey Box Red Noise in M AR",
                                  "Black Box","Black Box Noise in M","Black Box Red Noise in M",
                                  "Perfect","Perfect Noise in M","Perfect Red Noise in M")))
 spc=ddply(dat,.(Scenario,.id,iter), with, 
           FLife:::spectra(as.FLQuant(data.frame(data=data,year=year))))
 
+
 ggplot(subset(spc,f<0.1))+
   geom_boxplot(aes(factor(f),mx))+
   facet_wrap(~.id,ncol=3,scale="free")
 ```
+
+**Figure `r iFig=iFig+1; iFig`**
 
 ```{r}
 f=fbar(oms[["Perfect"]])[,-1]
@@ -325,19 +380,30 @@ save(oms, file="/home/laurie/Desktop/flr/FLRP/data/oms.RData")
 ```
 
 ```{r}
-plot(FLStocks(llply(oms[sort(names(oms))[seq(1,15,3)]],function(x) x[,ac(75:100)])))
+load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+
+plot(FLStocks(llply(oms[sort(names(oms))[seq(1,18,3)]],function(x) x[,ac(75:100)])))
 ```
 
+**Figure `r iFig=iFig+1; iFig`**
+
 ```{r}
-plot(FLStocks(llply(oms[sort(names(oms))[seq(2,15,3)]],function(x) x[,ac(75:100)])))
+load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+
+plot(FLStocks(llply(oms[sort(names(oms))[seq(2,18,3)]],function(x) x[,ac(75:100)])))
 ```
 
-```{r}
+**Figure `r iFig=iFig+1; iFig`**
 
-plot(FLStocks(llply(oms[sort(names(oms))[seq(3,15,3)]],function(x) x[,ac(75:100)])))
+```{r}
+load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
+
+plot(FLStocks(llply(oms[sort(names(oms))[seq(3,18,3)]],function(x) x[,ac(75:100)])))
 ```
 
-```{r}
+**Figure `r iFig=iFig+1; iFig`**
+
+```{r,eval=FALSE}
 load("/home/laurie/Desktop/flr/FLRP/data/oms.RData")
 load("/home/laurie/Desktop/flr/FLRP/data/eql.RData")
 
@@ -349,38 +415,57 @@ recFn<-function(x,rfs=eql@refpts["msy"]) catch(x)%/%rfs[,"recruits"]
 ss=ldply(oms,function(x) as.data.frame(FLQuants(x[,ac(76:100)],
                                                 "ssb"=ssbFn,
                                                 "fbr"=fbrFn,
-                                                "yld"=yldFn)),drop=TRUE)
-
+                                                "yld"=yldFn),drop=TRUE))
 save("ss",file="/home/laurie/Desktop/flr/FLRP/data/ss.RData", compress="xz")
 ```
 
-```{r, eval=FALSE}
+```{r}
 load("/home/laurie/Desktop/flr/FLRP/data/ss.RData")
 
 key=data.frame(
   .id=c("Perfect",    "Perfect Noise in M",       "Perfect Red Noise in M",  
         "White Box",  "White Box Noise in M",     "White Box Red Noise in M",
         "Grey Box",   "Grey Box Noise in M",      "Grey Box Red Noise in M",  
+        "Grey Box AR", "Grey Box Noise in M AR",  "Grey Box Red Noise in M AR",  
         "Black Box",  "Black Box Noise in M",     "Black Box Red Noise in M",
         "Ref",        "Ref Noise in M",           "Ref Red Noise in M"),
-  mp=rep(c("Perfect","White Box","Grey Box","Black Box","Ref"),each=3),
-  om=rep(c("None","Noise","Red Noise"),5),stringsAsFactors=FALSE)
+  mp=rep(c("Perfect","White Box","Grey Box","Grey Box AR","Black Box","Ref"),each=3),
+  om=rep(c("None","Noise","Red Noise"),6),stringsAsFactors=FALSE)
 
-ss=transform(merge(ss,key,by=".id"),om=factor(om,levels=c("None","Noise","Red Noise")))
-ggplot(subset(ss,qname=="ssb"&mp%in%c("White Box","Grey Box","Black Box")))+
+ss.=transform(merge(ss,key,by=".id"),om=factor(om,levels=c("None","Noise","Red Noise")))
+
+ggplot(subset(ss.,qname=="ssb"&mp%in%c("White Box","Grey Box","Grey Box AR","Black Box")))+
   geom_boxplot(aes(factor(year),data))+
   facet_grid(mp~om)
-
-dat=ddply(subset(ss,qname=="ssb"&mp%in%c("White Box","Grey Box","Black Box")),
-          .(mp,om,year), with, data.frame(p=mean(ifelse(data>=1,1,0))))
-
-ggplot(dat)+
-  geom_line(aes(year,p))+
-  facet_grid(mp~om)
-
-dat=ddply(subset(ss,qname=="yld"&mp%in%c("White Box","Grey Box","Black Box")&year<=90),
-          .(mp,om,year), with, data.frame(p=median(data)))
-ggplot(dat)+
-  geom_line(aes(year,p))+
-  facet_grid(mp~om)
 ```
+
+**Figure `r iFig=iFig+1; iFig`**
+
+```{r}
+ggplot(ddply(subset(ss.,qname=="ssb"&mp%in%c("White Box","Grey Box","Grey Box AR","Black Box")),
+          .(mp,om,year), with, data.frame(p=mean(ifelse(data>=1,1,0)))))+
+  geom_line(aes(year,p,col=mp))+
+  facet_grid(om~.)
+```
+
+**Figure `r iFig=iFig+1; iFig`**
+
+```{r}
+ggplot(ddply(subset(ss.,qname=="fbr"&mp%in%c("White Box","Grey Box","Grey Box AR","Black Box")&year<=90),
+          .(mp,om,year), with, data.frame(p=median(data))))+
+ geom_line(aes(year,p,col=mp))+
+  facet_grid(om~.)
+
+```
+
+**Figure `r iFig=iFig+1; iFig`** Median SSB
+
+```{r}
+ggplot(ddply(subset(ss.,qname=="yld"&mp%in%c("White Box","Grey Box","Grey Box AR","Black Box")&year<=90),
+          .(mp,om,year), with, data.frame(p=median(data))))+
+ geom_line(aes(year,p,col=mp))+
+  facet_grid(om~.)
+
+```
+
+**Figure `r iFig=iFig+1; iFig`** Median Yield.
