@@ -1,0 +1,248 @@
+---
+title: "Observation Error Model"
+subtitle: "To simulate indices of relative abundance"
+author: "Laurence Kell"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: rmarkdown:::html_document
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+bibliography: refs.bib
+tags: FLPKG FLR
+license: Creative Commons Attribution-ShareAlike 4.0 International
+---
+
+```{r knitr_init, echo=FALSE, results="hide"}
+library(knitr)
+## Global options
+opts_chunk$set(echo    =!TRUE,
+               eval    =TRUE,
+               cache   =FALSE,
+               cache.path="cache/",
+               prompt  =FALSE,
+               comment =NA,
+               message =FALSE,
+               tidy    =FALSE,
+               warnings=FALSE,
+               fig.height=4.5,
+               fig.width =4.5,
+               fig.path  ="tex/")
+```
+
+
+```{r, pkgs, echo=FALSE, message=FALSE}
+library(ggplot2)
+
+theme_set(theme_bw())
+options(digits=3)
+```
+
+[](#top)
+
+[Introduction](#Introduction)
+
+[Installation](#Installation)
+
+[Quick Start](#QuickStart)
+
+[Examples](#Examples)
+
+[More information](#More information)
+
+[References](#References)
+
+# Introduction {#Introduction}
+
+In Management Strategy Evaluation (MSE) an Operating Model (OM) is used to simulate resource dynamics in trials in order to evaluate the performance of a Management Procedure (MP). Where the MP is the combination of pre-defined data, together with an algorithm to which such data are input to provide a value for a management control measure. 
+
+The link between the OM and the MP is the Observation Error Model (OEM), which generates fishery-dependent or independent resource monitoring data. The OEM reflects the uncertainties, between the actual dynamics of the resource and perceptions arising from observations and assumptions by modelling the differences between the measured value of a resource index and the actual value in the OM. 
+
+[Back to Top](#top)
+
+# Installation {#Installation}
+
+The simplest way to obtain mpb is to install it from CRAN by using the following command in the R console:
+
+```{r install,eval=FALSE}
+install.packages("mpb", repos = "http://flr-project.org/R")
+```
+
+The repos options can be changed depending on personal preferences and includes options such as choosing the directories in which to install the packages see help(install.packages) for more details.
+
+[Back to Top](#top)
+
+# Quick Start {#QuickStart}
+
+So that users may have a better idea of what functions are available, which one to choose, or where to seek help, this section provides a general overview of the package. In particular it highlights the various elements, what they do, and provides some examples of usage. More details are given in later sections.
+
+First, load the `kobe` package:
+
+```{r lib,echo=TRUE}
+library(ggplot2)
+library(FLCore)
+library(ggplotFL)
+library(mpb)
+library(FLife)
+library(plyr)
+```
+
+Example dataset for North Sea plaice.
+
+```{r data,echo=TRUE}
+data(ple4)
+```
+
+### Plotting
+
+Plotting is done using `ggplot2` which provides a powerful alternative paradigm for creating both simple and complex plots in R using the ideas the *Grammar of Graphics* ^[Wilkinson, L. 1999. *The Grammar of Graphics*, Springer. [doi 10.1007/978-3-642-21551-3_13](http://dx.doi.org/10.1007/978-3-642-21551-3_13).] The idea of the grammar is to specify the individual building blocks of a plot and then to combine them to create the graphic desired^[<http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html>].
+
+The `ggplot` functions expects a `data.frame` for its first argument, `data`; then a geometric object `geom` that specifies the actual marks put on to a plot and an aesthetic that is "something you can see" have to be provided. Examples of geometic Objects (geom) include points (geom_point, for scatter plots, dot plots, etc), lines (geom_line, for time series, trend lines, etc) and boxplot (geom_boxplot, for, well, boxplots!). Aesthetic mappings are set with the aes() function and, examples include, position (i.e., on the x and y axes), color ("outside" color), fill ("inside" color), shape (of points), linetype and size. 
+
+The phase plot plots stock status against fishing mortality relative to target reference points as a two-dimensional phase plot. 
+
+```{r plot,echo=TRUE}
+plot(FLQuants(ple4,"Stock"=stock,"Index"=function(x) apply(oem(x),2,sum)))
+```
+
+[Back to Top](#top)
+
+# Examples {#Examples}
+
+
+Create an index aggregated over ages
+```{r example1,echo=TRUE,eval=TRUE}
+#source('~/Desktop/flr/mpb/R/generics.R')
+
+source('~/Desktop/flr/mse/R/generics.R')
+source('~/Desktop/flr/mse/R/oem.R')
+source('~/Desktop/flr/mse/R/noise.R')
+
+apply(oem(ple4),2,sum)
+```
+
+The age structure can be shaped by `sel`, and trends in q and hyperstability can be specified.`
+The type of the index e.g. the form of the index (`mass`), whether it is fishery dependent (`fish.dependendent`) and how the effort is derived in which case how the effort is derived (`effort`)
+
+```{r plot-2,echo=TRUE}
+ggplot(model.frame(mcf(FLQuants(ple4,"Stock"=stock,"Index"=function(x) apply(oem(x),2,sum)))))+
+  geom_point( aes(Stock,Index))+
+  geom_smooth(aes(Stock,Index),method="lm")+
+  facet_null()
+```
+
+```{r example6,echo=TRUE}
+timing=0.5
+fish.dependent=FALSE
+effort    =c("f","h")
+mass      =TRUE
+```
+
+## Uncertainty
+```{r example2,echo=TRUE}
+cv=rlnorm(100,log(stock(ple4)),0.3)
+ggplot(cv)+
+  geom_boxplot(aes(factor(year),data))
+```
+
+## Age structure
+```{r example4,echo=TRUE}
+sel  =apply(harvest(ple4),1,mean)
+ggplot(sel)+
+  geom_line(aes(age,data))
+```
+
+## Trends
+```{r example3,echo=TRUE}
+q    =FLQuant(cumprod(1+rep(.02,dim(fbar(ple4))[2])),dimnames=dimnames(fbar(ple4)))
+plot(q)
+```
+
+## Hyperstability
+```{r example5,echo=TRUE}
+cpue   =stock(ple4)/mean(stock(ple4))
+stable =cpue^0.1
+deplete=cpue^2
+
+plot(FLQuants("CPUE"          =cpue,
+              `Hyper_Stable`  =stable,
+              `Hyper_Depleted`=deplete))
+```
+
+
+```{r example7,echo=TRUE}
+trend=FLQuant(seq(1,2,length.out=dim(stock(ple4))[2]),dimnames=dimnames(stock(ple4)))
+var  =trend*abs(cv)*sign(cv)
+
+ggplot(FLQuants("Log Normal" =cv,
+                "Trend in CV"=var))+
+  geom_boxplot(aes(factor(year),data))+
+  facet_grid(qname~.)
+```
+
+```{r example8,echo=TRUE}
+bias=FLPar(omega=1,ref=mean(stock(ple4)),q=0)
+
+hyperstability<-function(object,omega=1,ref=apply(object,c(1,3:6),mean)) 
+  ref%*%((object%/%ref)^omega)
+
+bias<-function(object,bias=0.02) 
+     FLQuant(cumprod(1+rep(bias,dim(object)[2])),dimnames=dimnames(object))
+
+```
+
+```{r example9,echo=TRUE}
+set.seed(1234)
+u     =FLQuants("Unbiased"      =rlnorm(100,log(apply(oem(ple4),2:6,sum)),.3),
+                "Hyperstability"=rlnorm(100,log(apply(oem(ple4),2:6,sum)%*%
+                                                  hyperstability(stock(ple4),0.52)),.3),
+                "Trend"         =rlnorm(100,log(apply(oem(ple4),2:6,sum)%*%bias(stock(ple4),0.02)),.3),
+                "AR"            =apply(oem(ple4),2:6,sum)%*%
+                                   exp(rnoise(100,apply(oem(ple4),2:6,sum)*0,.3,b=.7)),
+                "Variable"      =var,
+                "Juvenile"      =rlnorm(100,log(apply(oem(ple4,sel=mat(ple4)),2:6,sum)),.3),
+                "Mature"        =rlnorm(100,log(apply(oem(ple4,sel=1-mat(ple4)),2:6,sum)),.3),
+                "Numbers"       =rlnorm(100,log(apply(oem(ple4,mass=FALSE),2:6,sum)),.3))
+
+u=FLQuants(llply(u,function(x) x/mean(x)))
+u=ldply(u,as.data.frame)
+
+u.=ddply(u,.(year,.id), with, quantile(data))
+ggplot()+
+  geom_line(aes(year,data,col=factor(iter)),
+            data=subset(u,iter%in%c(2,11)))+
+  geom_ribbon(aes(year,ymin=`25%`,ymax=`75%`),data=u.,col="grey",alpha=.5)+
+  facet_wrap(~.id,ncol=2)+
+  theme_bw()+theme(legend.position="none")
+```
+
+[Back to Top](#top)
+
+[More information](#More information)
+
+* You can submit bug reports, questions or suggestions on `FLPKG` at the `FLPKG` issue page ^[<https://github.com/flr/FLPKG/issues>], or on the *FLR* mailing list.
+* Or send a pull request to <https://github.com/flr/FLPKG/>
+* For more information on the FLR Project for Quantitative Fisheries Science in R, visit the FLR webpage ^[<http://flr-project.org>].
+* The latest version of `FLPKG` can always be installed using the `devtools` package, by calling
+```{r, devtools, echo=TRUE, eval=FALSE}
+	library(devtools)
+	install_github('flr/FLPKG')
+```
+
+
+## Software Versions
+
+* `r version$version.string`
+* FLCore: `r packageVersion('FLCore')`
+* FLPKG: `r # packageVersion('FLPKG')`
+* **Compiled**: `r date()`
+* **Git Hash**: `r system("git log --pretty=format:'%h' -n 1", intern=TRUE)`
+
+## Author information
+
+**Laurence KELL**. laurie@kell.es
+
+# References {#References}
+
+
+[Back to Top](#top)
