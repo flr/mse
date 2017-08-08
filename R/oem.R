@@ -62,3 +62,11 @@ setMethod('oem',   signature(object='FLStock'),
   }
 )
 
+hyperstability<-function(object,omega=1,ref=apply(object,c(1,3:6),mean)) 
+  ref%*%((object%/%ref)^omega)
+
+bias<-function(object,bias=0.02) 
+  FLQuant(cumprod(1+rep(bias,dim(object)[2])),dimnames=dimnames(object))
+
+
+
