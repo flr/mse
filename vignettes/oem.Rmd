@@ -8,7 +8,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEncoding{UTF-8}
-bibliography: refs.bib
+bibliography: bibliography.bib
 tags: FLPKG FLR
 license: Creative Commons Attribution-ShareAlike 4.0 International
 ---
@@ -114,9 +114,9 @@ Create an index aggregated over ages
 ```{r example1,echo=TRUE,eval=TRUE}
 #source('~/Desktop/flr/mpb/R/generics.R')
 
-source('~/Desktop/flr/mse/R/generics.R')
-source('~/Desktop/flr/mse/R/oem.R')
-source('~/Desktop/flr/mse/R/noise.R')
+# source('~/Desktop/flr/mse/R/generics.R')
+# source('~/Desktop/flr/mse/R/oem.R')
+# source('~/Desktop/flr/mse/R/noise.R')
 
 apply(oem(ple4),2,sum)
 ```

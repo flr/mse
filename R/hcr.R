@@ -108,8 +108,6 @@ hcrFn=function(object,refs=NULL,
     hvt<<-hvt
     hcrYrs<<-hcrYrs
     
-    save(object, hvt,rf,hcrYrs,file="/home/laurie/Desktop/tmp/t.RData")
-    
     rtn   = catch(fwd(object, f=hvt,sr=rf))[,ac(hcrYrs)]
     
     rtn[]=rep(c(apply(rtn,c(3:6),mean)),each=dim(rtn)[2])
