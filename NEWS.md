@@ -1,9 +1,8 @@
-# CHANGES IN FLPKG VERSION 0.0.0
-
-## NEW FEATURES
-- A new feature
+# mse 0.0.4
 
 ## USER-VISIBLE CHANGES
+
+- Methods moved to FLCore: rnoise, rlnoise
 
 ## BUG FIXES
 
