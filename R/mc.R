@@ -11,7 +11,8 @@
 #'
 #' @param z \code{numeric}  Value of Z for a given confidence level for a normally distributed random variable, default is 1.96 for a 95% CI
 #' @param E \code{numeric}  The required percentage error of the mean
-#' E. Bukaçi et al.Int. Journal of Engineering Research and Applications www.ijera.com ISSN: 2248-9622, Vol. 6, Issue 6, (Part - 3) June 2016, pp.60-64
+#'
+#' E. Bukaci et al.Int. Journal of Engineering Research and Applications www.ijera.com ISSN: 2248-9622, Vol. 6, Issue 6, (Part - 3) June 2016, pp.60-64
 #'
 #' @examples
 #' \dontrun{
