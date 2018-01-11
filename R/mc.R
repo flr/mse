@@ -6,14 +6,19 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-
-#' mcN
-#'
-#' @param z \code{numeric}  Value of Z for a given confidence level for a normally distributed random variable, default is 1.96 for a 95% CI
-#' @param E \code{numeric}  The required percentage error of the mean
+#' Compute number of necessary Monte Carlo runs
 #'
 #' E. Bukaci et al.Int. Journal of Engineering Research and Applications www.ijera.com ISSN: 2248-9622, Vol. 6, Issue 6, (Part - 3) June 2016, pp.60-64
 #'
+#' @name mcN
+#' @rdname mcN
+#'
+#' @param z Value of Z for a given confidence level for a normally distributed random variable, default is 1.96 for a 95% CI, *numeric*.
+#' @param E The required percentage error of the mean, *numeric*.
+#' @param s
+#' @param z
+#' @param start
+#' @param by
 #' @examples
 #' \dontrun{
 #'  data(ple4) 
@@ -26,7 +31,6 @@ setMethod("mcN", signature(x="FLQuant"),
   function(x, s, E=5, z=1.96, start=100, by=1) {
 
     i <- dim(x)[6]
-
     if(i < start)
       stop(paste0("Object does not have enough 'iter', dim(x)[6] = ", i))
     

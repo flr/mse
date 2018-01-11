@@ -8,17 +8,17 @@
 
 #' Functions to create grids and list for model runs
 #'
-#' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
-#' odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
-#' libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
-#' Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id 
-#' nunc euismod ante fringilla lobortis. Aliquam ullamcorper in diam non placerat. 
+#' Grids of combinations of variables (or parameters) can be created from a list
+#' of scenarios contaning all possible values for each variables. Such a grid can
+#' be used when conditioning an operating model around the structural uncertainty
+#' of fixed parameters and submodel choices. And it can also be used to create
+#' a range of combinations of management procedure parameters for *tuning* and
+#' selection of MPs.
 #'
-#' Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa, 
-#' vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in 
-#' mi. Sed sodales mollis arcu, sit amet venenatis lorem fringilla vel. Vivamus vitae 
-#' ipsum sem. Donec malesuada purus at libero bibendum accumsan. Donec ipsum sapien, 
-#' feugiat blandit arcu in, dapibus dictum felis. 
+#' The list of *scenarios* used as input should contain one element per variable,
+#' be it either a vector or a list of alternative values. The list must be named,
+#' and elements of class *list* should themselves be named. Names are added to
+#' vector elements by calling *as.character()* on their content.
 #'
 #' @param scenarios Values and levels for each run variable, *list*.
 #' @param names Should the table output contain names (`FALSE`) or indices (`TRUE`, default).
@@ -29,14 +29,23 @@
 #'
 #' @name grid
 #' @rdname grid
-#' @aliases expandGrid
 #'
 #' @author The FLR Team
 #' @seealso \link{FLComp}
 #' @keywords classes
 #' @examples
-#'
+#' # Lists of scenarios can contains vectors ...
+#' list(steepness=c(0.6, 0.7, 0.8), M=c(0.2, 0.3, 0.4))
+#' # lists ...
+#' list(M=list(0.2, 0.4, lo=seq(0.2, 0.4, length=10)))
+#' # or both
 #' scenarios  <- list(steepness=c(0.7, 0.8), M=list(0.2, 0.4, lo=seq(0.2, 0.4, length=10)))
+
+# expandGrid {{{
+
+#' @rdname grid
+#' @aliases expandGrid
+#' @examples
 #' # Create full grid as index table
 #' expandGrid(scenarios)
 #' # Drop certain combinations
@@ -44,7 +53,6 @@
 #' # Output as names
 #' expandGrid(scenarios, M == 0.2 & steepness == 0.7, names=TRUE)
 
-# expandGrid {{{
 expandGrid <- function(scenarios, ..., names=FALSE) {
 
   # CREATE index
@@ -79,7 +87,7 @@ expandGrid <- function(scenarios, ..., names=FALSE) {
   return(res)
 } # }}}
 
-# gridList {{{
+# gridList {{
 
 #' @rdname grid
 #' @aliases gridList

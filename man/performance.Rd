@@ -6,7 +6,7 @@
 \title{Compute performance indicators}
 \usage{
 \S4method{performance}{FLStock}(x, indicators, refpts,
-  years = dims(x[[1]])$maxyear, probs = NULL)
+  years = dims(x[[1]])$maxyear, probs = NULL, mp = NULL)
 }
 \arguments{
 \item{indicators}{Indicators to be computed, as formula, name and description, \code{list}}
@@ -23,15 +23,15 @@ data.frame Results of computing performance indicators
 \description{
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
 odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
-libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
-Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id 
+libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
+Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id
 nunc euismod ante fringilla lobortis. Aliquam ullamcorper in diam non placerat.
 }
 \details{
-Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa, 
-vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in 
-mi. Sed sodales mollis arcu, sit amet venenatis lorem fringilla vel. Vivamus vitae 
-ipsum sem. Donec malesuada purus at libero bibendum accumsan. Donec ipsum sapien, 
+Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa,
+vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in
+mi. Sed sodales mollis arcu, sit amet venenatis lorem fringilla vel. Vivamus vitae
+ipsum sem. Donec malesuada purus at libero bibendum accumsan. Donec ipsum sapien,
 feugiat blandit arcu in, dapibus dictum felis.
 }
 \examples{
