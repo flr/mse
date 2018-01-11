@@ -67,7 +67,7 @@ tune <- function(mp, grid, indicators, refpts, ...) {
 
   # ADD tolower(mp) name
   nmp <- tolower(deparse(substitute(mp)))
-  out[,mp:=nmp]
+  out[, mp:=nmp]
   setcolorder(out, c(length(out), 1:(length(out)-1)))
 
   setkey(out, mp, run, indicator, name, iter)
