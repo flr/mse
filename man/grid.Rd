@@ -4,7 +4,7 @@
 \alias{grid}
 \alias{expandGrid}
 \alias{gridList}
-\title{Functions to create grids and list for model runs}
+\title{Functions to create grids and lists of model and simulation runs}
 \usage{
 expandGrid(scenarios, ..., names = FALSE)
 
@@ -34,7 +34,8 @@ selection of MPs.
 The list of \emph{scenarios} used as input should contain one element per variable,
 be it either a vector or a list of alternative values. The list must be named,
 and elements of class \emph{list} should themselves be named. Names are added to
-vector elements by calling \emph{as.character()} on their content.
+vector elements by calling \emph{as.character()} on their content. See examples
+below for guidance.
 }
 \examples{
 # Lists of scenarios can contains vectors ...
@@ -62,6 +63,6 @@ length(runs)
 \link{FLComp}
 }
 \author{
-The FLR Team
+Iago Mosqueira, EC JRC
 }
 \keyword{classes}

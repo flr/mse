@@ -1,12 +1,12 @@
-# grid.R - DESC
-# /grid.R
+# grid.R - Functions to create grid of model and simulation runs
+# mse/R/grid.R
 
 # Copyright European Union, 2018
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-#' Functions to create grids and list for model runs
+#' Functions to create grids and lists of model and simulation runs
 #'
 #' Grids of combinations of variables (or parameters) can be created from a list
 #' of scenarios contaning all possible values for each variables. Such a grid can
@@ -18,7 +18,8 @@
 #' The list of *scenarios* used as input should contain one element per variable,
 #' be it either a vector or a list of alternative values. The list must be named,
 #' and elements of class *list* should themselves be named. Names are added to
-#' vector elements by calling *as.character()* on their content.
+#' vector elements by calling *as.character()* on their content. See examples
+#' below for guidance.
 #'
 #' @param scenarios Values and levels for each run variable, *list*.
 #' @param names Should the table output contain names (`FALSE`) or indices (`TRUE`, default).
@@ -30,7 +31,7 @@
 #' @name grid
 #' @rdname grid
 #'
-#' @author The FLR Team
+#' @author Iago Mosqueira, EC JRC
 #' @seealso \link{FLComp}
 #' @keywords classes
 #' @examples
@@ -87,7 +88,7 @@ expandGrid <- function(scenarios, ..., names=FALSE) {
   return(res)
 } # }}}
 
-# gridList {{
+# gridList {{{
 
 #' @rdname grid
 #' @aliases gridList

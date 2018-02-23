@@ -49,12 +49,12 @@ globalVariables("indicator")
 #' performance(run, indicators, refpts=FLPar(MSY=0))
 
 setMethod("performance", signature(x="FLStock"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear, probs=NULL, mp=NULL) {
+  function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
+    metrics=metrics, probs=NULL, mp=NULL) {
   
     # TODO Generalize as argument: metrics= ...
-    x <- metrics(x, list(SB=ssb, B=stock, C=catch, F=fbar))
-
-    return(performance(x, refpts=refpts, indicators=indicators,
+    # x <- metrics(x, list(SB=ssb, B=stock, C=catch, F=fbar))
+    return(performance(metrics(x), refpts=refpts, indicators=indicators,
       years=years, probs=probs, mp=mp))
   }
 )
@@ -73,7 +73,7 @@ setMethod("performance", signature(x="FLQuants"),
       data.table::rbindlist(lapply(indicators, function(j) {
         # EVAL indicator
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
-          c(window(x, end=i), as(refpts, 'list'))))
+          c(window(x, start=i, end=i), as(refpts, 'list'))))
       }), idcol="indicator")[,c("indicator", "data", "iter")]
     }), idcol="year")
 
@@ -84,6 +84,10 @@ setMethod("performance", signature(x="FLQuants"),
     inds <- lapply(indicators, '[[', 'name')
     inds <- data.table(indicator=names(inds), name=unlist(inds))
     setkey(inds, indicator)
+
+    # DROP iter if only one
+    if(length(unique(res$iter)) == 1)
+      res[, iter:=NULL]
 
     # MERGE
     res <- merge(res, inds, by='indicator')
@@ -104,12 +108,12 @@ setMethod("performance", signature(x="FLQuants"),
 
 setMethod("performance", signature(x="FLStocks"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
-    probs=NULL, grid=missing, mp=NULL) {
+    metrics=missing, probs=NULL, grid=missing, mp=NULL) {
 
     res <- data.table::rbindlist(lapply(x, performance,
-      indicators, refpts, years, probs=probs, mp=mp), idcol='run')
+      indicators, refpts, years, metrics=metrics, probs=probs, mp=mp), idcol='run')
     
-    # mp=run if not NULL
+    # mp=run if NULL
     if(is.null(mp))
       res[, mp:=run]
     

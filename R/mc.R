@@ -8,7 +8,11 @@
 
 #' Compute number of necessary Monte Carlo runs
 #'
-#' E. Bukaci et al.Int. Journal of Engineering Research and Applications www.ijera.com ISSN: 2248-9622, Vol. 6, Issue 6, (Part - 3) June 2016, pp.60-64
+#' The `mcN` function implements the simple method of Bukaci et al. (2016) to
+#' calculate the number of Monte Carlo (MC) simulations required to obtain
+#' results with a given precision level.
+#'
+#' Bukaci, E. Korini, Th., Periku, E., Allkja, S., Sheperi, P. 2016. Number of iterations needed in Monte Carlo Simulation using reliability analysis for tunnel supports.  Int. J. of Eng. Res. and Apps., 6 (6-3): 60-64. <www.ijera.com/papers/Vol6_issue6/Part%20-%203/J0606036064.pdf>
 #'
 #' @name mcN
 #' @rdname mcN
