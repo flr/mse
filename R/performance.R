@@ -41,21 +41,28 @@ globalVariables("indicator")
 #' @examples
 #'
 #' data(cod)
-#' indicators <- list(T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
-#'   name="mean(C_t / C_t-1)", desc="Mean absolute proportional change in catch"),
+#' indicators <- list(
+#'   T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]), name="mean(C[t] / C[t-1])",
+#'     desc="Mean absolute proportional change in catch"),
 #'   T2=list(~yearVars(C), name="var(C)", desc="Variance in catch"),
 #'   T3=list(~yearVars(F), name="var(F)", desc="Variance in fishing mortality"))
 #' run <- window(cod, start=20)
-#' performance(run, indicators, refpts=FLPar(MSY=0))
+#' performance(run, indicators, refpts=FLPar(MSY=0),
+#'   metrics=list(C=catch, F=fbar), years=list(20:25, 20:30))
 
 setMethod("performance", signature(x="FLStock"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
-    metrics=metrics, probs=NULL, mp=NULL) {
-  
-    # TODO Generalize as argument: metrics= ...
-    # x <- metrics(x, list(SB=ssb, B=stock, C=catch, F=fbar))
-    return(performance(metrics(x), refpts=refpts, indicators=indicators,
-      years=years, probs=probs, mp=mp))
+  function(x, indicators, refpts,
+    years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
+    metrics=FLCore::metrics(x), probs=NULL, mp=NULL) {
+      
+      if(is.list(metrics))
+        flqs <- do.call(FLCore::metrics, list(object=x, metrics))
+
+      if(is.function(metrics))
+        flqs <- do.call(metrics, list(x))
+
+      return(performance(flqs, refpts=refpts,
+      indicators=indicators, years=years, probs=probs, mp=mp))
   }
 )
 
@@ -63,9 +70,14 @@ setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
     
-    # CREATE years list, numeric names
-    years <- as.list(years)
-    names(years) <- unlist(years)
+    # CREATE years list
+    if(!is.list(years))
+      years <- setNames(as.list(years), as.character(years))
+
+    # SET names if not present
+    if(is.null(names(years)))
+      names(years) <- as.character(unlist(lapply(years,
+        function(x) x[length(x)])))
     
     # LOOP over years
     res <- data.table::rbindlist(lapply(years, function(i) {
@@ -73,7 +85,7 @@ setMethod("performance", signature(x="FLQuants"),
       data.table::rbindlist(lapply(indicators, function(j) {
         # EVAL indicator
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
-          c(window(x, start=i, end=i), as(refpts, 'list'))))
+          c(window(x, start=i[1], end=i[length(i)]), as(refpts, 'list'))))
       }), idcol="indicator")[,c("indicator", "data", "iter")]
     }), idcol="year")
 

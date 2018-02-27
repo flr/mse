@@ -6,7 +6,8 @@
 \title{Compute performance indicators}
 \usage{
 \S4method{performance}{FLStock}(x, indicators, refpts,
-  years = dims(x[[1]])$maxyear, probs = NULL, mp = NULL)
+  years = as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
+  metrics = FLCore::metrics(x), probs = NULL, mp = NULL)
 }
 \arguments{
 \item{indicators}{Indicators to be computed, as formula, name and description, \code{list}}
@@ -37,12 +38,14 @@ feugiat blandit arcu in, dapibus dictum felis.
 \examples{
 
 data(cod)
-indicators <- list(T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
-  name="mean(C_t / C_t-1)", desc="Mean absolute proportional change in catch"),
+indicators <- list(
+  T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]), name="mean(C[t] / C[t-1])",
+    desc="Mean absolute proportional change in catch"),
   T2=list(~yearVars(C), name="var(C)", desc="Variance in catch"),
   T3=list(~yearVars(F), name="var(F)", desc="Variance in fishing mortality"))
 run <- window(cod, start=20)
-performance(run, indicators, refpts=FLPar(MSY=0))
+performance(run, indicators, refpts=FLPar(MSY=0),
+  metrics=list(C=catch, F=fbar), years=list(20:25, 20:30))
 }
 \seealso{
 \code{\link{FLQuants}}

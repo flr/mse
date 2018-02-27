@@ -12,12 +12,12 @@
 #' calculate the number of Monte Carlo (MC) simulations required to obtain
 #' results with a given precision level.
 #'
-#' Bukaci, E. Korini, Th., Periku, E., Allkja, S., Sheperi, P. 2016. Number of iterations needed in Monte Carlo Simulation using reliability analysis for tunnel supports.  Int. J. of Eng. Res. and Apps., 6 (6-3): 60-64. <www.ijera.com/papers/Vol6_issue6/Part%20-%203/J0606036064.pdf>
+#' @references Bukaci, E. Korini, Th., Periku, E., Allkja, S., Sheperi, P. 2016. Number of iterations needed in Monte Carlo Simulation using reliability analysis for tunnel supports.  Int. J. of Eng. Res. and Apps., 6 (6-3): 60-64. <www.ijera.com/papers/Vol6_issue6/Part%20-%203/J0606036064.pdf>
 #'
 #' @name mcN
 #' @rdname mcN
 #'
-#' @param z Value of Z for a given confidence level for a normally distributed random variable, default is 1.96 for a 95% CI, *numeric*.
+#' @param z Value of Z for a given confidence level for a normally distributed random variable, default is 1.96 for a 95\% CI, *numeric*.
 #' @param E The required percentage error of the mean, *numeric*.
 #' @param s
 #' @param z
