@@ -58,7 +58,7 @@ setMethod("performance", signature(x="FLStock"),
       if(is.list(metrics))
         flqs <- do.call(FLCore::metrics, list(object=x, metrics))
 
-      if(is.function(metrics))
+      else if(is.function(metrics))
         flqs <- do.call(metrics, list(x))
 
       return(performance(flqs, refpts=refpts,
@@ -69,6 +69,7 @@ setMethod("performance", signature(x="FLStock"),
 setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
+    # TODO: MOVE mp=NULL to ...
     
     # CREATE years list
     if(!is.list(years))
@@ -84,11 +85,13 @@ setMethod("performance", signature(x="FLQuants"),
       # LOOP over indicators
       data.table::rbindlist(lapply(indicators, function(j) {
         # EVAL indicator
+        # TODO: CHECK colnames, sort or add if necessary [data, iter]
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
-          c(window(x, start=i[1], end=i[length(i)]), as(refpts, 'list'))))
-      }), idcol="indicator")[,c("indicator", "data", "iter")]
+          c(window(x, start=i[1], end=i[length(i)]), as(refpts, 'list'))),
+          drop=TRUE)
+      }), idcol="indicator", fill=TRUE)[,c("indicator", "data", "iter")]
     }), idcol="year")
-
+    
     # Set DT keys
     setkey(res, indicator, year)
     
@@ -98,8 +101,8 @@ setMethod("performance", signature(x="FLQuants"),
     setkey(inds, indicator)
 
     # DROP iter if only one
-    if(length(unique(res$iter)) == 1)
-      res[, iter:=NULL]
+    # if(length(unique(res$iter)) == 1)
+    #  res[, iter:=NULL]
 
     # MERGE
     res <- merge(res, inds, by='indicator')
@@ -120,7 +123,7 @@ setMethod("performance", signature(x="FLQuants"),
 
 setMethod("performance", signature(x="FLStocks"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
-    metrics=missing, probs=NULL, grid=missing, mp=NULL) {
+    metrics=FLCore::metrics, probs=NULL, grid=missing, mp=NULL) {
 
     res <- data.table::rbindlist(lapply(x, performance,
       indicators, refpts, years, metrics=metrics, probs=probs, mp=mp), idcol='run')
