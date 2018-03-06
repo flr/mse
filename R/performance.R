@@ -88,7 +88,7 @@ setMethod("performance", signature(x="FLQuants"),
         # TODO: CHECK colnames, sort or add if necessary [data, iter]
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(window(x, start=i[1], end=i[length(i)]), as(refpts, 'list'))),
-          drop=TRUE)
+          drop=FALSE)
       }), idcol="indicator", fill=TRUE)[,c("indicator", "data", "iter")]
     }), idcol="year")
     
