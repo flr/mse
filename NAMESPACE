@@ -6,6 +6,6 @@ import("FLasher")
 import("foreach")
 importFrom("ggstance",
   "geom_linerangeh")
-importFrom("utils", "data", "setTxtProgressBar")
+importFrom("utils", "setTxtProgressBar")
 importFrom("stats", "coef", "coefficients", "lm", "na.exclude", "rf")
 exportPattern("^[^\\.]")

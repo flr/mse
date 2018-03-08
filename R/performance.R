@@ -87,7 +87,7 @@ setMethod("performance", signature(x="FLQuants"),
         # EVAL indicator
         # TODO: CHECK colnames, sort or add if necessary [data, iter]
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
-          c(window(x, start=i[1], end=i[length(i)]), as(refpts, 'list'))),
+          c(FLCore::window(x, start=i[1], end=i[length(i)]), as(refpts, 'list'))),
           drop=FALSE)
       }), idcol="indicator", fill=TRUE)[,c("indicator", "data", "iter")]
     }), idcol="year")
@@ -123,10 +123,18 @@ setMethod("performance", signature(x="FLQuants"),
 
 setMethod("performance", signature(x="FLStocks"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
-    metrics=FLCore::metrics, probs=NULL, grid=missing, mp=NULL) {
+    metrics=FLCore::metrics, probs=NULL, grid=missing, mp=NULL, mc.cores=1) {
 
-    res <- data.table::rbindlist(lapply(x, performance,
-      indicators, refpts, years, metrics=metrics, probs=probs, mp=mp), idcol='run')
+    if(mc.cores > 1) {
+      res <- data.table::rbindlist(parallel::mclapply(x, performance,
+        indicators, refpts, years, metrics=metrics, probs=probs, mp=mp,
+        mc.cores=mc.cores), idcol='run')
+    } else {
+
+      res <- data.table::rbindlist(lapply(x, performance,
+        indicators, refpts, years, metrics=metrics, probs=probs, mp=mp),
+        idcol='run')
+    }
     
     # mp=run if NULL
     if(is.null(mp))

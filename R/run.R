@@ -52,7 +52,8 @@ tune <- function(mp, grid, indicators, refpts, ...) {
   out <- foreach(i = seq(nrow(df))) %dopar% {
     
     # CALL mp
-    run <- do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE], 'FLPar'), tune=TRUE)))
+    run <- do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE],
+      'FLPar'), tune=TRUE)))
     
     # UPDATE pb
     setTxtProgressBar(pb, i)
