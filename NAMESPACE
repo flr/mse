@@ -4,6 +4,7 @@ import("FLCore")
 import("ggplotFL")
 import("FLasher")
 import("foreach")
+import("parallel")
 importFrom("ggstance",
   "geom_linerangeh")
 importFrom("utils", "setTxtProgressBar")

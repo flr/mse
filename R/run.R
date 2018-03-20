@@ -87,7 +87,7 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=re
 
   # CREATE run index
   df <- df[ , run := .GRP, by = key(df)]
-
+  
   # PRINT message
   message(paste("Running grid with", nrow(df), "combinations."))
 
@@ -95,7 +95,7 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=re
   out <- foreach(i = seq(nrow(df)), .errorhandling="remove") %dopar% {
 
     cat(paste0("[", i, "]"), "\n")
-
+    
     # CALL mp
     do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE], 'FLPar'),
       tune=TRUE)))
@@ -104,7 +104,7 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=re
   # TODO HANDLE errors
 
   # NAMES out
-  names(out) <- paste0("R", df$run)
+  # names(out) <- paste0("R", df$run)
 
   # getPlural
   if(exists(getPlural(out[[1]]), mode="function"))

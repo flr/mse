@@ -69,8 +69,9 @@ setMethod("performance", signature(x="FLStock"),
 setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
-    # TODO: MOVE mp=NULL to ...
     
+    # TODO CHECK indicators
+
     # CREATE years list
     if(!is.list(years))
       years <- setNames(as.list(years), as.character(years))
@@ -85,7 +86,7 @@ setMethod("performance", signature(x="FLQuants"),
       # LOOP over indicators
       data.table::rbindlist(lapply(indicators, function(j) {
         # EVAL indicator
-        # TODO: CHECK colnames, sort or add if necessary [data, iter]
+        # TODO CHECK colnames, sort or add if necessary [data, iter]
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(FLCore::window(x, start=i[1], end=i[length(i)]), as(refpts, 'list'))),
           drop=FALSE)
@@ -99,10 +100,6 @@ setMethod("performance", signature(x="FLQuants"),
     inds <- lapply(indicators, '[[', 'name')
     inds <- data.table(indicator=names(inds), name=unlist(inds))
     setkey(inds, indicator)
-
-    # DROP iter if only one
-    # if(length(unique(res$iter)) == 1)
-    #  res[, iter:=NULL]
 
     # MERGE
     res <- merge(res, inds, by='indicator')
@@ -155,13 +152,19 @@ setMethod("performance", signature(x="FLStocks"),
 
 setMethod("performance", signature(x="list"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
-    probs=NULL, grid=missing, mp=NULL) {
+    probs=NULL, grid=missing, mp=NULL, mc.cores=1) {
 
     if(!all(unlist(lapply(x, is, 'FLQuants'))))
       stop("input list must contain objects of class FLQuants")
 
-    res <- data.table::rbindlist(lapply(x, performance,
-      indicators, refpts, years, probs=probs, mp=mp), idcol='run')
+    if(mc.cores > 1) {
+      res <- data.table::rbindlist(parallel::mclapply(x, performance,
+        indicators, refpts, years, probs=probs, mp=mp, mc.cores=mc.cores),
+        idcol='run')
+    } else {
+      res <- data.table::rbindlist(lapply(x, performance,
+        indicators, refpts, years, probs=probs, mp=mp), idcol='run')
+    }
     
     # mp=run if not NULL
     if(is.null(mp))

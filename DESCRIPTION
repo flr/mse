@@ -15,7 +15,8 @@ Depends:
   FLasher
 Imports:
   foreach,
-  ggstance
+  ggstance,
+  parallel
 Additional_repositories: http://flr-project.org/R
 Suggests:
   testthat,
