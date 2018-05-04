@@ -11,11 +11,9 @@ Depends:
   methods,
   FLCore,
   ggplotFL,
-  data.table,
-  FLasher
+  data.table
 Imports:
   foreach,
-  ggstance,
   parallel
 Additional_repositories: http://flr-project.org/R
 Suggests:

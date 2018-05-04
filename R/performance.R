@@ -112,7 +112,7 @@ setMethod("performance", signature(x="FLQuants"),
     
     # mp if not NULL
     if(!is.null(mp))
-      res[, mp:=mp]
+      res[, mp:=paste0(mp, run)]
 	  
     return(res)
   }
