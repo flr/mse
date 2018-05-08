@@ -1,6 +1,6 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 0.3.0
+Version: 0.4.0
 Date: 2018-03-08
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut", "cre"), email = "iago.mosqueira@ec.europa.eu"), 
     person("Ernesto", "Jardim", email = "ernesto.jardim@ec.europa.eu", role = c("aut")))
@@ -20,6 +20,19 @@ Suggests:
   testthat,
   knitr,
   rmarkdown
+Collate:
+    'generics.R'
+    'mseCtrl-class.R'
+    'FLoem-class.R'
+    'FLom-class.R'
+    'FLiem-class.R'
+    'FLmp-class.R'
+    'fwdControl.R'
+    'grid.R'
+    'mc.R'
+    'performance.R'
+    'plots.R'
+    'run.R'
 VignetteBuilder: knitr
 License: EUPL
 LazyLoad: Yes
