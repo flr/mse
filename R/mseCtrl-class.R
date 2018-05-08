@@ -84,4 +84,9 @@ setMethod("show", signature(object = "mseCtrl"),
 # Other methods
 #
 
+#' @rdname mseCtrl-class
+#' @aliases exists,mseCtrl-method
+setGeneric("exists")
+#' @rdname mseCtrl-class
+setMethod("exists", "mseCtrl", function(x) !is.null(body(x@method)))
 
