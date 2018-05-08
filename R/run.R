@@ -102,9 +102,9 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=re
   }
 
   # TODO HANDLE errors
-
+  
   # NAMES out
-  # names(out) <- paste0("R", df$run)
+  names(out) <- paste0("run", df$run)
 
   # getPlural
   if(exists(getPlural(out[[1]]), mode="function"))

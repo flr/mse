@@ -11,7 +11,7 @@ Depends:
   methods,
   FLCore,
   ggplotFL,
-  data.table,
+  data.table
 Imports:
   foreach,
   parallel
