@@ -21,18 +21,17 @@ Suggests:
   knitr,
   rmarkdown
 Collate:
-    'generics.R'
-    'mseCtrl-class.R'
-    'FLoem-class.R'
-    'FLom-class.R'
-    'FLiem-class.R'
-    'FLmp-class.R'
-    'fwdControl.R'
-    'grid.R'
-    'mc.R'
-    'performance.R'
-    'plots.R'
-    'run.R'
+  'generics.R'
+  'mseCtrl-class.R'
+  'FLoem-class.R'
+  'FLom-class.R'
+  'FLiem-class.R'
+  'FLmp-class.R'
+  'grid.R'
+  'mc.R'
+  'performance.R'
+  'plots.R'
+  'run.R'
 VignetteBuilder: knitr
 License: EUPL
 LazyLoad: Yes
