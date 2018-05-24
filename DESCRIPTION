@@ -27,7 +27,6 @@ Collate:
     'FLom-class.R'
     'FLiem-class.R'
     'FLmp-class.R'
-    'fwdControl.R'
     'grid.R'
     'mc.R'
     'performance.R'
