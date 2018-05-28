@@ -1,7 +1,7 @@
 import("methods")
 import("data.table")
 import("FLCore")
-import(FLBRP)
+importFrom(FLBRP,"brp")
 import("ggplotFL")
 import("foreach")
 import("parallel")
