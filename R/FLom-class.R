@@ -91,7 +91,6 @@ setReplaceMethod("sr", signature("FLom", "FLSR"), function(object, value){
 
 #' @rdname FLom-class
 #' @aliases brp brp-methods
-setGeneric("brp", function(object, ...) standardGeneric("brp"))
 #' @rdname FLom-class
 setMethod("brp", "FLom", function(object) object@brp)
 
