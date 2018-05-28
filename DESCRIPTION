@@ -31,7 +31,6 @@ Collate:
   'grid.R'
   'mc.R'
   'performance.R'
-  'plots.R'
   'run.R'
 VignetteBuilder: knitr
 License: EUPL

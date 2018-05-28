@@ -101,7 +101,7 @@ doRuns <- function(mp, grid, metrics=missing, ...) {
       'FLPar'), tune=TRUE)))
 
     if(missing(metrics))
-      return(res)
+      return(run)
     else
       if(metrics == TRUE)
         return(metrics(run))

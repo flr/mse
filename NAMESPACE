@@ -1,32 +1,38 @@
 import("methods")
 import("data.table")
 import("FLCore")
-importFrom(FLBRP,"brp")
+importFrom(FLBRP,
+  "brp")
 import("ggplotFL")
 import("foreach")
 import("parallel")
-importFrom("utils", "setTxtProgressBar")
-importFrom("stats", "coef", "coefficients", "lm", "na.exclude", "rf")
+importFrom("utils",
+  "setTxtProgressBar")
+importFrom("stats",
+  "coef", "coefficients", "lm", "na.exclude", "rf")
+
 exportPattern("^[^\\.]")
-exportClasses("FLom")
-exportClasses("FLoem")
-exportClasses("mseCtrl")
-exportClasses("FLiem")
-exportMethods("method")
-exportMethods("method<-")
-exportMethods("args")
-exportMethods("args<-")
-exportMethods("deviances")
-exportMethods("deviances<-")
-exportMethods("observations")
-exportMethods("observations<-")
-exportMethods("stock")
-exportMethods("stock<-")
-exportMethods("sr")
-exportMethods("sr<-")
-exportMethods("brp")
-exportMethods("brp<-")
-exportMethods("fleetBehaviour")
-exportMethods("fleetBehaviour<-")
 
+exportClasses(
+  "FLom",
+  "FLoem",
+  "mseCtrl",
+"FLiem")
 
+exportMethods(
+  "method",
+  "method<-",
+  "args",
+  "args<-",
+  "deviances",
+  "deviances<-",
+  "observations",
+  "observations<-",
+  "stock",
+  "stock<-",
+  "sr",
+  "sr<-",
+  "brp",
+  "brp<-",
+  "fleetBehaviour",
+  "fleetBehaviour<-")
