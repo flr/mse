@@ -33,7 +33,7 @@ FLoem <- setClass("FLoem",
 		dataYears <- vy0
 		assessmentYear <- ac(ay)
 		stk0 <- stk[,dataYears]
-		idx0 <- FLIndices(a=FLIndex(index=stock.n(stk)[]*0.01))
+		idx0 <- FLIndices(a=FLIndex(index=stock.n(stk)[,dataYears]*0.01))
 		range(idx0[[1]])[c("startf","endf")] <- c(0,0)
 		list(stk=stk0, idx=idx0, deviances=deviances, observations=observations, tracking=tracking)
 	},
