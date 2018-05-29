@@ -106,7 +106,7 @@ setMethod("performance", signature(x="FLQuants"),
     
     # QUANTILES if probs
     if(!is.null(probs)) {
-      res <- res[, as.list(quantile(data, probs=probs, na.rm=TRUE)),
+      res <- res[, as.list(quantile(res, probs=probs, na.rm=TRUE)),
         keyby=list(indicator, name, year)]
     }
     

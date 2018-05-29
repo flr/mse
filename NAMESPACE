@@ -3,6 +3,8 @@ import("data.table")
 import("FLCore")
 importFrom(FLBRP,
   "brp")
+importFrom(stats,
+  "setNames")
 import("ggplotFL")
 import("foreach")
 import("parallel")

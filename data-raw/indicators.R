@@ -55,3 +55,5 @@ kobeindicators <- list(
   red = list(~iterSums(FLQuant((SB / SBMSY) < 1 & (F / FMSY) >= 1)) / dim(SB)[6],
     name = "P(Red)", desc = "Probability of being in Kobe red quadrant")
 )
+
+save(indicators, kobeindicators, file="../data/indicators.RData", compress="xz")
