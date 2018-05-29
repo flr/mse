@@ -77,7 +77,7 @@ tune <- function(mp, grid, indicators, refpts, ...) {
 } # }}}
 
 # doRuns {{{
-doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=rec), ...) {
+doRuns <- function(mp, grid, metrics=missing, ...) {
   
   # PARSE args
   args <- list(...)
@@ -94,14 +94,24 @@ doRuns <- function(mp, grid, metrics=list(SB=ssb, B=stock, C=catch, F=fbar, R=re
   # LOOP over grid rows
   out <- foreach(i = seq(nrow(df)), .errorhandling="remove") %dopar% {
 
-    cat(paste0("[", i, "]"), "\n")
+    message(paste0("[", i, "]"))
     
     # CALL mp
-    do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE], 'FLPar'),
-      tune=TRUE)))
+    run <- do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE],
+      'FLPar'), tune=TRUE)))
+
+    if(missing(metrics))
+      return(run)
+    else
+      if(metrics == TRUE)
+        return(metrics(run))
+      else
+        return(metrics(run, metrics))
   }
 
   # TODO HANDLE errors
+  if(length(out) != dim(df)[1])
+    warning("Some runs errored!")
   
   # NAMES out
   names(out) <- paste0("run", df$run)
