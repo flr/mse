@@ -1,21 +1,60 @@
-#' @title S4 class \code{FLom}
+# FLom-class.R - DESC
+# mse/R/FLom-class.R
+
+# Copyright European Union, 2018
+# Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
+
+#' A class for an operating model (OM)
 #'
-#' @description The \code{FLom} class stores the information relative to the operating model of the MSE.
-#'
-#' @section Slots:
-#' \describe{
-#'    \item{catch.dev}{\code{FLQuant}  with catch-at-age deviances}
-#'    \item{index.qdev}{\code{FLQuants} with catchability deviances for abundance indices}
-#'    \item{ctrl}{\code{mseCtrl} with control parameter for the oem}
-#'  }
-#' @template Accessors
-#' @template Constructors
+#' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
+#' odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
+#' libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
+#' Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id 
+#' 
+#' @name FLom
+#' @rdname FLom-class
 #' @docType class
-#' @name FLoem-class
-#' @rdname FLoem-class
-#' @aliases FLoem-class
+#' @aliases FLom-class
+#'
+#' @slot stock The population and catch history, `FLStock`.
+#' @slot sr The stock-recruitment relationship, `FLSR`.
+#' @slot brp The estimated reference points, `FLPar`.
+#' @slot fleetBehaviour Dynamics of the fishing fleet to be used in projections, `mseCtrl`.
+#'
+#' @section Validity:
+#'
+#'   \describe{
+#'     \item{stock and sr dimensions}{Dimensions 2:6 of the `stock` and `sr` slots must match.}
+#'     \item{rec age}{Stock and stock recruitment residuals must use the recruitment age.}
+#' }
+#' You can inspect the class validity function by using
+#'    \code{getValidity(getClassDef('FLom'))}
+#'
+#' @section Accessors:
+#' All slots in the class have accessor and replacement methods defined that
+#' allow retrieving and substituting individual slots.
+#'
+#' The values passed for replacement need to be of the class of that slot.
+#' A numeric vector can also be used when replacing FLQuant slots, and the
+#' vector will be used to substitute the values in the slot, but not its other
+#' attributes.
+#'
+#' @section Constructor:
+#' A construction method exists for this class that can take named arguments for
+#' any of its slots. All unspecified slots are then created to match the
+#' requirements of the class validity function.
+#'
+#' @section Methods:
+#' Methods exist for various calculations based on values stored in the class:
+#'
+#' \describe{
+#'     \item{METHOD}{Neque porro quisquam est qui dolorem ipsum.}
+#' }
+#'
+#' @author The FLR Team
+#' @seealso \link{FLComp}
+#' @keywords classes
 #' @examples
-#' data(cod)
 #'
 
 FLom <- setClass("FLom", 
@@ -24,7 +63,6 @@ FLom <- setClass("FLom",
 		sr="FLSR",
 		brp="FLPar",
 		fleetBehaviour="mseCtrl"
-		
 	)
 )
 
@@ -116,7 +154,7 @@ setReplaceMethod("fleetBehaviour", signature("FLom", "mseCtrl"), function(object
 	object
 })
 
-#' @rdname FLoem-class
+#' @rdname FLom-class
 setMethod("show", signature(object = "FLom"),
   function(object)
   {
@@ -131,10 +169,3 @@ setMethod("show", signature(object = "FLom"),
 	cat("\nFleet behaviour:\n", object@fleetBehaviour)
 
  })
-
-
-#
-# Other methods
-#
-
-

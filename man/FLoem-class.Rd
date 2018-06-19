@@ -21,10 +21,7 @@
 \alias{deviances<--methods}
 \alias{deviances<-,FLoem,list-method}
 \alias{show,FLoem-method}
-\alias{FLoem-class}
-\alias{FLom}
 \alias{fleetBehaviour<-,FLom,mseCtrl-method}
-\alias{show,FLom-method}
 \alias{FLoem-class}
 \alias{FLiem}
 \title{S4 class \code{FLoem}}
@@ -53,11 +50,7 @@ deviances(object) <- value
 
 \S4method{show}{FLoem}(object)
 
-FLom(...)
-
 \S4method{fleetBehaviour}{FLom,mseCtrl}(object) <- value
-
-\S4method{show}{FLom}(object)
 }
 \arguments{
 \item{object}{object of relevant class (see signature of method)}
@@ -71,8 +64,6 @@ FLom(...)
 \description{
 The \code{FLoem} class stores the information relative to the observation error model of the MSE.
 
-The \code{FLom} class stores the information relative to the operating model of the MSE.
-
 The \code{FLiem} class stores the information relative to the implementation error model of the MSE.
 }
 \section{Slots}{
@@ -82,25 +73,9 @@ The \code{FLiem} class stores the information relative to the implementation err
 \item{index.qdev}{\code{FLQuants} with catchability deviances for abundance indices}
 \item{ctrl}{\code{mseCtrl} with control parameter for the oem}
 }
-
-
-\describe{
-\item{catch.dev}{\code{FLQuant}  with catch-at-age deviances}
-\item{index.qdev}{\code{FLQuants} with catchability deviances for abundance indices}
-\item{ctrl}{\code{mseCtrl} with control parameter for the oem}
-}
 }
 
 \section{Accessors}{
-
-All slots in the class have accessor and replacement methods defined that
-allow retrieving and substituting individual slots.
-
-The values passed for replacement need to be of the class of that slot.
-A numeric vector can also be used when replacing FLQuant slots, and the
-vector will be used to substitute the values in the slot, but not its other
-attributes.
-
 
 All slots in the class have accessor and replacement methods defined that
 allow retrieving and substituting individual slots.
@@ -132,17 +107,9 @@ A construction method exists for this class that can take named arguments for
 any of its slots. All slots are then created to match the requirements of the
 class validity. If an unnamed \code{FLQuant} object is provided, this is used
 for sizing, but not for populating any slot.
-
-
-A construction method exists for this class that can take named arguments for
-any of its slots. All slots are then created to match the requirements of the
-class validity. If an unnamed \code{FLQuant} object is provided, this is used
-for sizing, but not for populating any slot.
 }
 
 \examples{
-data(cod)
-
 data(cod)
 
 }
