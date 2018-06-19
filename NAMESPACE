@@ -11,30 +11,22 @@ import("parallel")
 importFrom("utils",
   "setTxtProgressBar")
 importFrom("stats",
-  "coef", "coefficients", "lm", "na.exclude", "rf")
-
-exportPattern("^[^\\.]")
-
+  "coef",
+  "coefficients",
+  "lm",
+  "na.exclude",
+  "setNames",
+  "rf")
 exportClasses(
   "FLom",
   "FLoem",
   "mseCtrl",
   "FLiem")
-
+export(
+  "doRuns",
+  "expandGrid",
+  "gridList",
+  "mcN",
+  "tune")
 exportMethods(
-  "method",
-  "method<-",
-  "args",
-  "args<-",
-  "deviances",
-  "deviances<-",
-  "observations",
-  "observations<-",
-  "stock",
-  "stock<-",
-  "sr",
-  "sr<-",
-  "brp",
-  "brp<-",
-  "fleetBehaviour",
-  "fleetBehaviour<-")
+  "performance")
