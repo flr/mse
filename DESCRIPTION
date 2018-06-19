@@ -33,6 +33,7 @@ Collate:
   'performance.R'
   'run.R'
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
 License: EUPL
 LazyLoad: Yes
 LazyData: No

@@ -19,7 +19,7 @@ exportClasses(
   "FLom",
   "FLoem",
   "mseCtrl",
-"FLiem")
+  "FLiem")
 
 exportMethods(
   "method",
