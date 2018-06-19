@@ -15,11 +15,7 @@
 #' @rdname FLoem-class
 #' @aliases FLoem-class
 #' @examples
-#' data(ple4)
-#' data(ple4.index)
-#'
-#' obj <- sca(stock=ple4, indices=FLIndices(ple4.index))
-#' obj
+#' data(cod)
 #'
 
 FLoem <- setClass("FLoem", 

@@ -20,7 +20,8 @@ Additional_repositories: http://flr-project.org/R
 Suggests:
   testthat,
   knitr,
-  rmarkdown
+  rmarkdown,
+  FLa4a
 Collate:
   'generics.R'
   'mseCtrl-class.R'
@@ -38,5 +39,4 @@ License: EUPL
 LazyLoad: Yes
 LazyData: No
 BugReports: https://github.com/iagomosqueira/mse/issues
-Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1

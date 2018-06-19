@@ -141,16 +141,8 @@ for sizing, but not for populating any slot.
 }
 
 \examples{
-data(ple4)
-data(ple4.index)
+data(cod)
 
-obj <- sca(stock=ple4, indices=FLIndices(ple4.index))
-obj
-
-data(ple4)
-data(ple4.index)
-
-obj <- sca(stock=ple4, indices=FLIndices(ple4.index))
-obj
+data(cod)
 
 }
