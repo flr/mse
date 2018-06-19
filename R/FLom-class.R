@@ -158,14 +158,18 @@ setReplaceMethod("fleetBehaviour", signature("FLom", "mseCtrl"), function(object
 setMethod("show", signature(object = "FLom"),
   function(object)
   {
-    cat("Operating Model\n")
+  cat('An object of class "FLom"\n')
 
-	cat("Stock:\n", summary(object@stock))
+	cat("\n--- Stock:\n")
+  summary(object@stock)
 
-	cat("\nStock-recruitment:\n", summary(object@sr))
+	cat("\n--- Stock-recruitment:\n")
+  summary(object@sr)
 
-	cat("\nReference points:\n", object@brp)
+	cat("\n--- Reference points:\n")
+  show(object@brp)
 
-	cat("\nFleet behaviour:\n", object@fleetBehaviour)
+	cat("\n--- Fleet behaviour:\n")
+  show(object@fleetBehaviour)
 
  })
