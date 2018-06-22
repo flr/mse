@@ -75,8 +75,6 @@ setMethod("show", signature(object = "mseCtrl"),
 
     cat("Arguments:\n")
     print(object @ args)
-
-
  })
 
 

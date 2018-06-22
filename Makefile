@@ -11,7 +11,7 @@ HELP_FILES := $(wildcard $(PKGSRC)/man/*.Rd)
 
 all: build
 
-.PHONY: all
+.PHONY: all release roxygen
 
 README.md: DESCRIPTION
 	sed -i 's/Version: *\([^ ]*\)/Version: $(PKGVERS)/' README.md
@@ -22,26 +22,40 @@ NEWS: NEWS.md
 	sed -i 's/^##//' NEWS
 
 docs: $(HELP_FILES) README.md NEWS
-R --vanilla --silent -e "options(repos='http://cran.r-project.org'); pkgdown::build_site(preview=FALSE)"
+	R --vanilla --silent -e "options(repos='http://cran.r-project.org'); pkgdown::build_site(preview=FALSE)"
 
 roxygen: $(R_FILES)
+	R --vanilla --silent -e "library(devtools);" \
+		-e "document(roclets='rd')"
+
+$(HELP_FILES): $(R_FILES)
 	R --vanilla --silent -e "library(devtools);" \
 		-e "document(roclets='rd')"
 
 update:
 	sed -i 's/Date: *\([^ ]*\)/Date: $(GITDATE)/' DESCRIPTION
 
+release: build docs
+	
 build: README.md NEWS
 	cd ..;\
 	R CMD build $(PKGSRC) --compact-vignettes
 
-install: build
+buildNV: README.md NEWS
+	cd ..;\
+	R CMD build $(PKGSRC) --no-build-vignettes
+
+install: ../$(PKGNAME)_$(PKGVERS).tar.gz
 	cd ..;\
 	R CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
 
-check: build
+checkCRAN: ../$(PKGNAME)_$(PKGVERS).tar.gz
 	cd ..;\
 	R CMD check $(PKGNAME)_$(PKGVERS).tar.gz --as-cran
+
+check: ../$(PKGNAME)_$(PKGVERS).tar.gz
+	cd ..;\
+	R CMD check $(PKGNAME)_$(PKGVERS).tar.gz
 
 clean:
 	cd ..;\

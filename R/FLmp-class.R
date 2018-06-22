@@ -5,7 +5,7 @@
 #' @section Slots:
 #' \describe{
 #'    \item{om}{\code{FLom} with the operating model.}
-#'    \item{decisionTracking}{\code{FLQuant} with record of decisions made during the mp cycle.}
+#'    \item{tracking}{\code{FLQuant} with record of decisions made during the mp cycle.}
 #'    \item{genArgs}{\code{list} with assorted arguments required to run the MSE cycle.}
 #'  }
 #' @template Accessors
@@ -19,7 +19,7 @@
 
 FLmp <- setClass("FLmp", contains="FLom", 
 	slots=c(
-		decisionTracking="FLQuant",
+		tracking="FLQuant",
 		genArgs="list"
 	)
 )
@@ -32,12 +32,12 @@ setGeneric("FLmp")
 setMethod("initialize", "FLmp",
     function(.Object,
              ...,
-             stock, sr, brp, fleetBehaviour, decisionTracking, genArgs) {
+             stock, sr, brp, fleetBehaviour, tracking, genArgs) {
       if (!missing(stock)) .Object@stock <- stock 
       if (!missing(sr)) .Object@sr <- sr
       if (!missing(brp)) .Object@brp <- brp
       if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
-      if (!missing(decisionTracking)) .Object@decisionTracking <- decisionTracking
+      if (!missing(tracking)) .Object@tracking <- tracking
       if (!missing(genArgs)) .Object@genArgs <- genArgs
       .Object <- callNextMethod(.Object, ...)
       .Object
@@ -62,18 +62,18 @@ setMethod("initialize", "FLmp",
 #
 
 #' @rdname FLmp-class
-#' @aliases decisionTracking decisionTracking-methods
-setGeneric("decisionTracking", function(object, ...) standardGeneric("decisionTracking"))
+#' @aliases tracking tracking-methods
+setGeneric("tracking", function(object, ...) standardGeneric("tracking"))
 #' @rdname FLom-class
-setMethod("decisionTracking", "FLmp", function(object) object@decisionTracking)
+setMethod("tracking", "FLmp", function(object) object@tracking)
 
 #' @rdname FLmp-class
 #' @param value the new object
-#' @aliases decisionTracking<- decisionTracking<--methods
-setGeneric("decisionTracking<-", function(object, value) standardGeneric("decisionTracking<-"))
+#' @aliases tracking<- tracking<--methods
+setGeneric("tracking<-", function(object, value) standardGeneric("tracking<-"))
 #' @rdname FLom-class
-setReplaceMethod("decisionTracking", signature("FLmp", "FLQuant"), function(object, value){
-	object@decisionTracking <- value
+setReplaceMethod("tracking", signature("FLmp", "FLQuant"), function(object, value){
+	object@tracking <- value
 	object
 })
 

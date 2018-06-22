@@ -15,5 +15,3 @@
 #' @examples
 
 FLiem <- setClass("FLiem", contains = "mseCtrl")
-
-

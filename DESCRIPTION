@@ -12,7 +12,7 @@ Depends:
   FLCore,
   ggplotFL,
   data.table,
-  FLBRP
+  FLRP
 Imports:
   foreach,
   parallel

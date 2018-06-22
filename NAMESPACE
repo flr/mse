@@ -1,7 +1,7 @@
 import("methods")
 import("data.table")
 import("FLCore")
-importFrom(FLBRP,
+importFrom(FLRP,
   "brp")
 importFrom(stats,
   "setNames")
@@ -17,41 +17,5 @@ importFrom("stats",
   "na.exclude",
   "setNames",
   "rf")
-exportClasses(
-  "FLom",
-  "FLoem",
-  "mseCtrl",
-  "FLiem")
-export(
-  "doRuns",
-  "expandGrid",
-  "gridList",
-  "tune")
-exportMethods(
-  "args",
-  "args<-",
-  "brp",
-  "brp<-",
-  "deviances",
-  "deviances<-",
-  "exists",
-  "fleetBehaviour",
-  "fleetBehaviour<-",
-  "FLoem",
-  "FLom",
-  "genArgs",
-  "genArgs<-",
-  "initialize",
-  "mcN",
-  "method",
-  "method<-",
-  "observations",
-  "observations<-",
-  "performance",
-  "show",
-  "sr",
-  "sr<-",
-  "stock",
-  "stock<-",
-  "tracking",
-  "tracking<-")
+
+exportPattern("^[^\\.]")
