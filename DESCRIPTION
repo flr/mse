@@ -12,7 +12,7 @@ Depends:
   FLCore,
   ggplotFL,
   data.table,
-  FLBRP
+  FLRP
 Imports:
   foreach,
   parallel
@@ -28,7 +28,17 @@ Collate:
   'FLoem-class.R'
   'FLom-class.R'
   'FLiem-class.R'
-  'FLmp-class.R'
+  'FLmse-class.R'
+  'dispatch.R'
+  'fb.R'
+  'hcr.R'
+  'iem.R'
+  'is.R'
+  'mp.R'
+  'oem.R'
+  'phcr.R'
+  'sa.R'
+  'tm.R'
   'grid.R'
   'mc.R'
   'performance.R'

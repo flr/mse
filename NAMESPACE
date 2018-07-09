@@ -1,13 +1,11 @@
 import("methods")
 import("data.table")
 import("FLCore")
-importFrom(FLRP,
-  "brp")
-importFrom(stats,
-  "setNames")
 import("ggplotFL")
 import("foreach")
 import("parallel")
+importFrom(FLRP,
+  "brp")
 importFrom("utils",
   "setTxtProgressBar")
 importFrom("stats",
@@ -17,5 +15,26 @@ importFrom("stats",
   "na.exclude",
   "setNames",
   "rf")
+
+export(
+
+  "hyperstability.fb",
+
+  "fixedF.hcr",
+  "ices.hcr",
+  "movingF.hcr",
+
+  "noise.iem",
+
+  "tac.is",
+  "effort.is",
+
+  "perfect.oem",
+  "sampling.oem",
+
+  "perfect.sa",
+
+  "mpa.tm"
+)
 
 exportPattern("^[^\\.]")
