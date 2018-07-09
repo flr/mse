@@ -1,4 +1,6 @@
 
+- CHANEGD FLmp to FLmse
+
 - ADDED mp.R: mp()
 
 - ADDED dispatch.R: flsval(), flival(), flpval(), flfval(), flqval()
