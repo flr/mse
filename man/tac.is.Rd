@@ -4,8 +4,8 @@
 \alias{tac.is}
 \title{TAC implementation function}
 \usage{
-tac.is(stk, ctrl, ay, nsqy = 3, delta_tac_max = NA, delta_tac_min = NA,
-  tracking)
+tac.is(stk, ctrl, ay, nsqy = 3, delta_tac_max = NA,
+  delta_tac_min = NA, tracking)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}

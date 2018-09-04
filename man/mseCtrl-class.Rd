@@ -5,7 +5,6 @@
 \alias{mseCtrl-class}
 \alias{mseCtrl}
 \alias{initialize,mseCtrl-method}
-\alias{mseCtrl}
 \alias{mseCtrl-methods}
 \alias{method}
 \alias{method-methods}
@@ -20,7 +19,6 @@
 \alias{args<--methods}
 \alias{args<-,mseCtrl,function-method}
 \alias{exists}
-\alias{exists,mseCtrl-method}
 \alias{exists,mseCtrl-method}
 \title{S4 class \code{mseCtrl}}
 \usage{
@@ -42,8 +40,8 @@ args(object) <- value
 
 \S4method{args}{mseCtrl,`function`}(object) <- value
 
-exists(x, where = -1, envir = if (missing(frame)) as.environment(where) else
-  sys.frame(frame), frame, mode = "any", inherits = TRUE)
+exists(x, where = -1, envir = if (missing(frame)) as.environment(where)
+  else sys.frame(frame), frame, mode = "any", inherits = TRUE)
 
 \S4method{exists}{mseCtrl}(x)
 }

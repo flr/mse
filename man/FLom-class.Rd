@@ -4,7 +4,6 @@
 \name{FLom}
 \alias{FLom}
 \alias{FLom-class}
-\alias{FLom}
 \alias{FLom-methods}
 \alias{stock,FLom-method}
 \alias{stock<-,FLom,FLStock-method}

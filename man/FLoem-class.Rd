@@ -6,7 +6,6 @@
 \alias{show,mseCtrl-method}
 \alias{FLoem-class}
 \alias{FLoem}
-\alias{FLoem}
 \alias{FLoem-methods}
 \alias{observations}
 \alias{observations-methods}
@@ -22,7 +21,6 @@
 \alias{deviances<-,FLoem,list-method}
 \alias{show,FLoem-method}
 \alias{fleetBehaviour<-,FLom,mseCtrl-method}
-\alias{FLoem-class}
 \alias{FLiem}
 \title{S4 class \code{FLoem}}
 \usage{

@@ -4,7 +4,6 @@
 \name{FLmse-class}
 \alias{FLmse-class}
 \alias{FLmse}
-\alias{FLmse}
 \alias{FLmse-methods}
 \alias{tracking}
 \alias{tracking-methods}
