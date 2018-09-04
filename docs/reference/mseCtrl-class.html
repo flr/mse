@@ -129,8 +129,8 @@
 <span class='co'># S4 method for mseCtrl,`function`</span>
 <span class='fu'>args</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
-<span class='fu'>exists</span>(<span class='no'>x</span>, <span class='kw'>where</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='kw'>if</span> (<span class='fu'>missing</span>(<span class='no'>frame</span>)) <span class='fu'>as.environment</span>(<span class='no'>where</span>) <span class='kw'>else</span>
-  <span class='fu'>sys.frame</span>(<span class='no'>frame</span>), <span class='no'>frame</span>, <span class='kw'>mode</span> <span class='kw'>=</span> <span class='st'>"any"</span>, <span class='kw'>inherits</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>exists</span>(<span class='no'>x</span>, <span class='kw'>where</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='kw'>envir</span> <span class='kw'>=</span> <span class='kw'>if</span> (<span class='fu'>missing</span>(<span class='no'>frame</span>)) <span class='fu'>as.environment</span>(<span class='no'>where</span>)
+  <span class='kw'>else</span> <span class='fu'>sys.frame</span>(<span class='no'>frame</span>), <span class='no'>frame</span>, <span class='kw'>mode</span> <span class='kw'>=</span> <span class='st'>"any"</span>, <span class='kw'>inherits</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># S4 method for mseCtrl</span>
 <span class='fu'>exists</span>(<span class='no'>x</span>)</pre>
