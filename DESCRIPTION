@@ -49,4 +49,4 @@ License: EUPL
 LazyLoad: Yes
 LazyData: No
 BugReports: https://github.com/iagomosqueira/mse/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
