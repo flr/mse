@@ -20,6 +20,7 @@
 FLmse <- setClass("FLmse", contains="FLom", 
 	slots=c(
 		tracking="FLQuant",
+    # TODO genArgs vs. mpargs
 		genArgs="list"
 	)
 )
