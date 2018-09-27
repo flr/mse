@@ -203,9 +203,9 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
     cat("\n")
 
 	#============================================================
-    mp <- as(opModel, "FLmp")
+    mp <- as(opModel, "FLmse")
     stock(mp) <- stk.om
-    decisionTracking(mp) <- tracking
+    tracking(mp) <- tracking
     genArgs(mp) <- mpPars
 	mp
 }
