@@ -8,6 +8,7 @@ Description: A set of functions and methods to simplify the development and
   running of Management Strategy Evaluation (MSE) analyses using the FLR
   packages and classes.
 Depends:
+  R(>= 3.5),
   methods,
   FLCore,
   ggplotFL,
