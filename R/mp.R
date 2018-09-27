@@ -191,6 +191,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		}
+    # TODO value()
 		tracking["FleetDyn",ac(ay)] <- ctrl@trgtArray[,"val",]
 
 		#----------------------------------------------------------

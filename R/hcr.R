@@ -97,7 +97,6 @@ movingF.hcr <- function(stk, hcrpars, ay, tracking){
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
 
-
 # Test:
 # library(FLCore)
 # data(ple4)
