@@ -31,6 +31,7 @@ Collate:
   'FLiem-class.R'
   'FLmse-class.R'
   'dispatch.R'
+  'control.R'
   'fb.R'
   'hcr.R'
   'iem.R'
