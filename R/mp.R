@@ -9,7 +9,7 @@
 
 # mp {{{
 
-mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars, 
+mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs, 
   scenario="test", tracking="missing"){
 
 	#============================================================
@@ -19,24 +19,24 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
 	sr.om <- sr(opModel)
 	sr.om.res <- residuals(sr.om)
 	sr.om.res.mult <- sr.om@logerror
-	fy <- mpPars$fy # final year
-	y0 <- mpPars$y0 # initial data year
-	dy <- mpPars$dy # final data year
-	iy <- mpPars$iy # initial year of projection (also intermediate)
-	nsqy <- mpPars$nsqy # number of years to compute status quo metrics
+	fy <- genArgs$fy # final year
+	y0 <- genArgs$y0 # initial data year
+	dy <- genArgs$dy # final data year
+	iy <- genArgs$iy # initial year of projection (also intermediate)
+	nsqy <- genArgs$nsqy # number of years to compute status quo metrics
 	ny <- fy - iy + 1 # number of years to project from intial year
 	vy <- ac(iy:fy) # vector of years to be projected
 
 	# init tracking
 	if (missing(tracking)) 
-		tracking <- FLQuant(NA, dimnames=list(metric=c("Fperc", "Bperc", "convergence",
-    "Fhcr", "Implementation", "IEM", "FleetDyn","OM.f", "OM.ssb", "OM.catch"),
+		tracking <- FLQuant(NA, dimnames=list(metric=c("F.est", "B.est", "convergence",
+    "F.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om"),
     year=c(iy-1,vy), iter=1:it))
 	
-  tracking["Implementation", ac(iy)] <- catch(stk.om)[,ac(iy)]
+	tracking["metric.is", ac(iy)] <- catch(stk.om)[,ac(iy)]
 
 	# set seed
-	if (!is.null(mpPars$seed)) set.seed(mpPars$seed)
+	if (!is.null(genArgs$seed)) set.seed(genArgs$seed)
   
 	#============================================================
 	# go fish
@@ -48,9 +48,9 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
 		vy0 <- 1:(ay-y0) # data years (positions vector) - one less than current year
 		sqy <- ac((ay-1):(ay-nsqy)) # years for status quo computations 
 		
-		tracking["OM.f", ac(ay-1)] <- fbar(stk.om)[,ac(ay-1)]    
-		tracking["OM.ssb", ac(ay-1)] <- ssb(stk.om)[,ac(ay-1)]    
-		tracking["OM.catch", ac(ay-1)] <- catch(stk.om)[,ac(ay-1)]    
+		tracking["F.om", ac(ay-1)] <- fbar(stk.om)[,ac(ay-1)]    
+		tracking["B.om", ac(ay-1)] <- ssb(stk.om)[,ac(ay-1)]    
+		tracking["C.om", ac(ay-1)] <- catch(stk.om)[,ac(ay-1)]    
 		
 		#==========================================================
 		# OEM
@@ -87,8 +87,8 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
 			stk0 <- out.assess$stk
 			tracking <- out.assess$tracking
 		}
-		tracking["Fperc",ac(ay)] <- fbar(stk0)[,ac(ay-1)]
-		tracking["Bperc",ac(ay)] <- ssb(stk0)[,ac(ay-1)]
+		tracking["F.est",ac(ay)] <- fbar(stk0)[,ac(ay-1)]
+		tracking["B.est",ac(ay)] <- ssb(stk0)[,ac(ay-1)]
 	
 
 		#----------------------------------------------------------
@@ -125,7 +125,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
 		} else {
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+1, it)
 		}
-		tracking["Fhcr", ac(ay)] <- ctrl@trgtArray[ac(ay+1),"val",]
+		tracking["F.hcr", ac(ay)] <- ctrl@trgtArray[ac(ay+1),"val",]
 		
 		#----------------------------------------------------------
 		# Implementation system
@@ -141,9 +141,9 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
 			out <- do.call("mpDispatch", ctrl.is)
 			ctrl <- out$ctrl
 			tracking <- out$tracking
-			tracking["Implementation", ac(ay)] <- ctrl@trgtArray[ac(ay+1),"val",]
+			tracking["metric.is", ac(ay)] <- ctrl@trgtArray[ac(ay+1),"val",]
 		} else {
-			tracking["Implementation", ac(ay)] <- tracking["Fhcr", ac(ay+1)]
+			tracking["metric.is", ac(ay)] <- tracking["F.hcr", ac(ay+1)]
 		}
 
 		#----------------------------------------------------------
@@ -174,7 +174,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		}
-		tracking["IEM",ac(ay)] <- ctrl@trgtArray[,"val",]
+		tracking["metric.iem",ac(ay)] <- ctrl@trgtArray[,"val",]
 
 		#==========================================================
 		# OM
@@ -191,7 +191,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		}
-		tracking["FleetDyn",ac(ay)] <- ctrl@trgtArray[,"val",]
+		tracking["metric.fb",ac(ay)] <- ctrl@trgtArray[,"val",]
 
 		#----------------------------------------------------------
 		# stock dynamics and OM projections
@@ -206,7 +206,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, mpPars,
     mp <- as(opModel, "FLmse")
     stock(mp) <- stk.om
     tracking(mp) <- tracking
-    genArgs(mp) <- mpPars
+    genArgs(mp) <- genArgs
 	mp
 }
 
