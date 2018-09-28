@@ -26,11 +26,13 @@ Suggests:
 Collate:
   'generics.R'
   'mseCtrl-class.R'
+  'mpCtrl-class.R'
   'FLoem-class.R'
   'FLom-class.R'
   'FLiem-class.R'
   'FLmse-class.R'
   'dispatch.R'
+  'control.R'
   'fb.R'
   'hcr.R'
   'iem.R'

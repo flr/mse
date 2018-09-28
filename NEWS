@@ -1,8 +1,12 @@
+ mse 0.7.x
+
+ USER-VISIBLE CHANGES
+ - new naming convention, est for estimator.
+ - tracking names adjusted to blocks acronymns. 
  mse 0.6.x
 
  USER-VISIBLE CHANGES
- - mpArgs replaced by genArgs across all methods and classes 
-
+ - mpArgs replaced by genArgs across all methods and classes. 
 
  mse 0.0.4
 

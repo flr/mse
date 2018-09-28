@@ -27,7 +27,7 @@
 
 tac.is <- function(stk, ctrl, ay, nsqy=3, delta_tac_max=NA, delta_tac_min=NA, tracking){
 	# reference value
-	if(ay==iy) refCatch <- tracking["OM.catch", ac(ay-1)] else refCatch <- tracking["Implementation", ac(ay-1)]
+	if(ay==iy) refCatch <- tracking["C.om", ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
 	# Year range of perceived stock
 	yrs <- as.numeric(dimnames(stock.n(stk))$year)
 	last_data_yr <- yrs[length(yrs)]
@@ -68,7 +68,7 @@ tac.is <- function(stk, ctrl, ay, nsqy=3, delta_tac_max=NA, delta_tac_min=NA, tr
 
 effort.is <- function(stk, ctrl, ay, tracking){
 	# reference value
-	if(ay==iy) fay <- tracking["OM.f",ac(ay-1)] else fay <- tracking["Implementation",ac(ay-1)]*tracking["Fperc",ac(ay)]	
+	if(ay==iy) fay <- tracking["F.om",ac(ay-1)] else fay <- tracking["metric.is",ac(ay-1)]*tracking["F.est",ac(ay)]	
 	# target to reach defined by HCR (in f units)
 	trgt <- ctrl@trgtArray[,"val",]
 	# multiplier

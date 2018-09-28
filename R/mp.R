@@ -28,11 +28,12 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 	vy <- ac(iy:fy) # vector of years to be projected
 
 	# init tracking
-	if (missing(tracking)) 
-		tracking <- FLQuant(NA, dimnames=list(metric=c("F.est", "B.est", "convergence",
+	tracking0 <- FLQuant(NA, dimnames=list(metric=c("F.est", "B.est", "conv.est",
     "F.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om"),
     year=c(iy-1,vy), iter=1:it))
-	
+	if (missing(tracking)) tracking <- tracking0 else tracking <- rbind(tracking0, tracking)
+
+	# get historical 	
 	tracking["metric.is", ac(iy)] <- catch(stk.om)[,ac(iy)]
 
 	# set seed
@@ -76,14 +77,14 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 		#----------------------------------------------------------
 		# Estimator of stock statistics
 		# function f()
-		if (!is.null(ctrl.mp$ctrl.sa)){
-			ctrl.sa <- args(ctrl.mp$ctrl.sa)
-			ctrl.sa$method <- method(ctrl.mp$ctrl.sa)
-			ctrl.sa$stk <- stk0
-			ctrl.sa$idx <- idx0
-			ctrl.sa$tracking <- tracking
-			ctrl.sa$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
-			out.assess <- do.call("mpDispatch", ctrl.sa)
+		if (!is.null(ctrl.mp$ctrl.est)){
+			ctrl.est <- args(ctrl.mp$ctrl.est)
+			ctrl.est$method <- method(ctrl.mp$ctrl.est)
+			ctrl.est$stk <- stk0
+			ctrl.est$idx <- idx0
+			ctrl.est$tracking <- tracking
+			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
+			out.assess <- do.call("mpDispatch", ctrl.est)
 			stk0 <- out.assess$stk
 			tracking <- out.assess$tracking
 		}
@@ -191,6 +192,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		}
+	    # TODO value()
 		tracking["metric.fb",ac(ay)] <- ctrl@trgtArray[,"val",]
 
 		#----------------------------------------------------------
