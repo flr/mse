@@ -24,14 +24,14 @@ sampling.oem <- function(stk, deviances, observations, vy0, ay, tracking,
 	
 	# catch.n
 	# note it's adding 1 individual to avoid sca from crashing
-	if(oe %in% c("both","catch")){
+	if(any(oe %in% c("both","catch"))){
 		catch.n(observations$stk)[,max(dataYears)] <- catch.n(stk)[,max(dataYears)]*deviances$stk$catch.n[,max(dataYears)] + 1
 		catch(observations$stk)[,max(dataYears)] <- computeCatch(observations$stk[,max(dataYears)])
 		stk0 <- observations$stk[,dataYears]
 	}
 
 	# indices
-	if(oe %in% c("both","index")){
+	if(any(oe %in% c("both","index"))){
 		for (idx_count in 1:length(observations$idx)){
 			index(observations$idx[[idx_count]])[,max(dataYears)] <- stock.n(stk)[,max(dataYears)]*deviances$idx[[idx_count]][,max(dataYears)]
 		}

@@ -34,6 +34,8 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 	
   if (!missing(tracking))
     tracking <- qbind(tracking, tracking0)
+  else
+    tracking <- tracking0
 
 	# get historical 	
 	tracking["metric.is", ac(iy)] <- catch(stk.om)[,ac(iy)]
