@@ -31,7 +31,9 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 	tracking0 <- FLQuant(NA, dimnames=list(metric=c("F.est", "B.est", "conv.est",
     "F.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om"),
     year=c(iy-1,vy), iter=1:it))
-	if (missing(tracking)) tracking <- tracking0 else tracking <- rbind(tracking0, tracking)
+	
+  if (!missing(tracking))
+    tracking <- qbind(tracking, tracking0)
 
 	# get historical 	
 	tracking["metric.is", ac(iy)] <- catch(stk.om)[,ac(iy)]
