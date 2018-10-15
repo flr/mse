@@ -12,6 +12,7 @@
 mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs, 
   scenario="test", tracking="missing"){
 
+
 	#============================================================
 	# prepare the om
 	stk.om <- stock(opModel)	
