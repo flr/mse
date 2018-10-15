@@ -14,7 +14,7 @@
 
 # LOAD packages
 
-# library(mse)
+library(mse)
 library(FLa4a)
 library(ggplotFL)
 
@@ -235,3 +235,7 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.est = mseCtrl(method=sep.sa)))
 
 res7 <- mp(om, FLoem(), ctrl.mp=ctrl, genArgs=mpargs)
+
+
+
+
