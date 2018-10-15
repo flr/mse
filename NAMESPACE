@@ -4,6 +4,7 @@ import("FLCore")
 import("ggplotFL")
 import("foreach")
 import("parallel")
+import("FLash")
 importFrom(FLBRP,
   "brp")
 importFrom("utils",
