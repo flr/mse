@@ -14,9 +14,12 @@
 
 # LOAD packages
 
-library(mse)
-library(FLa4a)
+#library(FLa4a)
 library(ggplotFL)
+#library(mse)
+library(devtools)
+load_all("~/devel/FLR/pkgs/mse")
+load_all("~/jrc/a4a/a4a-dev/FLa4a")
 
 # LOAD data
 
@@ -33,11 +36,11 @@ fy <- 2030 # final year
 y0 <- range(stk)["minyear"] # initial OM year
 dy <- range(stk)["maxyear"] # final OM year
 iy <- dy # initial year of projection (also intermediate)
-ny <- fy - iy + 1 # number of years to project from initial year
+#ny <- fy - iy + 1 # number of years to project from initial year
 nsqy <- 3 # number of years to compute status quo metrics
 vy <- ac(iy:fy) # vector of years to be projected
 
-mpargs <- list(it=it, fy=fy, y0=y0, dy=dy, iy=iy, ny=ny, nsqy=nsqy, vy=vy)
+mpargs <- list(fy=fy, y0=y0, iy=iy, nsqy=nsqy)
 
 # ==============================================================================
 # OM conditioning

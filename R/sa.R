@@ -7,7 +7,7 @@
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
 # perfect.sa {{{
-perfect.sa <- function(stk, tracking) {
+perfect.sa <- function(stk, genArgs, tracking) {
 
   tracking["convergence",ac(range(stk)["maxyear"] + 1)] <- 1
 

@@ -9,7 +9,7 @@
 
 # noise.iem {{{
 
-noise.iem <- function(ctrl, fun="rlnorm", mean=0, sd=0.1, multiplicative=TRUE, tracking){
+noise.iem <- function(ctrl, fun="rlnorm", mean=0, sd=0.1, multiplicative=TRUE, genArgs, tracking){
   # eh? number of non NA values in target. But if there are NAs then we need to
   # know their position for the *ctrl@trgtArray later
 	iem <- list(mean = mean, sd = sd, n = sum(!is.na(ctrl@trgtArray)))

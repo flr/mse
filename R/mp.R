@@ -9,36 +9,36 @@
 
 # mp {{{
 
-mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs, 
-  scenario="test", tracking="missing"){
+mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test", tracking="missing", verbose=TRUE){
 
 
 	#============================================================
 	# prepare the om
-	stk.om <- stock(opModel)	
+	stk.om <- stock(om)	
 	name(stk.om) <- scenario
-	sr.om <- sr(opModel)
+	sr.om <- sr(om)
 	sr.om.res <- residuals(sr.om)
 	sr.om.res.mult <- sr.om@logerror
 	fy <- genArgs$fy # final year
+	# dy0 om$startyr | oem$args$
 	y0 <- genArgs$y0 # initial data year
-	dy <- genArgs$dy # final data year
+	# ay - oem$args$datalag
+	#dy <- genArgs$dy # final data year
+	# TODO mlag
 	iy <- genArgs$iy # initial year of projection (also intermediate)
 	nsqy <- genArgs$nsqy # number of years to compute status quo metrics
-	ny <- fy - iy + 1 # number of years to project from intial year
+	#ny <- fy - iy + 1 # number of years to project from intial year
 	vy <- ac(iy:fy) # vector of years to be projected
+	# om$its
+	it <- dim(stk.om)[6]
 
-	# init tracking
-	tracking0 <- FLQuant(NA, dimnames=list(metric=c("F.est", "B.est", "conv.est",
-    "F.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om"),
-    year=c(iy-1,vy), iter=1:it))
+	# INIT tracking
+	metric <- c("F.est", "B.est", "conv.est", "metric.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om")
 	
-  if (!missing(tracking))
-    tracking <- qbind(tracking, tracking0)
-  else
-    tracking <- tracking0
+	if (!missing(tracking)) metric <- c(metric, tracking)
+	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=c(iy-1,vy), iter=1:it))
 
-	# get historical 	
+	# GET historical
 	tracking["metric.is", ac(iy)] <- catch(stk.om)[,ac(iy)]
 
 	# set seed
@@ -49,11 +49,12 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 	for(i in vy[-length(vy)]) {
 
 		gc()
-		ay <- an(i)
-		cat(i, " > ")
-		vy0 <- 1:(ay-y0) # data years (positions vector) - one less than current year
-		sqy <- ac((ay-1):(ay-nsqy)) # years for status quo computations 
+		if(verbose) cat(i, " > ")
+		ay <- genArgs$ay <- an(i)
+		genArgs$vy0 <- 1:(ay-y0) # data years (positions vector) - one less than current year
+		sqy <- genArgs$sqy <- ac((ay-1):(ay-nsqy)) # years for status quo computations 
 		
+    		# TRACK om
 		tracking["F.om", ac(ay-1)] <- fbar(stk.om)[,ac(ay-1)]    
 		tracking["B.om", ac(ay-1)] <- ssb(stk.om)[,ac(ay-1)]    
 		tracking["C.om", ac(ay-1)] <- catch(stk.om)[,ac(ay-1)]    
@@ -62,19 +63,19 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 		# OEM
 		#----------------------------------------------------------
 		# function o()
-		ctrl.oem <- args(obsModel)
-		ctrl.oem$method <- method(obsModel)
-		ctrl.oem$deviances <- deviances(obsModel)
-		ctrl.oem$observations <- observations(obsModel)
+		ctrl.oem <- args(oem)
+		ctrl.oem$method <- method(oem)
+		ctrl.oem$deviances <- deviances(oem)
+		ctrl.oem$observations <- observations(oem)
 		ctrl.oem$stk <- stk.om
-		ctrl.oem$vy0 <- vy0
-		ctrl.oem$ay <- ay
+		ctrl.oem$genArgs <- genArgs #vy0 <- vy0
+		#ctrl.oem$ay <- ay
 		ctrl.oem$tracking <- tracking
 		ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
 		o.out <- do.call("mpDispatch", ctrl.oem)
 		stk0 <- o.out$stk
 		idx0 <- o.out$idx
-		observations(obsModel) <- o.out$observations
+		observations(oem) <- o.out$observations
 		tracking <- o.out$tracking
 
 		#==========================================================
@@ -87,6 +88,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 			ctrl.est$method <- method(ctrl.mp$ctrl.est)
 			ctrl.est$stk <- stk0
 			ctrl.est$idx <- idx0
+			ctrl.est$genArgs <- genArgs #ay <- ay
 			ctrl.est$tracking <- tracking
 			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
 			out.assess <- do.call("mpDispatch", ctrl.est)
@@ -104,8 +106,8 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 			ctrl.phcr <- args(ctrl.mp$ctrl.phcr)
 			ctrl.phcr$method <- method(ctrl.mp$ctrl.phcr) 
 			ctrl.phcr$stk <- stk0
-			ctrl.phcr$ay <- ay
-			ctrl.phcr$iy <- iy
+			ctrl.phcr$genArgs <- genArgs #ay <- ay
+			#ctrl.phcr$iy <- iy
 			ctrl.phcr$tracking <- tracking
 			if(exists("hcrpars")) ctrl.phcr$hcrpars <- hcrpars
 			ctrl.phcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flpval))
@@ -121,7 +123,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 			ctrl.hcr <- args(ctrl.mp$ctrl.hcr)
 			ctrl.hcr$method <- method(ctrl.mp$ctrl.hcr)
 			ctrl.hcr$stk <- stk0
-			ctrl.hcr$ay <- ay
+			ctrl.hcr$genArgs <- genArgs #ay <- ay
 			ctrl.hcr$tracking <- tracking
 			if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
 			ctrl.hcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flfval))
@@ -131,7 +133,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 		} else {
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+1, it)
 		}
-		tracking["F.hcr", ac(ay)] <- ctrl@trgtArray[ac(ay+1),"val",]
+		tracking["metric.hcr", ac(ay)] <- ctrl@trgtArray[ac(ay+1),"val",]
 		
 		#----------------------------------------------------------
 		# Implementation system
@@ -141,7 +143,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 			ctrl.is$method <- method(ctrl.mp$ctrl.is)
 			ctrl.is$ctrl <- ctrl
 			ctrl.is$stk <- stk0
-			ctrl.is$ay <- ay
+			ctrl.is$genArgs <- genArgs #ay <- ay
 			ctrl.is$tracking <- tracking
 			ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval), ov=list(t1=flfval))
 			out <- do.call("mpDispatch", ctrl.is)
@@ -149,7 +151,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 			tracking <- out$tracking
 			tracking["metric.is", ac(ay)] <- ctrl@trgtArray[ac(ay+1),"val",]
 		} else {
-			tracking["metric.is", ac(ay)] <- tracking["F.hcr", ac(ay+1)]
+			tracking["metric.is", ac(ay)] <- tracking["metric.hcr", ac(ay+1)]
 		}
 
 		#----------------------------------------------------------
@@ -159,7 +161,7 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 			ctrl.tm <- args(ctrl.mp$ctrl.tm)
 			ctrl.tm$method <- method(ctrl.mp$ctrl.tm)
 			ctrl.tm$stk <- stk0
-			ctrl.tm$sqy <- sqy
+			ctrl.tm$genArgs <- genArgs #sqy <- sqy
 			ctrl.tm$tracking <- tracking
 			ctrl.tm$ioval <- list(iv=list(t1=flsval), ov=list(t1=flqval))
 			out <- do.call("mpDispatch", ctrl.tm)
@@ -170,10 +172,11 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 		#==========================================================
 		# IEM
 		#----------------------------------------------------------
-		if(!missing(impModel)){
-			ctrl.iem <- args(impModel)
-			ctrl.iem$method <- method(impModel)
+		if(!missing(iem)){
+			ctrl.iem <- args(iem)
+			ctrl.iem$method <- method(iem)
 			ctrl.iem$ctrl <- ctrl
+			ctrl.iem$genArgs <- genArgs
 			ctrl.iem$tracking <- tracking
 			ctrl.iem$ioval <- list(iv=list(t1=flfval), ov=list(t1=flfval))
 			out <- do.call("mpDispatch", ctrl.iem)
@@ -187,11 +190,12 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 		#----------------------------------------------------------
 		# fleet dynamics/behaviour
 		# function j()
-		if (exists(fleetBehaviour(opModel))){
-			ctrl.fb <- args(fleetBehaviour(opModel))
-			ctrl.fb$method <- method(fleetBehaviour(opModel))
-			ctrl.fb$tracking <- tracking
+		if (exists(fleetBehaviour(om))){
+			ctrl.fb <- args(fleetBehaviour(om))
+			ctrl.fb$method <- method(fleetBehaviour(om))
 			ctrl.fb$ctrl <- ctrl
+			ctrl.fb$genArgs <- genArgs
+			ctrl.fb$tracking <- tracking
 			ctrl.fb$ioval <- list(iv=list(t1=flfval), ov=list(t1=flfval))
 			out <- do.call("mpDispatch", ctrl.fb)
 			ctrl <- out$ctrl
@@ -207,13 +211,16 @@ mp <- function(opModel, obsModel=FLoem(), impModel="missing", ctrl.mp, genArgs,
 		stk.om <- fwd(stk.om, ctrl=ctrl, sr=sr.om, sr.residuals = sr.om.res, sr.residuals.mult = sr.om.res.mult, maxF=2)
 
 	}
-    cat("\n")
+	if(verbose) cat("\n")
 
 	#============================================================
-    mp <- as(opModel, "FLmse")
-    stock(mp) <- stk.om
-    tracking(mp) <- tracking
-    genArgs(mp) <- genArgs
-	mp
+	res <- as(om, "FLmse")
+	stock(res) <- window(stk.om, start=iy, end=fy)
+	tracking(res) <- window(tracking, end=fy)
+	genArgs(res) <- genArgs
+	# TODO accessors
+	res@oem <- oem
+	res@control <- ctrl.mp
+	return(res)
 }
 

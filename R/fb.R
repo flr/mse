@@ -8,7 +8,7 @@
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
 # hyperstability.fb {{{
-hyperstability.fb <- function(ctrl, beta=1, maxF=2, alpha=maxF^(1-beta), tracking) {
+hyperstability.fb <- function(ctrl, beta=1, maxF=2, alpha=maxF^(1-beta), tracking, genArgs) {
 
 	# Only operates on F targets - so nothing happens to TAC
 	# This function creates a control file to be later used in the fwd()
@@ -24,3 +24,4 @@ hyperstability.fb <- function(ctrl, beta=1, maxF=2, alpha=maxF^(1-beta), trackin
 	list(ctrl=ctrl, tracking=tracking)
 	
 } # }}}
+

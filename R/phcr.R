@@ -8,9 +8,9 @@
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
 # movingF.hcr {{{
-movingF.hcr <- function(stk, frp="f0.1", model="missing", ay, iy, hcrpars,
-  interval, tracking) {
-
+movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, genArgs, hcrpars, tracking) {
+	ay <- genArgs$ay
+	iy <- genArgs$iy
 	if(ay==iy | (ay-iy)%%interval==0){
 		if(!missing(model)){
 			sr0 <- fmle(as.FLSR(stk, model=model))

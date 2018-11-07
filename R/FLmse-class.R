@@ -20,6 +20,8 @@
 FLmse <- setClass("FLmse", contains="FLom", 
 	slots=c(
 		tracking="FLQuant",
+    control="mpCtrl",
+    oem="FLoem",
     # TODO genArgs vs. mpargs
 		genArgs="list"
 	)
@@ -33,12 +35,14 @@ setGeneric("FLmse")
 setMethod("initialize", "FLmse",
     function(.Object,
              ...,
-             stock, sr, brp, fleetBehaviour, tracking, genArgs) {
+             stock, sr, refpts, fleetBehaviour, tracking, control, oem, genArgs) {
       if (!missing(stock)) .Object@stock <- stock 
       if (!missing(sr)) .Object@sr <- sr
-      if (!missing(brp)) .Object@brp <- brp
+      if (!missing(refpts)) .Object@refpts <- refpts
       if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
       if (!missing(tracking)) .Object@tracking <- tracking
+      if (!missing(control)) .Object@control <- control
+      if (!missing(oem)) .Object@oem <- oem
       if (!missing(genArgs)) .Object@genArgs <- genArgs
       .Object <- callNextMethod(.Object, ...)
       .Object
@@ -98,4 +102,8 @@ setReplaceMethod("genArgs", signature("FLmse", "list"), function(object, value){
 # Other methods
 #
 
-
+setMethod("plot", signature(x="FLmse", y="missing"),
+  function(x, ...) {
+    plot(stock(x), ...)
+  }
+)

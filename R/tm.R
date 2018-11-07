@@ -9,7 +9,8 @@
 
 # map.tm {{{
 
-mpa.tm <- function(stk, sqy, sel.objective, tracking){             
+mpa.tm <- function(stk, genArgs, sel.objective, tracking){             
+	sqy <- genArgs$sqy
 	sold <- snew <- yearMeans(harvest(stk)[,sqy])
 	snew[] <- predict(sel.objective, x=as.numeric(dimnames(snew)[[1]]))
 	v <- range(stk, "minfbar"):range(stk,"maxfbar")

@@ -25,7 +25,9 @@
 #' @param EFF0 The tracking array
 #' @param EFF Not used by this function but may be used by the other implementation functions
 
-tac.is <- function(stk, ctrl, ay, nsqy=3, delta_tac_max=NA, delta_tac_min=NA, tracking){
+tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, tracking){
+	ay <- genArgs$ay
+	nsqy <- genArgs$nsqy
 	# reference value
 	if(ay==iy) refCatch <- tracking["C.om", ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
 	# Year range of perceived stock
@@ -66,7 +68,8 @@ tac.is <- function(stk, ctrl, ay, nsqy=3, delta_tac_max=NA, delta_tac_min=NA, tr
 #' @param imp_control A list with the elements: nsqy, delta_tac_min, delta_tac_max
 #' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
 
-effort.is <- function(stk, ctrl, ay, tracking){
+effort.is <- function(stk, ctrl, genArgs, tracking){
+	ay <- genArgs$ay
 	# reference value
 	if(ay==iy) fay <- tracking["F.om",ac(ay-1)] else fay <- tracking["metric.is",ac(ay-1)]*tracking["F.est",ac(ay)]	
 	# target to reach defined by HCR (in f units)
@@ -77,3 +80,6 @@ effort.is <- function(stk, ctrl, ay, tracking){
 	ctrl <- getCtrl(mult, "f", ay+1, it, rel.year=ay)
 	list(ctrl = ctrl, tracking = tracking)
 } # }}}
+
+
+
