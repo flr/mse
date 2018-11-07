@@ -18,7 +18,7 @@
 #'
 #' @slot stock The population and catch history, `FLStock`.
 #' @slot sr The stock-recruitment relationship, `FLSR`.
-#' @slot brp The estimated reference points, `FLPar`.
+#' @slot refpts The estimated reference points, `FLPar`.
 #' @slot fleetBehaviour Dynamics of the fishing fleet to be used in projections, `mseCtrl`.
 #'
 #' @section Validity:
@@ -61,7 +61,7 @@ FLom <- setClass("FLom",
 	slots=c(
 		stock="FLStock",
 		sr="FLSR",
-		brp="FLPar",
+		refpts="FLPar",
 		fleetBehaviour="mseCtrl"
 	)
 )
@@ -74,10 +74,10 @@ setGeneric("FLom")
 setMethod("initialize", "FLom",
     function(.Object,
              ...,
-             stock, sr, brp, fleetBehaviour) {
+             stock, sr, refpts, fleetBehaviour) {
       if (!missing(stock)) .Object@stock <- stock 
       if (!missing(sr)) .Object@sr <- sr
-      if (!missing(brp)) .Object@brp <- brp
+      if (!missing(refpts)) .Object@refpts <- refpts
       if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
       .Object <- callNextMethod(.Object, ...)
       .Object
@@ -124,17 +124,17 @@ setReplaceMethod("sr", signature("FLom", "FLSR"), function(object, value){
 })
 
 #' @rdname FLom-class
-#' @aliases brp brp-methods
+#' @aliases refpts refpts-methods
 #' @rdname FLom-class
-setMethod("brp", "FLom", function(object) object@brp)
+setMethod("refpts", "FLom", function(object) object@refpts)
 
 #' @rdname FLom-class
 #' @param value the new object
-#' @aliases brp<- brp<--methods
-setGeneric("brp<-", function(object, value) standardGeneric("brp<-"))
+#' @aliases refpts<- refpts<--methods
+setGeneric("refpts<-", function(object, value) standardGeneric("refpts<-"))
 #' @rdname FLom-class
-setReplaceMethod("brp", signature("FLom", "FLPar"), function(object, value){
-	object@brp <- value
+setReplaceMethod("refpts", signature("FLom", "FLPar"), function(object, value){
+	object@refpts <- value
 	object
 })
 
@@ -160,16 +160,16 @@ setMethod("show", signature(object = "FLom"),
   {
   cat('An object of class "FLom"\n')
 
-	cat("\n--- Stock:\n")
+	cat("\n--- stock:\n")
   summary(object@stock)
 
-	cat("\n--- Stock-recruitment:\n")
+	cat("\n--- sr:\n")
   summary(object@sr)
 
-	cat("\n--- Reference points:\n")
-  show(object@brp)
+	cat("\n--- refpts:\n")
+  show(object@refpts)
 
-	cat("\n--- Fleet behaviour:\n")
+	cat("\n--- fleetBehaviour:\n")
   show(object@fleetBehaviour)
 
  })

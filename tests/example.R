@@ -97,7 +97,7 @@ fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
 #==============================================================================
 # OM object
 #==============================================================================
-om <- FLom(stock=stk, sr=srbh, brp=refpts(brp))#, fleetBehaviour=fb)
+om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp))#, fleetBehaviour=fb)
 
 ###############################################################################
 # OEM settings
