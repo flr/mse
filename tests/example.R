@@ -14,12 +14,9 @@
 
 # LOAD packages
 
-#library(FLa4a)
+library(FLa4a)
 library(ggplotFL)
-#library(mse)
-library(devtools)
-load_all("~/devel/FLR/pkgs/mse")
-load_all("~/jrc/a4a/a4a-dev/FLa4a")
+library(mse)
 
 # LOAD data
 
