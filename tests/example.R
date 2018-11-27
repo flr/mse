@@ -186,7 +186,8 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3))))
 res1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # base with TAC
-ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+ctrl <- mpCtrl(list(
+	ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is)))
 
 res2 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
@@ -223,9 +224,9 @@ biased.sa <- function(stk, idx, bbias=1, fbias=1, ...){
 	list(stk = stk, tracking = tracking)
 }
 
-ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.2)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=biased.sa)))
+	ctrl.est = mseCtrl(method=biased.sa, args=list(fbias=.5))))
 
 res6 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
@@ -236,6 +237,6 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 
 res7 <- mp(om, FLoem(), ctrl.mp=ctrl, genArgs=mpargs)
 
-
+plot(FLStocks(om=window(stock(om), end=2017), sce1=stock(res1), sce2=stock(res2), sce3=stock(res3), sce4=stock(res4), sce5=stock(res5), sce6=stock(res6), sce7=stock(res7)))
 
 
