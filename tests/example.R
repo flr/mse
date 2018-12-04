@@ -185,6 +185,8 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3))))
 
 res1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
+resp2 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+
 # base with TAC
 ctrl <- mpCtrl(list(
 	ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
