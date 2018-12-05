@@ -17,7 +17,7 @@ Depends:
   FLBRP
 Imports:
   foreach,
-  parallel
+  doParallel
 Additional_repositories: http://flr-project.org/R
 Suggests:
   testthat,

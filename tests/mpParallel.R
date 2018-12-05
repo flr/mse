@@ -54,26 +54,25 @@ mpParallel <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenari
 	if(nblocks > 1){
 		# SPLIT iters in nblocks
 		its <- split(seq(it), sort(seq(it)%%nblocks) + 1)
-		registerDoParallel(1)
 		
 		# LOOP and combine
-		lst0 <- foreach(i=1, .combine=function(...)
+		lst0 <- foreach(i=its, .combine=function(...)
 			list(stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
 				tracking=do.call('combine', lapply(list(...), '[[', 'tracking'))),
 				.multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
 
 			# SUBSET object(s)
 #			if(nblocks > 1)
-				stkTmp <- FLCore::iter(stk.om, i)
+				stkTmp <- stk.om[,,,,,i]
+				oemTmp <- getIters(oem, i)
 				trackingTmp <- tracking[,,,,,i]
 				sr.om.resTmp <- sr.om.res[,,,,,i]		
-				out <- goFish(stkTmp, sr.om, sr.om.resTmp, sr.om.res.mult, fb, iem, fy, y0, iy, nsqy, vy, trackingTmp, ctrl.mp, genArgs, verbose)
-print(Sys.getpid())
+				out <- goFish(stkTmp, sr.om, sr.om.resTmp, sr.om.res.mult, fb, oemTmp, iem, fy, y0, iy, nsqy, vy, trackingTmp, ctrl.mp, genArgs, verbose)
 			# RETURN
 			list(stk.om=out$stk.om, tracking=out$tracking)
 	 	}
 	} else {
-		out <- goFish(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, iem, fy, y0, iy, nsqy, vy, tracking, ctrl.mp, genArgs, verbose)
+		out <- goFish(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, fy, y0, iy, nsqy, vy, tracking, ctrl.mp, genArgs, verbose)
 		lst0 <- list(stk.om=out$stk.om, tracking=out$tracking)
 	}
 
@@ -97,7 +96,7 @@ print(Sys.getpid())
 	return(res)
 }
 
-goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, iem, fy, y0, iy, nsqy, vy, tracking, ctrl.mp, genArgs, verbose){
+goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, fy, y0, iy, nsqy, vy, tracking, ctrl.mp, genArgs, verbose){
 	it <- dims(stk.om)$iter
 
 	#============================================================

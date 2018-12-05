@@ -184,7 +184,10 @@ mpargs$seed <- 1234
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3))))
 
 res1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+res2 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
+registerDoParallel(2)
+mpargs$nblocks <- 2
 resp2 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # base with TAC

@@ -3,7 +3,7 @@ import("data.table")
 import("FLCore")
 import("ggplotFL")
 import("foreach")
-import("parallel")
+import("doParallel")
 import("FLash")
 importFrom(FLBRP,
   "brp")

@@ -117,11 +117,13 @@ setMethod("show", signature(object = "FLoem"),
 
 
 #' @rdname FLoem-class
-setGeneric("iter", function(obj, ...) standardGeneric("iter"))
-setMethod("iter", signature(obj = "FLoem"),
-	function(obj, iter){browser()
+#' @aliases getIters getIters-methods
+setGeneric("getIters", function(obj, ...) standardGeneric("getIters"))
+#' @rdname FLoem-class
+setMethod("getIters", signature(obj = "FLoem"),
+	function(obj, iter){
 		deviances(obj) <- lapply(deviances(obj), FLCore::iter, iter)
-		onbservations(obj) <- lapply(observations(obj), FLCore::iter, iter)
+		observations(obj) <- lapply(observations(obj), FLCore::iter, iter)
  obj
 })
 
