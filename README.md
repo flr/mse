@@ -1,5 +1,5 @@
 # mse
-- Version: 0.8.1
+- Version: 0.8.5
 - Date: 2018-07-09
 - Author: Iago Mosqueira, EC JRC.
 - Maintainer: Iago Mosqueira, EC JRC.

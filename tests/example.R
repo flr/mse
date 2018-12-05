@@ -167,7 +167,7 @@ oem <- FLoem(method=sampling.oem, observations=obs, deviances=dev)
 # Implementation error
 ###############################################################################
 
-iem <- FLiem(method=noise.iem, args=list(fun="rlnorm", mean=0, sd=0.1, multiplicative=TRUE))
+iem <- FLiem(method=noise.iem, args=list(fun="rlnorm", mean=0, sd=0, multiplicative=TRUE))
 
 ###############################################################################
 # Management procedure
@@ -188,7 +188,6 @@ res1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # test parallel
 library(doParallel)
-source('mpParallel.R')
 
 # run new method in single core without foreach
 mpargs$nblocks <- 1
@@ -231,8 +230,8 @@ all.equal(stock(res2), stock(resp2a))
 # run new method in 2 cores with foreach
 registerDoParallel(2)
 mpargs$nblocks <- 2
-resp1b <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-all.equal(stock(res1), stock(resp1b))
+resp2b <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res2), stock(resp2b))
 
 #------------------------------------------------------------------------------
 # base with TAC and SA
@@ -241,7 +240,25 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=sca.sa)))
 
-res3 <- mp(om, FLoem(), ctrl.mp=ctrl, genArgs=mpargs)
+res3 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp3 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res3), stock(resp3))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp3a <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res3), stock(resp3a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp3b <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res3), stock(resp3b))
 
 #------------------------------------------------------------------------------
 # base with TAC and IEM
@@ -250,6 +267,24 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is)))
 
 res4 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp4 <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res4), stock(resp4))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp4a <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res4), stock(resp4a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp3b <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res3), stock(resp3b))
 
 #------------------------------------------------------------------------------
 # base with TAC and SA and OEM and IEM
@@ -260,6 +295,24 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
 
 res5 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp5 <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res5), stock(resp5))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp5a <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res4), stock(resp5a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp5b <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res5), stock(resp5b))
 
 #------------------------------------------------------------------------------
 # testing biased assessment
@@ -280,15 +333,241 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.2)),
 
 res6 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp6 <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res6), stock(resp6))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp6a <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res6), stock(resp6a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp6b <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res6), stock(resp6b))
+
 #------------------------------------------------------------------------------
 # base with TAC and separable SA
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sep.sa)))
+	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment"))))
 
-res7 <- mp(om, FLoem(), ctrl.mp=ctrl, genArgs=mpargs)
+res7 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp7 <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res7), stock(resp7))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp7a <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res7), stock(resp7a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp7b <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res7), stock(resp7b))
 
 plot(FLStocks(om=window(stock(om), end=2017), sce1=stock(res1), sce2=stock(res2), sce3=stock(res3), sce4=stock(res4), sce5=stock(res5), sce6=stock(res6), sce7=stock(res7)))
+
+#==============================================================================
+# Test again with cluster
+#==============================================================================
+
+cl <- makeCluster(2)
+clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+registerDoParallel(cl)
+
+#------------------------------------------------------------------------------
+# base
+#------------------------------------------------------------------------------
+ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3))))
+
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp1 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res1), stock(resp1))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp1a <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res1), stock(resp1a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp1b <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res1), stock(resp1b))
+
+#------------------------------------------------------------------------------
+# base with TAC
+#------------------------------------------------------------------------------
+ctrl <- mpCtrl(list(
+	ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+	ctrl.is = mseCtrl(method=tac.is)))
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp2 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res2), stock(resp2))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp2a <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res2), stock(resp2a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp2b <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res2), stock(resp2b))
+
+#------------------------------------------------------------------------------
+# base with TAC and SA
+#------------------------------------------------------------------------------
+ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+	ctrl.is = mseCtrl(method=tac.is),
+	ctrl.est = mseCtrl(method=sca.sa)))
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp3 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res3), stock(resp3))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp3a <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res3), stock(resp3a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp3b <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res3), stock(resp3b))
+
+#------------------------------------------------------------------------------
+# base with TAC and IEM
+#------------------------------------------------------------------------------
+ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+	ctrl.is = mseCtrl(method=tac.is)))
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp4 <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res4), stock(resp4))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp4a <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res4), stock(resp4a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp3b <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res3), stock(resp3b))
+
+#------------------------------------------------------------------------------
+# base with TAC and SA and OEM and IEM
+#------------------------------------------------------------------------------
+ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+	ctrl.is = mseCtrl(method=tac.is),
+	ctrl.est = mseCtrl(method=sca.sa),
+	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp5 <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res5), stock(resp5))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp5a <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res4), stock(resp5a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp5b <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res5), stock(resp5b))
+
+#------------------------------------------------------------------------------
+# testing biased assessment
+#------------------------------------------------------------------------------
+biased.sa <- function(stk, idx, bbias=1, fbias=1, ...){
+	args <- list(...)
+	dy <- dimnames(catch(stk))[[2]]
+	dy <- dy[length(dy)]
+	tracking <- args$tracking
+	stock.n(stk)[, dy] <- stock.n(stk)[, dy]*bbias
+	harvest(stk)[, dy] <- harvest(stk)[, dy]*fbias
+	list(stk = stk, tracking = tracking)
+}
+
+ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.2)),
+	ctrl.is = mseCtrl(method=tac.is),
+	ctrl.est = mseCtrl(method=biased.sa, args=list(fbias=.5))))
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp6 <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res6), stock(resp6))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp6a <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res6), stock(resp6a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp6b <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res6), stock(resp6b))
+
+#------------------------------------------------------------------------------
+# base with TAC and separable SA
+#------------------------------------------------------------------------------
+ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+	ctrl.is = mseCtrl(method=tac.is),
+	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment"))))
+
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp7 <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res7), stock(resp7))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp7a <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res7), stock(resp7a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp7b <- mpParallel(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res7), stock(resp7b))
 
 

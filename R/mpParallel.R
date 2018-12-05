@@ -21,15 +21,9 @@ mpParallel <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenari
 	sr.om.res.mult <- sr.om@logerror
 	if (!is.null(genArgs$nblocks)) nblocks <- genArgs$nblocks else nblocks <- 1
 	fy <- genArgs$fy # final year
-	# dy0 om$startyr | oem$args$
-	y0 <- genArgs$y0 # initial data year
-	# ay - oem$args$datalag
-	#dy <- genArgs$dy # final data year
-	# TODO mlag
 	iy <- genArgs$iy # initial year of projection (also intermediate)
-	nsqy <- genArgs$nsqy # number of years to compute status quo metrics
-	#ny <- fy - iy + 1 # number of years to project from intial year
 	vy <- ac(iy:fy) # vector of years to be projected
+	# TODO mlag
 	# om$its
 	it <- dim(stk.om)[6]
 
@@ -62,18 +56,43 @@ mpParallel <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenari
 				.multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
 
 			# SUBSET object(s)
-#			if(nblocks > 1)
-				stkTmp <- stk.om[,,,,,i]
-				sr.omTmp <- FLCore::iter(sr.om,i)		
-				sr.om.resTmp <- sr.om.res[,,,,,i]		
-				oemTmp <- getIters(oem, i)
-				trackingTmp <- tracking[,,,,,i]
-				out <- goFish(stkTmp, sr.omTmp, sr.om.resTmp, sr.om.res.mult, fb, oemTmp, iem, fy, y0, iy, nsqy, vy, trackingTmp, ctrl.mp, genArgs, verbose)
+			call0 <- list(
+				stk.om = stk.om[,,,,,i],
+				sr.om = FLCore::iter(sr.om,i),
+				sr.om.res = sr.om.res[,,,,,i],
+				oem = getIters(oem, i),
+				tracking = tracking[,,,,,i],
+				sr.om.res.mult=sr.om.res.mult,
+				fb=fb,
+				iem=iem,
+				ctrl.mp=ctrl.mp,
+				genArgs=genArgs,
+				verbose=verbose)
+			out <- do.call("goFish", call0)
+#			stkTmp <- stk.om[,,,,,i]
+#			sr.omTmp <- FLCore::iter(sr.om,i)		
+#			sr.om.resTmp <- sr.om.res[,,,,,i]		
+#			oemTmp <- getIters(oem, i)
+#			trackingTmp <- tracking[,,,,,i]
+#			out <- goFish(stkTmp, sr.omTmp, sr.om.resTmp, sr.om.res.mult, fb, oemTmp, iem, trackingTmp, ctrl.mp, genArgs, verbose)
 			# RETURN
 			list(stk.om=out$stk.om, tracking=out$tracking)
-	 	}
+		}
 	} else {
-		out <- goFish(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, fy, y0, iy, nsqy, vy, tracking, ctrl.mp, genArgs, verbose)
+		call0 <- list(
+			stk.om = stk.om,
+			sr.om = sr.om,
+			sr.om.res = sr.om.res,
+			oem = oem,
+			tracking = tracking,
+			sr.om.res.mult=sr.om.res.mult,
+			fb=fb,
+			iem=iem,
+			ctrl.mp=ctrl.mp,
+			genArgs=genArgs,
+			verbose=verbose)
+		out <- do.call("goFish", call0)
+#		out <- goFish(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, tracking, ctrl.mp, genArgs, verbose)
 		lst0 <- list(stk.om=out$stk.om, tracking=out$tracking)
 	}
 
@@ -97,8 +116,14 @@ mpParallel <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenari
 	return(res)
 }
 
-goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, fy, y0, iy, nsqy, vy, tracking, ctrl.mp, genArgs, verbose){
+goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, tracking, ctrl.mp, genArgs, verbose){
+
 	it <- dims(stk.om)$iter
+	y0 <- genArgs$y0 # initial data year
+	fy <- genArgs$fy # final year
+	iy <- genArgs$iy # initial year of projection (also intermediate)
+	nsqy <- genArgs$nsqy # number of years to compute status quo metrics
+	vy <- ac(iy:fy) # vector of years to be projected
 
 	#============================================================
 	# go fish
