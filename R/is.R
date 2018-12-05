@@ -28,6 +28,7 @@
 tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, tracking){
 	ay <- genArgs$ay
 	nsqy <- genArgs$nsqy
+	it <- dims(stk)$iter
 	# reference value
 	if(ay==iy) refCatch <- tracking["C.om", ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
 	# Year range of perceived stock
@@ -40,7 +41,7 @@ tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, track
 	# Number of intermediate years (between last data year and ay+1)
 	ninter_yrs <- ay - last_data_yr
 	# Control object for the STF
-	ctrl <- getCtrl(c(rep(fsq0, times=ninter_yrs), ctrl@trgtArray[,"val",]), "f", (last_data_yr+1):(ay+1), dim(stock.n(stk))[6])
+	ctrl <- getCtrl(c(rep(fsq0, times=ninter_yrs), ctrl@trgtArray[,"val",]), "f", (last_data_yr+1):(ay+1), it)
 	# Number of projection years
 	nproj_yrs <- (ay+1) - last_data_yr
 	stkTmp <- stf(stk, nproj_yrs, wts.nyears=nsqy)
@@ -70,6 +71,7 @@ tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, track
 
 effort.is <- function(stk, ctrl, genArgs, tracking){
 	ay <- genArgs$ay
+	it <- dims(stk)$iter
 	# reference value
 	if(ay==iy) fay <- tracking["F.om",ac(ay-1)] else fay <- tracking["metric.is",ac(ay-1)]*tracking["F.est",ac(ay)]	
 	# target to reach defined by HCR (in f units)

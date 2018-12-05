@@ -64,10 +64,11 @@ mpParallel <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenari
 			# SUBSET object(s)
 #			if(nblocks > 1)
 				stkTmp <- stk.om[,,,,,i]
+				sr.omTmp <- FLCore::iter(sr.om,i)		
+				sr.om.resTmp <- sr.om.res[,,,,,i]		
 				oemTmp <- getIters(oem, i)
 				trackingTmp <- tracking[,,,,,i]
-				sr.om.resTmp <- sr.om.res[,,,,,i]		
-				out <- goFish(stkTmp, sr.om, sr.om.resTmp, sr.om.res.mult, fb, oemTmp, iem, fy, y0, iy, nsqy, vy, trackingTmp, ctrl.mp, genArgs, verbose)
+				out <- goFish(stkTmp, sr.omTmp, sr.om.resTmp, sr.om.res.mult, fb, oemTmp, iem, fy, y0, iy, nsqy, vy, trackingTmp, ctrl.mp, genArgs, verbose)
 			# RETURN
 			list(stk.om=out$stk.om, tracking=out$tracking)
 	 	}

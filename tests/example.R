@@ -180,37 +180,80 @@ mpargs$seed <- 1234
 # Scenarios
 #==============================================================================
 
+#------------------------------------------------------------------------------
 # base
+#------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3))))
-
 res1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-res2 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
+# test parallel
+library(doParallel)
+source('mpParallel.R')
+
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp1 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res1), stock(resp1))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp1a <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res1), stock(resp1a))
+
+# run new method in 2 cores with foreach
 registerDoParallel(2)
 mpargs$nblocks <- 2
-resp2 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+resp1b <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res1), stock(resp1b))
 
+#------------------------------------------------------------------------------
 # base with TAC
+#------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(
 	ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is)))
 
 res2 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
+# test parallel
+# run new method in single core without foreach
+mpargs$nblocks <- 1
+resp2 <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res2), stock(resp2))
+
+# run new method in 1 core with sequential foreach
+registerDoParallel(1)
+mpargs$nblocks <- 2
+resp2a <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res2), stock(resp2a))
+
+# run new method in 2 cores with foreach
+registerDoParallel(2)
+mpargs$nblocks <- 2
+resp1b <- mpParallel(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+all.equal(stock(res1), stock(resp1b))
+
+#------------------------------------------------------------------------------
 # base with TAC and SA
+#------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=sca.sa)))
 
 res3 <- mp(om, FLoem(), ctrl.mp=ctrl, genArgs=mpargs)
 
+#------------------------------------------------------------------------------
 # base with TAC and IEM
+#------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is)))
 
 res4 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
+#------------------------------------------------------------------------------
 # base with TAC and SA and OEM and IEM
+#------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=sca.sa),
@@ -218,7 +261,9 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 
 res5 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
+#------------------------------------------------------------------------------
 # testing biased assessment
+#------------------------------------------------------------------------------
 biased.sa <- function(stk, idx, bbias=1, fbias=1, ...){
 	args <- list(...)
 	dy <- dimnames(catch(stk))[[2]]
@@ -235,7 +280,9 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.2)),
 
 res6 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
+#------------------------------------------------------------------------------
 # base with TAC and separable SA
+#------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=sep.sa)))
