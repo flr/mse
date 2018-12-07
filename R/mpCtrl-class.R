@@ -120,6 +120,19 @@ setMethod("show", signature(object = "mpCtrl"),
     print(names(object))
  })
 
+#' @rdname mpCtrl-class
+setMethod("iters", signature(object = "mpCtrl"), function(object, iter){
+
+	ctrl <- lapply(object, function(x) {
+		lst0 <- lapply(x@args, function(y){
+			if(is(y, "FLQuant")) FLCore::iter(y,iter) else y	
+		})
+		args(x) <- lst0
+		x
+	})
+	mpCtrl(ctrl)
+})
+
 
 #
 # Other methods

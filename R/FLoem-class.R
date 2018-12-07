@@ -115,20 +115,70 @@ setMethod("show", signature(object = "FLoem"),
 	}
  })
 
+#' @rdname FLoem-class
+setMethod("iters", signature(object = "FLoem"), function(object, iter){
+	deviances(object) <- lapply(deviances(object), FLCore::iter, iter)
+	observations(object) <- lapply(observations(object), FLCore::iter, iter)
+	object
+})
 
 #' @rdname FLoem-class
-#' @aliases getIters getIters-methods
-setGeneric("getIters", function(obj, ...) standardGeneric("getIters"))
-#' @rdname FLoem-class
-setMethod("getIters", signature(obj = "FLoem"),
-	function(obj, iter){
-		deviances(obj) <- lapply(deviances(obj), FLCore::iter, iter)
-		observations(obj) <- lapply(observations(obj), FLCore::iter, iter)
- obj
+setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
+	obj <- x
+	dev <- deviances(obj)
+	obs <- observations(obj)
+	for(i in 1:length(dev)) dev[[i]] <- combine(deviances(x)[[i]], deviances(y)[[i]])
+	for(i in 1:length(obs)) obs [[i]] <- combine(observations(x)[[i]], observations(y)[[i]])
+	dev -> deviances(obj)
+	obs -> observations(obj)
+	obj
 })
 
 #
 # Other methods
 #
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

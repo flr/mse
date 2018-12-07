@@ -28,6 +28,7 @@
 tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, tracking){
 	ay <- genArgs$ay
 	nsqy <- genArgs$nsqy
+	iy <- genArgs$iy
 	it <- dims(stk)$iter
 	# reference value
 	if(ay==iy) refCatch <- tracking["C.om", ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]

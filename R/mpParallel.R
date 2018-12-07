@@ -52,7 +52,8 @@ mpParallel <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenari
 		# LOOP and combine
 		lst0 <- foreach(i=its, .combine=function(...)
 			list(stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
-				tracking=do.call('combine', lapply(list(...), '[[', 'tracking'))),
+				tracking=do.call('combine', lapply(list(...), '[[', 'tracking')),
+				oem=do.call('combine', lapply(list(...), '[[', 'oem'))),
 				.multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
 
 			# SUBSET object(s)
@@ -60,23 +61,17 @@ mpParallel <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenari
 				stk.om = stk.om[,,,,,i],
 				sr.om = FLCore::iter(sr.om,i),
 				sr.om.res = sr.om.res[,,,,,i],
-				oem = getIters(oem, i),
+				oem = iters(oem, i),
 				tracking = tracking[,,,,,i],
 				sr.om.res.mult=sr.om.res.mult,
 				fb=fb,
 				iem=iem,
-				ctrl.mp=ctrl.mp,
+				ctrl.mp= iters(ctrl.mp, i),
 				genArgs=genArgs,
 				verbose=verbose)
 			out <- do.call("goFish", call0)
-#			stkTmp <- stk.om[,,,,,i]
-#			sr.omTmp <- FLCore::iter(sr.om,i)		
-#			sr.om.resTmp <- sr.om.res[,,,,,i]		
-#			oemTmp <- getIters(oem, i)
-#			trackingTmp <- tracking[,,,,,i]
-#			out <- goFish(stkTmp, sr.omTmp, sr.om.resTmp, sr.om.res.mult, fb, oemTmp, iem, trackingTmp, ctrl.mp, genArgs, verbose)
 			# RETURN
-			list(stk.om=out$stk.om, tracking=out$tracking)
+			list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
 		}
 	} else {
 		call0 <- list(
@@ -92,15 +87,13 @@ mpParallel <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenari
 			genArgs=genArgs,
 			verbose=verbose)
 		out <- do.call("goFish", call0)
-#		out <- goFish(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, tracking, ctrl.mp, genArgs, verbose)
-		lst0 <- list(stk.om=out$stk.om, tracking=out$tracking)
+		lst0 <- list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
 	}
 
 	# GET objects back from loop
 	stk.om <- lst0$stk.om
 	tracking <- lst0$tracking
-	#oem <- lst0$oem
-	#genArgs <- lst0$genArgs
+	oem <- lst0$oem
 
 	if(verbose) cat("\n")
 
@@ -289,6 +282,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, track
 		# stock dynamics and OM projections
 		# function g()
 		if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[,ac(ay+1)] <- attr(ctrl, "snew")
+		stk.om <- fwd(stk.om, ctrl=ctrl, sr=sr.om, sr.residuals = sr.om.res, sr.residuals.mult = sr.om.res.mult, maxF=2)
 		stk.om <- fwd(stk.om, ctrl=ctrl, sr=sr.om, sr.residuals = sr.om.res, sr.residuals.mult = sr.om.res.mult, maxF=2)
 
 	}

@@ -61,12 +61,12 @@ setMethod("args", "mseCtrl", function(object) object@args)
 #' @aliases args<- args<--methods
 setGeneric("args<-", function(object, value) standardGeneric("args<-"))
 #' @rdname mseCtrl-class
-setReplaceMethod("args", signature("mseCtrl", "function"), function(object, value){
+setReplaceMethod("args", signature("mseCtrl", "list"), function(object, value){
 	object@args <- value
 	object
 })
 
-#' @rdname FLoem-class
+#' @rdname mseCtrl-class
 setMethod("show", signature(object = "mseCtrl"),
   function(object)
   {
@@ -76,7 +76,6 @@ setMethod("show", signature(object = "mseCtrl"),
     cat("Arguments:\n")
     print(object @ args)
  })
-
 
 #
 # Other methods
