@@ -586,7 +586,7 @@ clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
 registerDoParallel(cl)
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment"))))
+	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
 
 # test parallel
 # run new method in single core without foreach
