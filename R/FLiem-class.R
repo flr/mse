@@ -9,9 +9,19 @@
 #' @template Accessors
 #' @template Constructors
 #' @docType class
-#' @name FLoem-class
-#' @rdname FLoem-class
-#' @aliases FLoem-class
+#' @name FLiem-class
+#' @rdname FLiem-class
+#' @aliases FLiem-class
 #' @examples
 
 FLiem <- setClass("FLiem", contains = "mseCtrl")
+
+#' @rdname FLiem-class
+#' @template bothargs
+#' @aliases FLiem FLiem-methods
+setMethod("initialize", "FLiem",
+    function(.Object, ...) {
+      .Object <- callNextMethod(.Object, ...)
+      .Object
+    })
+

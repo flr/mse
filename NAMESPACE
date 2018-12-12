@@ -5,7 +5,7 @@ import("ggplotFL")
 import("foreach")
 import("doParallel")
 import("FLash")
-importFrom(FLBRP,
+importFrom("FLBRP",
   "brp")
 importFrom("utils",
   "setTxtProgressBar")
@@ -29,7 +29,58 @@ export(
   "perfect.oem",
   "sampling.oem",
   "perfect.sa",
-  "mpa.tm"
+  "mpa.tm",
+  "mpDispatch",
+  "mp",
+  "mseCtrl",
+  "mpCtrl",
+  "FLiem",
+  "expandGrid",
+  "gridList"
 )
 
-exportPattern("^[^\\.]")
+exportClasses("FLiem")
+exportClasses("FLmse")
+exportClasses("FLoem")
+exportClasses("FLom")
+exportClasses("mpCtrl")
+exportClasses("mseCtrl")
+
+exportMethods("FLmse")
+exportMethods("FLoem")
+exportMethods("FLom")
+
+exportMethods("FLmse")
+exportMethods("tracking")
+exportMethods("tracking<-")
+exportMethods("genArgs")
+exportMethods("genArgs<-")
+exportMethods("observations")
+exportMethods("observations<-")
+exportMethods("deviances")
+exportMethods("deviances<-")
+exportMethods("sr<-")
+exportMethods("refpts<-")
+exportMethods("fleetBehaviour")
+exportMethods("fleetBehaviour<-")
+exportMethods("performance")
+exportMethods("mcN")
+exportMethods("ctrl.est")
+exportMethods("ctrl.est<-")
+exportMethods("ctrl.phcr")
+exportMethods("ctrl.phcr<-")
+exportMethods("ctrl.hcr")
+exportMethods("ctrl.hcr<-")
+exportMethods("ctrl.is")
+exportMethods("ctrl.is<-")
+exportMethods("ctrl.tm")
+exportMethods("ctrl.tm<-")
+exportMethods("exists")
+exportMethods("method")
+exportMethods("method<-")
+exportMethods("args")
+exportMethods("args<-")
+exportMethods("exists")
+
+
+

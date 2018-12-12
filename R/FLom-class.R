@@ -62,7 +62,8 @@ FLom <- setClass("FLom",
 		stock="FLStock",
 		sr="FLSR",
 		refpts="FLPar",
-		fleetBehaviour="mseCtrl"
+		fleetBehaviour="mseCtrl"#,
+#		fwd="mseCtrl"
 	)
 )
 
