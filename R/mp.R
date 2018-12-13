@@ -19,6 +19,7 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 	sr.om <- sr(om)
 	sr.om.res <- residuals(sr.om)
 	sr.om.res.mult <- sr.om@logerror
+	projection <- projection(om)
 	if (!is.null(genArgs$nblocks)) nblocks <- genArgs$nblocks else nblocks <- 1
 	fy <- genArgs$fy # final year
 	iy <- genArgs$iy # initial year of projection (also intermediate)
@@ -65,6 +66,7 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 				tracking = tracking[,,,,,i],
 				sr.om.res.mult=sr.om.res.mult,
 				fb=fb,
+				projection=projection,
 				iem=iem,
 				ctrl.mp= iters(ctrl.mp, i),
 				genArgs=genArgs,
@@ -82,6 +84,7 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 			tracking = tracking,
 			sr.om.res.mult=sr.om.res.mult,
 			fb=fb,
+			projection=projection,
 			iem=iem,
 			ctrl.mp=ctrl.mp,
 			genArgs=genArgs,
@@ -109,7 +112,7 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 	return(res)
 }
 
-goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, tracking, ctrl.mp, genArgs, verbose){
+goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem, iem, tracking, ctrl.mp, genArgs, verbose){
 
 	it <- dims(stk.om)$iter
 	y0 <- genArgs$y0 # initial data year
@@ -282,15 +285,15 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, oem, iem, track
 		# stock dynamics and OM projections
 		# function g()
 		if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[,ac(ay+1)] <- attr(ctrl, "snew")
-#		ctrl.om <- args(fwd(om))
-#		ctrl.om$ctrl <- ctrl
-#		ctrl.om$object <- stk.om
-#		ctrl.om$sr <- sr.om
-#		ctrl.om$sr.residuals <- sr.om.res
-#		ctrl.om$sr.residuals.mult <- sr.om.res.mult
-#		stk.om <- do.call(fwdMethod, lst0)
-		stk.om <- fwd(stk.om, ctrl=ctrl, sr=sr.om, sr.residuals = sr.om.res, sr.residuals.mult = sr.om.res.mult, maxF=2)
-		stk.om <- fwd(stk.om, ctrl=ctrl, sr=sr.om, sr.residuals = sr.om.res, sr.residuals.mult = sr.om.res.mult, maxF=2)
+		ctrl.om <- args(projection)
+		ctrl.om$ctrl <- ctrl
+		ctrl.om$stk <- stk.om
+		ctrl.om$sr <- sr.om
+		ctrl.om$sr.residuals <- sr.om.res
+		ctrl.om$sr.residuals.mult <- sr.om.res.mult
+		ctrl.om$method <- method(projection)
+		ctrl.om$ioval <- list(iv=list(t1=flsval, t2=flfval), ov=list(t1=flsval))
+		stk.om <- do.call("mpDispatch", ctrl.om)$object
 
 	}
 	list(stk.om=stk.om, tracking=tracking, oem=oem, genArgs=genArgs)

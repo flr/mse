@@ -93,9 +93,15 @@ stk <- fwdWindow(stk, brp, end=2030)
 fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
 
 #==============================================================================
+# OM projection method
+#==============================================================================
+
+proj <- mseCtrl(method=fwd.om, args=list(maxF=2))
+
+#==============================================================================
 # OM object
 #==============================================================================
-om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp))#, fleetBehaviour=fb)
+om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp), projection=proj)#, fleetBehaviour=fb)
 
 ###############################################################################
 # OEM settings

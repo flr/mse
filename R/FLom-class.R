@@ -62,8 +62,8 @@ FLom <- setClass("FLom",
 		stock="FLStock",
 		sr="FLSR",
 		refpts="FLPar",
-		fleetBehaviour="mseCtrl"#,
-#		fwd="mseCtrl"
+		fleetBehaviour="mseCtrl",
+		projection="mseCtrl"
 	)
 )
 
@@ -75,11 +75,12 @@ setGeneric("FLom")
 setMethod("initialize", "FLom",
     function(.Object,
              ...,
-             stock, sr, refpts, fleetBehaviour) {
+             stock, sr, refpts, fleetBehaviour, projection) {
       if (!missing(stock)) .Object@stock <- stock 
       if (!missing(sr)) .Object@sr <- sr
       if (!missing(refpts)) .Object@refpts <- refpts
       if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
+      if (!missing(projection)) .Object@projection <- projection
       .Object <- callNextMethod(.Object, ...)
       .Object
 })
@@ -90,12 +91,10 @@ setValidity("FLom",
 	sd <- dim(object@stock)
 	rd <- dim(object@sr@residuals)
     if (!all.equal(sd[-1], rd[-1])) "Stock and stock recruitment residuals must have the same dimensions." else TRUE
-
 	# recruitment must be the same age
 	sd <- dimnames(object@stock@stock.n)$age[1]
     rd <- dimnames(object@sr@residuals)$age[1]
     if (!all.equal(sd, rd)) "Stock and stock recruitment residuals must use the recruitment age." else TRUE
-    
 })
 
 #
@@ -156,6 +155,23 @@ setReplaceMethod("fleetBehaviour", signature("FLom", "mseCtrl"), function(object
 })
 
 #' @rdname FLom-class
+#' @aliases projection projection-methods
+setGeneric("projection", function(object, ...) standardGeneric("projection"))
+#' @rdname FLom-class
+setMethod("projection", "FLom", function(object) object@projection)
+
+#' @rdname FLom-class
+#' @param value the new object
+#' @aliases projection<- projection<--methods
+setGeneric("projection<-", function(object, value) standardGeneric("projection<-"))
+#' @rdname FLoem-class
+setReplaceMethod("projection", signature("FLom", "mseCtrl"), function(object, value){
+	object@projection <- value
+	object
+})
+
+
+#' @rdname FLom-class
 setMethod("show", signature(object = "FLom"),
   function(object)
   {
@@ -173,4 +189,73 @@ setMethod("show", signature(object = "FLom"),
 	cat("\n--- fleetBehaviour:\n")
   show(object@fleetBehaviour)
 
+	cat("\n--- projection:\n")
+  show(object@projection)
+
  })
+ 
+ 
+#' @rdname fwd.om
+#' @aliases fwd.om
+#' A method to project the operating model (OM)
+#'
+#' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
+#' odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
+#' libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
+#' Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id 
+#' @param object the OM as a FLStock
+#' @param ctrl the fwdControl object with objectives and constraints
+#' @param sr a FLSR with the stock-recruitment model
+#' @param sr.residuals a FLQuant with S/R residuals
+#' @param sr.residuals.mult logical about residuals being multiplicative
+ 
+fwd.om <- function(stk, ctrl, sr, ...){
+	args <- list(...)
+	args$object <- stk
+	args$control <- ctrl
+	args$sr <- sr
+	args$object <- do.call("fwd", args)
+	stk <- do.call("fwd", args)
+	list(object=stk)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 

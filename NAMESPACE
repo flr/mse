@@ -3,7 +3,6 @@ import("data.table")
 import("FLCore")
 import("ggplotFL")
 import("foreach")
-import("doParallel")
 import("FLash")
 importFrom("FLBRP",
   "brp")
@@ -36,7 +35,8 @@ export(
   "mpCtrl",
   "FLiem",
   "expandGrid",
-  "gridList"
+  "gridList",
+  "fwd.om"
 )
 
 exportClasses("FLiem")
@@ -46,7 +46,6 @@ exportClasses("FLom")
 exportClasses("mpCtrl")
 exportClasses("mseCtrl")
 
-exportMethods("FLmse")
 exportMethods("FLoem")
 exportMethods("FLom")
 
@@ -63,6 +62,8 @@ exportMethods("sr<-")
 exportMethods("refpts<-")
 exportMethods("fleetBehaviour")
 exportMethods("fleetBehaviour<-")
+exportMethods("projection")
+exportMethods("projection<-")
 exportMethods("performance")
 exportMethods("mcN")
 exportMethods("ctrl.est")
