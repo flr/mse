@@ -1,18 +1,8 @@
- mse 0.7.x
-
- USER-VISIBLE CHANGES
- - new naming convention, est for estimator.
- - tracking names adjusted to blocks acronymns. 
- mse 0.6.x
-
- USER-VISIBLE CHANGES
- - mpArgs replaced by genArgs across all methods and classes. 
-
- mse 0.0.4
+ mse 0.9
 
  USER-VISIBLE CHANGES
 
-- Methods moved to FLCore: rnoise, rlnoise
+- Complete new code base.
 
  BUG FIXES
 
@@ -21,3 +11,9 @@
  DOCUMENTATION
 
  DEPRECATED & DEFUNCT
+
+ mse 0.0.4
+
+ USER-VISIBLE CHANGES
+
+- Methods moved to FLCore: rnoise, rlnoise

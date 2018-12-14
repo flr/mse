@@ -5,7 +5,8 @@ import("ggplotFL")
 import("foreach")
 import("FLash")
 importFrom("FLBRP",
-  "brp")
+  "brp",
+  "FLBRP")
 importFrom("utils",
   "setTxtProgressBar")
 importFrom("stats",
@@ -39,49 +40,46 @@ export(
   "fwd.om"
 )
 
-exportClasses("FLiem")
-exportClasses("FLmse")
-exportClasses("FLoem")
-exportClasses("FLom")
-exportClasses("mpCtrl")
-exportClasses("mseCtrl")
+exportClasses(
+  "FLiem",
+  "FLmse",
+  "FLoem",
+  "FLom",
+  "mpCtrl",
+  "mseCtrl")
 
-exportMethods("FLoem")
-exportMethods("FLom")
-
-exportMethods("FLmse")
-exportMethods("tracking")
-exportMethods("tracking<-")
-exportMethods("genArgs")
-exportMethods("genArgs<-")
-exportMethods("observations")
-exportMethods("observations<-")
-exportMethods("deviances")
-exportMethods("deviances<-")
-exportMethods("sr<-")
-exportMethods("refpts<-")
-exportMethods("fleetBehaviour")
-exportMethods("fleetBehaviour<-")
-exportMethods("projection")
-exportMethods("projection<-")
-exportMethods("performance")
-exportMethods("mcN")
-exportMethods("ctrl.est")
-exportMethods("ctrl.est<-")
-exportMethods("ctrl.phcr")
-exportMethods("ctrl.phcr<-")
-exportMethods("ctrl.hcr")
-exportMethods("ctrl.hcr<-")
-exportMethods("ctrl.is")
-exportMethods("ctrl.is<-")
-exportMethods("ctrl.tm")
-exportMethods("ctrl.tm<-")
-exportMethods("exists")
-exportMethods("method")
-exportMethods("method<-")
-exportMethods("args")
-exportMethods("args<-")
-exportMethods("exists")
-
-
-
+exportMethods("FLoem",
+  "FLom",
+  "FLmse",
+  "tracking",
+  "tracking<-",
+  "genArgs",
+  "genArgs<-",
+  "observations",
+  "observations<-",
+  "deviances",
+  "deviances<-",
+  "sr<-",
+  "refpts<-",
+  "fleetBehaviour",
+  "fleetBehaviour<-",
+  "projection",
+  "projection<-",
+  "performance",
+  "mcN",
+  "ctrl.est",
+  "ctrl.est<-",
+  "ctrl.phcr",
+  "ctrl.phcr<-",
+  "ctrl.hcr",
+  "ctrl.hcr<-",
+  "ctrl.is",
+  "ctrl.is<-",
+  "ctrl.tm",
+  "ctrl.tm<-",
+  "exists",
+  "method",
+  "method<-",
+  "args",
+  "args<-",
+  "exists")

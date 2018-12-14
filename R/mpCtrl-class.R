@@ -142,5 +142,5 @@ setMethod("iters", signature(object = "mpCtrl"), function(object, iter){
 #' @aliases exists,mpCtrl-method
 setGeneric("exists")
 #' @rdname mseCtrl-class
-setMethod("exists", "mpCtrl", function(x) !is.empty(x))
+setMethod("exists", "mpCtrl", function(x) length(x) != 0)
 

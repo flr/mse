@@ -1,8 +1,8 @@
-# mse 0.0.4
+# mse 0.9
 
 ## USER-VISIBLE CHANGES
 
-- Methods moved to FLCore: rnoise, rlnoise
+- Complete new code base.
 
 ## BUG FIXES
 
@@ -11,3 +11,9 @@
 ## DOCUMENTATION
 
 ## DEPRECATED & DEFUNCT
+
+# mse 0.0.4
+
+## USER-VISIBLE CHANGES
+
+- Methods moved to FLCore: rnoise, rlnoise

@@ -73,6 +73,7 @@ tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, track
 effort.is <- function(stk, ctrl, genArgs, tracking){
 	ay <- genArgs$ay
 	it <- dims(stk)$iter
+	iy <- genArgs$iy
 	# reference value
 	if(ay==iy) fay <- tracking["F.om",ac(ay-1)] else fay <- tracking["metric.is",ac(ay-1)]*tracking["F.est",ac(ay)]	
 	# target to reach defined by HCR (in f units)
