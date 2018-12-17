@@ -51,11 +51,11 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 		its <- split(seq(it), sort(seq(it)%%nblocks) + 1)
 		
 		# LOOP and combine
-		lst0 <- foreach(i=its, .combine=function(...)
+		lst0 <- foreach(i=its, .combine=function(...) {
 			list(stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
 				tracking=do.call('combine', lapply(list(...), '[[', 'tracking')),
-				oem=do.call('combine', lapply(list(...), '[[', 'oem'))),
-				.multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
+				oem=do.call('combine', lapply(list(...), '[[', 'oem')))
+      }, .multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
 
 			# SUBSET object(s)
 			call0 <- list(
