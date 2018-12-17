@@ -53,9 +53,9 @@ setReplaceMethod("method", signature("mseCtrl", "function"), function(object, va
 
 #' @rdname mseCtrl-class
 #' @aliases args args-methods
-setGeneric("args", function(object, ...) standardGeneric("args"))
+setGeneric("args", useAsDefault = base::args)
 #' @rdname mseCtrl-class
-setMethod("args", "mseCtrl", function(object) object@args)
+setMethod("args", "mseCtrl", function(name) name@args)
 
 #' @rdname mseCtrl-class
 #' @aliases args<- args<--methods
