@@ -1,3 +1,14 @@
+# FLmse-class.R - DESC
+# mse/R/FLmse-class.R
+
+# Copyright European Union, 2018
+# Author: Ernesto Jardim (EC JRC) <ernesto.jardim@ec.europa.eu>
+#         Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
+#
+# Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
+
+# FLmse {{{
+
 #' @title S4 class \code{FLmse}
 #'
 #' @description The \code{FLmse} class stores information relative to the MSE's management procedure'.
@@ -46,29 +57,14 @@ setMethod("initialize", "FLmse",
       if (!missing(genArgs)) .Object@genArgs <- genArgs
       .Object <- callNextMethod(.Object, ...)
       .Object
-})
+}) # }}}
 
-#setValidity("FLom",
-#  function(object) {
-#    # stk and sr must be compatible
-#	sd <- dim(object@stock)
-#	rd <- dim(object@sr@residuals)
-#    if (!all.equal(sd[-1], rd[-1])) "Stock and stock recruitment residuals must have the same dimensions." else TRUE
-
-#	# recruitment must be the same age
-#	sd <- dimnames(object@stock@stock.n)$age[1]
-#    rd <- dimnames(object@sr@residuals)$age[1]
-#    if (!all.equal(sd, rd)) "Stock and stock recruitment residuals must use the recruitment age." else TRUE
-#    
-#})
-
-#
-#  accessor methods
-#
+# accessor methods {{{
 
 #' @rdname FLmse-class
 #' @aliases tracking tracking-methods
 setGeneric("tracking", function(object, ...) standardGeneric("tracking"))
+
 #' @rdname FLom-class
 setMethod("tracking", "FLmse", function(object) object@tracking)
 
@@ -76,6 +72,7 @@ setMethod("tracking", "FLmse", function(object) object@tracking)
 #' @param value the new object
 #' @aliases tracking<- tracking<--methods
 setGeneric("tracking<-", function(object, value) standardGeneric("tracking<-"))
+
 #' @rdname FLom-class
 setReplaceMethod("tracking", signature("FLmse", "FLQuant"), function(object, value){
 	object@tracking <- value
@@ -85,6 +82,7 @@ setReplaceMethod("tracking", signature("FLmse", "FLQuant"), function(object, val
 #' @rdname FLmse-class
 #' @aliases genArgs genArgs-methods
 setGeneric("genArgs", function(object, ...) standardGeneric("genArgs"))
+
 #' @rdname FLom-class
 setMethod("genArgs", "FLmse", function(object) object@genArgs)
 
@@ -92,18 +90,46 @@ setMethod("genArgs", "FLmse", function(object) object@genArgs)
 #' @param value the new object
 #' @aliases genArgs<- genArgs<--methods
 setGeneric("genArgs<-", function(object, value) standardGeneric("genArgs<-"))
-#' @rdname FLom-class
+
+#' @rdname FLmse-class
 setReplaceMethod("genArgs", signature("FLmse", "list"), function(object, value){
 	object@genArgs <- value
 	object
-})
+}) # }}}
 
-#
-# Other methods
-#
-
+# plot {{{
 setMethod("plot", signature(x="FLmse", y="missing"),
   function(x, ...) {
     plot(stock(x), ...)
   }
-)
+) # }}}
+
+# summary {{{
+setMethod("summary", signature(object="FLmse"),
+  function(object) {
+
+    callNextMethod()
+
+    cat("\n")
+
+    # tracking
+    cat("-- tracking\n")
+    show(yearMeans(tracking(object)))
+
+    # control
+    cat("-- control\n")
+    control <- object@control
+
+    for(i in names(control)) {
+
+      cat(paste0(i, ":"), "\n")
+      cat("\tMethod: ", find.original.name(method(control[[i]])), "\n")
+    }
+
+    # oem
+
+    # genArgs
+
+
+  }
+) # }}}

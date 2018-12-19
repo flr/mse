@@ -131,8 +131,6 @@ setMethod("refpts", "FLom", function(object) object@refpts)
 #' @rdname FLom-class
 #' @param value the new object
 #' @aliases refpts<- refpts<--methods
-setGeneric("refpts<-", function(object, value) standardGeneric("refpts<-"))
-#' @rdname FLom-class
 setReplaceMethod("refpts", signature("FLom", "FLPar"), function(object, value){
 	object@refpts <- value
 	object
@@ -219,43 +217,65 @@ fwd.om <- function(stk, ctrl, sr, ...){
 	list(object=stk)
 }
 
+# summary {{{
 
+setMethod("summary", signature(object="FLom"),
+  function(object) {
 
+    cat("An object of class \"", class(object), "\"\n\n", sep="")
 
+    # stock
+    cat("-- stock\n")
+    stock <- stock(object)
+		dms <- dims(stock)
+    
+		cat("Name:", name(stock), "\n")
+    cat("Quant:", dms$quant, "\n")
+		cat("Dims: ", dms$quant, "\tyear\tunit\tseason\tarea\titer\n")
+		cat("", unname(unlist(dms[c(dms$quant, "year", "unit", "season",
+    "area", "iter")])), "\n", sep="\t")
+    cat("Range: ", paste(sub('plusgroup', 'pgroup', names(stock@range)),
+      collapse="\t"), "\n")
+		cat("", stock@range, "\n", sep="\t")
 
+    # sr
+    cat("-- sr\n")
+    sr <- sr(object)
+   
+    cat("Model: \t")
+    print(model(sr), showEnv=FALSE)
+    # params
+    print(params(sr), reduced=TRUE)
+    
+    cat("\n")
 
+    # refpts
+    cat("-- refpts\n")
+    refpts <- refpts(object)
 
+    rows <- as.logical(c(apply(refpts, c(1,3),
+      function(x) sum(is.na(x)) < length(x))))
+    cols <- as.logical(c(apply(refpts, c(2,3),
+      function(x) sum(is.na(x)) < length(x))))
 
+    print(refpts[rows, cols,])
 
+    cat("\n")
 
+    # fleetBehaviour
+    cat("-- fleetBehaviour\n")
+    behaviour <- fleetBehaviour(object)
+    
+    cat("Method: ", find.original.name(method(behaviour)), "\n")
+    cat("Args: ", names(unlist(args(behaviour))), "\n", sep="\t")
+    cat("", unlist(args(behaviour)), "\n", sep="\t")
 
+    # projection
+    cat("-- projection\n")
+    projection <- projection(object)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
- 
- 
+    cat("Method: ", find.original.name(method(projection)), "\n")
+    cat("Args: ", names(unlist(args(projection))), "\n", sep="\t")
+    cat("", unlist(args(projection)), "\n", sep="\t")
+  }
+) # }}}
