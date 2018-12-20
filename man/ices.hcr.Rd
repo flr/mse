@@ -4,14 +4,14 @@
 \alias{ices.hcr}
 \title{Evaluate the chosen HCR function}
 \usage{
-ices.hcr(stk, fmin, ftrg, blim, bsafe, ssb_lag = 1, ay, tracking)
+ices.hcr(stk, fmin, ftrg, blim, bsafe, genArgs, tracking)
 }
 \arguments{
 \item{stk}{The perceived stock.}
 
-\item{ay}{The current year. The management control (e.g. F or effort) will be set in ay+1.}
-
 \item{method}{Name of the chosen HCR function.}
+
+\item{ay}{The current year. The management control (e.g. F or effort) will be set in ay+1.}
 
 \item{EFF}{Effort array (if effort management is being used).}
 

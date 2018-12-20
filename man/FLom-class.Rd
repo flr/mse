@@ -11,17 +11,22 @@
 \alias{sr<-}
 \alias{sr<--methods}
 \alias{sr<-,FLom,FLSR-method}
-\alias{brp,FLom-method}
-\alias{brp}
-\alias{brp-methods}
-\alias{brp<-}
-\alias{brp<--methods}
-\alias{brp<-,FLom,FLPar-method}
+\alias{refpts,FLom-method}
+\alias{refpts}
+\alias{refpts-methods}
+\alias{refpts<-}
+\alias{refpts<--methods}
+\alias{refpts<-,FLom,FLPar-method}
 \alias{fleetBehaviour}
 \alias{fleetBehaviour-methods}
 \alias{fleetBehaviour,FLom-method}
 \alias{fleetBehaviour<-}
 \alias{fleetBehaviour<--methods}
+\alias{projection}
+\alias{projection-methods}
+\alias{projection,FLom-method}
+\alias{projection<-}
+\alias{projection<--methods}
 \alias{show,FLom-method}
 \alias{tracking,FLmse-method}
 \alias{tracking<-,FLmse,FLQuant-method}
@@ -43,17 +48,23 @@ sr(object) <- value
 
 \S4method{sr}{FLom,FLSR}(object) <- value
 
-\S4method{brp}{FLom}(object)
+\S4method{refpts}{FLom}(object)
 
-brp(object) <- value
+refpts(object) <- value
 
-\S4method{brp}{FLom,FLPar}(object) <- value
+\S4method{refpts}{FLom,FLPar}(object) <- value
 
 fleetBehaviour(object, ...)
 
 \S4method{fleetBehaviour}{FLom}(object)
 
 fleetBehaviour(object) <- value
+
+projection(object, ...)
+
+\S4method{projection}{FLom}(object)
+
+projection(object) <- value
 
 \S4method{show}{FLom}(object)
 
@@ -75,6 +86,8 @@ fleetBehaviour(object) <- value
 \item{value}{the new object}
 
 \item{value}{the new object}
+
+\item{value}{the new object}
 }
 \description{
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
@@ -89,7 +102,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id
 
 \item{\code{sr}}{The stock-recruitment relationship, \code{FLSR}.}
 
-\item{\code{brp}}{The estimated reference points, \code{FLPar}.}
+\item{\code{refpts}}{The estimated reference points, \code{FLPar}.}
 
 \item{\code{fleetBehaviour}}{Dynamics of the fishing fleet to be used in projections, \code{mseCtrl}.}
 }}

@@ -4,14 +4,14 @@
 \alias{effort.is}
 \title{effort implementation function}
 \usage{
-effort.is(stk, ctrl, ay, tracking)
+effort.is(stk, ctrl, genArgs, tracking)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}
 
-\item{ay}{The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).}
-
 \item{imp_control}{A list with the elements: nsqy, delta_tac_min, delta_tac_max}
+
+\item{ay}{The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).}
 }
 \description{
 effort implementation function
