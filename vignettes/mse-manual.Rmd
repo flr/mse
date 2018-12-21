@@ -15,7 +15,8 @@ license: Creative Commons Attribution-ShareAlike 4.0 International
 ---
 
 ```{r, pkgs, echo=FALSE, message=FALSE}
-knitr::opts_chunk$set(collapse = T, comment = "#>")
+knitr::opts_chunk$set(collapse = T, comment = "#>",
+  fig.align="center")
 library(mse)
 ```
 
@@ -33,7 +34,15 @@ library(mse)
 
 ## FLom
 
+```{r FLom, echo=FALSE, out.width='50%', fig.cap="**FLom class**: Structure of the FLom class. Slot name followed by the slot class, in parenthesis."}
+knitr::include_graphics('diagrams/classes/FLom.png')
+```
+
 ## FLmse
+
+```{r FLmse, echo=FALSE, out.width='50%', fig.cap="**FLmse class**: Structure of the FLmse class. Slot name followed by the slot class, in parenthesis."}
+knitr::include_graphics('diagrams/classes/FLmse.png')
+```
 
 ## FLoem
 
@@ -61,19 +70,20 @@ library(mse)
 
 # More information
 
-* You can submit bug reports, questions or suggestions on `FLPKG` at the `FLPKG` issue page ^[<https://github.com/flr/FLPKG/issues>], or on the *FLR* mailing list.
-* Or send a pull request to <https://github.com/flr/FLPKG/>
+* You can submit bug reports, questions or suggestions on `mse` at the `mse` issue page ^[<https://github.com/flr/mse/issues>], or on the *FLR* mailing list.
+* Or send a pull request to <https://github.com/flr/mse/>
 * For more information on the FLR Project for Quantitative Fisheries Science in R, visit the FLR webpage ^[<http://flr-project.org>].
-* The latest version of `FLPKG` can always be installed using the `devtools` package, by calling
+* The latest version of `mse` can always be installed using the `devtools` package, by calling
 ```{r, devtools, echo=TRUE, eval=FALSE}
 	library(devtools)
-	install_github('flr/FLPKG')
+	install_github('flr/mse')
 ```
 
 ## Software Versions
 
 * `r version$version.string`
 * FLCore: `r packageVersion('FLCore')`
+* mse: `r packageVersion('mse')`
 * **Compiled**: `r date()`
 * **Git Hash**: `r system("git log --pretty=format:'%h' -n 1", intern=TRUE)`
 
