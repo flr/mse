@@ -111,7 +111,7 @@ setMethod("show", signature(object = "FLoem"),
 
 	for(i in names(object@deviances)){
 		cat("\nDeviances for ", i, ":\n", sep="")
-		print(summary(object@deviances[[i]]))
+		cat(summary(object@deviances[[i]]), "\n")
 	}
  })
 
@@ -137,48 +137,6 @@ setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
 #
 # Other methods
 #
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
