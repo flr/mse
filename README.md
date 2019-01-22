@@ -1,10 +1,10 @@
 # mse
 - Version: 0.9.1
 - Date: 2018-12-14
-- Author: Iago Mosqueira, EC JRC.
+- Authors: Iago Mosqueira, EC JRC. Ernesto Jardim, EC JRC.
 - Maintainer: Iago Mosqueira, EC JRC.
-- Repository: <https://github.com/iagomosqueira/mse/>
-- Bug reports: <https://github.com/iagomosqueira/mse/issues>
+- Repository: <https://github.com/flr/mse/>
+- Bug reports: <https://github.com/flr/mse/issues>
 
 ## Overview
 Tools for running Management Strategy Evaluations using FLR
@@ -12,6 +12,7 @@ Tools for running Management Strategy Evaluations using FLR
 To install this package, start R and enter:
 
   library(devtools)
+
   install_github("iagomosqueira/mse")
 
 ## Documentation
