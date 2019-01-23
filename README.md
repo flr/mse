@@ -7,12 +7,19 @@
 - Bug reports: <https://github.com/iagomosqueira/mse/issues>
 
 ## Overview
-Tools for running Management Strategy Evaluations using FLR
+
+Tools for constructing, running and analyzing Management Strategy Evaluation simulations using FLR.
 
 To install this package, start R and enter:
 
+	install.packages("mse", repos="http://flr-project.org/R")
+
+or directly from the github repository by using:
+
+```
   library(devtools)
-  install_github("iagomosqueira/mse")
+  install_github("flr/mse")
+```
 
 ## Documentation
 - Help pages
