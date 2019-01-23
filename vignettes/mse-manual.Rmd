@@ -1,5 +1,5 @@
 ---
-title: "Technical Manual for the *mse* FLR package"
+title: "Technical Manual for the *mse* FLR/a4a package"
 author:
   - "Iago MOSQUEIRA, (EC JRC)"
   - "Ernesto JARDIM (EC JRC)"

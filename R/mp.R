@@ -55,7 +55,7 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 			list(stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
 				tracking=do.call('combine', lapply(list(...), '[[', 'tracking')),
 				oem=do.call('combine', lapply(list(...), '[[', 'oem')))
-      }, .multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
+      }, .packages="mse", .multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
 
 			# SUBSET object(s)
 			call0 <- list(
@@ -71,7 +71,7 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 				ctrl.mp= iters(ctrl.mp, i),
 				genArgs=genArgs,
 				verbose=verbose)
-			out <- do.call("goFish", call0)
+			out <- do.call(mse:::goFish, call0)
 			# RETURN
 			list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
 		}
@@ -89,7 +89,7 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 			ctrl.mp=ctrl.mp,
 			genArgs=genArgs,
 			verbose=verbose)
-		out <- do.call("goFish", call0)
+		out <- do.call(mse:::goFish, call0)
 		lst0 <- list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
 	}
 

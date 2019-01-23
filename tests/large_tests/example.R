@@ -405,7 +405,7 @@ resp1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 all.equal(stock(res1), stock(resp1))
 
 # run new method in 1 core with sequential foreach
-mpargs$nblocks <- 2
+mpargs$nblocks <- 3
 resp1a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 all.equal(stock(res1), stock(resp1a))
 
