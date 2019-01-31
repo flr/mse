@@ -33,7 +33,6 @@ globalVariables("indicator")
 #'
 #' @name performance
 #' @rdname performance
-#' @aliases performance
 #'
 #' @author Iago Mosqueira, EC JRC
 #' @seealso \code{\link{FLQuants}}
@@ -65,6 +64,8 @@ setMethod("performance", signature(x="FLStock"),
       indicators=indicators, years=years, probs=probs, mp=mp))
   }
 )
+
+#' @rdname performance
 
 setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
@@ -118,6 +119,8 @@ setMethod("performance", signature(x="FLQuants"),
   }
 )
 
+#' @rdname performance
+
 setMethod("performance", signature(x="FLStocks"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
     metrics=FLCore::metrics, probs=NULL, grid=missing, mp=NULL, mc.cores=1) {
@@ -149,6 +152,8 @@ setMethod("performance", signature(x="FLStocks"),
     return(res)
   }
 ) 
+
+#' @rdname performance
 
 setMethod("performance", signature(x="list"),
   function(x, indicators, refpts, years=dims(x[[1]])$maxyear,

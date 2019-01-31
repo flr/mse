@@ -24,8 +24,6 @@ library(mse)
 
 # The mse workflow
 
-
-
 ## Example / Workflow 1
 
 ## Example / Workflow 2
@@ -35,13 +33,13 @@ library(mse)
 ## FLom
 
 ```{r FLom, echo=FALSE, out.width='50%', fig.cap="**FLom class**: Structure of the FLom class. Slot name followed by the slot class, in parenthesis."}
-knitr::include_graphics('diagrams/classes/FLom.png')
+knitr::include_graphics('diagrams/FLom.png')
 ```
 
 ## FLmse
 
 ```{r FLmse, echo=FALSE, out.width='50%', fig.cap="**FLmse class**: Structure of the FLmse class. Slot name followed by the slot class, in parenthesis."}
-knitr::include_graphics('diagrams/classes/FLmse.png')
+knitr::include_graphics('diagrams/FLmse.png')
 ```
 
 ## FLoem
@@ -55,6 +53,10 @@ knitr::include_graphics('diagrams/classes/FLmse.png')
 # Functions
 
 ## mp()
+
+```{r mp, echo=FALSE, out.width='50%', fig.cap="Workflow of the mp() function."}
+knitr::include_graphics('diagrams/mp.svg')
+```
 
 ### goFish()
 

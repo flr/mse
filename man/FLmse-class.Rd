@@ -7,12 +7,25 @@
 \alias{FLmse-methods}
 \alias{tracking}
 \alias{tracking-methods}
+\alias{tracking,FLmse-method}
 \alias{tracking<-}
 \alias{tracking<--methods}
+\alias{control}
+\alias{control-methods}
+\alias{control,FLmse-method}
+\alias{control<-}
+\alias{control<--methods}
+\alias{oem}
+\alias{oem-methods}
+\alias{oem,FLmse-method}
+\alias{oem<-}
+\alias{oem<--methods}
 \alias{genArgs}
 \alias{genArgs-methods}
+\alias{genArgs,FLmse-method}
 \alias{genArgs<-}
 \alias{genArgs<--methods}
+\alias{genArgs<-,FLmse,list-method}
 \title{S4 class \code{FLmse}}
 \usage{
 FLmse(...)
@@ -21,16 +34,38 @@ FLmse(...)
 
 tracking(object, ...)
 
+\S4method{tracking}{FLmse}(object)
+
 tracking(object) <- value
+
+control(object, ...)
+
+\S4method{control}{FLmse}(object)
+
+control(object) <- value
+
+oem(object, ...)
+
+\S4method{oem}{FLmse}(object)
+
+oem(object) <- value
 
 genArgs(object, ...)
 
+\S4method{genArgs}{FLmse}(object)
+
 genArgs(object) <- value
+
+\S4method{genArgs}{FLmse,list}(object) <- value
 }
 \arguments{
 \item{...}{additional argument list that might never be used}
 
 \item{object}{object of relevant class (see signature of method)}
+
+\item{value}{the new object}
+
+\item{value}{the new object}
 
 \item{value}{the new object}
 
