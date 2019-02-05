@@ -130,7 +130,6 @@ setMethod("refpts", "FLom", function(object) object@refpts)
 
 #' @rdname FLom-class
 #' @param value the new object
-#' @aliases refpts<- refpts<--methods
 setReplaceMethod("refpts", signature("FLom", "FLPar"), function(object, value){
 	object@refpts <- value
 	object
