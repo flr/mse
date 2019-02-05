@@ -17,6 +17,11 @@ matrix:
 
 sudo: false
 
+addons:
+  apt:
+    packages:
+      - libgsl-dev
+
 cache: packages
 
 notifications:
