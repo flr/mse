@@ -67,7 +67,7 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 				sr.om.res.mult=sr.om.res.mult,
 				fb=fb,
 				projection=projection,
-				iem=iters(iem, i),
+				iem=iem,
 				ctrl.mp= iters(ctrl.mp, i),
 				genArgs=genArgs,
 				verbose=verbose)
