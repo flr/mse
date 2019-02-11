@@ -5,221 +5,221 @@
  -->
 <!-- Title: mp Pages: 1 -->
 <svg width="713pt" height="954pt"
- viewBox="57.60 57.60 655.60 896.79" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(0.57955 0.57955) rotate(0) translate(103.387 1543.39)">
+ viewBox="57.60 57.60 655.60 896.89" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.579623 0.579623) rotate(0) translate(103.375 1543.37)">
 <title>mp</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-1444 1027.83,-1444 1027.83,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-1444 1027.7,-1444 1027.7,4 -4,4"/>
 <!-- oem -->
 <g id="node1" class="node"><title>oem</title>
-<text text-anchor="middle" x="434.511" y="-1335.2" font-family="Courier,monospace" font-weight="bold" font-size="36.00" fill="#000000">oem</text>
+<text text-anchor="middle" x="502.389" y="-1335.2" font-family="Courier,monospace" font-weight="bold" font-size="36.00" fill="#000000">oem</text>
 </g>
 <!-- oemargs -->
 <g id="node11" class="node"><title>oemargs</title>
-<polygon fill="none" stroke="black" points="811.511,-1362 661.511,-1362 661.511,-1326 811.511,-1326 811.511,-1362"/>
-<text text-anchor="middle" x="736.511" y="-1337.8" font-family="Times,serif" font-size="24.00">oem (FLoem)</text>
+<polygon fill="none" stroke="black" points="844.389,-1362 694.389,-1362 694.389,-1326 844.389,-1326 844.389,-1362"/>
+<text text-anchor="middle" x="769.389" y="-1337.8" font-family="Times,serif" font-size="24.00">oem (FLoem)</text>
 </g>
 <!-- oem&#45;&#45;oemargs -->
 <g id="edge1" class="edge"><title>oem&#45;&#45;oemargs</title>
-<path fill="none" stroke="black" d="M475.8,-1344C537.668,-1344 599.536,-1344 661.404,-1344"/>
+<path fill="none" stroke="black" d="M543.586,-1344C593.716,-1344 643.845,-1344 693.975,-1344"/>
 </g>
 <!-- estin -->
 <g id="node12" class="node"><title>estin</title>
-<polygon fill="none" stroke="black" points="620.511,-1284 248.511,-1284 248.511,-1248 620.511,-1248 620.511,-1284"/>
-<text text-anchor="middle" x="434.511" y="-1259.8" font-family="Times,serif" font-size="24.00">stock (FLStock), indices (FLIndices)</text>
+<polygon fill="none" stroke="black" points="688.389,-1284 316.389,-1284 316.389,-1248 688.389,-1248 688.389,-1284"/>
+<text text-anchor="middle" x="502.389" y="-1259.8" font-family="Times,serif" font-size="24.00">stock (FLStock), indices (FLIndices)</text>
 </g>
 <!-- oem&#45;&#45;estin -->
 <g id="edge8" class="edge"><title>oem&#45;&#45;estin</title>
-<path fill="none" stroke="black" d="M434.511,-1319.78C434.511,-1308.26 434.511,-1294.59 434.511,-1284.04"/>
+<path fill="none" stroke="black" d="M502.389,-1319.78C502.389,-1308.26 502.389,-1294.59 502.389,-1284.04"/>
 </g>
 <!-- est -->
 <g id="node2" class="node"><title>est</title>
-<text text-anchor="middle" x="434.511" y="-1179.2" font-family="Courier,monospace" font-weight="bold" font-size="36.00" fill="#000000">est</text>
+<text text-anchor="middle" x="502.389" y="-1179.2" font-family="Courier,monospace" font-weight="bold" font-size="36.00" fill="#000000">est</text>
 </g>
 <!-- estargs -->
 <g id="node13" class="node"><title>estargs</title>
-<polygon fill="none" stroke="black" points="879.011,-1206 688.011,-1206 688.011,-1170 879.011,-1170 879.011,-1206"/>
-<text text-anchor="middle" x="783.511" y="-1181.8" font-family="Times,serif" font-size="24.00">method (function)</text>
+<polygon fill="none" stroke="black" points="906.889,-1206 715.889,-1206 715.889,-1170 906.889,-1170 906.889,-1206"/>
+<text text-anchor="middle" x="811.389" y="-1181.8" font-family="Times,serif" font-size="24.00">method (function)</text>
 </g>
 <!-- est&#45;&#45;estargs -->
 <g id="edge2" class="edge"><title>est&#45;&#45;estargs</title>
-<path fill="none" stroke="black" d="M475.75,-1188C546.479,-1188 617.208,-1188 687.937,-1188"/>
+<path fill="none" stroke="black" d="M543.428,-1188C600.911,-1188 658.393,-1188 715.876,-1188"/>
 </g>
 <!-- phcrin -->
 <g id="node14" class="node"><title>phcrin</title>
-<polygon fill="none" stroke="black" points="521.011,-1128 348.011,-1128 348.011,-1092 521.011,-1092 521.011,-1128"/>
-<text text-anchor="middle" x="434.511" y="-1103.8" font-family="Times,serif" font-size="24.00">stock (FLStock)</text>
+<polygon fill="none" stroke="black" points="588.889,-1128 415.889,-1128 415.889,-1092 588.889,-1092 588.889,-1128"/>
+<text text-anchor="middle" x="502.389" y="-1103.8" font-family="Times,serif" font-size="24.00">stock (FLStock)</text>
 </g>
 <!-- est&#45;&#45;phcrin -->
 <g id="edge10" class="edge"><title>est&#45;&#45;phcrin</title>
-<path fill="none" stroke="black" d="M434.511,-1163.78C434.511,-1152.26 434.511,-1138.59 434.511,-1128.04"/>
+<path fill="none" stroke="black" d="M502.389,-1163.78C502.389,-1152.26 502.389,-1138.59 502.389,-1128.04"/>
 </g>
 <!-- hcr -->
 <g id="node3" class="node"><title>hcr</title>
-<text text-anchor="middle" x="434.511" y="-867.2" font-family="Courier,monospace" font-weight="bold" font-size="36.00" fill="#000000">hcr</text>
+<text text-anchor="middle" x="502.389" y="-867.2" font-family="Courier,monospace" font-weight="bold" font-size="36.00" fill="#000000">hcr</text>
 </g>
 <!-- hcrargs -->
 <g id="node17" class="node"><title>hcrargs</title>
-<polygon fill="none" stroke="black" points="879.011,-894 688.011,-894 688.011,-858 879.011,-858 879.011,-894"/>
-<text text-anchor="middle" x="783.511" y="-869.8" font-family="Times,serif" font-size="24.00">method (function)</text>
+<polygon fill="none" stroke="black" points="906.889,-894 715.889,-894 715.889,-858 906.889,-858 906.889,-894"/>
+<text text-anchor="middle" x="811.389" y="-869.8" font-family="Times,serif" font-size="24.00">method (function)</text>
 </g>
 <!-- hcr&#45;&#45;hcrargs -->
 <g id="edge4" class="edge"><title>hcr&#45;&#45;hcrargs</title>
-<path fill="none" stroke="black" d="M475.75,-876C546.479,-876 617.208,-876 687.937,-876"/>
+<path fill="none" stroke="black" d="M543.428,-876C600.911,-876 658.393,-876 715.876,-876"/>
 </g>
 <!-- isin -->
 <g id="node18" class="node"><title>isin</title>
-<polygon fill="none" stroke="black" points="543.511,-816 325.511,-816 325.511,-780 543.511,-780 543.511,-816"/>
-<text text-anchor="middle" x="434.511" y="-791.8" font-family="Times,serif" font-size="24.00">control (fwdControl)</text>
+<polygon fill="none" stroke="black" points="611.389,-816 393.389,-816 393.389,-780 611.389,-780 611.389,-816"/>
+<text text-anchor="middle" x="502.389" y="-791.8" font-family="Times,serif" font-size="24.00">control (fwdControl)</text>
 </g>
 <!-- hcr&#45;&#45;isin -->
 <g id="edge14" class="edge"><title>hcr&#45;&#45;isin</title>
-<path fill="none" stroke="black" d="M434.511,-851.785C434.511,-840.26 434.511,-826.587 434.511,-816.044"/>
+<path fill="none" stroke="black" d="M502.389,-851.785C502.389,-840.26 502.389,-826.587 502.389,-816.044"/>
 </g>
 <!-- om -->
 <g id="node4" class="node"><title>om</title>
-<text text-anchor="middle" x="434.511" y="-87.2" font-family="Courier,monospace" font-weight="bold" font-size="36.00" fill="#000000">om</text>
+<text text-anchor="middle" x="502.389" y="-87.2" font-family="Courier,monospace" font-weight="bold" font-size="36.00" fill="#000000">om</text>
 </g>
 <!-- omout -->
 <g id="node23" class="node"><title>omout</title>
-<polygon fill="none" stroke="black" points="521.011,-36 348.011,-36 348.011,-0 521.011,-0 521.011,-36"/>
-<text text-anchor="middle" x="434.511" y="-11.8" font-family="Times,serif" font-size="24.00">stock (FLStock)</text>
+<polygon fill="none" stroke="black" points="588.889,-36 415.889,-36 415.889,-0 588.889,-0 588.889,-36"/>
+<text text-anchor="middle" x="502.389" y="-11.8" font-family="Times,serif" font-size="24.00">stock (FLStock)</text>
 </g>
 <!-- om&#45;&#45;omout -->
 <g id="edge24" class="edge"><title>om&#45;&#45;omout</title>
-<path fill="none" stroke="black" d="M434.511,-71.7845C434.511,-60.2602 434.511,-46.5866 434.511,-36.044"/>
+<path fill="none" stroke="black" d="M502.389,-71.7845C502.389,-60.2602 502.389,-46.5866 502.389,-36.044"/>
 </g>
 <!-- omargs -->
 <g id="node24" class="node"><title>omargs</title>
-<polygon fill="none" stroke="black" points="855.011,-114 664.011,-114 664.011,-78 855.011,-78 855.011,-114"/>
-<text text-anchor="middle" x="759.511" y="-89.8" font-family="Times,serif" font-size="24.00">method (function)</text>
+<polygon fill="none" stroke="black" points="884.889,-114 693.889,-114 693.889,-78 884.889,-78 884.889,-114"/>
+<text text-anchor="middle" x="789.389" y="-89.8" font-family="Times,serif" font-size="24.00">method (function)</text>
 </g>
 <!-- om&#45;&#45;omargs -->
 <g id="edge6" class="edge"><title>om&#45;&#45;omargs</title>
-<path fill="none" stroke="black" d="M464.662,-96C531.08,-96 597.498,-96 663.915,-96"/>
+<path fill="none" stroke="black" d="M532.659,-96C586.395,-96 640.131,-96 693.867,-96"/>
 </g>
 <!-- phcr -->
 <g id="node5" class="node"><title>phcr</title>
-<text text-anchor="middle" x="434.511" y="-1023.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">phcr</text>
+<text text-anchor="middle" x="502.389" y="-1023.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">phcr</text>
 </g>
 <!-- phcrargs -->
 <g id="node15" class="node"><title>phcrargs</title>
-<polygon fill="none" stroke="black" points="904.011,-1050 713.011,-1050 713.011,-1014 904.011,-1014 904.011,-1050"/>
-<text text-anchor="middle" x="808.511" y="-1025.8" font-family="Times,serif" font-size="24.00">method (function)</text>
+<polygon fill="none" stroke="black" points="928.889,-1050 737.889,-1050 737.889,-1014 928.889,-1014 928.889,-1050"/>
+<text text-anchor="middle" x="833.389" y="-1025.8" font-family="Times,serif" font-size="24.00">method (function)</text>
 </g>
 <!-- phcr&#45;&#45;phcrargs -->
 <g id="edge3" class="edge"><title>phcr&#45;&#45;phcrargs</title>
-<path fill="none" stroke="black" d="M486.739,-1032C562.155,-1032 637.57,-1032 712.985,-1032"/>
+<path fill="none" stroke="black" d="M554.431,-1032C615.544,-1032 676.657,-1032 737.77,-1032"/>
 </g>
 <!-- hcrin -->
 <g id="node16" class="node"><title>hcrin</title>
-<polygon fill="none" stroke="black" points="521.011,-972 348.011,-972 348.011,-936 521.011,-936 521.011,-972"/>
-<text text-anchor="middle" x="434.511" y="-947.8" font-family="Times,serif" font-size="24.00">stock (FLStock)</text>
+<polygon fill="none" stroke="black" points="588.889,-972 415.889,-972 415.889,-936 588.889,-936 588.889,-972"/>
+<text text-anchor="middle" x="502.389" y="-947.8" font-family="Times,serif" font-size="24.00">stock (FLStock)</text>
 </g>
 <!-- phcr&#45;&#45;hcrin -->
 <g id="edge12" class="edge"><title>phcr&#45;&#45;hcrin</title>
-<path fill="none" stroke="black" d="M434.511,-1007.78C434.511,-996.26 434.511,-982.587 434.511,-972.044"/>
+<path fill="none" stroke="black" d="M502.389,-1007.78C502.389,-996.26 502.389,-982.587 502.389,-972.044"/>
 </g>
 <!-- is -->
 <g id="node6" class="node"><title>is</title>
-<text text-anchor="middle" x="434.511" y="-711.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">is</text>
+<text text-anchor="middle" x="502.389" y="-711.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">is</text>
 </g>
 <!-- tmin -->
 <g id="node19" class="node"><title>tmin</title>
-<polygon fill="none" stroke="black" points="543.511,-660 325.511,-660 325.511,-624 543.511,-624 543.511,-660"/>
-<text text-anchor="middle" x="434.511" y="-635.8" font-family="Times,serif" font-size="24.00">control (fwdControl)</text>
+<polygon fill="none" stroke="black" points="611.389,-660 393.389,-660 393.389,-624 611.389,-624 611.389,-660"/>
+<text text-anchor="middle" x="502.389" y="-635.8" font-family="Times,serif" font-size="24.00">control (fwdControl)</text>
 </g>
 <!-- is&#45;&#45;tmin -->
 <g id="edge16" class="edge"><title>is&#45;&#45;tmin</title>
-<path fill="none" stroke="black" d="M434.511,-695.785C434.511,-684.26 434.511,-670.587 434.511,-660.044"/>
+<path fill="none" stroke="black" d="M502.389,-695.785C502.389,-684.26 502.389,-670.587 502.389,-660.044"/>
 </g>
 <!-- tm -->
 <g id="node7" class="node"><title>tm</title>
-<text text-anchor="middle" x="434.511" y="-555.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">tm</text>
+<text text-anchor="middle" x="502.389" y="-555.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">tm</text>
 </g>
 <!-- iemin -->
 <g id="node20" class="node"><title>iemin</title>
-<polygon fill="none" stroke="black" points="543.511,-504 325.511,-504 325.511,-468 543.511,-468 543.511,-504"/>
-<text text-anchor="middle" x="434.511" y="-479.8" font-family="Times,serif" font-size="24.00">control (fwdControl)</text>
+<polygon fill="none" stroke="black" points="611.389,-504 393.389,-504 393.389,-468 611.389,-468 611.389,-504"/>
+<text text-anchor="middle" x="502.389" y="-479.8" font-family="Times,serif" font-size="24.00">control (fwdControl)</text>
 </g>
 <!-- tm&#45;&#45;iemin -->
 <g id="edge18" class="edge"><title>tm&#45;&#45;iemin</title>
-<path fill="none" stroke="black" d="M434.511,-539.785C434.511,-528.26 434.511,-514.587 434.511,-504.044"/>
+<path fill="none" stroke="black" d="M502.389,-539.785C502.389,-528.26 502.389,-514.587 502.389,-504.044"/>
 </g>
 <!-- iem -->
 <g id="node8" class="node"><title>iem</title>
-<text text-anchor="middle" x="434.511" y="-399.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">iem</text>
+<text text-anchor="middle" x="502.389" y="-399.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">iem</text>
 </g>
 <!-- fbin -->
 <g id="node21" class="node"><title>fbin</title>
-<polygon fill="none" stroke="black" points="543.511,-348 325.511,-348 325.511,-312 543.511,-312 543.511,-348"/>
-<text text-anchor="middle" x="434.511" y="-323.8" font-family="Times,serif" font-size="24.00">control (fwdControl)</text>
+<polygon fill="none" stroke="black" points="611.389,-348 393.389,-348 393.389,-312 611.389,-312 611.389,-348"/>
+<text text-anchor="middle" x="502.389" y="-323.8" font-family="Times,serif" font-size="24.00">control (fwdControl)</text>
 </g>
 <!-- iem&#45;&#45;fbin -->
 <g id="edge20" class="edge"><title>iem&#45;&#45;fbin</title>
-<path fill="none" stroke="black" d="M434.511,-383.785C434.511,-372.26 434.511,-358.587 434.511,-348.044"/>
+<path fill="none" stroke="black" d="M502.389,-383.785C502.389,-372.26 502.389,-358.587 502.389,-348.044"/>
 </g>
 <!-- fb -->
 <g id="node9" class="node"><title>fb</title>
-<text text-anchor="middle" x="434.511" y="-243.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">fb</text>
+<text text-anchor="middle" x="502.389" y="-243.2" font-family="Courier,monospace" font-size="36.00" fill="#000000">fb</text>
 </g>
 <!-- omin -->
 <g id="node22" class="node"><title>omin</title>
-<polygon fill="none" stroke="black" points="627.511,-192 241.511,-192 241.511,-156 627.511,-156 627.511,-192"/>
-<text text-anchor="middle" x="434.511" y="-167.8" font-family="Times,serif" font-size="24.00">stock (FLStock), control (fwdControl)</text>
+<polygon fill="none" stroke="black" points="695.389,-192 309.389,-192 309.389,-156 695.389,-156 695.389,-192"/>
+<text text-anchor="middle" x="502.389" y="-167.8" font-family="Times,serif" font-size="24.00">stock (FLStock), control (fwdControl)</text>
 </g>
 <!-- fb&#45;&#45;omin -->
 <g id="edge22" class="edge"><title>fb&#45;&#45;omin</title>
-<path fill="none" stroke="black" d="M434.511,-227.785C434.511,-216.26 434.511,-202.587 434.511,-192.044"/>
+<path fill="none" stroke="black" d="M502.389,-227.785C502.389,-216.26 502.389,-202.587 502.389,-192.044"/>
 </g>
 <!-- oemin -->
 <g id="node10" class="node"><title>oemin</title>
-<polygon fill="none" stroke="black" points="544.511,-1440 324.511,-1440 324.511,-1404 544.511,-1404 544.511,-1440"/>
-<text text-anchor="middle" x="434.511" y="-1415.8" font-family="Times,serif" font-size="24.00">stock(om) (FLStock)</text>
+<polygon fill="none" stroke="black" points="612.389,-1440 392.389,-1440 392.389,-1404 612.389,-1404 612.389,-1440"/>
+<text text-anchor="middle" x="502.389" y="-1415.8" font-family="Times,serif" font-size="24.00">stock(om) (FLStock)</text>
 </g>
 <!-- oemin&#45;&#45;oem -->
 <g id="edge7" class="edge"><title>oemin&#45;&#45;oem</title>
-<path fill="none" stroke="black" d="M434.511,-1403.75C434.511,-1393.24 434.511,-1379.68 434.511,-1368.23"/>
+<path fill="none" stroke="black" d="M502.389,-1403.75C502.389,-1393.24 502.389,-1379.68 502.389,-1368.23"/>
 </g>
 <!-- estin&#45;&#45;est -->
 <g id="edge9" class="edge"><title>estin&#45;&#45;est</title>
-<path fill="none" stroke="black" d="M434.511,-1247.75C434.511,-1237.24 434.511,-1223.68 434.511,-1212.23"/>
+<path fill="none" stroke="black" d="M502.389,-1247.75C502.389,-1237.24 502.389,-1223.68 502.389,-1212.23"/>
 </g>
 <!-- phcrin&#45;&#45;phcr -->
 <g id="edge11" class="edge"><title>phcrin&#45;&#45;phcr</title>
-<path fill="none" stroke="black" d="M434.511,-1091.75C434.511,-1081.24 434.511,-1067.68 434.511,-1056.23"/>
+<path fill="none" stroke="black" d="M502.389,-1091.75C502.389,-1081.24 502.389,-1067.68 502.389,-1056.23"/>
 </g>
 <!-- hcrin&#45;&#45;hcr -->
 <g id="edge13" class="edge"><title>hcrin&#45;&#45;hcr</title>
-<path fill="none" stroke="black" d="M434.511,-935.754C434.511,-925.244 434.511,-911.677 434.511,-900.228"/>
+<path fill="none" stroke="black" d="M502.389,-935.754C502.389,-925.244 502.389,-911.677 502.389,-900.228"/>
 </g>
 <!-- isin&#45;&#45;is -->
 <g id="edge15" class="edge"><title>isin&#45;&#45;is</title>
-<path fill="none" stroke="black" d="M434.511,-779.754C434.511,-769.244 434.511,-755.677 434.511,-744.228"/>
+<path fill="none" stroke="black" d="M502.389,-779.754C502.389,-769.244 502.389,-755.677 502.389,-744.228"/>
 </g>
 <!-- tmin&#45;&#45;tm -->
 <g id="edge17" class="edge"><title>tmin&#45;&#45;tm</title>
-<path fill="none" stroke="black" d="M434.511,-623.754C434.511,-613.244 434.511,-599.677 434.511,-588.228"/>
+<path fill="none" stroke="black" d="M502.389,-623.754C502.389,-613.244 502.389,-599.677 502.389,-588.228"/>
 </g>
 <!-- iemin&#45;&#45;iem -->
 <g id="edge19" class="edge"><title>iemin&#45;&#45;iem</title>
-<path fill="none" stroke="black" d="M434.511,-467.754C434.511,-457.244 434.511,-443.677 434.511,-432.228"/>
+<path fill="none" stroke="black" d="M502.389,-467.754C502.389,-457.244 502.389,-443.677 502.389,-432.228"/>
 </g>
 <!-- fbin&#45;&#45;fb -->
 <g id="edge21" class="edge"><title>fbin&#45;&#45;fb</title>
-<path fill="none" stroke="black" d="M434.511,-311.754C434.511,-301.244 434.511,-287.677 434.511,-276.228"/>
+<path fill="none" stroke="black" d="M502.389,-311.754C502.389,-301.244 502.389,-287.677 502.389,-276.228"/>
 </g>
 <!-- omin&#45;&#45;om -->
 <g id="edge23" class="edge"><title>omin&#45;&#45;om</title>
-<path fill="none" stroke="black" d="M434.511,-155.754C434.511,-145.244 434.511,-131.677 434.511,-120.228"/>
+<path fill="none" stroke="black" d="M502.389,-155.754C502.389,-145.244 502.389,-131.677 502.389,-120.228"/>
 </g>
 <!-- omargs2 -->
 <g id="node25" class="node"><title>omargs2</title>
-<polygon fill="none" stroke="black" points="263.011,-114 164.011,-114 164.011,-78 263.011,-78 263.011,-114"/>
-<text text-anchor="middle" x="213.511" y="-89.8" font-family="Times,serif" font-size="24.00">omargs2</text>
+<polygon fill="none" stroke="black" points="305.389,-114 101.389,-114 101.389,-78 305.389,-78 305.389,-114"/>
+<text text-anchor="middle" x="203.389" y="-89.8" font-family="Times,serif" font-size="24.00">deviates (FLQuant)</text>
 </g>
 <!-- omargs2&#45;&#45;om -->
 <g id="edge5" class="edge"><title>omargs2&#45;&#45;om</title>
-<path fill="none" stroke="black" d="M263.149,-96C310.229,-96 357.309,-96 404.389,-96"/>
+<path fill="none" stroke="black" d="M305.586,-96C361.065,-96 416.544,-96 472.023,-96"/>
 </g>
 </g>
 </svg>

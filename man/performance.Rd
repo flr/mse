@@ -3,11 +3,27 @@
 \docType{methods}
 \name{performance}
 \alias{performance}
+\alias{performance,FLQuants-method}
+\alias{performance,FLStock-method}
+\alias{performance,FLStocks-method}
+\alias{performance,list-method}
 \title{Compute performance indicators}
 \usage{
 \S4method{performance}{FLStock}(x, indicators, refpts,
   years = as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
   metrics = FLCore::metrics(x), probs = NULL, mp = NULL)
+
+\S4method{performance}{FLQuants}(x, indicators, refpts,
+  years = dims(x[[1]])$maxyear, probs = c(0.1, 0.25, 0.5, 0.75, 0.9),
+  mp = NULL)
+
+\S4method{performance}{FLStocks}(x, indicators, refpts,
+  years = dims(x[[1]])$maxyear, metrics = FLCore::metrics,
+  probs = NULL, grid = missing, mp = NULL, mc.cores = 1)
+
+\S4method{performance}{list}(x, indicators, refpts,
+  years = dims(x[[1]])$maxyear, probs = NULL, grid = missing,
+  mp = NULL, mc.cores = 1)
 }
 \arguments{
 \item{indicators}{Indicators to be computed, as formula, name and description, \code{list}}

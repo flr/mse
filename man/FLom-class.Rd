@@ -14,9 +14,9 @@
 \alias{refpts,FLom-method}
 \alias{refpts}
 \alias{refpts-methods}
+\alias{refpts<-,FLom,FLPar-method}
 \alias{refpts<-}
 \alias{refpts<--methods}
-\alias{refpts<-,FLom,FLPar-method}
 \alias{fleetBehaviour}
 \alias{fleetBehaviour-methods}
 \alias{fleetBehaviour,FLom-method}
@@ -28,10 +28,9 @@
 \alias{projection<-}
 \alias{projection<--methods}
 \alias{show,FLom-method}
-\alias{tracking,FLmse-method}
 \alias{tracking<-,FLmse,FLQuant-method}
-\alias{genArgs,FLmse-method}
-\alias{genArgs<-,FLmse,list-method}
+\alias{control<-,FLmse,FLQuant-method}
+\alias{oem<-,FLmse,FLQuant-method}
 \title{A class for an operating model (OM)}
 \usage{
 FLom(...)
@@ -50,8 +49,6 @@ sr(object) <- value
 
 \S4method{refpts}{FLom}(object)
 
-refpts(object) <- value
-
 \S4method{refpts}{FLom,FLPar}(object) <- value
 
 fleetBehaviour(object, ...)
@@ -68,13 +65,11 @@ projection(object) <- value
 
 \S4method{show}{FLom}(object)
 
-\S4method{tracking}{FLmse}(object)
-
 \S4method{tracking}{FLmse,FLQuant}(object) <- value
 
-\S4method{genArgs}{FLmse}(object)
+\S4method{control}{FLmse,FLQuant}(object) <- value
 
-\S4method{genArgs}{FLmse,list}(object) <- value
+\S4method{oem}{FLmse,FLQuant}(object) <- value
 }
 \arguments{
 \item{...}{additional argument list that might never be used}
