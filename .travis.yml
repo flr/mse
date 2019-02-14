@@ -2,6 +2,9 @@
 #
 # https://travis-ci.org/flr/FLCore
 
+env:
+  - R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
+
 warnings_are_errors: false
 
 language: r
