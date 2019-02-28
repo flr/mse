@@ -26,6 +26,7 @@ export(
   "fixedF.hcr",
   "fwd.om",
   "getCtrl",
+  "goFish",
   "gridList",
   "hyperstability.fb",
   "ices.hcr",
