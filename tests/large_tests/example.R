@@ -14,9 +14,9 @@
 
 # LOAD packages
 
+library(mse)
 library(FLa4a)
 library(ggplotFL)
-library(mse)
 library(doParallel)
 
 # LOAD data

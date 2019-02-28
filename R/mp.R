@@ -9,7 +9,7 @@
 
 # mp {{{
 
-mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test", tracking="missing", verbose=TRUE){
+mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tracking="missing", verbose=TRUE){
 
 
 	#============================================================
@@ -41,8 +41,7 @@ mp <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test"
 	if (!is.null(genArgs$seed)) set.seed(genArgs$seed)
   
 	# PREPARE objects for loop call
-  	if (exists(fleetBehaviour(om))) fb <- fleetBehaviour(om) else fb <- NULL 
-	if (missing(iem)) iem <- NULL
+  if (exists(fleetBehaviour(om))) fb <- fleetBehaviour(om) else fb <- NULL 
 	
 	#============================================================
 	# PREPARE for parallel if needed

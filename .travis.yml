@@ -1,20 +1,18 @@
-# .travis.yml for R projects.
-#
-# https://travis-ci.org/flr/FLCore
+language: r
 
 warnings_are_errors: false
 
-language: r
+os:
+  - linux
+  - osx
 
-matrix:
-  include:
-    - os: linux
-      r: release
-    - os: linux
-      r: devel
-    - os: osx
-      r: release
+r:
+  - release
 
+branches:
+  only:
+  - master
+    
 sudo: false
 
 cache: packages
@@ -24,6 +22,27 @@ notifications:
     on_success: change
     on_failure: change
 
-branches:
-  only:
-    - master
+before_deploy:
+  # Get PKGVER
+  - 'export PKGVER=$(sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)'
+  # CHECK version type by counting dots (flaky)
+  - 'export RELEASE=$(grep -o \\. <<< $PKGVER | wc -w)'
+  - "echo $RELEASE"
+  # Build binary and remove the source archive
+  - "R CMD INSTALL --build mse_$PKGVER.tar.gz"
+  - "rm mse_$PKGVER.tar.gz"
+  # Look for packages
+  - "export RELEASE_PKG_FILE=$(ls mse*gz)"
+  - "echo $RELEASE_PKG_FILE"
+
+deploy:
+  provider: releases
+  api_key:
+    secure: i4Exs5Nvqa5qPOuE7+6bGPh9O3lXp5COE18mcLanzh4KU//mOHkyhoHKc/1fnagh9dS2+URbe0sdqdeOKdq300fsHFw3G6xhXdASrEdaopQ99lEVWRjnaldJ090PTMXkQ71Oy1jzz6q6r4kBt+v+0cjHaKOjia68n2++y/n5OC9KbFCcFWkdDj61pX/k4HqLCNB2yoAD48IiW1571OS8sqvvZXKzZtmQy407B9sZk548BSOQHT/PH1tzshfiUvA4hdQP6TJDv8KyNM199ZW0c/JdX6NbcZvj2v+IR/f58/RCkUUBgoHBD0Lm3HZkCbOijhSfLZHM2koaXhnZrXhZK/xUHZWSN+9KjqfHt4vGmlRaAfpHAeAVHz/t5I/wa3ruKWH9nKx6yqDOxj1ed6wOykI094i1uLo8UI3V12uUM+3oyKN56J1oDfU7bUJsNwLSnuaVQC8hW7lj7vPAHctfsKa4hu/QI3r2ksXKSuLRq36I8rs+oL0R/19yjqeFlxDjvyx40MZDgI5hawe1Wzqou7+eWvG0yuOjIe9Ua/4uey8ee5arZMatqk3h4CWv27xb7bgXr8Vrm/YkolLcM5NN5+I3KcfZPXwR5OnJwjbL+WiRer7bX7oUJpEuGJSTyZPXGRyuYy4iSySRAK3V0TCXmX7APnpXPi3TAHlILJGSC2Q=
+  file: $RELEASE_PKG_FILE
+  skip_cleanup: true
+  draft: true
+  on:
+    repo: flr/mse
+    # condition: "$RELEASE=2"
+    # condition: $RELEASE =~ ^[0-9]+\.[0-9]+\.[0-9]+

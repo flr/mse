@@ -4,7 +4,6 @@
 \name{performance}
 \alias{performance}
 \alias{performance,FLQuants-method}
-\alias{performance,FLStock-method}
 \alias{performance,FLStocks-method}
 \alias{performance,list-method}
 \title{Compute performance indicators}
