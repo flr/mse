@@ -33,7 +33,9 @@ sampling.oem <- function(stk, deviances, observations, genArgs, tracking,
 	# indices
 	if(any(oe %in% c("both","index"))){
 		for (idx_count in 1:length(observations$idx)){
-			index(observations$idx[[idx_count]])[,max(dataYears)] <- stock.n(stk)[,max(dataYears)]*deviances$idx[[idx_count]][,max(dataYears)]
+			TS <- mean(range(observations$idx[[i]])[c("startf", "endf")])
+			index(observations$idx[[idx_count]])[,max(dataYears)] <- 
+				stock.n(stk)[,max(dataYears)] * exp((-m(stk)[,max(dataYears)] - harvest(stk)[,max(dataYears)]) * TS) * deviances$idx[[idx_count]][,max(dataYears)]
 		}
 		idx0 <- lapply(observations$idx, function(x) x[,dataYears])
 	}
