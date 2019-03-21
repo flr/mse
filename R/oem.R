@@ -10,11 +10,11 @@
 # sampling.oem {{{
 
 sampling.oem <- function(stk, deviances, observations, genArgs, tracking,
-  oe=c("both","index","catch")) {
+  oe=c("both","index","catch"), lag=1) {
 	
   # TODO needs more work to remove the index OE, for now index OE is mandatory 
 
-	dataYears <- genArgs$vy0
+	dataYears <- 1:(genArgs$ay-genArgs$y0-lag+1)
 	assessmentYear <- ac(genArgs$ay)
 	# dataYears is a position vector, not the years themselves
 

@@ -127,7 +127,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		gc()
 		if(verbose) cat(i, " > ")
 		ay <- genArgs$ay <- an(i)
-		genArgs$vy0 <- 1:(ay-y0) # data years (positions vector) - one less than current year
+		#genArgs$vy0 <- 1:(ay-y0) # data years (positions vector) - one less than current year
 		sqy <- genArgs$sqy <- ac((ay-1):(ay-nsqy)) # years for status quo computations 
 		
     		# TRACK om
