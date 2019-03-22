@@ -11,7 +11,7 @@
 
 mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tracking="missing", verbose=TRUE){
 
-
+browser()
 	#============================================================
 	# prepare the om
 	stk.om <- stock(om)	
@@ -23,22 +23,27 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	if (!is.null(genArgs$nblocks)) nblocks <- genArgs$nblocks else nblocks <- 1
 	fy <- genArgs$fy # final year
 	iy <- genArgs$iy # initial year of projection (also intermediate)
-	vy <- ac(iy:fy) # vector of years to be projected
+	vy <- genArgs$vy <- ac(iy:fy) # vector of years to be projected
 	# TODO mlag
 	# om$its
-	it <- dim(stk.om)[6]
+	it <- genArgs$it <- dim(stk.om)[6]
+
+	# SET lags
+	if (is.null(genArgs$data_lag)) genArgs$data_lag <- 1
+	if (is.null(genArgs$management_lag)) genArgs$management_lag <- 1
 
 	# INIT tracking
 	metric <- c("F.est", "B.est", "conv.est", "metric.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om")
 	
 	if (!missing(tracking)) metric <- c(metric, tracking)
-	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=c(iy-1,vy), iter=1:it))
+	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=c((iy-genArgs$management_lag+1):(iy-1),vy), iter=1:it))
 
 	# GET historical
-	tracking["metric.is", ac(iy)] <- catch(stk.om)[,ac(iy)]
+	tracking["metric.is", ac((iy-genArgs$management_lag+1):(iy-1))] <- catch(stk.om)[,ac((iy+1):(iy+genArgs$management_lag-2))]
 
 	# SET seed
 	if (!is.null(genArgs$seed)) set.seed(genArgs$seed)
+
   
 	# PREPARE objects for loop call
   if (exists(fleetBehaviour(om))) fb <- fleetBehaviour(om) else fb <- NULL 
@@ -113,12 +118,12 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 
 goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem, iem, tracking, ctrl.mp, genArgs, verbose){
 
-	it <- dims(stk.om)$iter
+	it <- genArgs$it
 	y0 <- genArgs$y0 # initial data year
 	fy <- genArgs$fy # final year
 	iy <- genArgs$iy # initial year of projection (also intermediate)
 	nsqy <- genArgs$nsqy # number of years to compute status quo metrics
-	vy <- ac(iy:fy) # vector of years to be projected
+	vy <- genArgs$vy # vector of years to be projected
 
 	#============================================================
 	# go fish
@@ -137,8 +142,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		
 		#==========================================================
 		# OEM
-		#----------------------------------------------------------
-		# function o()
+		#==========================================================
 		ctrl.oem <- args(oem)
 		ctrl.oem$method <- method(oem)
 		ctrl.oem$deviances <- deviances(oem)
@@ -156,9 +160,8 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 
 		#==========================================================
 		# MP
-		#----------------------------------------------------------
 		# Estimator of stock statistics
-		# function f()
+		#==========================================================
 		if (!is.null(ctrl.mp$ctrl.est)){
 			ctrl.est <- args(ctrl.mp$ctrl.est)
 			ctrl.est$method <- method(ctrl.mp$ctrl.est)
@@ -173,11 +176,10 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		}
 		tracking["F.est",ac(ay)] <- fbar(stk0)[,ac(ay-1)]
 		tracking["B.est",ac(ay)] <- ssb(stk0)[,ac(ay-1)]
-	
 
 		#----------------------------------------------------------
 		# HCR parametrization
-		# function x()
+		#----------------------------------------------------------
 		if (!is.null(ctrl.mp$ctrl.phcr)){
 			ctrl.phcr <- args(ctrl.mp$ctrl.phcr)
 			ctrl.phcr$method <- method(ctrl.mp$ctrl.phcr) 
@@ -194,7 +196,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 
 		#----------------------------------------------------------
 		# HCR
-		# function h()
+		#----------------------------------------------------------
 		if (!is.null(ctrl.mp$ctrl.hcr)){
 			ctrl.hcr <- args(ctrl.mp$ctrl.hcr)
 			ctrl.hcr$method <- method(ctrl.mp$ctrl.hcr)
@@ -213,7 +215,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		
 		#----------------------------------------------------------
 		# Implementation system
-		# function k()
+		#----------------------------------------------------------
 		if (!is.null(ctrl.mp$ctrl.is)){
 			ctrl.is <- args(ctrl.mp$ctrl.is)
 			ctrl.is$method <- method(ctrl.mp$ctrl.is)
@@ -232,7 +234,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 
 		#----------------------------------------------------------
 		# Technical measures
-		# function w()
+		#----------------------------------------------------------
 		if (!is.null(ctrl.mp$ctrl.tm)){
 			ctrl.tm <- args(ctrl.mp$ctrl.tm)
 			ctrl.tm$method <- method(ctrl.mp$ctrl.tm)
@@ -247,7 +249,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 
 		#==========================================================
 		# IEM
-		#----------------------------------------------------------
+		#==========================================================
 		if(!is.null(iem)){
 			ctrl.iem <- args(iem)
 			ctrl.iem$method <- method(iem)
@@ -263,9 +265,8 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 
 		#==========================================================
 		# OM
-		#----------------------------------------------------------
 		# fleet dynamics/behaviour
-		# function j()
+		#==========================================================
 		if (!is.null(fb)){
 			ctrl.fb <- args(fb)
 			ctrl.fb$method <- method(fb)
@@ -282,7 +283,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 
 		#----------------------------------------------------------
 		# stock dynamics and OM projections
-		# function g()
+		#----------------------------------------------------------
 		if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[,ac(ay+1)] <- attr(ctrl, "snew")
 		ctrl.om <- args(projection)
 		ctrl.om$ctrl <- ctrl
@@ -297,7 +298,6 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 	}
 	list(stk.om=stk.om, tracking=tracking, oem=oem, genArgs=genArgs)
 }
-
 
 mp00 <- function(om, oem=FLoem(), iem="missing", ctrl.mp, genArgs, scenario="test", tracking="missing", verbose=TRUE){
 
