@@ -29,9 +29,11 @@ tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, track
 	ay <- genArgs$ay
 	nsqy <- genArgs$nsqy
 	iy <- genArgs$iy
-	it <- dims(stk)$iter
+	mlag <- genArgs$management_lag
+	it <- dim(stk)[6]
 	# reference value
-	if(ay==iy) refCatch <- tracking["C.om", ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
+	#if(ay==iy) refCatch <- tracking["C.om", ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
+	if(ay==iy) refCatch <- catch(stk)[, ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
 	# Year range of perceived stock
 	yrs <- as.numeric(dimnames(stock.n(stk))$year)
 	last_data_yr <- yrs[length(yrs)]
@@ -40,25 +42,25 @@ tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, track
 	# Get the Fbar for the intermediate years
 	fsq0 <- yearMeans(fbar(stk)[,ac(sqy)])
 	# Number of intermediate years (between last data year and ay+1)
-	ninter_yrs <- ay - last_data_yr
+	ninter_yrs <- ay - last_data_yr + mlag - 1
 	# Control object for the STF
-	ctrl <- getCtrl(c(rep(fsq0, times=ninter_yrs), ctrl@trgtArray[,"val",]), "f", (last_data_yr+1):(ay+1), it)
+	ctrl <- getCtrl(c(rep(fsq0, times=ninter_yrs), ctrl@trgtArray[,"val",]), "f", (last_data_yr+1):(ay+mlag), it)
 	# Number of projection years
-	nproj_yrs <- (ay+1) - last_data_yr
+	nproj_yrs <- (ay+mlag) - last_data_yr
 	stkTmp <- stf(stk, nproj_yrs, wts.nyears=nsqy)
 	# Set geomean sr relationship
 	gmean_rec <- c(exp(yearMeans(log(rec(stk)[,ac(sqy)]))))
 	# Project!
 	stkTmp <- fwd(stkTmp, ctrl=ctrl, sr=list(model="mean", params = FLPar(gmean_rec,iter=it)))
-	# Get TAC for following year that results from hitting the F in STF
-	TAC <- catch(stkTmp)[,ac(ay+1)]
+	# Get TAC for the management year that results from hitting the F in STF
+	TAC <- catch(stkTmp)[,ac(ay+mlag)]
 	# catch stabelizers
 	upper_limit <- refCatch * delta_tac_max
 	lower_limit <- refCatch * delta_tac_min
 	TAC <- pmin(c(upper_limit), c(TAC), na.rm=TRUE)
 	TAC <- pmax(c(lower_limit), c(TAC), na.rm=TRUE)
 	# new control file
-	ctrl <- getCtrl(c(TAC), "catch", ay+1, it)
+	ctrl <- getCtrl(c(TAC), "catch", ay+mlag, it)
 	list(ctrl = ctrl, tracking = tracking)
 } # }}}
 
@@ -75,7 +77,7 @@ effort.is <- function(stk, ctrl, genArgs, tracking){
 	it <- dims(stk)$iter
 	iy <- genArgs$iy
 	# reference value
-	if(ay==iy) fay <- tracking["F.om",ac(ay-1)] else fay <- tracking["metric.is",ac(ay-1)]*tracking["F.est",ac(ay)]	
+	if(ay==iy) fay <- fbar(stock)[,ac(ay-1)] else fay <- tracking["metric.is",ac(ay-1)]*tracking["F.est",ac(ay)]	
 	# target to reach defined by HCR (in f units)
 	trgt <- ctrl@trgtArray[,"val",]
 	# multiplier
