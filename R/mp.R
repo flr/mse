@@ -40,7 +40,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	if (!missing(tracking)) metric <- c(metric, tracking)
 	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=unique(c((iy-genArgs$management_lag+1):iy,vy)), iter=1:it))
 	# GET historical
-	tracking["metric.is", ac((iy-genArgs$management_lag+1):iy)] <- catch(stk.om)[,ac((iy+1):(iy+genArgs$management_lag))]
+	tracking["metric.is", ac((iy-genArgs$management_lag+1):iy)] <- tracking["metric.iem", ac((iy-genArgs$management_lag+1):iy)] <- catch(stk.om)[,ac((iy+1):(iy+genArgs$management_lag))]
 
 	# SET seed
 	if (!is.null(genArgs$seed)) set.seed(genArgs$seed)
@@ -142,10 +142,11 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		tracking["F.om", ac(ay)] <- fbar(stk.om)[,ac(ay)]    
 		tracking["B.om", ac(ay)] <- ssb(stk.om)[,ac(ay)]    
 		tracking["C.om", ac(ay)] <- catch(stk.om)[,ac(ay)]    
-		
+
 		#==========================================================
 		# OEM
 		#==========================================================
+		cat("oem\n")
 		ctrl.oem <- args(oem)
 		ctrl.oem$method <- method(oem)
 		ctrl.oem$deviances <- deviances(oem)
@@ -165,6 +166,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		# MP
 		# Estimator of stock statistics
 		#==========================================================
+		cat("est\n")
 		if (!is.null(ctrl.mp$ctrl.est)){
 			ctrl.est <- args(ctrl.mp$ctrl.est)
 			ctrl.est$method <- method(ctrl.mp$ctrl.est)
@@ -183,6 +185,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#----------------------------------------------------------
 		# HCR parametrization
 		#----------------------------------------------------------
+		cat("phcr\n")
 		if (!is.null(ctrl.mp$ctrl.phcr)){
 			ctrl.phcr <- args(ctrl.mp$ctrl.phcr)
 			ctrl.phcr$method <- method(ctrl.mp$ctrl.phcr) 
@@ -200,6 +203,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#----------------------------------------------------------
 		# HCR
 		#----------------------------------------------------------
+		cat("hcr\n")
 		if (!is.null(ctrl.mp$ctrl.hcr)){
 			ctrl.hcr <- args(ctrl.mp$ctrl.hcr)
 			ctrl.hcr$method <- method(ctrl.mp$ctrl.hcr)
@@ -219,6 +223,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#----------------------------------------------------------
 		# Implementation system
 		#----------------------------------------------------------
+		cat("is\n")
 		if (!is.null(ctrl.mp$ctrl.is)){
 			ctrl.is <- args(ctrl.mp$ctrl.is)
 			ctrl.is$method <- method(ctrl.mp$ctrl.is)
@@ -233,12 +238,13 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			tracking["metric.is", ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
 
 		} else {
-			tracking["metric.is", ac(ay)] <- tracking["metric.hcr", ac(ay+1)]
+			tracking["metric.is", ac(ay)] <- tracking["metric.hcr", ac(ay+genArgs$management_lag)]
 		}
 
 		#----------------------------------------------------------
 		# Technical measures
 		#----------------------------------------------------------
+		cat("tm\n")
 		if (!is.null(ctrl.mp$ctrl.tm)){
 			ctrl.tm <- args(ctrl.mp$ctrl.tm)
 			ctrl.tm$method <- method(ctrl.mp$ctrl.tm)
@@ -254,6 +260,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#==========================================================
 		# IEM
 		#==========================================================
+		cat("iem\n")
 		if(!is.null(iem)){
 			ctrl.iem <- args(iem)
 			ctrl.iem$method <- method(iem)
@@ -265,12 +272,13 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		}
-		tracking["metric.iem",ac(ay)] <- ctrl@trgtArray[,"val",]
+		tracking["metric.iem",ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
 
 		#==========================================================
 		# OM
 		# fleet dynamics/behaviour
 		#==========================================================
+		cat("fb\n")
 		if (!is.null(fb)){
 			ctrl.fb <- args(fb)
 			ctrl.fb$method <- method(fb)
@@ -283,13 +291,16 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			tracking <- out$tracking
 		}
 	    # TODO value()
-		tracking["metric.fb",ac(ay)] <- ctrl@trgtArray[,"val",]
+		tracking["metric.fb",ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
 
 		#----------------------------------------------------------
 		# stock dynamics and OM projections
 		#----------------------------------------------------------
+		cat("om\n")
 		if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[,ac(ay+1)] <- attr(ctrl, "snew")
 		ctrl.om <- args(projection)
+		# update with decision made having into account management lag
+		ctrl <- getCtrl(tracking["metric.iem",ac(genArgs$ay-genArgs$management_lag+1)], ac(ctrl@target[,"quantity",]), ay+1, it)   		
 		ctrl.om$ctrl <- ctrl
 		ctrl.om$stk <- stk.om
 		ctrl.om$sr <- sr.om

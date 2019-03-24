@@ -58,7 +58,7 @@ ices.hcr <- function(stk, fmin, ftrg, blim, bsafe, genArgs, tracking){
 	gradient <- (ftrg - fmin) / (bsafe - blim)
 	fout[inbetween] <- (ssb[inbetween] - blim) * gradient + fmin
 	# create control file
-	ctrl <- getCtrl(c(fout), "f", ay+1, dim(fout)[6])
+	ctrl <- getCtrl(c(fout), "f", ay+genArgs$management_lag, dim(fout)[6])
 	# return
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
@@ -78,7 +78,7 @@ fixedF.hcr <- function(stk, ftrg, genArgs, tracking){
     ftrg <- FLQuant(ftrg, dimnames=list(iter=dimnames(stk@catch)$iter))
 
 	# create control file
-	ctrl <- getCtrl(c(ftrg), "f", ay+1, dim(ftrg)[6])
+	ctrl <- getCtrl(c(ftrg), "f", ay+genArgs$management_lag, dim(ftrg)[6])
 	
 	# return
 	list(ctrl=ctrl, tracking=tracking)
@@ -93,7 +93,7 @@ movingF.hcr <- function(stk, hcrpars, genArgs, tracking){
     hcrpars <- FLQuant(hcrpars, dimnames=list(iter=dimnames(stk@catch)$iter))
 	
   # create control file
-	ctrl <- getCtrl(c(hcrpars), "f", ay+1, dim(hcrpars)[6])
+	ctrl <- getCtrl(c(hcrpars), "f", ay+genArgs$management_lag, dim(hcrpars)[6])
 	
   # return
 	list(ctrl=ctrl, tracking=tracking)
