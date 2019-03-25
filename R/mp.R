@@ -22,6 +22,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	if (!is.null(genArgs$nblocks)) nblocks <- genArgs$nblocks else nblocks <- 1
 	fy <- genArgs$fy # final year
 	iy <- genArgs$iy # initial year of projection (also intermediate)
+	nsqy <- genArgs$nsqy # sq years
 	vy <- genArgs$vy <- ac(iy:fy) # vector of years to be projected
 	# om$its
 	it <- genArgs$it <- dim(stk.om)[6]
@@ -39,9 +40,16 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 
 	if (!missing(tracking)) metric <- c(metric, tracking)
 	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=unique(c((iy-genArgs$management_lag+1):iy,vy)), iter=1:it))
-	# GET historical
-	tracking["metric.is", ac((iy-genArgs$management_lag+1):iy)] <- tracking["metric.iem", ac((iy-genArgs$management_lag+1):iy)] <- catch(stk.om)[,ac((iy+1):(iy+genArgs$management_lag))]
-
+	# GET historical from OM 
+	# ToDo intermediate year function
+	catch.inty <- catch(stk.om)[,ac((iy+1):(iy+genArgs$management_lag))]
+	fsq.inty <- c(yearMeans(fbar(stk.om)[,ac((iy-1):(iy-nsqy))]))
+	if(sum(is.na(catch.inty))==0){
+		tracking["metric.is", ac((iy-genArgs$management_lag+1):iy)] <- tracking["metric.iem", ac((iy-genArgs$management_lag+1):iy)] <- catch.inty
+	} else {
+		tracking["metric.is", ac((iy-genArgs$management_lag+1):iy)] <- tracking["metric.iem", ac((iy-genArgs$management_lag+1):iy)] <- 1 #fsq.inty
+	}
+	
 	# SET seed
 	if (!is.null(genArgs$seed)) set.seed(genArgs$seed)
   
@@ -300,7 +308,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[,ac(ay+1)] <- attr(ctrl, "snew")
 		ctrl.om <- args(projection)
 		# update with decision made having into account management lag
-		ctrl <- getCtrl(tracking["metric.iem",ac(genArgs$ay-genArgs$management_lag+1)], ac(ctrl@target[,"quantity",]), ay+1, it)   		
+		ctrl <- getCtrl(tracking["metric.iem",ac(genArgs$ay-genArgs$management_lag+1)], ac(ctrl@target[,"quantity",]), ay+1, it, ctrl@target[,"rel.year",])   		
 		ctrl.om$ctrl <- ctrl
 		ctrl.om$stk <- stk.om
 		ctrl.om$sr <- sr.om

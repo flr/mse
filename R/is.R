@@ -76,16 +76,25 @@ effort.is <- function(stk, ctrl, genArgs, tracking){
 	ay <- genArgs$ay
 	it <- dims(stk)$iter
 	iy <- genArgs$iy
+	mlag <- genArgs$management_lag
 	# reference value
-	if(ay==iy) fay <- fbar(stock)[,ac(ay-1)] else fay <- tracking["metric.is",ac(ay-1)]*tracking["F.est",ac(ay)]	
+	if(ay==iy) fay <- fbar(stk)[,ac(ay-1)] else fay <- tracking["metric.is",ac(ay-1)]*tracking["F.est",ac(ay)]	
 	# target to reach defined by HCR (in f units)
 	trgt <- ctrl@trgtArray[,"val",]
 	# multiplier
 	mult <- trgt/fay
 	# new control file, in relative terms
-	ctrl <- getCtrl(mult, "f", ay+1, it, rel.year=ay)
+	ctrl <- getCtrl(mult, "f", ay+mlag, it, rel.year=ay)
 	list(ctrl = ctrl, tracking = tracking)
 } # }}}
+
+
+
+
+
+
+
+
 
 
 
