@@ -154,7 +154,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#==========================================================
 		# OEM
 		#==========================================================
-		cat("oem\n")
+		#cat("oem\n")
 		ctrl.oem <- args(oem)
 		ctrl.oem$method <- method(oem)
 		ctrl.oem$deviances <- deviances(oem)
@@ -174,7 +174,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		# MP
 		# Estimator of stock statistics
 		#==========================================================
-		cat("est\n")
+		#cat("est\n")
 		if (!is.null(ctrl.mp$ctrl.est)){
 			ctrl.est <- args(ctrl.mp$ctrl.est)
 			ctrl.est$method <- method(ctrl.mp$ctrl.est)
@@ -193,7 +193,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#----------------------------------------------------------
 		# HCR parametrization
 		#----------------------------------------------------------
-		cat("phcr\n")
+		#cat("phcr\n")
 		if (!is.null(ctrl.mp$ctrl.phcr)){
 			ctrl.phcr <- args(ctrl.mp$ctrl.phcr)
 			ctrl.phcr$method <- method(ctrl.mp$ctrl.phcr) 
@@ -211,7 +211,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#----------------------------------------------------------
 		# HCR
 		#----------------------------------------------------------
-		cat("hcr\n")
+		#cat("hcr\n")
 		if (!is.null(ctrl.mp$ctrl.hcr)){
 			ctrl.hcr <- args(ctrl.mp$ctrl.hcr)
 			ctrl.hcr$method <- method(ctrl.mp$ctrl.hcr)
@@ -231,7 +231,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#----------------------------------------------------------
 		# Implementation system
 		#----------------------------------------------------------
-		cat("is\n")
+		#cat("is\n")
 		if (!is.null(ctrl.mp$ctrl.is)){
 			ctrl.is <- args(ctrl.mp$ctrl.is)
 			ctrl.is$method <- method(ctrl.mp$ctrl.is)
@@ -252,7 +252,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#----------------------------------------------------------
 		# Technical measures
 		#----------------------------------------------------------
-		cat("tm\n")
+		#cat("tm\n")
 		if (!is.null(ctrl.mp$ctrl.tm)){
 			ctrl.tm <- args(ctrl.mp$ctrl.tm)
 			ctrl.tm$method <- method(ctrl.mp$ctrl.tm)
@@ -268,7 +268,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#==========================================================
 		# IEM
 		#==========================================================
-		cat("iem\n")
+		#cat("iem\n")
 		if(!is.null(iem)){
 			ctrl.iem <- args(iem)
 			ctrl.iem$method <- method(iem)
@@ -286,7 +286,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		# OM
 		# fleet dynamics/behaviour
 		#==========================================================
-		cat("fb\n")
+		#cat("fb\n")
 		if (!is.null(fb)){
 			ctrl.fb <- args(fb)
 			ctrl.fb$method <- method(fb)
@@ -304,7 +304,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		#----------------------------------------------------------
 		# stock dynamics and OM projections
 		#----------------------------------------------------------
-		cat("om\n")
+		#cat("om\n")
 		if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[,ac(ay+1)] <- attr(ctrl, "snew")
 		ctrl.om <- args(projection)
 		# update with decision made having into account management lag
