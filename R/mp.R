@@ -132,6 +132,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 	iy <- genArgs$iy # initial year of projection (also intermediate)
 	nsqy <- genArgs$nsqy # number of years to compute status quo metrics
 	vy <- genArgs$vy # vector of years to be projected
+	data_lag <- genArgs$data_lag
 
 	#============================================================
 	# go fish
@@ -141,7 +142,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		if(verbose) cat(i, " > ")
 		ay <- genArgs$ay <- an(i)
 		#genArgs$vy0 <- 1:(ay-y0) # data years (positions vector) - one less than current year
-		sqy <- genArgs$sqy <- ac((ay-1):(ay-nsqy)) # years for status quo computations 
+		sqy <- genArgs$sqy <- ac((ay-data_lag):(ay-nsqy-data_lag+1)) # years for status quo computations 
 		
     		# TRACK om
 		#tracking["F.om", ac(ay-1)] <- fbar(stk.om)[,ac(ay-1)]    
