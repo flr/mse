@@ -1,7 +1,8 @@
  mse 0.9
 
  USER-VISIBLE CHANGES
-
+- sampling.oem adds min when survey generates 0
+- added management and data lags
 - new sampling.oem including time of survey
 - Complete new code base.
 
