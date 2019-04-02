@@ -16,7 +16,7 @@ install:
 environment:
   matrix:
   - R_VERSION: release
-  - R_ARCH: x64
+    R_ARCH: x64
 
 platform:
   - x64
