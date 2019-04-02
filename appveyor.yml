@@ -16,7 +16,9 @@ install:
 environment:
   matrix:
   - R_VERSION: release
-  - R_ARCH: x64
+
+platform:
+  - x64
 
 build_script:
   - travis-tool.sh install_deps
@@ -29,8 +31,8 @@ test_script:
 
 on_failure:
   - travis-tool.sh dump_logs
-  - 7z a Bits.zip *.log
-  - appveyor PushArtifact Bits.zip
+  - 7z a Logs.zip *.Rcheck\*
+  - appveyor PushArtifact Logs.zip
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
