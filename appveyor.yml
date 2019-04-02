@@ -27,12 +27,13 @@ build_script:
 test_script:
   - travis-tool.sh run_tests
   - travis-tool.sh dump_logs
-  - 7z a Logs.zip *.Rcheck\*
+  - 7z a Logs.zip *.Rcheck\00*.*
   - appveyor PushArtifact Logs.zip
+  - appveyor PushArtifact Bits.zip
 
 on_failure:
   - travis-tool.sh dump_logs
-  - 7z a Logs.zip *.Rcheck\00*.log
+  - 7z a Logs.zip *.Rcheck\00*.*
   - appveyor PushArtifact Logs.zip
 
 artifacts:
