@@ -34,7 +34,9 @@ sampling.oem <- function(stk, deviances, observations, genArgs, tracking,
 	if(any(oe %in% c("both","index"))){
 		for (idx_count in 1:length(observations$idx)){
 			TS <- mean(range(observations$idx[[i]])[c("startf", "endf")])
-			i0 <- stock.n(stk)[,max(dataYears)] * exp((-m(stk)[,max(dataYears)] - harvest(stk)[,max(dataYears)]) * TS) * deviances$idx[[idx_count]][,max(dataYears)]
+			ages <- dimnames(observations$idx[[i]])$age
+			i0 <- (stock.n(stk)[,max(dataYears)] * exp((-m(stk)[,max(dataYears)] - harvest(stk)[,max(dataYears)]) * TS))[ages]
+			i0 <- i0 * deviances$idx[[idx_count]][,max(dataYears)]
 			if(any(i0==0)) i0[i0==0] <- min(i0[i0>0])/2
 			index(observations$idx[[idx_count]])[,max(dataYears)] <- i0
 		}
