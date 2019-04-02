@@ -14,9 +14,10 @@ sampling.oem <- function(stk, deviances, observations, genArgs, tracking,
 	
   # TODO needs more work to remove the index OE, for now index OE is mandatory 
 	
-	dataYears <- 1:(genArgs$ay-genArgs$y0-genArgs$data_lag+1)
+	#dataYears <- 1:(genArgs$ay-genArgs$y0-genArgs$data_lag+1)
+	dataYears <- genArgs$y0:genArgs$dy
+	mxy <- ac(max(dataYears))
 	assessmentYear <- ac(genArgs$ay)
-	# dataYears is a position vector, not the years themselves
 
 	# carry on stock information in the observations for "short-cut" approach
 	stock.n(observations$stk)[,assessmentYear] <- stock.n(stk)[,assessmentYear]	
@@ -25,22 +26,23 @@ sampling.oem <- function(stk, deviances, observations, genArgs, tracking,
 	# catch.n
 	# note it's adding 1 individual to avoid sca from crashing
 	if(any(oe %in% c("both","catch"))){
-		catch.n(observations$stk)[,max(dataYears)] <- catch.n(stk)[,max(dataYears)]*deviances$stk$catch.n[,max(dataYears)] + 1
-		catch(observations$stk)[,max(dataYears)] <- computeCatch(observations$stk[,max(dataYears)])
-		stk0 <- observations$stk[,dataYears]
+		catch.n(observations$stk)[,mxy] <- catch.n(stk)[,mxy]*deviances$stk$catch.n[,mxy] + 1
+		catch(observations$stk)[,mxy] <- computeCatch(observations$stk[,mxy])
+		stk0 <- observations$stk[,ac(dataYears)]
 	}
 
 	# indices
 	if(any(oe %in% c("both","index"))){
+		idx0 <- observations$idx
 		for (idx_count in 1:length(observations$idx)){
 			TS <- mean(range(observations$idx[[i]])[c("startf", "endf")])
 			ages <- dimnames(observations$idx[[i]])$age
-			i0 <- (stock.n(stk)[,max(dataYears)] * exp((-m(stk)[,max(dataYears)] - harvest(stk)[,max(dataYears)]) * TS))[ages]
-			i0 <- i0 * deviances$idx[[idx_count]][,max(dataYears)]
+			i0 <- (stock.n(stk)[,mxy] * exp((-m(stk)[,mxy] - harvest(stk)[,mxy]) * TS))[ages]
+			i0 <- i0 * deviances$idx[[idx_count]][,mxy]
 			if(any(i0==0)) i0[i0==0] <- min(i0[i0>0])/2
-			index(observations$idx[[idx_count]])[,max(dataYears)] <- i0
+			index(observations$idx[[idx_count]])[,mxy] <- i0
+			idx0[[idx_count]] <- observations$idx[[idx_count]][,ac(range(observations$idx[[idx_count]])['minyear']:mxy)]
 		}
-		idx0 <- lapply(observations$idx, function(x) x[,dataYears])
 	}
 
 	# return

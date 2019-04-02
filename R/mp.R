@@ -141,13 +141,10 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		gc()
 		if(verbose) cat(i, " > ")
 		ay <- genArgs$ay <- an(i)
-		#genArgs$vy0 <- 1:(ay-y0) # data years (positions vector) - one less than current year
+		dy <- genArgs$dy <- ay-data_lag
 		sqy <- genArgs$sqy <- ac((ay-data_lag):(ay-nsqy-data_lag+1)) # years for status quo computations 
-		
-    		# TRACK om
-		#tracking["F.om", ac(ay-1)] <- fbar(stk.om)[,ac(ay-1)]    
-		#tracking["B.om", ac(ay-1)] <- ssb(stk.om)[,ac(ay-1)]    
-		#tracking["C.om", ac(ay-1)] <- catch(stk.om)[,ac(ay-1)]    
+
+   		# TRACK om
 		tracking["F.om", ac(ay)] <- fbar(stk.om)[,ac(ay)]    
 		tracking["B.om", ac(ay)] <- ssb(stk.om)[,ac(ay)]    
 		tracking["C.om", ac(ay)] <- catch(stk.om)[,ac(ay)]    
@@ -225,7 +222,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		} else {
-			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+1, it)
+			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+genArgs$management_lag, it)
 		}
 		tracking["metric.hcr", ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
 		
@@ -244,11 +241,8 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			out <- do.call("mpDispatch", ctrl.is)
 			ctrl <- out$ctrl
 			tracking <- out$tracking
-			tracking["metric.is", ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
-
-		} else {
-			tracking["metric.is", ac(ay)] <- tracking["metric.hcr", ac(ay+genArgs$management_lag)]
-		}
+		}		
+		tracking["metric.is", ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
 
 		#----------------------------------------------------------
 		# Technical measures
