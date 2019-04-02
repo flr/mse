@@ -14,6 +14,7 @@ install:
 # Adapt as necessary starting from here
 
 environment:
+  matrix:
   - R_VERSION: release
   - R_ARCH: x64
 
