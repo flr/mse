@@ -29,7 +29,7 @@ test_script:
 
 on_failure:
   - travis-tool.sh dump_logs
-  - 7z a Bits.zip *_*.zip
+  - 7z a Bits.zip *.log
   - appveyor PushArtifact Bits.zip
 
 artifacts:
