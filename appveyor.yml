@@ -16,6 +16,7 @@ install:
 environment:
   R_VERSION: release
   R_ARCH: x64
+  R_BUILD_ARGS: --no-multiarch
 
 platform: x64
 
