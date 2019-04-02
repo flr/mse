@@ -6,9 +6,10 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
+library(mse)
 library(FLa4a)
 library(FLasher)
-library(FLRP)
+library(FLBRP)
 
 data(ple4)
 data(ple4.index)
@@ -32,7 +33,7 @@ vy <- ac(iy:fy) # vector of years to be projected
 # fit stock assessment model
 mcsave <- 500
 mcmc <- mcsave*it
-fit <- a4aSCA(stk, idx, fit="MCMC",
+fit <- sca(stk, idx, fit="MCMC",
   mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
 
 stk <- stk + fit
@@ -65,7 +66,7 @@ stk <- fwdWindow(stk, brp, end=fy)
 fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
 
 # OM object
-om <- FLom(stock=stk, sr=srbh, brp=refpts(brp))# , fleetBehaviour=fb)
+om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp))# , fleetBehaviour=fb)
 
 
 save(om, file="../data/p4om.RData", compress="xz")
