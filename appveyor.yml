@@ -15,8 +15,8 @@ install:
 
 environment:
   matrix:
-  - R_VERSION: devel
   - R_VERSION: release
+  - R_ARCH: x64
 
 build_script:
   - travis-tool.sh install_deps
