@@ -67,9 +67,11 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 			list(stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
 				tracking=do.call('combine', lapply(list(...), '[[', 'tracking')),
 				oem=do.call('combine', lapply(list(...), '[[', 'oem')))
-      }, .packages="mse", .multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
+      }, .packages="mse", .multicombine=TRUE, .errorhandling = "stop",
+      .inorder=TRUE) %dopar% {
+			
+      # SUBSET object(s)
 
-			# SUBSET object(s)
 			call0 <- list(
 				stk.om = stk.om[,,,,,i],
 				sr.om = FLCore::iter(sr.om,i),
@@ -83,6 +85,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 				ctrl.mp= iters(ctrl.mp, i),
 				genArgs=genArgs,
 				verbose=verbose)
+      call0$genArgs$it <- length(i)
 			out <- do.call(mse:::goFish, call0)
 			# RETURN
 			list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
