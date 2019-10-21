@@ -17,3 +17,5 @@ mpa.tm <- function(stk, genArgs, sel.objective, tracking){
 	snew <- snew * mean(sold[v])/mean(snew[v])
 	list(flq=snew, tracking=tracking)
 } # }}}
+
+

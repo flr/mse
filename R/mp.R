@@ -54,24 +54,19 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	if (!is.null(genArgs$seed)) set.seed(genArgs$seed)
   
 	# PREPARE objects for loop call
-  if (exists(fleetBehaviour(om))) fb <- fleetBehaviour(om) else fb <- NULL 
+    if (exists(fleetBehaviour(om))) fb <- fleetBehaviour(om) else fb <- NULL 
 	
 	#============================================================
 	# PREPARE for parallel if needed
-	if(nblocks > 1){
-		# SPLIT iters in nblocks
-		its <- split(seq(it), sort(seq(it)%%nblocks) + 1)
-		
+	if(getDoParWorkers() > 1){
+		cat("Going parallel with ", getDoParWorkers(), " cores !\n")
+
 		# LOOP and combine
-		lst0 <- foreach(i=its, .combine=function(...) {
+		lst0 <- foreach(i=1:it, .combine=function(...) {
 			list(stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
 				tracking=do.call('combine', lapply(list(...), '[[', 'tracking')),
 				oem=do.call('combine', lapply(list(...), '[[', 'oem')))
-      }, .packages="mse", .multicombine=TRUE, .errorhandling = "stop",
-      .inorder=TRUE) %dopar% {
-			
-      # SUBSET object(s)
-
+			}, .packages="mse", .multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
 			call0 <- list(
 				stk.om = stk.om[,,,,,i],
 				sr.om = FLCore::iter(sr.om,i),
@@ -85,12 +80,12 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 				ctrl.mp= iters(ctrl.mp, i),
 				genArgs=genArgs,
 				verbose=verbose)
-      call0$genArgs$it <- length(i)
 			out <- do.call(mse:::goFish, call0)
 			# RETURN
 			list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
 		}
 	} else {
+		cat("Going single core !\n")
 		call0 <- list(
 			stk.om = stk.om,
 			sr.om = sr.om,

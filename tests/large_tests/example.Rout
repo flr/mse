@@ -1,0 +1,899 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # example.R - DESC
+> # mse/tests/example.R
+> 
+> # Copyright European Union, 2018
+> # Authors: Finlay Scott (EC JRC)
+> #          Ernesto Jardim (EC JRC) <ernesto.jardim@ec.europa.eu>
+> #          Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
+> #
+> # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
+> 
+> # ==============================================================================
+> # SETUP
+> # ==============================================================================
+> 
+> # LOAD packages
+> 
+> library(mse)
+Loading required package: FLCore
+Loading required package: lattice
+Loading required package: iterators
+FLCore (Version 2.6.12.9002, packaged: 2019-03-21 15:32:42 UTC)
+Loading required package: ggplotFL
+Loading required package: ggplot2
+
+Attaching package: ‘ggplot2’
+
+The following object is masked from ‘package:FLCore’:
+
+    %+%
+
+Loading required package: data.table
+Loading required package: FLash
+Loading required package: FLBRP
+Warning message:
+replacing previous import ‘ggplot2::%+%’ by ‘FLCore::%+%’ when loading ‘ggplotFL’ 
+> library(FLa4a)
+Loading required package: triangle
+Loading required package: copula
+Loading required package: coda
+This is FLa4a 1.6.8. For overview type 'help(package="FLa4a")'
+
+> library(ggplotFL)
+> library(doParallel)
+Loading required package: foreach
+Loading required package: parallel
+> 
+> # LOAD data
+> 
+> data(ple4)
+> data(ple4.indices)
+> 
+> stk <- ple4
+> idx <- ple4.indices["BTS-Combined (all)"]
+> 
+> # VARIABLES
+> 
+> it <- 3 # iterations
+> fy <- 2030 # final year
+> y0 <- range(stk)["minyear"] # initial OM year
+> dy <- range(stk)["maxyear"] # final OM year
+> iy <- dy # initial year of projection (also intermediate)
+> #ny <- fy - iy + 1 # number of years to project from initial year
+> nsqy <- 3 # number of years to compute status quo metrics
+> vy <- ac(iy:fy) # vector of years to be projected
+> 
+> mpargs <- list(fy=fy, y0=y0, iy=iy, nsqy=nsqy)
+> 
+> # ==============================================================================
+> # OM conditioning
+> # ==============================================================================
+> 
+> # - Two SRRs: geomean and Bevholt
+> 
+> mcsave <- 500
+> mcmc <- mcsave*it
+> 
+> fit <- sca(stk, idx, fit="MCMC", mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
+> 
+> stk <- stk + fit
+> 
+> # skin to keep one iteration
+> stk0 <- qapply(stk, iterMedians)
+> 
+> # Fit a4a model to replicate official assessment w/MCMC
+> 
+> # average recruitment estimation sd
+> rv1 <- sqrt(mean(c(iterVars(log(rec(stk)))), na.rm=TRUE))
+> 
+> # average autocor lag1
+> # TODO acf(residuals)
+> ac1 <- mean(apply(window(rec(stk), end=2008)@.Data, 6, function(x)
++   c(acf(c(x), plot=FALSE, lag.max=1)$acf[2])))
+> 
+> # BevHolt
+> srbh <- fmle(as.FLSR(stk0, model="bevholt"), method="L-BFGS-B", lower=c(1e-6, 1e-6), upper=c(max(rec(stk)) * 3, Inf))
+final  value -16.033282 
+converged
+> 
+> # Residuals
+> resbh <- ar1rlnorm(rho=ac1, years=dy:fy, iters=it, margSD=rv1*2)
+> residuals(srbh) <- resbh
+> 
+> # ==============================================================================
+> # Refpts
+> # ==============================================================================
+> 
+> brp <- brp(FLBRP(stk0, srbh))
+> 
+> # ==============================================================================
+> # Set up operating model
+> # ==============================================================================
+> 
+> # Set up future assumptions - means of 3 years
+> stk <- fwdWindow(stk, brp, end=2030)
+> 
+> #==============================================================================
+> # Fleet behaviour
+> #==============================================================================
+> 
+> fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
+> 
+> #==============================================================================
+> # OM projection method
+> #==============================================================================
+> 
+> proj <- mseCtrl(method=fwd.om, args=list(maxF=2))
+> 
+> #==============================================================================
+> # OM object
+> #==============================================================================
+> om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp), projection=proj)#, fleetBehaviour=fb)
+> 
+> ###############################################################################
+> # OEM settings
+> ###############################################################################
+> 
+> #==============================================================================
+> # prepare objects
+> #==============================================================================
+> 
+> stk <- stock(om)
+> 
+> #==============================================================================
+> # Estimate the indices catchability from the a4a fit (without simulation)
+> #==============================================================================
+> 
+> set.seed(0)
+> 
+> # Use all indices
+> idcs <- FLIndices()
+> for (i in 1:length(idx)){
++ 	# this is a simplification as if index reflects 01 January abundances
++ 	lst <- mcf(list(idx[[i]]@index, stock.n(stk0)))
++ 	# log catchability of index 
++ 	idx.lq <- log(lst[[1]]/lst[[2]]) 
++ 	# empty quant
++ 	idx.qmu <- idx.qsig <- stock.n(iter(stk,1)) 
++ 	# Every year has the same mean catchability
++ 	idx.qmu[] <- yearMeans(idx.lq) 
++ 	idx.qsig[] <- sqrt(yearVars(idx.lq))
++ 	idx.q <- FLQuant(NA, dimnames=dimnames(stock.n(stk)))
++ 	# Build FLQ of index catchability based on lognormal distribution with mean and sd calculated above
++ 	idx.q <- rlnorm(it, idx.qmu, idx.qsig) 
++ 	#idx.q[,ac(y0:iy)] <- idx.q[,ac(y0:iy)]
++ 	idx_temp <- idx.q * stock.n(stk)
++ 	# generate initial index
++ 	idx_temp <- FLIndex(index=idx_temp, index.q=idx.q) 
++ 	range(idx_temp)[c("startf", "endf")] <- c(0, 0)
++ 	idcs[[i]] <- idx_temp
++ }
+> names(idcs) <- names(idx)
+> 
+> #==============================================================================
+> # Deviances for catch.n
+> #==============================================================================
+> 
+> set.seed(0)
+> 
+> catch.dev <- log(catch.n(stk))
+> catch.dev <- catch.dev-iterMeans(catch.dev)
+> Sig <- apply(catch.dev[,ac(y0:dy),1,1,,drop=TRUE], 3, function(x) cov(t(x)))
+> Sig <- apply(Sig, 1, mean)
+> Sig <- matrix(Sig, ncol=dim(catch.dev)[1])
+> catch.dev[,ac(vy)][] <- t(mvrnorm(it * length(vy), rep(0, nrow(Sig)), Sig))
+> catch.dev <- exp(catch.dev)
+> 
+> #==============================================================================
+> # OEM object
+> #==============================================================================
+> 
+> idxDev <- lapply(idcs, index.q)
+> names(idxDev) <- "index.q"
+> stkDev <- FLQuants(catch.n=catch.dev)
+> dev <- list(idx=idxDev, stk=stkDev)
+> obs <- list(idx=idcs[1], stk=stk)
+> 
+> oem <- FLoem(method=sampling.oem, observations=obs, deviances=dev)
+> #save(oem, file="oem.RData")
+> 
+> ###############################################################################
+> # Implementation error
+> ###############################################################################
+> 
+> iem <- FLiem(method=noise.iem, args=list(fun="rlnorm", mean=0, sd=0, multiplicative=TRUE))
+> 
+> ###############################################################################
+> # Management procedure
+> ###############################################################################
+> 
+> # general pars, add seed
+> mpargs$seed <- 1234
+> 
+> #==============================================================================
+> # Scenarios
+> #==============================================================================
+> 
+> #------------------------------------------------------------------------------
+> # base
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=FLQuant(0.3)))))
+> 
+> # test parallel
+> 
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp1a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp1), stock(resp1a))
+[1] TRUE
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp1b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2017  > 2017  > 2018  > 2018  > 2018  > 2019  > 2019  > 2019  > 2020  > 2020  > 2020  > 2021  > 2021  > 2021  > 2022  > 2022  > 2022  > 2023  > 2023  > 2023  > 2024  > 2024  > 2024  > 2025  > 2025  > 2025  > 2026  > 2026  > 2026  > 2027  > 2027  > 2027  > 2028  > 2028  > 2028  > 2029  > 2029  > 2029  > 
+> all.equal(stock(resp1), stock(resp1b))
+[1] TRUE
+> 
+> #------------------------------------------------------------------------------
+> # base with TAC
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(
++ 	ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
++ 	ctrl.is = mseCtrl(method=tac.is)))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp2 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp2a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp2), stock(resp2a))
+[1] TRUE
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp2b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2017  > 2017  > 2018  > 2018  > 2018  > 2019  > 2019  > 2019  > 2020  > 2020  > 2020  > 2021  > 2021  > 2021  > 2022  > 2022  > 2022  > 2023  > 2023  > 2023  > 2024  > 2024  > 2024  > 2025  > 2025  > 2025  > 2026  > 2026  > 2026  > 2027  > 2027  > 2027  > 2028  > 2028  > 2028  > 2029  > 2029  > 2029  > 
+> all.equal(stock(resp2), stock(resp2b))
+[1] TRUE
+> 
+> #------------------------------------------------------------------------------
+> # base with TAC and SA
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
++ 	ctrl.is = mseCtrl(method=tac.is),
++ 	ctrl.est = mseCtrl(method=sca.sa)))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp3 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp3a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp3), stock(resp3a))
+[1] TRUE
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp3b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2017  > 2017  > 2018  > 2018  > 2019  > 2020  > 2019  > 2021  > 2020  > 2018  > 2022  > 2021  > 2023  > 2022  > 2024  > 2019  > 2023  > 2025  > 2024  > 2020  > 2026  > 2025  > 2021  > 2027  > 2022  > 2026  > 2028  > 2023  > 2027  > 2029  > 2024  > 2028  > 2025  > 2029  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp3), stock(resp3b))
+[1] TRUE
+> 
+> #------------------------------------------------------------------------------
+> # base with TAC and IEM
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
++ 	ctrl.is = mseCtrl(method=tac.is)))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp4 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp4a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp4), stock(resp4a))
+[1] TRUE
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp4b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2017  > 2017  > 2018  > 2018  > 2018  > 2019  > 2019  > 2019  > 2020  > 2020  > 2020  > 2021  > 2021  > 2021  > 2022  > 2022  > 2022  > 2023  > 2023  > 2023  > 2024  > 2024  > 2024  > 2025  > 2025  > 2025  > 2026  > 2026  > 2026  > 2027  > 2027  > 2027  > 2028  > 2028  > 2028  > 2029  > 2029  > 2029  > 
+> all.equal(stock(resp4), stock(resp4b))
+[1] TRUE
+> 
+> #------------------------------------------------------------------------------
+> # base with TAC and SA and OEM and IEM
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
++ 	ctrl.is = mseCtrl(method=tac.is),
++ 	ctrl.est = mseCtrl(method=sca.sa),
++ 	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp5 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp5a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp5), stock(resp5a))
+[1] "Attributes: < Component “catch”: Mean relative difference: 1.809155e-07 >"     
+[2] "Attributes: < Component “catch.n”: Mean relative difference: 2.05937e-07 >"    
+[3] "Attributes: < Component “discards”: Mean relative difference: 1.859305e-07 >"  
+[4] "Attributes: < Component “discards.n”: Mean relative difference: 2.23913e-07 >" 
+[5] "Attributes: < Component “harvest”: Mean relative difference: 2.800107e-07 >"   
+[6] "Attributes: < Component “landings”: Mean relative difference: 1.575497e-07 >"  
+[7] "Attributes: < Component “landings.n”: Mean relative difference: 1.840808e-07 >"
+[8] "Attributes: < Component “stock”: Mean relative difference: 9.395329e-08 >"     
+[9] "Attributes: < Component “stock.n”: Mean relative difference: 9.18121e-08 >"    
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp5b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 20172017   >  > 2018  > 2018  > 2019  > 2020  > 2021  > 2019  > 2022  > 2020  > 2018  > 2023  > 2021  > 2024  > 2022  > 2025  > 2023  > 2019  > 2026  > 2024  > 2020  > 2027  > 2025  > 2021  > 2028  > 2026  > 2022  > 2029  > 2027  > 2023  > 2028  > 2024  > 2029  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp5), stock(resp5b))
+[1] "Attributes: < Component “catch”: Mean relative difference: 1.809155e-07 >"     
+[2] "Attributes: < Component “catch.n”: Mean relative difference: 2.05937e-07 >"    
+[3] "Attributes: < Component “discards”: Mean relative difference: 1.859305e-07 >"  
+[4] "Attributes: < Component “discards.n”: Mean relative difference: 2.23913e-07 >" 
+[5] "Attributes: < Component “harvest”: Mean relative difference: 2.800107e-07 >"   
+[6] "Attributes: < Component “landings”: Mean relative difference: 1.575497e-07 >"  
+[7] "Attributes: < Component “landings.n”: Mean relative difference: 1.840808e-07 >"
+[8] "Attributes: < Component “stock”: Mean relative difference: 9.395329e-08 >"     
+[9] "Attributes: < Component “stock.n”: Mean relative difference: 9.18121e-08 >"    
+> 
+> #------------------------------------------------------------------------------
+> # testing biased assessment
+> #------------------------------------------------------------------------------
+> biased.sa <- function(stk, idx, bbias=1, fbias=1, ...){
++ 	args <- list(...)
++ 	dy <- dimnames(catch(stk))[[2]]
++ 	dy <- dy[length(dy)]
++ 	tracking <- args$tracking
++ 	stock.n(stk)[, dy] <- stock.n(stk)[, dy]*bbias
++ 	harvest(stk)[, dy] <- harvest(stk)[, dy]*fbias
++ 	list(stk = stk, tracking = tracking)
++ }
+> 
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.2)),
++ 	ctrl.is = mseCtrl(method=tac.is),
++ 	ctrl.est = mseCtrl(method=biased.sa, args=list(fbias=.5))))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp6 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp6a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp6), stock(resp6a))
+[1] TRUE
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp6b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+20172017   >  > 2017  > 2018  > 2018  > 2018  > 2019  > 2019  > 2019  > 2020  > 2020  > 2020  > 2021  > 2021  > 2021  > 2022  > 2022  > 2022  > 2023  > 2023  > 2023  > 2024  > 2024  > 2024  > 2025  > 2025  > 2025  > 2026  > 2026  > 2026  > 2027  > 2027  > 2027  > 2028  > 2028  > 2028  > 2029  > 2029  > 2029  > 
+> all.equal(stock(resp6), stock(resp6b))
+[1] TRUE
+> 
+> #------------------------------------------------------------------------------
+> # base with TAC and separable SA
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
++ 	ctrl.is = mseCtrl(method=tac.is),
++ 	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp7 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp7a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp7), stock(resp7a))
+[1] "Attributes: < Component “catch”: Mean relative difference: 6.060289e-08 >"     
+[2] "Attributes: < Component “catch.n”: Mean relative difference: 9.218992e-08 >"   
+[3] "Attributes: < Component “discards”: Mean relative difference: 9.646432e-08 >"  
+[4] "Attributes: < Component “discards.n”: Mean relative difference: 9.072296e-08 >"
+[5] "Attributes: < Component “harvest”: Mean relative difference: 1.049905e-07 >"   
+[6] "Attributes: < Component “landings”: Mean relative difference: 5.774291e-08 >"  
+[7] "Attributes: < Component “landings.n”: Mean relative difference: 9.266858e-08 >"
+[8] "Attributes: < Component “stock”: Mean relative difference: 4.534215e-08 >"     
+[9] "Attributes: < Component “stock.n”: Mean relative difference: 4.146428e-08 >"   
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp7b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2017  > 2017  > 2018  > 2018  > 2018  > 2019  > 2019  > 2019  > 2020  > 2020  > 2020  > 2021  > 2021  > 2021  > 2022  > 2022  > 2022  > 2023  > 2023  > 2023  > 2024  > 2024  > 2024  > 2025  > 2025  > 2025  > 2026  > 2026  > 2026  > 2027  > 2027  > 2027  > 2028  > 2028  > 2028  > 2029  > 2029  > 2029  > 
+> all.equal(stock(resp7), stock(resp7b))
+[1] "Attributes: < Component “catch”: Mean relative difference: 6.060289e-08 >"     
+[2] "Attributes: < Component “catch.n”: Mean relative difference: 9.218992e-08 >"   
+[3] "Attributes: < Component “discards”: Mean relative difference: 9.646432e-08 >"  
+[4] "Attributes: < Component “discards.n”: Mean relative difference: 9.072296e-08 >"
+[5] "Attributes: < Component “harvest”: Mean relative difference: 1.049905e-07 >"   
+[6] "Attributes: < Component “landings”: Mean relative difference: 5.774291e-08 >"  
+[7] "Attributes: < Component “landings.n”: Mean relative difference: 9.266858e-08 >"
+[8] "Attributes: < Component “stock”: Mean relative difference: 4.534215e-08 >"     
+[9] "Attributes: < Component “stock.n”: Mean relative difference: 4.146428e-08 >"   
+> 
+> ##==============================================================================
+> ## Test again with cluster
+> ##==============================================================================
+> 
+> #cl <- makeCluster(1)
+> #clusterEvalQ(cl = cl, expr = {library(mse)})
+> #registerDoParallel(cl)
+> 
+> ##------------------------------------------------------------------------------
+> ## base
+> ##------------------------------------------------------------------------------
+> #ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3))))
+> 
+> ## run new method in single core without foreach
+> #mpargs$nblocks <- 1
+> #resp1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+> 
+> ## run new method in 1 core with sequential foreach
+> #mpargs$nblocks <- 3
+> #resp1a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(resp1), stock(resp1a))
+> 
+> ## run new method in 2 cores with foreach
+> #stopCluster(cl)
+> #cl <- makeCluster(3)
+> #clusterEvalQ(cl = cl, expr = {library(mse)})
+> #registerDoParallel(cl)
+> #resp1b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(resp1), stock(resp1b))
+> #stopCluster(cl)
+> 
+> ##------------------------------------------------------------------------------
+> ## base with TAC
+> ##------------------------------------------------------------------------------
+> #cl <- makeCluster(1)
+> #clusterEvalQ(cl = cl, expr = {library(mse)})
+> #registerDoParallel(cl)
+> 
+> #ctrl <- mpCtrl(list(
+> #	ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+> #	ctrl.is = mseCtrl(method=tac.is)))
+> 
+> ## test parallel
+> ## run new method in single core without foreach
+> #mpargs$nblocks <- 1
+> #resp2 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res2), stock(resp2))
+> 
+> ## run new method in 1 core with sequential foreach
+> #mpargs$nblocks <- 2
+> #resp2a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res2), stock(resp2a))
+> 
+> ## run new method in 2 cores with foreach
+> #stopCluster(cl)
+> #cl <- makeCluster(2)
+> #clusterEvalQ(cl = cl, expr = {library(mse)})
+> #registerDoParallel(cl)
+> #mpargs$nblocks <- 2
+> #resp2b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res2), stock(resp2b))
+> #stopCluster(cl)
+> 
+> ##------------------------------------------------------------------------------
+> ## base with TAC and SA
+> ##------------------------------------------------------------------------------
+> #cl <- makeCluster(1)
+> #clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+> #registerDoParallel(cl)
+> #ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+> #	ctrl.is = mseCtrl(method=tac.is),
+> #	ctrl.est = mseCtrl(method=sca.sa)))
+> 
+> ## test parallel
+> ## run new method in single core without foreach
+> #mpargs$nblocks <- 1
+> #resp3 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res3), stock(resp3))
+> 
+> ## run new method in 1 core with sequential foreach
+> #mpargs$nblocks <- 2
+> #resp3a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res3), stock(resp3a))
+> 
+> ## run new method in 2 cores with foreach
+> #stopCluster(cl)
+> #cl <- makeCluster(2)
+> #clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+> #registerDoParallel(cl)
+> #mpargs$nblocks <- 2
+> #resp3b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res3), stock(resp3b))
+> #stopCluster(cl)
+> 
+> ##------------------------------------------------------------------------------
+> ## base with TAC and IEM
+> ##------------------------------------------------------------------------------
+> #cl <- makeCluster(1)
+> #clusterEvalQ(cl = cl, expr = {library(mse)})
+> #registerDoParallel(cl)
+> #ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+> #	ctrl.is = mseCtrl(method=tac.is)))
+> 
+> ## test parallel
+> ## run new method in single core without foreach
+> #mpargs$nblocks <- 1
+> #resp4 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res4), stock(resp4))
+> 
+> ## run new method in 1 core with sequential foreach
+> #mpargs$nblocks <- 2
+> #resp4a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res4), stock(resp4a))
+> 
+> ## run new method in 2 cores with foreach
+> #stopCluster(cl)
+> #cl <- makeCluster(2)
+> #clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+> #registerDoParallel(cl)
+> #mpargs$nblocks <- 2
+> #resp4b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res4), stock(resp4b))
+> #stopCluster(cl)
+> 
+> ##------------------------------------------------------------------------------
+> ## base with TAC and SA and OEM and IEM
+> ##------------------------------------------------------------------------------
+> #cl <- makeCluster(1)
+> #clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+> #registerDoParallel(cl)
+> #ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+> #	ctrl.is = mseCtrl(method=tac.is),
+> #	ctrl.est = mseCtrl(method=sca.sa),
+> #	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
+> 
+> ## test parallel
+> ## run new method in single core without foreach
+> #mpargs$nblocks <- 1
+> #resp5 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res5), stock(resp5))
+> 
+> ## run new method in 1 core with sequential foreach
+> #mpargs$nblocks <- 2
+> #resp5a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res5), stock(resp5a))
+> 
+> ## run new method in 2 cores with foreach
+> #stopCluster(cl)
+> #cl <- makeCluster(2)
+> #clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+> #registerDoParallel(cl)
+> #mpargs$nblocks <- 2
+> #resp5b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res5), stock(resp5b))
+> #stopCluster(cl)
+> 
+> ##------------------------------------------------------------------------------
+> ## testing biased assessment
+> ##------------------------------------------------------------------------------
+> #cl <- makeCluster(1)
+> #clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+> #registerDoParallel(cl)
+> #biased.sa <- function(stk, idx, bbias=1, fbias=1, ...){
+> #	args <- list(...)
+> #	dy <- dimnames(catch(stk))[[2]]
+> #	dy <- dy[length(dy)]
+> #	tracking <- args$tracking
+> #	stock.n(stk)[, dy] <- stock.n(stk)[, dy]*bbias
+> #	harvest(stk)[, dy] <- harvest(stk)[, dy]*fbias
+> #	list(stk = stk, tracking = tracking)
+> #}
+> 
+> #ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.2)),
+> #	ctrl.is = mseCtrl(method=tac.is),
+> #	ctrl.est = mseCtrl(method=biased.sa, args=list(fbias=.5))))
+> 
+> ## test parallel
+> ## run new method in single core without foreach
+> #mpargs$nblocks <- 1
+> #resp6 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res6), stock(resp6))
+> 
+> ## run new method in 1 core with sequential foreach
+> #mpargs$nblocks <- 2
+> #resp6a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res6), stock(resp6a))
+> 
+> ## run new method in 2 cores with foreach
+> #stopCluster(cl)
+> #cl <- makeCluster(2)
+> #clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+> #registerDoParallel(cl)
+> #mpargs$nblocks <- 2
+> #resp6b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res6), stock(resp6b))
+> #stopCluster(cl)
+> 
+> ##------------------------------------------------------------------------------
+> ## base with TAC and separable SA
+> ##------------------------------------------------------------------------------
+> #cl <- makeCluster(1)
+> #clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+> #registerDoParallel(cl)
+> #ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
+> #	ctrl.is = mseCtrl(method=tac.is),
+> #	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
+> 
+> ## test parallel
+> ## run new method in single core without foreach
+> #mpargs$nblocks <- 1
+> #resp7 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res7), stock(resp7))
+> 
+> ## run new method in 1 core with sequential foreach
+> #mpargs$nblocks <- 2
+> #resp7a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res7), stock(resp7a))
+> 
+> ## run new method in 2 cores with foreach
+> #stopCluster(cl)
+> #cl <- makeCluster(2)
+> #clusterEvalQ(cl = cl, expr = {library(mse);library(FLa4a)})
+> #registerDoParallel(cl)
+> #mpargs$nblocks <- 2
+> #resp7b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+> #all.equal(stock(res7), stock(resp7b))
+> #stopCluster(cl)
+> 
+> #==============================================================================
+> # More tests
+> #==============================================================================
+> 
+> #------------------------------------------------------------------------------
+> # Iters in args
+> #------------------------------------------------------------------------------
+> flq <- FLQuant(c(0.3,0.2,0.4), dim=c(1,1,1,1,1,3))
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(
++ 	method=fixedF.hcr, 
++ 	args=list(ftrg=flq)
++ 	)))
+> 
+> # test parallel
+> 
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp1a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp1), stock(resp1a))
+[1] TRUE
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp1b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2017  > 2017  > 2018  > 2018  > 2018  > 2019  > 2019  > 2019  > 2020  > 2020  > 2020  > 2021  > 2021  > 2021  > 2022  > 2022  > 2022  > 2023  > 2023  > 2023  > 2024  > 2024  > 2024  > 2025  > 2025  > 2025  > 2026  > 2026  > 2026  > 2027  > 2027  > 2027  > 2028  > 2028  > 2028  > 2029  > 2029  > 2029  > 
+> all.equal(stock(resp1), stock(resp1b))
+[1] TRUE
+> 
+> #------------------------------------------------------------------------------
+> # base with TAC
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(
++ 	ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
++ 	ctrl.is = mseCtrl(method=tac.is)))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp2 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp2a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp2), stock(resp2a))
+[1] TRUE
+> 
+> # run new method in 3 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp2b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2017  > 2017  > 2018  > 2018  > 2018  > 2019  > 2019  > 2019  > 2020  > 2020  > 2020  > 2021  > 2021  > 2021  > 2022  > 2022  > 2022  > 2023  > 2023  > 2023  > 2024  > 2024  > 2024  > 2025  > 2025  > 2025  > 2026  > 2026  > 2026  > 2027  > 2027  > 2027  > 2028  > 2028  > 2028  > 2029  > 2029  > 2029  > 
+> all.equal(stock(resp2), stock(resp2b))
+[1] TRUE
+> 
+> #------------------------------------------------------------------------------
+> # base with TAC and SA
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
++ 	ctrl.is = mseCtrl(method=tac.is),
++ 	ctrl.est = mseCtrl(method=sca.sa)))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp3 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp3a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp3), stock(resp3a))
+[1] TRUE
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp3b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+20172017   >  > 2017  > 2018  > 2018  > 2019  > 2020  > 2021  > 2019  > 2022  > 2020  > 2018  > 2023  > 2021  > 2024  > 2022  > 2025  > 2019  > 2023  > 2026  > 2020  > 2024  > 2027  > 2021  > 2025  > 2028  > 2022  > 2026  > 2029  > 2023  > 2027  > 2024  > 2028  > 2025  > 2029  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp3), stock(resp3b))
+[1] TRUE
+> 
+> #------------------------------------------------------------------------------
+> # base with TAC and IEM
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
++ 	ctrl.is = mseCtrl(method=tac.is)))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp4 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp4a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp4), stock(resp4a))
+[1] TRUE
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp4b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2017  > 2017  > 2018  > 2018  > 2018  > 20192019   >  > 2019  > 2020  > 2020  > 2020  > 2021  > 2021  > 2021  > 2022  > 2022  > 2022  > 2023  > 2023  > 2023  > 2024  > 2024  > 2024  > 2025  > 2025  > 2025  > 2026  > 2026  > 2026  > 2027  > 2027  > 2027  > 2028  > 2028  > 2028  > 2029  > 2029  > 2029  > 
+> all.equal(stock(resp4), stock(resp4b))
+[1] TRUE
+> 
+> #------------------------------------------------------------------------------
+> # base with TAC and SA and OEM and IEM
+> #------------------------------------------------------------------------------
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
++ 	ctrl.is = mseCtrl(method=tac.is),
++ 	ctrl.est = mseCtrl(method=sca.sa),
++ 	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp5 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> 
+> # run new method in 1 core with sequential foreach
+> registerDoParallel(1)
+> mpargs$nblocks <- 3
+> resp5a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 2017  > 2018  > 2019  > 2020  > 2021  > 2022  > 2023  > 2024  > 2025  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp5), stock(resp5a))
+[1] "Attributes: < Component “catch”: Mean relative difference: 7.362581e-08 >"     
+[2] "Attributes: < Component “catch.n”: Mean relative difference: 7.214847e-08 >"   
+[3] "Attributes: < Component “discards”: Mean relative difference: 7.241152e-08 >"  
+[4] "Attributes: < Component “discards.n”: Mean relative difference: 7.362191e-08 >"
+[5] "Attributes: < Component “harvest”: Mean relative difference: 7.671174e-08 >"   
+[6] "Attributes: < Component “landings”: Mean relative difference: 6.476617e-08 >"  
+[7] "Attributes: < Component “landings.n”: Mean relative difference: 7.02248e-08 >" 
+[8] "Attributes: < Component “stock”: Mean relative difference: 3.414539e-08 >"     
+[9] "Attributes: < Component “stock.n”: Mean relative difference: 2.45717e-08 >"    
+> 
+> # run new method in 2 cores with foreach
+> registerDoParallel(3)
+> mpargs$nblocks <- 3
+> resp5b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > 2017  > 2017  > 2018  > 2018  > 2019  > 2020  > 2021  > 2019  > 2022  > 2020  > 2018  > 2023  > 2021  > 2024  > 2022  > 2025  > 2023  > 2019  > 2026  > 2024  > 2020  > 2027  > 2025  > 2021  > 2028  > 2022  > 2026  > 2029  > 2023  > 2027  > 2024  > 2028  > 2025  > 2029  > 2026  > 2027  > 2028  > 2029  > 
+> all.equal(stock(resp5), stock(resp5b))
+[1] "Attributes: < Component “catch”: Mean relative difference: 7.362581e-08 >"     
+[2] "Attributes: < Component “catch.n”: Mean relative difference: 7.214847e-08 >"   
+[3] "Attributes: < Component “discards”: Mean relative difference: 7.241152e-08 >"  
+[4] "Attributes: < Component “discards.n”: Mean relative difference: 7.362191e-08 >"
+[5] "Attributes: < Component “harvest”: Mean relative difference: 7.671174e-08 >"   
+[6] "Attributes: < Component “landings”: Mean relative difference: 6.476617e-08 >"  
+[7] "Attributes: < Component “landings.n”: Mean relative difference: 7.02248e-08 >" 
+[8] "Attributes: < Component “stock”: Mean relative difference: 3.414539e-08 >"     
+[9] "Attributes: < Component “stock.n”: Mean relative difference: 2.45717e-08 >"    
+> 
+> #------------------------------------------------------------------------------
+> # testing biased assessment
+> #------------------------------------------------------------------------------
+> biased.sa <- function(stk, idx, bbias=1, fbias=1, ...){
++ 	args <- list(...)
++ 	dy <- dimnames(catch(stk))[[2]]
++ 	dy <- dy[length(dy)]
++ 	tracking <- args$tracking
++ 	stock.n(stk)[, dy] <- stock.n(stk)[, dy]*bbias
++ 	harvest(stk)[, dy] <- harvest(stk)[, dy]*fbias
++ 	list(stk = stk, tracking = tracking)
++ }
+> 
+> ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
++ 	ctrl.is = mseCtrl(method=tac.is),
++ 	ctrl.est = mseCtrl(method=biased.sa, args=list(fbias=flq))))
+> 
+> # test parallel
+> # run new method in single core without foreach
+> mpargs$nblocks <- 1
+> resp6 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+2017  > Error in harvest(stk)[, dy] * fbias : non-conformable arrays
+Calls: mp ... do.call -> mpDispatch -> do.call -> <Anonymous> -> * -> *
+Execution halted
