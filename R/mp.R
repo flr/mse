@@ -38,7 +38,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	# INIT tracking
 	metric <- c("F.est", "B.est", "conv.est", "metric.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om")
 
-	if (!missing(tracking)) metric <- c(metric, tracking)
+	if (!missing(tracking)) metric <- c(tracking, metric)
 	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=unique(c((iy-genArgs$management_lag+1):iy,vy)), iter=1:it))
 	# GET historical from OM 
 	# ToDo intermediate year function
