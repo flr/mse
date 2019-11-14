@@ -151,7 +151,23 @@ setMethod("plot", signature(x="FLmse", y="missing"),
   function(x, ...) {
     plot(stock(x), ...)
   }
-) # }}}
+) 
+
+setMethod("plot", signature(x="FLom", y="FLmse"),
+  function(x, y, ...) {
+
+    args <- list(...)
+
+    cls <- unlist(lapply(args, is, "FLmse"))
+
+    stocks <- lapply(c(list(x, y), args[cls]), stock)
+    names(stocks) <- lapply(stocks, name)
+
+    stocks[[1]] <- window(stocks[[1]], end=dims(stocks[[2]])$minyear)
+
+    plot(FLStocks(stocks))
+  }
+)# }}}
 
 # summary {{{
 setMethod("summary", signature(object="FLmse"),

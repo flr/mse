@@ -124,7 +124,8 @@ setMethod("iters", signature(object = "FLoem"), function(object, iter){
 
 #' @rdname FLoem-class
 setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
-	args <- c(list(x, y), list(...))
+	
+  args <- c(list(x, y), list(...))
 
 	if(length(args) > 2) {
 		return(combine(combine(x, y), ...))
@@ -132,8 +133,10 @@ setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
 		obj <- x
 		dev <- deviances(obj)
 		obs <- observations(obj)
-		for(i in 1:length(dev)) dev[[i]] <- combine(deviances(x)[[i]], deviances(y)[[i]])
-		for(i in 1:length(obs)) obs [[i]] <- combine(observations(x)[[i]], observations(y)[[i]])
+		for(i in 1:length(dev))
+      dev[[i]] <- combine(deviances(x)[[i]], deviances(y)[[i]])
+		for(i in 1:length(obs))
+      obs [[i]] <- combine(observations(x)[[i]], observations(y)[[i]])
 		dev -> deviances(obj)
 		obs -> observations(obj)
 		return(obj)
