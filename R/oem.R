@@ -35,8 +35,8 @@ sampling.oem <- function(stk, deviances, observations, genArgs, tracking,
 	if(any(oe %in% c("both","index"))){
 		idx0 <- observations$idx
 		for (idx_count in 1:length(observations$idx)){
-			TS <- mean(range(observations$idx[[i]])[c("startf", "endf")])
-			ages <- dimnames(observations$idx[[i]])$age
+			TS <- mean(range(observations$idx[[idx_count]])[c("startf", "endf")])
+			ages <- dimnames(observations$idx[[idx_count]])$age
 			i0 <- (stock.n(stk)[,mxy] * exp((-m(stk)[,mxy] - harvest(stk)[,mxy]) * TS))[ages]
 			i0 <- i0 * deviances$idx[[idx_count]][,mxy]
 			if(any(i0==0)) i0[i0==0] <- min(i0[i0>0])/2
@@ -59,3 +59,39 @@ perfect.oem <- function(stk, deviances, observations, genArgs, tracking){
 	range(idx0[[1]])[c("startf","endf")] <- c(0,0)
 	list(stk=stk0, idx=idx0, deviances, observations, tracking=tracking)
 } # }}}
+
+# sample lengths
+
+#sampling_lengths.oem <- function(stk, deviances, observations, genArgs, tracking, ...) {
+
+#	dataYears <- genArgs$y0:genArgs$dy
+#	mxy <- ac(max(dataYears))
+#	assessmentYear <- ac(genArgs$ay)
+
+#	 carry on stock information in the observations for "short-cut" approach
+#	stock.n(observations$stk)[,assessmentYear] <- stock.n(stk)[,assessmentYear]	
+#	harvest(observations$stk)[,assessmentYear] <- harvest(stk)[,assessmentYear]	
+#	
+#	 catch.n
+#	 note it's adding 1 individual to avoid sca from crashing
+#	flq <- observations$stk@catch.ml
+#	flq[,mxy] <- quantSums(catch.n(stk)[,mxy]*deviances$stk$catch.n[,mxy]*deviances$stk$catch.la[,mxy])/quantSums(catch.n(stk)[,mxy]*deviances$stk$catch.n[,mxy])
+#	attr(observations$stk, "catch.ml")<- flq
+#	stk0 <- observations$stk[,ac(dataYears)]
+#	 return
+#	list(stk=stk0, idx=FLIndices(), observations=observations, tracking=tracking)
+#}  }}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
