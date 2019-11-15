@@ -280,3 +280,46 @@ setMethod("summary", signature(object="FLom"),
     cat("", unlist(args(projection)), "\n", sep="\t")
   }
 ) # }}}
+
+
+# plot {{{
+setMethod("plot", signature(x="FLom", y="missing"),
+  function(x, ...) {
+
+    # PARSE args for FLmse objects
+    args <- list(...)
+    cls <- unlist(lapply(args, is, "FLmse"))
+
+    if(any(cls)) {
+      stocks <- lapply(c(list(x), args[cls]), stock)
+
+      # SORT OUT names
+      names(stocks) <- unlist(lapply(stocks, name))
+      names(stocks)[names(stocks) == character(1)] <- 
+        c("OM", paste0("MP", seq(length(cls))))[names(stocks) == character(1)]
+
+    stocks[[1]] <- window(stocks[[1]], end=dims(stocks[[2]])$minyear)
+
+    plot(FLStocks(stocks))
+
+    } else {
+    
+      plot(stock(x))
+    
+    }
+  }
+) 
+
+setMethod("plot", signature(x="FLom", y="FLmse"),
+  function(x, y, ...) {
+
+    stocks <- lapply(list(x, y), stock)
+    
+    # SORT OUT names
+    names(stocks) <- unlist(lapply(stocks, name))
+    names(stocks)[names(stocks) == character(1)] <- 
+      c("OM", "MP")[names(stocks) == character(1)]
+
+    plot(FLStocks(stocks))
+  }
+)# }}}
