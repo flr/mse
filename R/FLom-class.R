@@ -294,9 +294,13 @@ setMethod("plot", signature(x="FLom", y="missing"),
       stocks <- lapply(c(list(x), args[cls]), stock)
 
       # SORT OUT names
-      names(stocks) <- unlist(lapply(stocks, name))
-      names(stocks)[names(stocks) == character(1)] <- 
-        c("OM", paste0("MP", seq(length(cls))))[names(stocks) == character(1)]
+      if(is.null(names(stocks)))
+        names(stocks) <- rep(character(1), length(stocks))
+      idx <- names(stocks) == character(1)
+      names(stocks)[idx] <- unlist(lapply(stocks, name))[idx]
+      idx <- names(stocks) == character(1)
+      names(stocks)[idx] <- 
+        c("OM", paste0("MP", seq(length(cls))))[idx]
 
     stocks[[1]] <- window(stocks[[1]], end=dims(stocks[[2]])$minyear)
 
@@ -313,12 +317,17 @@ setMethod("plot", signature(x="FLom", y="missing"),
 setMethod("plot", signature(x="FLom", y="FLmse"),
   function(x, y, ...) {
 
-    stocks <- lapply(list(x, y), stock)
-    
+    args <- list(...)
+
+    stocks <- lapply(c(list(x, y), args), stock)
+ 
     # SORT OUT names
-    names(stocks) <- unlist(lapply(stocks, name))
-    names(stocks)[names(stocks) == character(1)] <- 
-      c("OM", "MP")[names(stocks) == character(1)]
+    if(is.null(names(stocks)))
+      names(stocks) <- rep(character(1), length(stocks))
+    idx <- names(stocks) == character(1)
+    names(stocks)[idx] <- unlist(lapply(stocks, name))[idx]
+    idx <- names(stocks) == character(1)
+    names(stocks)[idx] <- c("OM", paste0("MP", seq(sum(idx))))[idx]
 
     plot(FLStocks(stocks))
   }
