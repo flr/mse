@@ -7,7 +7,6 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-# Harvest Control Rule function: h()
 #' Evaluate the chosen HCR function
 #'
 #' Evaluate the chosen HCR function using the current stock perception and a control
@@ -98,6 +97,26 @@ movingF.hcr <- function(stk, hcrpars, genArgs, tracking){
   # return
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
+
+#' A indicator based HCR
+#'
+#' Get indicator to target. The control argument is a list of parameters used by the HCR.
+#' @param stk The perceived FLStock.
+#' @param itrg The target for the indicator.
+#' @param genArgs A list with generic arguments to be used by the function if needed.
+#' @param tracking The tracking matrix.
+indicator.hcr <- function (stk, itrg, genArgs, tracking) 
+{
+    ay <- genArgs$ay
+    dy <- genArgs$dy
+  	sqy <- genArgs$sqy
+    if (!is(itrg, "FLQuant")) itrg <- FLQuant(itrg, dimnames = list(iter = dimnames(stk@catch)$iter))
+	fmult <- stk@indicator[,ac(dy)]/itrg
+	fsq <- yearMeans(fbar(stk)[,sqy])
+    ctrl <- getCtrl(fsq*fmult, "f", ay + genArgs$management_lag, dim(itrg)[6])
+    list(ctrl = ctrl, tracking = tracking)
+}
+
 
 # Test:
 # library(FLCore)

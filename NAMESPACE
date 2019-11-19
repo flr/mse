@@ -30,6 +30,8 @@ export(
   "gridList",
   "hyperstability.fb",
   "ices.hcr",
+  "indicator.hcr",
+  "length.est",
   "movingF.hcr",
   "mp",
   "mpCtrl",

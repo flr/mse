@@ -19,7 +19,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	sr.om.res <- residuals(sr.om)
 	sr.om.res.mult <- sr.om@logerror
 	projection <- projection(om)
-	if (!is.null(genArgs$nblocks)) nblocks <- genArgs$nblocks else nblocks <- 1
+	#if (!is.null(genArgs$nblocks)) nblocks <- genArgs$nblocks else nblocks <- 1
 	fy <- genArgs$fy # final year
 	iy <- genArgs$iy # initial year of projection (also intermediate)
 	nsqy <- genArgs$nsqy # sq years
@@ -114,7 +114,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	# PREPARE for return
 	res <- as(om, "FLmse")
 	stock(res) <- window(stk.om, start=iy, end=fy)
-	tracking(res) <- window(tracking, end=fy)
+	tracking(res) <- window(tracking, end=fy-genArgs$management_lag)
 	genArgs(res) <- genArgs
 	# TODO accessors
 	res@oem <- oem
