@@ -105,18 +105,18 @@ movingF.hcr <- function(stk, hcrpars, genArgs, tracking){
 #' @param itrg The target for the indicator.
 #' @param genArgs A list with generic arguments to be used by the function if needed.
 #' @param tracking The tracking matrix.
-indicator.hcr <- function (stk, itrg, genArgs, tracking) 
+indicator.hcr <- function (stk, hcrpars, genArgs, tracking) 
 {
     ay <- genArgs$ay
     dy <- genArgs$dy
-  	sqy <- genArgs$sqy
-    if (!is(itrg, "FLQuant")) itrg <- FLQuant(itrg, dimnames = list(iter = dimnames(stk@catch)$iter))
-	fmult <- stk@indicator[,ac(dy)]/itrg
-	fsq <- yearMeans(fbar(stk)[,sqy])
-    ctrl <- getCtrl(fsq*fmult, "f", ay + genArgs$management_lag, dim(itrg)[6])
+  	#sqy <- genArgs$sqy
+  	mlag <- genArgs$management_lag
+	if(!is(hcrpars, "FLQuant")) hcrpars <- FLQuant(hcrpars, dimnames=list(iter=dimnames(stk@catch)$iter))
+	mult <- stk@indicator[,ac(dy)]/hcrpars
+	#csq <- yearMeans(catch(stk)[,ac(dy)])
+    ctrl <- getCtrl(mult, NA, ay + mlag, dim(hcrpars)[6])
     list(ctrl = ctrl, tracking = tracking)
 }
-
 
 # Test:
 # library(FLCore)

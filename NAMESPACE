@@ -31,6 +31,8 @@ export(
   "hyperstability.fb",
   "ices.hcr",
   "indicator.hcr",
+  "indicator.phcr",
+  "indicator.is",
   "length.est",
   "movingF.hcr",
   "movingF.phcr",
