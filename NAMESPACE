@@ -86,7 +86,6 @@ exportMethods(
   "performance",
   "projection",
   "projection<-",
-  "refpts<-",
   "sr<-",
   "tracking",
   "tracking<-")
