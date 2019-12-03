@@ -50,7 +50,7 @@ globalVariables("indicator")
 #'   metrics=list(C=catch, F=fbar), years=list(20:25, 20:30))
 
 setMethod("performance", signature(x="FLStock"),
-  function(x, indicators, refpts,
+  function(x, indicators, refpts=FLPar(),
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     metrics=FLCore::metrics(x), probs=NULL, mp=NULL) {
       
@@ -68,7 +68,7 @@ setMethod("performance", signature(x="FLStock"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLQuants"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
+  function(x, indicators, refpts=FLPar(), years=dims(x[[1]])$maxyear,
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
     
     # TODO CHECK indicators
@@ -122,7 +122,7 @@ setMethod("performance", signature(x="FLQuants"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLStocks"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
+  function(x, indicators, refpts=FLPar(), years=dims(x[[1]])$maxyear,
     metrics=FLCore::metrics, probs=NULL, grid=missing, mp=NULL, mc.cores=1) {
 
     if(mc.cores > 1) {
@@ -156,7 +156,7 @@ setMethod("performance", signature(x="FLStocks"),
 #' @rdname performance
 
 setMethod("performance", signature(x="list"),
-  function(x, indicators, refpts, years=dims(x[[1]])$maxyear,
+  function(x, indicators, refpts=FLPar(), years=dims(x[[1]])$maxyear,
     probs=NULL, grid=missing, mp=NULL, mc.cores=1) {
 
     if(!all(unlist(lapply(x, is, 'FLQuants'))))
