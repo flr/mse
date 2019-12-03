@@ -6,9 +6,9 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-data(cod)
+data(p4om)
 
-refpts <- FLPar(SSBMSY=400, SSBlim=300, FMSY=0.18)
+refpts <- FLPar(SSBMSY=450000, SSBlim=250000, FMSY=0.18)
 
 indicators <- list(
   # S3
@@ -29,9 +29,6 @@ indicators <- list(
   T1 = list(~yearMeans(C[, -1]/C[, -dims(C)$year]), name = "mean(C_t / C_t-1)",
     desc = "Mean absolute proportional change in catch"))
 
-
-
-
 indicators <- list(
   # S3
   S3 = list(~yearMeans(SSB/SSBMSY), name = "mean(SSB/SSB_MSY)",
@@ -51,9 +48,7 @@ indicators <- list(
   T1 = list(~yearMeans(C[, -1]/C[, -dims(C)$year]), name = "mean(C_t / C_t-1)",
     desc = "Mean absolute proportional change in catch"))
 
-run <- window(cod, start=20)
-
-perf <- performance(run, indicators, refpts, years=30, mp='OM')
+perf <- performance(stock(om), indicators, refpts, years=1980:1999, mp='OM')
 
 perf <- performance(run, indicators, refpts, years=list(20:25, 20:30), mp='OM')
 
