@@ -529,8 +529,6 @@ flq <- FLQuant(c(0.3,0.2,0.4), dim=c(1,1,1,1,1,3))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq))))
 
-resp1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-
 # run new method in single core without foreach
 cl <- makeCluster(1)
 clusterEvalQ(cl = cl, expr = {i <- 1})
@@ -554,8 +552,7 @@ ctrl <- mpCtrl(list(
 	ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is)))
 
-resp2 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-
+# test parallel
 # run new method in single core without foreach
 cl <- makeCluster(1)
 clusterEvalQ(cl = cl, expr = {i <- 1})
@@ -579,8 +576,7 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=sca.sa)))
 
-resp3 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-
+# test parallel
 # run new method in single core without foreach
 cl <- makeCluster(1)
 clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
@@ -602,8 +598,6 @@ all.equal(stock(resp3), stock(resp3b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is)))
-
-resp4 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # test parallel
 cl <- makeCluster(1)
@@ -628,8 +622,6 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=sca.sa),
 	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
-
-resp5 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # test parallel
 cl <- makeCluster(1)
@@ -665,8 +657,6 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=biased.sa, args=list(fbias=.5))))
 
-resp6 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
-
 # test parallel
 cl <- makeCluster(1)
 clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
@@ -690,8 +680,6 @@ all.equal(stock(resp6), stock(resp6b))
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
-
-resp7 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # test parallel
 cl <- makeCluster(1)

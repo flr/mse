@@ -89,29 +89,6 @@ effort.is <- function(stk, ctrl, genArgs, tracking){
 	list(ctrl = ctrl, tracking = tracking)
 } # }}}
 
-#' indicator implementation function
-#'
-#' @param stk The perceived FLStock.
-#' @param ctrl control file with HCR decision
-
-indicator.is <- function(stk, ctrl, genArgs, tracking, system=c("output", "input"), ...){
-
-  	sqy <- genArgs$sqy
-  	if(system=='input'){
-  		vsq <- yearMeans(fbar(stk)[,ac(sqy)]) 
-  		quantity <- 'f'
-  	} else {
-  		vsq <- yearMeans(catch(stk)[,ac(sqy)]) 
-  		quantity <- 'catch'
-	}  	
-	# new control file
-	ctrl@target[,'quantity'] <- quantity
-	ctrl@trgtArray[,'val',] <- ctrl@trgtArray[,'val',]*vsq
-
-	# return
-	list(ctrl = ctrl, tracking = tracking)
-} # }}}
-
 
 
 

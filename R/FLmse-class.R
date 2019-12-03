@@ -158,15 +158,14 @@ setMethod("plot", signature(x="FLom", y="FLmse"),
 
     args <- list(...)
 
-    #  SUBSET FLmse objects
     cls <- unlist(lapply(args, is, "FLmse"))
 
-    # argument list with new names
-    args <- c(list(x=x, y), args[cls])
-    names(args) <- c("x", paste0("MP", seq(length(args)-1)))
+    stocks <- lapply(c(list(x, y), args[cls]), stock)
+    names(stocks) <- lapply(stocks, name)
 
-    do.call("plot", args)
+    stocks[[1]] <- window(stocks[[1]], end=dims(stocks[[2]])$minyear)
 
+    plot(FLStocks(stocks))
   }
 )# }}}
 

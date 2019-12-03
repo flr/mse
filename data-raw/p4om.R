@@ -31,13 +31,12 @@ vy <- ac(iy:fy) # vector of years to be projected
 # Operating model conditioning
 
 # fit stock assessment model
-mcsave <- 500
+mcsave <- 300
 mcmc <- mcsave*it
 fit <- sca(stk, idx, fit="MCMC",
   mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
 
-stk <- stk + fit
-
+stk <- slim(stk + fit)
 
 # Make SRRs
 
@@ -66,7 +65,16 @@ stk <- fwdWindow(stk, brp, end=fy)
 fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
 
 # OM object
-om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp))# , fleetBehaviour=fb)
+om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp))
 
+# OEM
+
+# Indices
+
+# IEM
+
+# mpargs
 
 save(om, file="../data/p4om.RData", compress="xz")
+
+save(om, oem, iem, mpargs, file="../data/p4om.RData", compress="xz")
