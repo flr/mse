@@ -6,9 +6,12 @@
 \alias{FLiem}
 \alias{initialize,FLiem-method}
 \alias{FLiem-methods}
+\alias{iters,FLiem-method}
 \title{S4 class \code{FLiem}}
 \usage{
 \S4method{initialize}{FLiem}(.Object, ...)
+
+\S4method{iters}{FLiem}(object, iter)
 }
 \arguments{
 \item{...}{additional argument list that might never be used}

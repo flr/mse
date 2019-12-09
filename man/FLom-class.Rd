@@ -15,8 +15,6 @@
 \alias{refpts}
 \alias{refpts-methods}
 \alias{refpts<-,FLom,FLPar-method}
-\alias{refpts<-}
-\alias{refpts<--methods}
 \alias{fleetBehaviour}
 \alias{fleetBehaviour-methods}
 \alias{fleetBehaviour,FLom-method}
