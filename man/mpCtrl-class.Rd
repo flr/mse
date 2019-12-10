@@ -88,8 +88,14 @@ ctrl.tm(object) <- value
 
 \S4method{iters}{mpCtrl}(object, iter)
 
-exists(x, where = -1, envir = if (missing(frame)) as.environment(where)
-  else sys.frame(frame), frame, mode = "any", inherits = TRUE)
+exists(
+  x,
+  where = -1,
+  envir = if (missing(frame)) as.environment(where) else sys.frame(frame),
+  frame,
+  mode = "any",
+  inherits = TRUE
+)
 }
 \arguments{
 \item{...}{additional argument list that might never be used}
@@ -99,6 +105,16 @@ exists(x, where = -1, envir = if (missing(frame)) as.environment(where)
 \description{
 The \code{mpCtrl} class defines which moules will be runned and carries the specifications of those modules in \code{mseCtrl} elements.
 }
+\section{Slots}{
+
+\describe{
+\item{ctrl.est}{\code{mseCtrl} object with estimator of stock abundance specifications.}
+\item{ctrl.phcr}{\code{mseCtrl} object with specifications about parameters needed for harvest control rule which must e computed from estimator results, e.g. Fmsy.}
+\item{ctrl.hcr}{\code{mseCtrl} object with harvest control rule specifications.}
+\item{ctrl.is}{\code{mseCtrl} object with management system specifications, e.g. translation of F into catch limits.}
+\item{ctrl.tm}{\code{mseCtrl} object with technical measures specifications.}
+}
+
 \section{Accessors}{
 
 All slots in the class have accessor and replacement methods defined that

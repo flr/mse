@@ -21,6 +21,13 @@
 \description{
 The \code{FLiem} class stores the information relative to the implementation error model of the MSE.
 }
+\section{Slots}{
+
+\describe{
+\item{method}{\code{character} with the name of the method to be run. Note a function of method must exist in the environment with the same name.}
+\item{args}{\code{list} with arguments to be passed to the function defined in \code{method}}
+}
+
 \section{Accessors}{
 
 All slots in the class have accessor and replacement methods defined that

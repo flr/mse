@@ -60,8 +60,6 @@ deviances(object) <- value
 \item{object}{object of relevant class (see signature of method)}
 
 \item{value}{the new object}
-
-\item{value}{the new object}
 }
 \description{
 The \code{FLoem} class stores the information relative to the observation error model of the MSE.

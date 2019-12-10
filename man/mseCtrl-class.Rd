@@ -44,8 +44,14 @@ args(object) <- value
 
 \S4method{show}{mseCtrl}(object)
 
-exists(x, where = -1, envir = if (missing(frame)) as.environment(where)
-  else sys.frame(frame), frame, mode = "any", inherits = TRUE)
+exists(
+  x,
+  where = -1,
+  envir = if (missing(frame)) as.environment(where) else sys.frame(frame),
+  frame,
+  mode = "any",
+  inherits = TRUE
+)
 
 \S4method{exists}{mseCtrl}(x)
 
@@ -59,6 +65,13 @@ exists(x, where = -1, envir = if (missing(frame)) as.environment(where)
 \description{
 The \code{mseCtrl} class stores information about how a specific module will be run.
 }
+\section{Slots}{
+
+\describe{
+\item{method}{\code{character} with the name of the method to be run. Note a function of method must exist in the environment with the same name.}
+\item{args}{\code{list} with arguments to be passed to the function defined in \code{method}}
+}
+
 \section{Accessors}{
 
 All slots in the class have accessor and replacement methods defined that

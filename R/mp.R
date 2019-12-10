@@ -19,7 +19,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	sr.om.res <- residuals(sr.om)
 	sr.om.res.mult <- sr.om@logerror
 	projection <- projection(om)
-	if (!is.null(genArgs$nblocks)) nblocks <- genArgs$nblocks else nblocks <- 1
+	#if (!is.null(genArgs$nblocks)) nblocks <- genArgs$nblocks else nblocks <- 1
 	fy <- genArgs$fy # final year
 	iy <- genArgs$iy # initial year of projection (also intermediate)
 	nsqy <- genArgs$nsqy # sq years
@@ -36,7 +36,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	if (is.null(genArgs$management_lag)) genArgs$management_lag <- 1
 
 	# INIT tracking
-	metric <- c("F.est", "B.est", "conv.est", "metric.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om")
+	metric <- c("C.obs", "F.est", "B.est", "C.est", "conv.est", "metric.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om")
 
 	if (!missing(tracking)) metric <- c(tracking, metric)
 	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=unique(c((iy-genArgs$management_lag+1):iy,vy)), iter=1:it))
@@ -114,7 +114,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	# PREPARE for return
 	res <- as(om, "FLmse")
 	stock(res) <- window(stk.om, start=iy, end=fy)
-	tracking(res) <- window(tracking, end=fy)
+	tracking(res) <- window(tracking, end=fy-genArgs$management_lag)
 	genArgs(res) <- genArgs
 	# TODO accessors
 	res@oem <- oem
@@ -165,6 +165,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		idx0 <- o.out$idx
 		observations(oem) <- o.out$observations
 		tracking <- o.out$tracking
+		tracking["C.obs",ac(ay)] <- catch(stk0)[,ac(ay-genArgs$data_lag)]
 
 		#==========================================================
 		# MP
@@ -183,6 +184,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			stk0 <- out.assess$stk
 			tracking <- out.assess$tracking
 		}
+		tracking["C.est",ac(ay)] <- catch(stk0)[,ac(ay-genArgs$data_lag)]
 		tracking["F.est",ac(ay)] <- fbar(stk0)[,ac(ay-genArgs$data_lag)]
 		tracking["B.est",ac(ay)] <- ssb(stk0)[,ac(ay-genArgs$data_lag)]
 

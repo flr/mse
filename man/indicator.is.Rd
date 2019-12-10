@@ -4,8 +4,7 @@
 \alias{indicator.is}
 \title{indicator implementation function}
 \usage{
-indicator.is(stk, ctrl, genArgs, tracking, system = c("output", "input"),
-  ...)
+indicator.is(stk, ctrl, genArgs, tracking, system = c("output", "input"), ...)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}

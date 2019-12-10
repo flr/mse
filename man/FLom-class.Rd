@@ -75,12 +75,6 @@ projection(object) <- value
 \item{object}{object of relevant class (see signature of method)}
 
 \item{value}{the new object}
-
-\item{value}{the new object}
-
-\item{value}{the new object}
-
-\item{value}{the new object}
 }
 \description{
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend

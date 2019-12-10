@@ -7,30 +7,13 @@
 ices.hcr(stk, fmin, ftrg, blim, bsafe, genArgs, tracking)
 }
 \arguments{
-\item{stk}{The perceived stock.}
+\item{stk}{The perceived FLStock.}
 
 \item{method}{Name of the chosen HCR function.}
-
-\item{ay}{The current year. The management control (e.g. F or effort) will be set in ay+1.}
 
 \item{EFF}{Effort array (if effort management is being used).}
 
 \item{EFF0}{Tracking array.}
-
-\item{control}{The control object for the chosen HCR function. A list of parameters.
-The typical HCR used by ICES
-
-The typical HCR used by ICES which sets a target F based on the SSB based on 4 parameters: blim, bsafe, fmin and ftrg.
-F increases linearly between SSB = blim and SSB = bsafe, from F = fmin to F = ftrg.
-If:
-B < Blim, F = Fbycatch;
-B > trigger, F = Fmsy;
-B > Blim & B < trigger, F linear between Fbycatch and Fmsy;
-F = ftrg is the maximum F, F = fmin is the minimum F.
-F is set in year ay, based on SSB in year ay - ssb_lag.
-The control argument is a list of parameters used by the HCR.}
-
-\item{stk}{The perceived FLStock.}
 
 \item{control}{A list with the elements fmin, ftrg, blim, bsafe and ssb_lag, all of which are numeric.}
 
