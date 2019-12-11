@@ -19,7 +19,7 @@ idx <- FLIndices(SURVEY=ple4.index)
 
 # Variables
 
-it <- 300 # iterations
+it <- 50 # iterations
 fy <- 2030 # final year
 y0 <- range(stk)["minyear"] # initial data year
 dy <- range(stk)["maxyear"] # final data year
