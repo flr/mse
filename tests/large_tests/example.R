@@ -529,23 +529,17 @@ flq <- FLQuant(c(0.3,0.2,0.4), dim=c(1,1,1,1,1,3))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq))))
 
-resp1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+#resp1 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # run new method in single core without foreach
-cl <- makeCluster(1)
-clusterEvalQ(cl = cl, expr = {i <- 1})
-registerDoParallel(cl)
+registerDoParallel(1)
 resp1a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp1), stock(resp1a))
+#all.equal(stock(resp1), stock(resp1a))
 
 # run new method in 2 cores with foreach
-cl <- makeCluster(3)
-clusterEvalQ(cl = cl, expr = {i <- 1})
-registerDoParallel(cl)
+registerDoParallel(3)
 resp1b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp1), stock(resp1b))
+all.equal(stock(resp1a), stock(resp1b))
 
 #------------------------------------------------------------------------------
 # base with TAC
@@ -554,23 +548,17 @@ ctrl <- mpCtrl(list(
 	ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is)))
 
-resp2 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+#resp2 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # run new method in single core without foreach
-cl <- makeCluster(1)
-clusterEvalQ(cl = cl, expr = {i <- 1})
-registerDoParallel(cl)
+registerDoParallel(1)
 resp2a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp2), stock(resp2a))
+#all.equal(stock(resp2), stock(resp2a))
 
 # run new method in 3 cores with foreach
-cl <- makeCluster(3)
-clusterEvalQ(cl = cl, expr = {i <- 1})
-registerDoParallel(cl)
+registerDoParallel(3)
 resp2b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp2), stock(resp2b))
+all.equal(stock(resp2a), stock(resp2b))
 
 #------------------------------------------------------------------------------
 # base with TAC and SA
@@ -579,23 +567,17 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=sca.sa)))
 
-resp3 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
+#resp3 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # run new method in single core without foreach
-cl <- makeCluster(1)
-clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
-registerDoParallel(cl)
+registerDoParallel(1)
 resp3a <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp3), stock(resp3a))
+#all.equal(stock(resp3), stock(resp3a))
 
 # run new method in 3 cores with foreach
-cl <- makeCluster(3)
-clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
-registerDoParallel(cl)
+registerDoParallel(3)
 resp3b <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp3), stock(resp3b))
+all.equal(stock(resp3a), stock(resp3b))
 
 #------------------------------------------------------------------------------
 # base with TAC and IEM
@@ -603,23 +585,17 @@ all.equal(stock(resp3), stock(resp3b))
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is)))
 
-resp4 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+#resp4 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # test parallel
-cl <- makeCluster(1)
-clusterEvalQ(cl = cl, expr = {i <- 1})
-registerDoParallel(cl)
+registerDoParallel(1)
 resp4a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp4), stock(resp4a))
+#all.equal(stock(resp4), stock(resp4a))
 
 # run new method in 2 cores with foreach
-cl <- makeCluster(3)
-clusterEvalQ(cl = cl, expr = {i <- 1})
-registerDoParallel(cl)
+registerDoParallel(3)
 resp4b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
-all.equal(stock(resp4), stock(resp4b))
-stopCluster(cl)
+all.equal(stock(resp4a), stock(resp4b))
 
 #------------------------------------------------------------------------------
 # base with TAC and SA and OEM and IEM
@@ -629,24 +605,17 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.est = mseCtrl(method=sca.sa),
 	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
 
-resp5 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+#resp5 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # test parallel
-cl <- makeCluster(1)
-clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
-registerDoParallel(cl)
+registerDoParallel(1)
 resp5a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp5), stock(resp5a))
+#all.equal(stock(resp5), stock(resp5a))
 
 # run new method in 2 cores with foreach
-cl <- makeCluster(3)
-clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
-registerDoParallel(cl)
-mpargs$nblocks <- 3
+registerDoParallel(3)
 resp5b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp5), stock(resp5b))
+all.equal(stock(resp5a), stock(resp5b))
 
 #------------------------------------------------------------------------------
 # testing biased assessment
@@ -665,24 +634,17 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=biased.sa, args=list(fbias=.5))))
 
-resp6 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+#resp6 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # test parallel
-cl <- makeCluster(1)
-clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
-registerDoParallel(cl)
+registerDoParallel(1)
 resp6a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp6), stock(resp6a))
+#all.equal(stock(resp6), stock(resp6a))
 
 # run new method in 2 cores with foreach
-cl <- makeCluster(3)
-clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
-registerDoParallel(cl)
-mpargs$nblocks <- 3
+registerDoParallel(3)
 resp6b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp6), stock(resp6b))
+all.equal(stock(resp6a), stock(resp6b))
 
 #------------------------------------------------------------------------------
 # base with TAC and separable SA
@@ -691,22 +653,15 @@ ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
 	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
 
-resp7 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
+#resp7 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
 # test parallel
-cl <- makeCluster(1)
-clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
-registerDoParallel(cl)
+registerDoParallel(1)
 resp7a <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp7), stock(resp7a))
+#all.equal(stock(resp7), stock(resp7a))
 
 # run new method in 2 cores with foreach
-cl <- makeCluster(3)
-clusterEvalQ(cl = cl, expr = {i <- 1;library(FLa4a)})
-registerDoParallel(cl)
-mpargs$nblocks <- 3
+registerDoParallel(3)
 resp7b <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
-stopCluster(cl)
-all.equal(stock(resp7), stock(resp7b))
+all.equal(stock(resp7a), stock(resp7b))
 

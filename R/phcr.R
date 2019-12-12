@@ -14,9 +14,9 @@ movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, genArgs, hc
 	if(ay==iy | (ay-iy)%%interval==0){
 		if(!missing(model)){
 			sr0 <- fmle(as.FLSR(stk, model=model))
-			hcrpars <- c(refpts(brp(FLBRP(stk, sr0)))[frp,"harvest"])
+			hcrpars <- refpts(brp(FLBRP(stk, sr0)))[frp,"harvest"]
 		} else {
-			hcrpars <- c(refpts(brp(FLBRP(stk)))[frp,"harvest"])
+			hcrpars <- refpts(brp(FLBRP(stk)))[frp,"harvest"]
 		}
 	}
 	list(hcrpars=hcrpars, tracking=tracking)	

@@ -15,8 +15,8 @@ perfect.sa <- function(stk, idx, genArgs, tracking, ...) {
 }
 # }}}
 
-# length based estimator
-length.est <- function (stk, idx, genArgs, vbPars, ...){
+# mean length of the catch - length based estimator
+mlc.est <- function (stk, idx, genArgs, vbPars, ...){
     args <- list(...)
 	tracking <- args$tracking
 	vbObj <- a4aGr(

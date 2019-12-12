@@ -36,7 +36,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl.mp, genArgs, scenario="test", tra
 	if (is.null(genArgs$management_lag)) genArgs$management_lag <- 1
 
 	# INIT tracking
-	metric <- c("C.obs", "F.est", "B.est", "C.est", "conv.est", "metric.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om")
+	metric <- c("C.obs", "F.est", "B.est", "C.est", "conv.est", "metric.phcr", "metric.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om")
 
 	if (!missing(tracking)) metric <- c(tracking, metric)
 	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=unique(c((iy-genArgs$management_lag+1):iy,vy)), iter=1:it))
@@ -205,6 +205,11 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			hcrpars <- out$hcrpars
 			tracking <- out$tracking
 		}
+		# EJ: don't like this hack but seems to work ...
+		# by default stores the first par in tracking
+		if(exists("hcrpars")){
+			tracking["metric.phcr", ac(ay)] <- hcrpars[1,1,,drop=TRUE]
+		 }
 
 		#----------------------------------------------------------
 		# HCR

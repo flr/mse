@@ -89,7 +89,7 @@ movingF.hcr <- function(stk, hcrpars, genArgs, tracking){
 	ay <- genArgs$ay
 	# rule 
 	if(!is(hcrpars, "FLQuant"))
-    hcrpars <- FLQuant(hcrpars, dimnames=list(iter=dimnames(stk@catch)$iter))
+    hcrpars <- FLQuant(c(hcrpars), dimnames=list(iter=dimnames(stk@catch)$iter))
 	
   # create control file
 	ctrl <- getCtrl(c(hcrpars), "f", ay+genArgs$management_lag, dim(hcrpars)[6])
