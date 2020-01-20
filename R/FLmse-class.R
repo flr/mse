@@ -124,16 +124,7 @@ setReplaceMethod("oem", signature("FLmse", "FLQuant"), function(object, value){
 # args
 
 #' @rdname FLmse-class
-#' @aliases args args-methods
-setGeneric("args", function(object, ...) standardGeneric("args"))
-
-#' @rdname FLmse-class
 setMethod("args", "FLmse", function(object) object@args)
-
-#' @rdname FLmse-class
-#' @param value the new object
-#' @aliases args<- args<--methods
-setGeneric("args<-", function(object, value) standardGeneric("args<-"))
 
 #' @rdname FLmse-class
 setReplaceMethod("args", signature("FLmse", "list"), function(object, value){

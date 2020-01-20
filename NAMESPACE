@@ -76,8 +76,6 @@ exportMethods(
   "FLmse",
   "FLoem",
   "FLom",
-  "genArgs",
-  "genArgs<-",
   "mcN",
   "method",
   "method<-",

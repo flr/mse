@@ -55,54 +55,60 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl, args, scenario="test", tracking=
   
 	# PREPARE objects for loop call
     if (exists(fleetBehaviour(om))) fb <- fleetBehaviour(om) else fb <- NULL 
-	
+
 	#============================================================
 	# PREPARE for parallel if needed
 	if(getDoParWorkers() > 1){
 		cat("Going parallel with ", getDoParWorkers(), " cores !\n")
-
 		# LOOP and combine
-		lst0 <- foreach(i=1:it, .combine=function(...) {
-			list(stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
-				tracking=do.call('combine', lapply(list(...), '[[', 'tracking')),
-				oem=do.call('combine', lapply(list(...), '[[', 'oem')))
-			}, .packages="mse", .multicombine=TRUE, .errorhandling = "stop", .inorder=TRUE) %dopar% {
+		lst0 <- foreach(i=1:it, 
+			.combine=function(...) {
+				list(
+					stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
+					tracking=do.call('combine', lapply(list(...), '[[', 'tracking')),
+					oem=do.call('combine', lapply(list(...), '[[', 'oem'))
+				)
+			}, 
+			.packages="mse", 
+			.multicombine=TRUE, 
+			.errorhandling = "stop", 
+			.inorder=TRUE) %dopar% {
+				call0 <- list(
+					stk.om = stk.om[,,,,,i],
+					sr.om = FLCore::iter(sr.om,i),
+					sr.om.res = sr.om.res[,,,,,i],
+					oem = iters(oem, i),
+					tracking = tracking[,,,,,i],
+					sr.om.res.mult=sr.om.res.mult,
+					fb=fb,
+					projection=projection,
+					iem=iem,
+					ctrl= iters(ctrl, i),
+					args=args,
+					verbose=verbose)
+				out <- do.call(mse:::goFish, call0)
+				# RETURN
+				list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
+			}
+		} else {
+			cat("Going single core !\n")
 			call0 <- list(
-				stk.om = stk.om[,,,,,i],
-				sr.om = FLCore::iter(sr.om,i),
-				sr.om.res = sr.om.res[,,,,,i],
-				oem = iters(oem, i),
-				tracking = tracking[,,,,,i],
+				stk.om = stk.om,
+				sr.om = sr.om,
+				sr.om.res = sr.om.res,
+				oem = oem,
+				tracking = tracking,
 				sr.om.res.mult=sr.om.res.mult,
 				fb=fb,
 				projection=projection,
 				iem=iem,
-				ctrl= iters(ctrl, i),
+				ctrl=ctrl,
 				args=args,
 				verbose=verbose)
 			out <- do.call(mse:::goFish, call0)
-			# RETURN
-			list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
+			lst0 <- list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
 		}
-	} else {
-		cat("Going single core !\n")
-		call0 <- list(
-			stk.om = stk.om,
-			sr.om = sr.om,
-			sr.om.res = sr.om.res,
-			oem = oem,
-			tracking = tracking,
-			sr.om.res.mult=sr.om.res.mult,
-			fb=fb,
-			projection=projection,
-			iem=iem,
-			ctrl=ctrl,
-			args=args,
-			verbose=verbose)
-		out <- do.call(mse:::goFish, call0)
-		lst0 <- list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
-	}
-
+	
 	# GET objects back from loop
 	stk.om <- lst0$stk.om
 	tracking <- lst0$tracking
