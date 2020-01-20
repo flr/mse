@@ -9,7 +9,7 @@
 
 # mp {{{
 
-mp <- function(om, oem=FLoem(), iem=NULL, ctrl, genArgs, scenario="test", tracking="missing", verbose=TRUE){
+mp <- function(om, oem=FLoem(), iem=NULL, ctrl, args, scenario="test", tracking="missing", verbose=TRUE){
 
 	#============================================================
 	# prepare the om
@@ -19,39 +19,39 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl, genArgs, scenario="test", tracki
 	sr.om.res <- residuals(sr.om)
 	sr.om.res.mult <- sr.om@logerror
 	projection <- projection(om)
-	#if (!is.null(genArgs$nblocks)) nblocks <- genArgs$nblocks else nblocks <- 1
-	fy <- genArgs$fy # final year
-	iy <- genArgs$iy # initial year of projection (also intermediate)
-	nsqy <- genArgs$nsqy # sq years
-	vy <- genArgs$vy <- ac(iy:fy) # vector of years to be projected
+	#if (!is.null(args$nblocks)) nblocks <- args$nblocks else nblocks <- 1
+	fy <- args$fy # final year
+	iy <- args$iy # initial year of projection (also intermediate)
+	nsqy <- args$nsqy # sq years
+	vy <- args$vy <- ac(iy:fy) # vector of years to be projected
 	# om$its
-	it <- genArgs$it <- dim(stk.om)[6]
+	it <- args$it <- dim(stk.om)[6]
 
 	# SET lags
 	# data lag = time in years between the data and the year 
 	#  the assessment is performed (ay).
 	# management lag = time in years between the year the 
 	#  assessment is performed (ay) and the implementation of the management action.
-	if (is.null(genArgs$data_lag)) genArgs$data_lag <- 1
-	if (is.null(genArgs$management_lag)) genArgs$management_lag <- 1
+	if (is.null(args$data_lag)) args$data_lag <- 1
+	if (is.null(args$management_lag)) args$management_lag <- 1
 
 	# INIT tracking
 	metric <- c("C.obs", "F.est", "B.est", "C.est", "conv.est", "metric.phcr", "metric.hcr", "metric.is", "metric.iem", "metric.fb","F.om", "B.om", "C.om")
 
 	if (!missing(tracking)) metric <- c(tracking, metric)
-	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=unique(c((iy-genArgs$management_lag+1):iy,vy)), iter=1:it))
+	tracking <- FLQuant(NA, dimnames=list(metric=metric, year=unique(c((iy-args$management_lag+1):iy,vy)), iter=1:it))
 	# GET historical from OM 
 	# ToDo intermediate year function
-	catch.inty <- catch(stk.om)[,ac((iy+1):(iy+genArgs$management_lag))]
+	catch.inty <- catch(stk.om)[,ac((iy+1):(iy+args$management_lag))]
 	fsq.inty <- c(yearMeans(fbar(stk.om)[,ac((iy-1):(iy-nsqy))]))
 	if(sum(is.na(catch.inty))==0){
-		tracking["metric.is", ac((iy-genArgs$management_lag+1):iy)] <- tracking["metric.iem", ac((iy-genArgs$management_lag+1):iy)] <- catch.inty
+		tracking["metric.is", ac((iy-args$management_lag+1):iy)] <- tracking["metric.iem", ac((iy-args$management_lag+1):iy)] <- catch.inty
 	} else {
-		tracking["metric.is", ac((iy-genArgs$management_lag+1):iy)] <- tracking["metric.iem", ac((iy-genArgs$management_lag+1):iy)] <- 1 #fsq.inty
+		tracking["metric.is", ac((iy-args$management_lag+1):iy)] <- tracking["metric.iem", ac((iy-args$management_lag+1):iy)] <- 1 #fsq.inty
 	}
 	
 	# SET seed
-	if (!is.null(genArgs$seed)) set.seed(genArgs$seed)
+	if (!is.null(args$seed)) set.seed(args$seed)
   
 	# PREPARE objects for loop call
     if (exists(fleetBehaviour(om))) fb <- fleetBehaviour(om) else fb <- NULL 
@@ -78,7 +78,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl, genArgs, scenario="test", tracki
 				projection=projection,
 				iem=iem,
 				ctrl= iters(ctrl, i),
-				genArgs=genArgs,
+				args=args,
 				verbose=verbose)
 			out <- do.call(mse:::goFish, call0)
 			# RETURN
@@ -97,7 +97,7 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl, genArgs, scenario="test", tracki
 			projection=projection,
 			iem=iem,
 			ctrl=ctrl,
-			genArgs=genArgs,
+			args=args,
 			verbose=verbose)
 		out <- do.call(mse:::goFish, call0)
 		lst0 <- list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
@@ -114,23 +114,23 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl, genArgs, scenario="test", tracki
 	# PREPARE for return
 	res <- as(om, "FLmse")
 	stock(res) <- window(stk.om, start=iy, end=fy)
-	tracking(res) <- window(tracking, end=fy-genArgs$management_lag)
-	genArgs(res) <- genArgs
+	tracking(res) <- window(tracking, end=fy-args$management_lag)
+	args(res) <- args
 	# TODO accessors
 	res@oem <- oem
 	res@control <- ctrl
 	return(res)
 }
 
-goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem, iem, tracking, ctrl, genArgs, verbose){
+goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem, iem, tracking, ctrl, args, verbose){
 
-	it <- genArgs$it
-	y0 <- genArgs$y0 # initial data year
-	fy <- genArgs$fy # final year
-	iy <- genArgs$iy # initial year of projection (also intermediate)
-	nsqy <- genArgs$nsqy # number of years to compute status quo metrics
-	vy <- genArgs$vy # vector of years to be projected
-	data_lag <- genArgs$data_lag
+	it <- args$it
+	y0 <- args$y0 # initial data year
+	fy <- args$fy # final year
+	iy <- args$iy # initial year of projection (also intermediate)
+	nsqy <- args$nsqy # number of years to compute status quo metrics
+	vy <- args$vy # vector of years to be projected
+	data_lag <- args$data_lag
 	# need to rename ctrl to avoid breaking code
 	ctrl0 <- ctrl
 
@@ -140,9 +140,9 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 
 		gc()
 		if(verbose) cat(i, " > ")
-		ay <- genArgs$ay <- an(i)
-		dy <- genArgs$dy <- ay-data_lag
-		sqy <- genArgs$sqy <- ac((ay-data_lag):(ay-nsqy-data_lag+1)) # years for status quo computations 
+		ay <- args$ay <- an(i)
+		dy <- args$dy <- ay-data_lag
+		sqy <- args$sqy <- ac((ay-data_lag):(ay-nsqy-data_lag+1)) # years for status quo computations 
 
    		# TRACK om
 		tracking["F.om", ac(ay)] <- fbar(stk.om)[,ac(ay)]    
@@ -158,7 +158,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		ctrl.oem$deviances <- deviances(oem)
 		ctrl.oem$observations <- observations(oem)
 		ctrl.oem$stk <- stk.om
-		ctrl.oem$genArgs <- genArgs #vy0 <- vy0
+		ctrl.oem$args <- args #vy0 <- vy0
 		#ctrl.oem$ay <- ay
 		ctrl.oem$tracking <- tracking
 		ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
@@ -167,7 +167,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		idx0 <- o.out$idx
 		observations(oem) <- o.out$observations
 		tracking <- o.out$tracking
-		tracking["C.obs",ac(ay)] <- catch(stk0)[,ac(ay-genArgs$data_lag)]
+		tracking["C.obs",ac(ay)] <- catch(stk0)[,ac(ay-args$data_lag)]
 
 		#==========================================================
 		# MP
@@ -179,16 +179,16 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl.est$method <- method(ctrl0$ctrl.est)
 			ctrl.est$stk <- stk0
 			ctrl.est$idx <- idx0
-			ctrl.est$genArgs <- genArgs #ay <- ay
+			ctrl.est$args <- args #ay <- ay
 			ctrl.est$tracking <- tracking
 			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
 			out.assess <- do.call("mpDispatch", ctrl.est)
 			stk0 <- out.assess$stk
 			tracking <- out.assess$tracking
 		}
-		tracking["C.est",ac(ay)] <- catch(stk0)[,ac(ay-genArgs$data_lag)]
-		tracking["F.est",ac(ay)] <- fbar(stk0)[,ac(ay-genArgs$data_lag)]
-		tracking["B.est",ac(ay)] <- ssb(stk0)[,ac(ay-genArgs$data_lag)]
+		tracking["C.est",ac(ay)] <- catch(stk0)[,ac(ay-args$data_lag)]
+		tracking["F.est",ac(ay)] <- fbar(stk0)[,ac(ay-args$data_lag)]
+		tracking["B.est",ac(ay)] <- ssb(stk0)[,ac(ay-args$data_lag)]
 
 		#----------------------------------------------------------
 		# HCR parametrization
@@ -198,7 +198,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl.phcr <- args(ctrl0$ctrl.phcr)
 			ctrl.phcr$method <- method(ctrl0$ctrl.phcr) 
 			ctrl.phcr$stk <- stk0
-			ctrl.phcr$genArgs <- genArgs #ay <- ay
+			ctrl.phcr$args <- args #ay <- ay
 			#ctrl.phcr$iy <- iy
 			ctrl.phcr$tracking <- tracking
 			if(exists("hcrpars")) ctrl.phcr$hcrpars <- hcrpars
@@ -221,7 +221,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl.hcr <- args(ctrl0$ctrl.hcr)
 			ctrl.hcr$method <- method(ctrl0$ctrl.hcr)
 			ctrl.hcr$stk <- stk0
-			ctrl.hcr$genArgs <- genArgs #ay <- ay
+			ctrl.hcr$args <- args #ay <- ay
 			ctrl.hcr$tracking <- tracking
 			if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
 			ctrl.hcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flfval))
@@ -229,9 +229,9 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		} else {
-			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+genArgs$management_lag, it)
+			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+args$management_lag, it)
 		}
-		tracking["metric.hcr", ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
+		tracking["metric.hcr", ac(ay)] <- ctrl@trgtArray[ac(ay+args$management_lag),"val",]
 		
 		#----------------------------------------------------------
 		# Implementation system
@@ -242,14 +242,14 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl.is$method <- method(ctrl0$ctrl.is)
 			ctrl.is$ctrl <- ctrl
 			ctrl.is$stk <- stk0
-			ctrl.is$genArgs <- genArgs #ay <- ay
+			ctrl.is$args <- args #ay <- ay
 			ctrl.is$tracking <- tracking
 			ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval), ov=list(t1=flfval))
 			out <- do.call("mpDispatch", ctrl.is)
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		}		
-		tracking["metric.is", ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
+		tracking["metric.is", ac(ay)] <- ctrl@trgtArray[ac(ay+args$management_lag),"val",]
 
 		#----------------------------------------------------------
 		# Technical measures
@@ -259,7 +259,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl.tm <- args(ctrl0$ctrl.tm)
 			ctrl.tm$method <- method(ctrl0$ctrl.tm)
 			ctrl.tm$stk <- stk0
-			ctrl.tm$genArgs <- genArgs #sqy <- sqy
+			ctrl.tm$args <- args #sqy <- sqy
 			ctrl.tm$tracking <- tracking
 			ctrl.tm$ioval <- list(iv=list(t1=flsval), ov=list(t1=flqval))
 			out <- do.call("mpDispatch", ctrl.tm)
@@ -275,14 +275,14 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl.iem <- args(iem)
 			ctrl.iem$method <- method(iem)
 			ctrl.iem$ctrl <- ctrl
-			ctrl.iem$genArgs <- genArgs
+			ctrl.iem$args <- args
 			ctrl.iem$tracking <- tracking
 			ctrl.iem$ioval <- list(iv=list(t1=flfval), ov=list(t1=flfval))
 			out <- do.call("mpDispatch", ctrl.iem)
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		}
-		tracking["metric.iem",ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
+		tracking["metric.iem",ac(ay)] <- ctrl@trgtArray[ac(ay+args$management_lag),"val",]
 
 		#==========================================================
 		# OM
@@ -293,7 +293,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			ctrl.fb <- args(fb)
 			ctrl.fb$method <- method(fb)
 			ctrl.fb$ctrl <- ctrl
-			ctrl.fb$genArgs <- genArgs
+			ctrl.fb$args <- args
 			ctrl.fb$tracking <- tracking
 			ctrl.fb$ioval <- list(iv=list(t1=flfval), ov=list(t1=flfval))
 			out <- do.call("mpDispatch", ctrl.fb)
@@ -301,7 +301,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 			tracking <- out$tracking
 		}
 	    # TODO value()
-		tracking["metric.fb",ac(ay)] <- ctrl@trgtArray[ac(ay+genArgs$management_lag),"val",]
+		tracking["metric.fb",ac(ay)] <- ctrl@trgtArray[ac(ay+args$management_lag),"val",]
 
 		#----------------------------------------------------------
 		# stock dynamics and OM projections
@@ -310,7 +310,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[,ac(ay+1)] <- attr(ctrl, "snew")
 		ctrl.om <- args(projection)
 		# update with decision made having into account management lag
-		ctrl <- getCtrl(tracking["metric.iem",ac(genArgs$ay-genArgs$management_lag+1)], ac(ctrl@target[,"quantity",]), ay+1, it, ctrl@target[,"rel.year",])   		
+		ctrl <- getCtrl(tracking["metric.iem",ac(args$ay-args$management_lag+1)], ac(ctrl@target[,"quantity",]), ay+1, it, ctrl@target[,"rel.year",])   		
 		ctrl.om$ctrl <- ctrl
 		ctrl.om$stk <- stk.om
 		ctrl.om$sr <- sr.om
@@ -321,7 +321,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		stk.om <- do.call("mpDispatch", ctrl.om)$object
 
 	}
-	list(stk.om=stk.om, tracking=tracking, oem=oem, genArgs=genArgs)
+	list(stk.om=stk.om, tracking=tracking, oem=oem, args=args)
 }
 
 #mp00 <- function(om, oem=FLoem(), iem="missing", ctrl, genArgs, scenario="test", tracking="missing", verbose=TRUE){

@@ -9,15 +9,15 @@
 
 # sampling.oem {{{
 
-sampling.oem <- function(stk, deviances, observations, genArgs, tracking,
+sampling.oem <- function(stk, deviances, observations, args, tracking,
   oe=c("both","index","catch")) {
 	
   # TODO needs more work to remove the index OE, for now index OE is mandatory 
 	
-	#dataYears <- 1:(genArgs$ay-genArgs$y0-genArgs$data_lag+1)
-	dataYears <- genArgs$y0:genArgs$dy
+	#dataYears <- 1:(args$ay-args$y0-args$data_lag+1)
+	dataYears <- args$y0:args$dy
 	mxy <- ac(max(dataYears))
-	assessmentYear <- ac(genArgs$ay)
+	assessmentYear <- ac(args$ay)
 
 	# carry on stock information in the observations for "short-cut" approach
 	stock.n(observations$stk)[,assessmentYear] <- stock.n(stk)[,assessmentYear]	
@@ -51,9 +51,9 @@ sampling.oem <- function(stk, deviances, observations, genArgs, tracking,
 
 # perfect.oem {{{
 
-perfect.oem <- function(stk, deviances, observations, genArgs, tracking){
-	dataYears <- genArgs$vy0
-	assessmentYear <- ac(genArgs$ay)
+perfect.oem <- function(stk, deviances, observations, args, tracking){
+	dataYears <- args$vy0
+	assessmentYear <- ac(args$ay)
 	stk0 <- stk[,dataYears]
 	idx0 <- FLIndices(a=FLIndex(index=stock.n(stk)[,dataYears]*0.01))
 	range(idx0[[1]])[c("startf","endf")] <- c(0,0)
@@ -62,11 +62,11 @@ perfect.oem <- function(stk, deviances, observations, genArgs, tracking){
 
 # sample lengths
 
-#sampling_lengths.oem <- function(stk, deviances, observations, genArgs, tracking, ...) {
+#sampling_lengths.oem <- function(stk, deviances, observations, args, tracking, ...) {
 
-#	dataYears <- genArgs$y0:genArgs$dy
+#	dataYears <- args$y0:args$dy
 #	mxy <- ac(max(dataYears))
-#	assessmentYear <- ac(genArgs$ay)
+#	assessmentYear <- ac(args$ay)
 
 #	 carry on stock information in the observations for "short-cut" approach
 #	stock.n(observations$stk)[,assessmentYear] <- stock.n(stk)[,assessmentYear]	

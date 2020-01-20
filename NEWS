@@ -1,3 +1,8 @@
+ mse 2.0
+ USER-VISIBLE CHANGES
+- genArgs renamed args
+- ctrl.mp renamed ctrl
+
  mse 1.0
  USER-VISIBLE CHANGES
 - metric.phcr, C.obs and C.est added to the tracking matrix
