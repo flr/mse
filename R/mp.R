@@ -180,9 +180,9 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		# Estimator of stock statistics
 		#==========================================================
 		#cat("est\n")
-		if (!is.null(ctrl0$ctrl.est)){
-			ctrl.est <- args(ctrl0$ctrl.est)
-			ctrl.est$method <- method(ctrl0$ctrl.est)
+		if (!is.null(ctrl0$est)){
+			ctrl.est <- args(ctrl0$est)
+			ctrl.est$method <- method(ctrl0$est)
 			ctrl.est$stk <- stk0
 			ctrl.est$idx <- idx0
 			ctrl.est$args <- args #ay <- ay
@@ -200,9 +200,9 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		# HCR parametrization
 		#----------------------------------------------------------
 		#cat("phcr\n")
-		if (!is.null(ctrl0$ctrl.phcr)){
-			ctrl.phcr <- args(ctrl0$ctrl.phcr)
-			ctrl.phcr$method <- method(ctrl0$ctrl.phcr) 
+		if (!is.null(ctrl0$phcr)){
+			ctrl.phcr <- args(ctrl0$phcr)
+			ctrl.phcr$method <- method(ctrl0$phcr) 
 			ctrl.phcr$stk <- stk0
 			ctrl.phcr$args <- args #ay <- ay
 			#ctrl.phcr$iy <- iy
@@ -223,9 +223,9 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		# HCR
 		#----------------------------------------------------------
 		#cat("hcr\n")
-		if (!is.null(ctrl0$ctrl.hcr)){
-			ctrl.hcr <- args(ctrl0$ctrl.hcr)
-			ctrl.hcr$method <- method(ctrl0$ctrl.hcr)
+		if (!is.null(ctrl0$hcr)){
+			ctrl.hcr <- args(ctrl0$hcr)
+			ctrl.hcr$method <- method(ctrl0$hcr)
 			ctrl.hcr$stk <- stk0
 			ctrl.hcr$args <- args #ay <- ay
 			ctrl.hcr$tracking <- tracking
@@ -243,9 +243,9 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		# Implementation system
 		#----------------------------------------------------------
 		#cat("is\n")
-		if (!is.null(ctrl0$ctrl.is)){
-			ctrl.is <- args(ctrl0$ctrl.is)
-			ctrl.is$method <- method(ctrl0$ctrl.is)
+		if (!is.null(ctrl0$isys)){
+			ctrl.is <- args(ctrl0$isys)
+			ctrl.is$method <- method(ctrl0$isys)
 			ctrl.is$ctrl <- ctrl
 			ctrl.is$stk <- stk0
 			ctrl.is$args <- args #ay <- ay
@@ -261,9 +261,9 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb, projection, oem
 		# Technical measures
 		#----------------------------------------------------------
 		#cat("tm\n")
-		if (!is.null(ctrl0$ctrl.tm)){
-			ctrl.tm <- args(ctrl0$ctrl.tm)
-			ctrl.tm$method <- method(ctrl0$ctrl.tm)
+		if (!is.null(ctrl0$tm)){
+			ctrl.tm <- args(ctrl0$tm)
+			ctrl.tm$method <- method(ctrl0$tm)
 			ctrl.tm$stk <- stk0
 			ctrl.tm$args <- args #sqy <- sqy
 			ctrl.tm$tracking <- tracking
