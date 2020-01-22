@@ -29,7 +29,7 @@ idx <- ple4.indices["BTS-Combined (all)"]
 
 # VARIABLES
 
-it <- 25 # iterations
+it <- 3 # iterations
 fy <- 2030 # final year
 y0 <- range(stk)["minyear"] # initial OM year
 dy <- range(stk)["maxyear"] # final OM year
@@ -70,6 +70,7 @@ ac1 <- mean(apply(window(rec(stk), end=2008)@.Data, 6, function(x)
 srbh <- fmle(as.FLSR(stk0, model="bevholt"), method="L-BFGS-B", lower=c(1e-6, 1e-6), upper=c(max(rec(stk)) * 3, Inf))
 
 # Residuals
+set.seed(0)
 resbh <- ar1rlnorm(rho=ac1, years=dy:fy, iters=it, margSD=rv1*2)
 residuals(srbh) <- resbh
 
@@ -522,7 +523,7 @@ all.equal(stock(resp7), stock(resp7b))
 #==============================================================================
 # Tests iters in args
 #==============================================================================
-rnorm(123)
+set.seed(0)
 flq <- FLQuant(rnorm(it, 0.3, 0.05), dim=c(1,1,1,1,1,it))
 
 #------------------------------------------------------------------------------
