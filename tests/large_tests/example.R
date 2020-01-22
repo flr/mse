@@ -21,168 +21,174 @@ library(doParallel)
 
 # LOAD data
 
-data(ple4)
-data(ple4.indices)
+load("om3.RData")
 
-stk <- ple4
-idx <- ple4.indices["BTS-Combined (all)"]
+# need to fix oem and iem methods
+method(oem) <- sampling.oem
+method(iem) <- noise.iem
 
-# VARIABLES
+#data(ple4)
+#data(ple4.indices)
 
-it <- 3 # iterations
-fy <- 2030 # final year
-y0 <- range(stk)["minyear"] # initial OM year
-dy <- range(stk)["maxyear"] # final OM year
-iy <- dy # initial year of projection (also intermediate)
-#ny <- fy - iy + 1 # number of years to project from initial year
-nsqy <- 3 # number of years to compute status quo metrics
-vy <- ac(iy:fy) # vector of years to be projected
+#stk <- ple4
+#idx <- ple4.indices["BTS-Combined (all)"]
 
-mpargs <- list(fy=fy, y0=y0, iy=iy, nsqy=nsqy)
+## VARIABLES
 
-# ==============================================================================
-# OM conditioning
-# ==============================================================================
+#it <- 3 # iterations
+#fy <- 2030 # final year
+#y0 <- range(stk)["minyear"] # initial OM year
+#dy <- range(stk)["maxyear"] # final OM year
+#iy <- dy # initial year of projection (also intermediate)
+##ny <- fy - iy + 1 # number of years to project from initial year
+#nsqy <- 3 # number of years to compute status quo metrics
+#vy <- ac(iy:fy) # vector of years to be projected
 
-# - Two SRRs: geomean and Bevholt
+#mpargs <- list(fy=fy, y0=y0, iy=iy, nsqy=nsqy)
 
-mcsave <- 500
-mcmc <- mcsave*it
+## ==============================================================================
+## OM conditioning
+## ==============================================================================
 
-fit <- sca(stk, idx, fit="MCMC", mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
+## - Two SRRs: geomean and Bevholt
 
-stk <- stk + fit
+#mcsave <- 500
+#mcmc <- mcsave*it
 
-# skin to keep one iteration
-stk0 <- qapply(stk, iterMedians)
+#fit <- sca(stk, idx, fit="MCMC", mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
 
-# Fit a4a model to replicate official assessment w/MCMC
+#stk <- stk + fit
 
-# average recruitment estimation sd
-rv1 <- sqrt(mean(c(iterVars(log(rec(stk)))), na.rm=TRUE))
+## skin to keep one iteration
+#stk0 <- qapply(stk, iterMedians)
 
-# average autocor lag1
-# TODO acf(residuals)
-ac1 <- mean(apply(window(rec(stk), end=2008)@.Data, 6, function(x)
-  c(acf(c(x), plot=FALSE, lag.max=1)$acf[2])))
+## Fit a4a model to replicate official assessment w/MCMC
 
-# BevHolt
-srbh <- fmle(as.FLSR(stk0, model="bevholt"), method="L-BFGS-B", lower=c(1e-6, 1e-6), upper=c(max(rec(stk)) * 3, Inf))
+## average recruitment estimation sd
+#rv1 <- sqrt(mean(c(iterVars(log(rec(stk)))), na.rm=TRUE))
 
-# Residuals
-set.seed(0)
-resbh <- ar1rlnorm(rho=ac1, years=dy:fy, iters=it, margSD=rv1*2)
-residuals(srbh) <- resbh
+## average autocor lag1
+## TODO acf(residuals)
+#ac1 <- mean(apply(window(rec(stk), end=2008)@.Data, 6, function(x)
+#  c(acf(c(x), plot=FALSE, lag.max=1)$acf[2])))
 
-# ==============================================================================
-# Refpts
-# ==============================================================================
+## BevHolt
+#srbh <- fmle(as.FLSR(stk0, model="bevholt"), method="L-BFGS-B", lower=c(1e-6, 1e-6), upper=c(max(rec(stk)) * 3, Inf))
 
-brp <- brp(FLBRP(stk0, srbh))
+## Residuals
+#set.seed(0)
+#resbh <- ar1rlnorm(rho=ac1, years=dy:fy, iters=it, margSD=rv1*2)
+#residuals(srbh) <- resbh
 
-# ==============================================================================
-# Set up operating model
-# ==============================================================================
+## ==============================================================================
+## Refpts
+## ==============================================================================
 
-# Set up future assumptions - means of 3 years
-stk <- fwdWindow(stk, brp, end=2030)
+#brp <- brp(FLBRP(stk0, srbh))
 
-#==============================================================================
-# Fleet behaviour
-#==============================================================================
+## ==============================================================================
+## Set up operating model
+## ==============================================================================
 
-fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
+## Set up future assumptions - means of 3 years
+#stk <- fwdWindow(stk, brp, end=2030)
 
-#==============================================================================
-# OM projection method
-#==============================================================================
+##==============================================================================
+## Fleet behaviour
+##==============================================================================
 
-proj <- mseCtrl(method=fwd.om, args=list(maxF=2))
+#fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
 
-#==============================================================================
-# OM object
-#==============================================================================
-om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp), projection=proj)#, fleetBehaviour=fb)
+##==============================================================================
+## OM projection method
+##==============================================================================
 
-###############################################################################
-# OEM settings
-###############################################################################
+#proj <- mseCtrl(method=fwd.om, args=list(maxF=2))
 
-#==============================================================================
-# prepare objects
-#==============================================================================
+##==============================================================================
+## OM object
+##==============================================================================
+#om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp), projection=proj)#, fleetBehaviour=fb)
 
-stk <- stock(om)
+################################################################################
+## OEM settings
+################################################################################
 
-#==============================================================================
-# Estimate the indices catchability from the a4a fit (without simulation)
-#==============================================================================
+##==============================================================================
+## prepare objects
+##==============================================================================
 
-set.seed(0)
+#stk <- stock(om)
 
-# Use all indices
-idcs <- FLIndices()
-for (i in 1:length(idx)){
-	# this is a simplification as if index reflects 01 January abundances
-	lst <- mcf(list(idx[[i]]@index, stock.n(stk0)))
-	# log catchability of index 
-	idx.lq <- log(lst[[1]]/lst[[2]]) 
-	# empty quant
-	idx.qmu <- idx.qsig <- stock.n(iter(stk,1)) 
-	# Every year has the same mean catchability
-	idx.qmu[] <- yearMeans(idx.lq) 
-	idx.qsig[] <- sqrt(yearVars(idx.lq))
-	idx.q <- FLQuant(NA, dimnames=dimnames(stock.n(stk)))
-	# Build FLQ of index catchability based on lognormal distribution with mean and sd calculated above
-	idx.q <- rlnorm(it, idx.qmu, idx.qsig) 
-	#idx.q[,ac(y0:iy)] <- idx.q[,ac(y0:iy)]
-	idx_temp <- idx.q * stock.n(stk)
-	# generate initial index
-	idx_temp <- FLIndex(index=idx_temp, index.q=idx.q) 
-	range(idx_temp)[c("startf", "endf")] <- c(0, 0)
-	idcs[[i]] <- idx_temp
-}
-names(idcs) <- names(idx)
+##==============================================================================
+## Estimate the indices catchability from the a4a fit (without simulation)
+##==============================================================================
 
-#==============================================================================
-# Deviances for catch.n
-#==============================================================================
+#set.seed(0)
 
-set.seed(0)
+## Use all indices
+#idcs <- FLIndices()
+#for (i in 1:length(idx)){
+#	# this is a simplification as if index reflects 01 January abundances
+#	lst <- mcf(list(idx[[i]]@index, stock.n(stk0)))
+#	# log catchability of index 
+#	idx.lq <- log(lst[[1]]/lst[[2]]) 
+#	# empty quant
+#	idx.qmu <- idx.qsig <- stock.n(iter(stk,1)) 
+#	# Every year has the same mean catchability
+#	idx.qmu[] <- yearMeans(idx.lq) 
+#	idx.qsig[] <- sqrt(yearVars(idx.lq))
+#	idx.q <- FLQuant(NA, dimnames=dimnames(stock.n(stk)))
+#	# Build FLQ of index catchability based on lognormal distribution with mean and sd calculated above
+#	idx.q <- rlnorm(it, idx.qmu, idx.qsig) 
+#	#idx.q[,ac(y0:iy)] <- idx.q[,ac(y0:iy)]
+#	idx_temp <- idx.q * stock.n(stk)
+#	# generate initial index
+#	idx_temp <- FLIndex(index=idx_temp, index.q=idx.q) 
+#	range(idx_temp)[c("startf", "endf")] <- c(0, 0)
+#	idcs[[i]] <- idx_temp
+#}
+#names(idcs) <- names(idx)
 
-catch.dev <- log(catch.n(stk))
-catch.dev <- catch.dev-iterMeans(catch.dev)
-Sig <- apply(catch.dev[,ac(y0:dy),1,1,,drop=TRUE], 3, function(x) cov(t(x)))
-Sig <- apply(Sig, 1, mean)
-Sig <- matrix(Sig, ncol=dim(catch.dev)[1])
-catch.dev[,ac(vy)][] <- t(mvrnorm(it * length(vy), rep(0, nrow(Sig)), Sig))
-catch.dev <- exp(catch.dev)
+##==============================================================================
+## Deviances for catch.n
+##==============================================================================
 
-#==============================================================================
-# OEM object
-#==============================================================================
+#set.seed(0)
 
-idxDev <- lapply(idcs, index.q)
-names(idxDev) <- "index.q"
-stkDev <- FLQuants(catch.n=catch.dev)
-dev <- list(idx=idxDev, stk=stkDev)
-obs <- list(idx=idcs[1], stk=stk)
+#catch.dev <- log(catch.n(stk))
+#catch.dev <- catch.dev-iterMeans(catch.dev)
+#Sig <- apply(catch.dev[,ac(y0:dy),1,1,,drop=TRUE], 3, function(x) cov(t(x)))
+#Sig <- apply(Sig, 1, mean)
+#Sig <- matrix(Sig, ncol=dim(catch.dev)[1])
+#catch.dev[,ac(vy)][] <- t(mvrnorm(it * length(vy), rep(0, nrow(Sig)), Sig))
+#catch.dev <- exp(catch.dev)
 
-oem <- FLoem(method=sampling.oem, observations=obs, deviances=dev)
-#save(oem, file="oem.RData")
+##==============================================================================
+## OEM object
+##==============================================================================
 
-###############################################################################
-# Implementation error
-###############################################################################
+#idxDev <- lapply(idcs, index.q)
+#names(idxDev) <- "index.q"
+#stkDev <- FLQuants(catch.n=catch.dev)
+#dev <- list(idx=idxDev, stk=stkDev)
+#obs <- list(idx=idcs[1], stk=stk)
 
-iem <- FLiem(method=noise.iem, args=list(fun="rlnorm", mean=0, sd=0, multiplicative=TRUE))
+#oem <- FLoem(method=sampling.oem, observations=obs, deviances=dev)
+##save(oem, file="oem.RData")
 
-###############################################################################
-# Management procedure
-###############################################################################
+################################################################################
+## Implementation error
+################################################################################
 
-# general pars, add seed
-mpargs$seed <- 1234
+#iem <- FLiem(method=noise.iem, args=list(fun="rlnorm", mean=0, sd=0, multiplicative=TRUE))
+
+################################################################################
+## Management procedure
+################################################################################
+
+## general pars, add seed
+#mpargs$seed <- 1234
 
 #==============================================================================
 # Scenarios
