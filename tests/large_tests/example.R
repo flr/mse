@@ -70,6 +70,7 @@ ac1 <- mean(apply(window(rec(stk), end=2008)@.Data, 6, function(x)
 srbh <- fmle(as.FLSR(stk0, model="bevholt"), method="L-BFGS-B", lower=c(1e-6, 1e-6), upper=c(max(rec(stk)) * 3, Inf))
 
 # Residuals
+set.seed(0)
 resbh <- ar1rlnorm(rho=ac1, years=dy:fy, iters=it, margSD=rv1*2)
 residuals(srbh) <- resbh
 
@@ -231,7 +232,7 @@ all.equal(stock(resp2), stock(resp2b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sca.sa)))
+	ctrl.est = mseCtrl(method=FLa4a:::scaold.sa)))
 
 # test parallel
 # run new method in single core without foreach
@@ -272,7 +273,7 @@ all.equal(stock(resp4), stock(resp4b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sca.sa),
+	ctrl.est = mseCtrl(method=FLa4a:::scaold.sa),
 	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
 
 # test parallel
@@ -325,7 +326,7 @@ all.equal(stock(resp6), stock(resp6b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
+	ctrl.est = mseCtrl(method=FLa4a:::sepold.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
 
 # test parallel
 # run new method in single core without foreach
@@ -395,7 +396,7 @@ all.equal(stock(resp2), stock(resp2b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sca.sa)))
+	ctrl.est = mseCtrl(method=FLa4a:::scaold.sa)))
 
 # test parallel
 # run new method in single core without foreach
@@ -441,7 +442,7 @@ stopCluster(cl)
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sca.sa),
+	ctrl.est = mseCtrl(method=FLa4a:::scaold.sa),
 	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
 
 # test parallel
@@ -500,7 +501,7 @@ all.equal(stock(resp6), stock(resp6b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
+	ctrl.est = mseCtrl(method=FLa4a:::sepold.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
 
 # test parallel
 cl <- makeCluster(1)
@@ -522,7 +523,8 @@ all.equal(stock(resp7), stock(resp7b))
 #==============================================================================
 # Tests iters in args
 #==============================================================================
-flq <- FLQuant(c(0.3,0.2,0.4), dim=c(1,1,1,1,1,3))
+set.seed(0)
+flq <- FLQuant(rnorm(it, 0.3, 0.05), dim=c(1,1,1,1,1,it))
 
 #------------------------------------------------------------------------------
 # base
@@ -565,7 +567,7 @@ all.equal(stock(resp2a), stock(resp2b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sca.sa)))
+	ctrl.est = mseCtrl(method=FLa4a:::scaold.sa)))
 
 #resp3 <- mp(om, oem, ctrl.mp=ctrl, genArgs=mpargs)
 
@@ -602,7 +604,7 @@ all.equal(stock(resp4a), stock(resp4b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sca.sa),
+	ctrl.est = mseCtrl(method=FLa4a:::scaold.sa),
 	ctrl.tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
 
 #resp5 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
@@ -651,7 +653,7 @@ all.equal(stock(resp6a), stock(resp6b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(ctrl.hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
 	ctrl.is = mseCtrl(method=tac.is),
-	ctrl.est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
+	ctrl.est = mseCtrl(method=FLa4a:::sepold.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
 
 #resp7 <- mp(om, oem, iem, ctrl.mp=ctrl, genArgs=mpargs)
 
