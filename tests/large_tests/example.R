@@ -213,7 +213,7 @@ all.equal(stock(resp1), stock(resp1b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(
 	hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is)))
+	isys = mseCtrl(method=tac.is)))
 
 # test parallel
 # run new method in single core without foreach
@@ -233,7 +233,7 @@ all.equal(stock(resp2), stock(resp2b))
 # base with TAC and SA
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=sca.sa)))
 
 # test parallel
@@ -254,7 +254,7 @@ all.equal(stock(resp3), stock(resp3b))
 # base with TAC and IEM
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is)))
+	isys = mseCtrl(method=tac.is)))
 
 # test parallel
 # run new method in single core without foreach
@@ -274,7 +274,7 @@ all.equal(stock(resp4), stock(resp4b))
 # base with TAC and SA and OEM and IEM
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=sca.sa),
 	tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
 
@@ -306,7 +306,7 @@ biased.sa <- function(stk, idx, bbias=1, fbias=1, ...){
 }
 
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.2)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=biased.sa, args=list(fbias=.5))))
 
 # test parallel
@@ -327,7 +327,7 @@ all.equal(stock(resp6), stock(resp6b))
 # base with TAC and separable SA
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
 
 # test parallel
@@ -374,7 +374,7 @@ all.equal(stock(resp1), stock(resp1b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(
 	hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is)))
+	isys = mseCtrl(method=tac.is)))
 
 # test parallel
 # run new method in single core without foreach
@@ -397,7 +397,7 @@ all.equal(stock(resp2), stock(resp2b))
 # base with TAC and SA
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=sca.sa)))
 
 # test parallel
@@ -421,7 +421,7 @@ all.equal(stock(resp3), stock(resp3b))
 # base with TAC and IEM
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is)))
+	isys = mseCtrl(method=tac.is)))
 
 # test parallel
 cl <- makeCluster(1)
@@ -443,7 +443,7 @@ stopCluster(cl)
 # base with TAC and SA and OEM and IEM
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=sca.sa),
 	tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
 
@@ -478,7 +478,7 @@ biased.sa <- function(stk, idx, bbias=1, fbias=1, ...){
 }
 
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.2)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=biased.sa, args=list(fbias=.5))))
 
 # test parallel
@@ -502,7 +502,7 @@ all.equal(stock(resp6), stock(resp6b))
 # base with TAC and separable SA
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.3)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
 
 # test parallel
@@ -550,7 +550,7 @@ all.equal(stock(resp1a), stock(resp1b))
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(
 	hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
-	is = mseCtrl(method=tac.is)))
+	isys = mseCtrl(method=tac.is)))
 
 #resp2 <- mp(om, oem, ctrl=ctrl, args=mpargs)
 
@@ -568,7 +568,7 @@ all.equal(stock(resp2a), stock(resp2b))
 # base with TAC and SA
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=sca.sa)))
 
 #resp3 <- mp(om, oem, ctrl=ctrl, args=mpargs)
@@ -587,7 +587,7 @@ all.equal(stock(resp3a), stock(resp3b))
 # base with TAC and IEM
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
-	is = mseCtrl(method=tac.is)))
+	isys = mseCtrl(method=tac.is)))
 
 #resp4 <- mp(om, oem, iem, ctrl=ctrl, args=mpargs)
 
@@ -605,7 +605,7 @@ all.equal(stock(resp4a), stock(resp4b))
 # base with TAC and SA and OEM and IEM
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=sca.sa),
 	tm = mseCtrl(method=mpa.tm, args=list(sel.objective=FLModelSim(model=~1/(1+exp(-(a+b*x))), params=FLPar(a=-10, b=5))))))
 
@@ -635,7 +635,7 @@ biased.sa <- function(stk, idx, bbias=1, fbias=1, ...){
 }
 
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=biased.sa, args=list(fbias=.5))))
 
 #resp6 <- mp(om, oem, iem, ctrl=ctrl, args=mpargs)
@@ -654,7 +654,7 @@ all.equal(stock(resp6a), stock(resp6b))
 # base with TAC and separable SA
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=flq)),
-	is = mseCtrl(method=tac.is),
+	isys = mseCtrl(method=tac.is),
 	est = mseCtrl(method=sep.sa, args=list(fit="assessment", qmodel=list(~s(age, k=3), fmodel=~s(age, k=4) + s(year, k=20), update=FALSE)))))
 
 #resp7 <- mp(om, oem, iem, ctrl=ctrl, args=mpargs)
