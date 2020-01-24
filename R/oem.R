@@ -52,7 +52,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking,
 # perfect.oem {{{
 
 perfect.oem <- function(stk, deviances, observations, args, tracking){
-	dataYears <- args$vy0
+	dataYears <- ac(args$y0:args$dy)
 	assessmentYear <- ac(args$ay)
 	stk0 <- stk[,dataYears]
 	idx0 <- FLIndices(a=FLIndex(index=stock.n(stk)[,dataYears]*0.01))

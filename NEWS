@@ -2,6 +2,10 @@
  USER-VISIBLE CHANGES
 - genArgs renamed args
 - ctrl.mp renamed ctrl
+- elements of ctrl.mp don't use ctrl.## anymore
+
+ BUG FIXES
+- oem set of dataYears fixed
 
  mse 1.0
  USER-VISIBLE CHANGES
