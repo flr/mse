@@ -26,7 +26,8 @@ sampling.oem <- function(stk, deviances, observations, genArgs, tracking,
 	# catch.n
 	# note it's adding 1 individual to avoid sca from crashing
 	if(any(oe %in% c("both","catch"))){
-		catch.n(observations$stk)[,mxy] <- catch.n(stk)[,mxy]*deviances$stk$catch.n[,mxy] + 1
+		catch.n(observations$stk)[,mxy] <- catch.n(stk)[,mxy] *
+      deviances$stk$catch.n[,mxy] + 1
 		catch(observations$stk)[,mxy] <- computeCatch(observations$stk[,mxy])
 		stk0 <- observations$stk[,ac(dataYears)]
 	}
