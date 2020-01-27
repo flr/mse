@@ -9,7 +9,7 @@
 
 # mp {{{
 
-mp <- function(om, oem=FLoem(), iem=NULL, ctrl, args, scenario="test", tracking="missing", verbose=TRUE){
+mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="missing", verbose=TRUE){
 
 	#============================================================
 	# prepare the om
@@ -55,6 +55,20 @@ mp <- function(om, oem=FLoem(), iem=NULL, ctrl, args, scenario="test", tracking=
   
 	# PREPARE objects for loop call
     if (exists(fleetBehaviour(om))) fb <- fleetBehaviour(om) else fb <- NULL 
+
+	if(is.null(oem)){
+		flqdc <- catch.n(stock(om))
+		flqdc[] <- 1
+		stkDev <- FLQuants(catch.n=flqdc)
+		flqdi <- stock.n(stock(om))
+		flqdi[] <- 1
+		idxDev <- FLQuants(index.q=flqdi)
+		dev <- list(idx=idxDev, stk=stkDev)
+		idx <- FLIndex(index=stock.n(stock(om)))
+		range(idx)[c("startf", "endf")] <- c(0, 0)
+		obs <- list(idx=FLIndices(stkn=idx), stk=stock(om))
+		oem <- FLoem(method=perfect.oem, observations=obs, deviances=dev)
+	}
 
 	#============================================================
 	# PREPARE for parallel if needed

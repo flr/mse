@@ -189,9 +189,26 @@ load("om3.RData")
 #==============================================================================
 # Scenarios
 #==============================================================================
+#------------------------------------------------------------------------------
+# base without oem
+#------------------------------------------------------------------------------
+ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=FLQuant(0.3)))))
+
+# run new method in single core without foreach
+resp1 <- mp(om, ctrl=ctrl, args=mpargs)
+
+# run new method in 1 core with foreach
+registerDoParallel(1)
+resp1a <- mp(om, ctrl=ctrl, args=mpargs)
+all.equal(stock(resp1), stock(resp1a))
+
+# run new method in 3 cores with foreach
+registerDoParallel(3)
+resp1b <- mp(om, ctrl=ctrl, args=mpargs)
+all.equal(stock(resp1), stock(resp1b))
 
 #------------------------------------------------------------------------------
-# base
+# base with oem
 #------------------------------------------------------------------------------
 ctrl <- mpCtrl(list(hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=FLQuant(0.3)))))
 

@@ -3,9 +3,11 @@
 - genArgs renamed args
 - ctrl.mp renamed ctrl
 - elements of ctrl.mp don't use ctrl.## anymore
+- mp oem default became NULL
 
  BUG FIXES
 - oem set of dataYears fixed
+- mp without oem now creates one which is conform the other objects.
 
  mse 1.0
  USER-VISIBLE CHANGES

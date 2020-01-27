@@ -57,7 +57,7 @@ perfect.oem <- function(stk, deviances, observations, args, tracking){
 	stk0 <- stk[,dataYears]
 	idx0 <- FLIndices(a=FLIndex(index=stock.n(stk)[,dataYears]*0.01))
 	range(idx0[[1]])[c("startf","endf")] <- c(0,0)
-	list(stk=stk0, idx=idx0, deviances, observations, tracking=tracking)
+	list(stk=stk0, idx=idx0, observations=observations, tracking=tracking)
 } # }}}
 
 # sample lengths
