@@ -100,7 +100,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="mi
 					ctrl= iters(ctrl, i),
 					args=args,
 					verbose=verbose)
-				out <- do.call(mse:::goFish, call0)
+				out <- do.call(goFish, call0)
 				# RETURN
 				list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
 			}
@@ -119,7 +119,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="mi
 				ctrl=ctrl,
 				args=args,
 				verbose=verbose)
-			out <- do.call(mse:::goFish, call0)
+			out <- do.call(goFish, call0)
 			lst0 <- list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
 		}
 	
