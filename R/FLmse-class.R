@@ -17,7 +17,7 @@
 #' \describe{
 #'    \item{om}{\code{FLom} with the operating model.}
 #'    \item{tracking}{\code{FLQuant} with record of decisions made during the mp cycle.}
-#'    \item{genArgs}{\code{list} with assorted arguments required to run the MSE cycle.}
+#'    \item{args}{\code{list} with assorted arguments required to run the MSE cycle.}
 #'  }
 #' @template Accessors
 #' @template Constructors
@@ -33,8 +33,8 @@ FLmse <- setClass("FLmse", contains="FLom",
 		tracking="FLQuant",
     control="mpCtrl",
     oem="FLoem",
-    # TODO genArgs vs. mpargs
-		genArgs="list"
+    # TODO args vs. mpargs
+		args="list"
 	)
 )
 
@@ -46,7 +46,7 @@ setGeneric("FLmse")
 setMethod("initialize", "FLmse",
     function(.Object,
              ...,
-             stock, sr, refpts, fleetBehaviour, tracking, control, oem, genArgs) {
+             stock, sr, refpts, fleetBehaviour, tracking, control, oem, args) {
       if (!missing(stock)) .Object@stock <- stock 
       if (!missing(sr)) .Object@sr <- sr
       if (!missing(refpts)) .Object@refpts <- refpts
@@ -54,7 +54,7 @@ setMethod("initialize", "FLmse",
       if (!missing(tracking)) .Object@tracking <- tracking
       if (!missing(control)) .Object@control <- control
       if (!missing(oem)) .Object@oem <- oem
-      if (!missing(genArgs)) .Object@genArgs <- genArgs
+      if (!missing(args)) .Object@args <- args
       .Object <- callNextMethod(.Object, ...)
       .Object
 }) # }}}
@@ -121,23 +121,14 @@ setReplaceMethod("oem", signature("FLmse", "FLQuant"), function(object, value){
 	object
 })
 
-# genArgs
+# args
 
 #' @rdname FLmse-class
-#' @aliases genArgs genArgs-methods
-setGeneric("genArgs", function(object, ...) standardGeneric("genArgs"))
+setMethod("args", "FLmse", function(object) object@args)
 
 #' @rdname FLmse-class
-setMethod("genArgs", "FLmse", function(object) object@genArgs)
-
-#' @rdname FLmse-class
-#' @param value the new object
-#' @aliases genArgs<- genArgs<--methods
-setGeneric("genArgs<-", function(object, value) standardGeneric("genArgs<-"))
-
-#' @rdname FLmse-class
-setReplaceMethod("genArgs", signature("FLmse", "list"), function(object, value){
-	object@genArgs <- value
+setReplaceMethod("args", signature("FLmse", "list"), function(object, value){
+	object@args <- value
 	object
 })
 
@@ -215,12 +206,12 @@ setMethod("summary", signature(object="FLmse"),
     # TODO
     show(oem)
     
-    # genArgs
-    cat("-- genArgs\n")
-    genArgs <- genArgs(object)
+    # args
+    cat("-- args\n")
+    args <- args(object)
 
     cat(
-      paste0(names(genArgs), unname(unlist(lapply(genArgs, function(x) {
+      paste0(names(args), unname(unlist(lapply(args, function(x) {
         if(length(x) == 1) paste(":", x)
         else paste(":", paste(x[1], x[length(x)], sep="-"))
       }))), collapse=", "), "\n")

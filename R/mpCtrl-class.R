@@ -4,11 +4,11 @@
 #'
 #' @section Slots:
 #' \describe{
-#'    \item{ctrl.est}{\code{mseCtrl} object with estimator of stock abundance specifications.}
-#'    \item{ctrl.phcr}{\code{mseCtrl} object with specifications about parameters needed for harvest control rule which must e computed from estimator results, e.g. Fmsy.}
-#'    \item{ctrl.hcr}{\code{mseCtrl} object with harvest control rule specifications.}
-#'    \item{ctrl.is}{\code{mseCtrl} object with management system specifications, e.g. translation of F into catch limits.}
-#'    \item{ctrl.tm}{\code{mseCtrl} object with technical measures specifications.}
+#'    \item{est}{\code{mseCtrl} object with estimator of stock abundance specifications.}
+#'    \item{phcr}{\code{mseCtrl} object with specifications about parameters needed for harvest control rule which must e computed from estimator results, e.g. Fmsy.}
+#'    \item{hcr}{\code{mseCtrl} object with harvest control rule specifications.}
+#'    \item{is}{\code{mseCtrl} object with management system specifications, e.g. translation of F into catch limits.}
+#'    \item{tm}{\code{mseCtrl} object with technical measures specifications.}
 #' @template Accessors
 #' @template Constructors
 #' @docType class
@@ -37,78 +37,78 @@ setMethod("initialize", "mpCtrl",
 #
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.est ctrl.est-methods
-setGeneric("ctrl.est", function(object, ...) standardGeneric("ctrl.est"))
+#' @aliases est est-methods
+setGeneric("est", function(object, ...) standardGeneric("est"))
 #' @rdname mpCtrl-class
-setMethod("ctrl.est", "mpCtrl", function(object) object$ctrl.est)
+setMethod("est", "mpCtrl", function(object) object$est)
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.est<- ctrl.est<--methods
-setGeneric("ctrl.est<-", function(object, value) standardGeneric("ctrl.est<-"))
+#' @aliases est<- est<--methods
+setGeneric("est<-", function(object, value) standardGeneric("est<-"))
 #' @rdname mpCtrl-class
-setReplaceMethod("ctrl.est", signature("mpCtrl", "function"), function(object, value){
-	object$ctrl.est <- value
+setReplaceMethod("est", signature("mpCtrl", "function"), function(object, value){
+	object$est <- value
 	object
 })
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.phcr ctrl.phcr-methods
-setGeneric("ctrl.phcr", function(object, ...) standardGeneric("ctrl.phcr"))
+#' @aliases phcr phcr-methods
+setGeneric("phcr", function(object, ...) standardGeneric("phcr"))
 #' @rdname mpCtrl-class
-setMethod("ctrl.phcr", "mpCtrl", function(object) object$ctrl.phcr)
+setMethod("phcr", "mpCtrl", function(object) object$phcr)
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.phcr<- ctrl.phcr<--methods
-setGeneric("ctrl.phcr<-", function(object, value) standardGeneric("ctrl.phcr<-"))
+#' @aliases phcr<- phcr<--methods
+setGeneric("phcr<-", function(object, value) standardGeneric("phcr<-"))
 #' @rdname mpCtrl-class
-setReplaceMethod("ctrl.phcr", signature("mpCtrl", "function"), function(object, value){
-	object$ctrl.phcr <- value
+setReplaceMethod("phcr", signature("mpCtrl", "function"), function(object, value){
+	object$phcr <- value
 	object
 })
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.hcr ctrl.hcr-methods
-setGeneric("ctrl.hcr", function(object, ...) standardGeneric("ctrl.hcr"))
+#' @aliases hcr hcr-methods
+setGeneric("hcr", function(object, ...) standardGeneric("hcr"))
 #' @rdname mpCtrl-class
-setMethod("ctrl.hcr", "mpCtrl", function(object) object$ctrl.hcr)
+setMethod("hcr", "mpCtrl", function(object) object$hcr)
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.hcr<- ctrl.hcr<--methods
-setGeneric("ctrl.hcr<-", function(object, value) standardGeneric("ctrl.hcr<-"))
+#' @aliases hcr<- hcr<--methods
+setGeneric("hcr<-", function(object, value) standardGeneric("hcr<-"))
 #' @rdname mpCtrl-class
-setReplaceMethod("ctrl.hcr", signature("mpCtrl", "function"), function(object, value){
-	object$ctrl.hcr <- value
+setReplaceMethod("hcr", signature("mpCtrl", "function"), function(object, value){
+	object$hcr <- value
 	object
 })
 
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.is ctrl.is-methods
-setGeneric("ctrl.is", function(object, ...) standardGeneric("ctrl.is"))
+#' @aliases isys isys-methods
+setGeneric("isys", function(object, ...) standardGeneric("isys"))
 #' @rdname mpCtrl-class
-setMethod("ctrl.is", "mpCtrl", function(object) object$ctrl.is)
+setMethod("isys", "mpCtrl", function(object) object$isys)
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.is<- ctrl.is<--methods
-setGeneric("ctrl.is<-", function(object, value) standardGeneric("ctrl.is<-"))
+#' @aliases isys<- isys<--methods
+setGeneric("isys<-", function(object, value) standardGeneric("isys<-"))
 #' @rdname mpCtrl-class
-setReplaceMethod("ctrl.is", signature("mpCtrl", "function"), function(object, value){
-	object$ctrl.is <- value
+setReplaceMethod("isys", signature("mpCtrl", "function"), function(object, value){
+	object$isys <- value
 	object
 })
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.tm ctrl.tm-methods
-setGeneric("ctrl.tm", function(object, ...) standardGeneric("ctrl.tm"))
+#' @aliases tm tm-methods
+setGeneric("tm", function(object, ...) standardGeneric("tm"))
 #' @rdname mpCtrl-class
-setMethod("ctrl.tm", "mpCtrl", function(object) object$ctrl.tm)
+setMethod("tm", "mpCtrl", function(object) object$tm)
 
 #' @rdname mpCtrl-class
-#' @aliases ctrl.tm<- ctrl.tm<--methods
-setGeneric("ctrl.tm<-", function(object, value) standardGeneric("ctrl.tm<-"))
+#' @aliases tm<- tm<--methods
+setGeneric("tm<-", function(object, value) standardGeneric("tm<-"))
 #' @rdname mpCtrl-class
-setReplaceMethod("ctrl.tm", signature("mpCtrl", "function"), function(object, value){
-	object$ctrl.tm <- value
+setReplaceMethod("tm", signature("mpCtrl", "function"), function(object, value){
+	object$tm <- value
 	object
 })
 

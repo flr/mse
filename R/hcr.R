@@ -46,9 +46,9 @@
 #' @param stk The perceived FLStock.
 #' @param control A list with the elements fmin, ftrg, blim, bsafe and ssb_lag, all of which are numeric.
 #' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
-ices.hcr <- function(stk, fmin, ftrg, blim, bsafe, genArgs, tracking){
-	ay <- genArgs$ay
-	ssb_lag <- ifelse(is.null(genArgs$ssb_lag), 1, genArgs$ssb_lag)
+ices.hcr <- function(stk, fmin, ftrg, blim, bsafe, args, tracking){
+	ay <- args$ay
+	ssb_lag <- ifelse(is.null(args$ssb_lag), 1, args$ssb_lag)
 	# rule
 	ssb <- ssb(stk)[, ac(ay-ssb_lag)]
 	fout <- FLQuant(fmin, dimnames=list(iter=dimnames(ssb)$iter))
@@ -57,7 +57,7 @@ ices.hcr <- function(stk, fmin, ftrg, blim, bsafe, genArgs, tracking){
 	gradient <- (ftrg - fmin) / (bsafe - blim)
 	fout[inbetween] <- (ssb[inbetween] - blim) * gradient + fmin
 	# create control file
-	ctrl <- getCtrl(c(fout), "f", ay+genArgs$management_lag, dim(fout)[6])
+	ctrl <- getCtrl(c(fout), "f", ay+args$management_lag, dim(fout)[6])
 	# return
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
@@ -70,14 +70,14 @@ ices.hcr <- function(stk, fmin, ftrg, blim, bsafe, genArgs, tracking){
 #' The control argument is a list of parameters used by the HCR.
 #' @param stk The perceived FLStock.
 #' @param control A list with the element ftrg (numeric).
-fixedF.hcr <- function(stk, ftrg, genArgs, tracking){
-	ay <- genArgs$ay
+fixedF.hcr <- function(stk, ftrg, args, tracking){
+	ay <- args$ay
 	# rule 
 	if(!is(ftrg, "FLQuant"))
     ftrg <- FLQuant(ftrg, dimnames=list(iter=dimnames(stk@catch)$iter))
 
 	# create control file
-	ctrl <- getCtrl(c(ftrg), "f", ay+genArgs$management_lag, dim(ftrg)[6])
+	ctrl <- getCtrl(c(ftrg), "f", ay+args$management_lag, dim(ftrg)[6])
 	
 	# return
 	list(ctrl=ctrl, tracking=tracking)
@@ -85,14 +85,14 @@ fixedF.hcr <- function(stk, ftrg, genArgs, tracking){
 
 # movingF.hcr {{{
 
-movingF.hcr <- function(stk, hcrpars, genArgs, tracking){
-	ay <- genArgs$ay
+movingF.hcr <- function(stk, hcrpars, args, tracking){
+	ay <- args$ay
 	# rule 
 	if(!is(hcrpars, "FLQuant"))
     hcrpars <- FLQuant(c(hcrpars), dimnames=list(iter=dimnames(stk@catch)$iter))
 	
   # create control file
-	ctrl <- getCtrl(c(hcrpars), "f", ay+genArgs$management_lag, dim(hcrpars)[6])
+	ctrl <- getCtrl(c(hcrpars), "f", ay+args$management_lag, dim(hcrpars)[6])
 	
   # return
 	list(ctrl=ctrl, tracking=tracking)
@@ -103,14 +103,14 @@ movingF.hcr <- function(stk, hcrpars, genArgs, tracking){
 #' Get indicator to target. The control argument is a list of parameters used by the HCR.
 #' @param stk The perceived FLStock.
 #' @param itrg The target for the indicator.
-#' @param genArgs A list with generic arguments to be used by the function if needed.
+#' @param args A list with generic arguments to be used by the function if needed.
 #' @param tracking The tracking matrix.
-indicator.hcr <- function (stk, hcrpars, genArgs, tracking) 
+indicator.hcr <- function (stk, hcrpars, args, tracking) 
 {
-    ay <- genArgs$ay
-    dy <- genArgs$dy
-  	#sqy <- genArgs$sqy
-  	mlag <- genArgs$management_lag
+    ay <- args$ay
+    dy <- args$dy
+  	#sqy <- args$sqy
+  	mlag <- args$management_lag
 	if(!is(hcrpars, "FLQuant"))
     hcrpars <- FLQuant(hcrpars, dimnames=list(iter=dimnames(stk@catch)$iter))
 	mult <- stk@indicator[,ac(dy)]/hcrpars

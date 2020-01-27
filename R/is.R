@@ -25,11 +25,11 @@
 #' @param EFF0 The tracking array
 #' @param EFF Not used by this function but may be used by the other implementation functions
 
-tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, tracking){
-	ay <- genArgs$ay
-	nsqy <- genArgs$nsqy
-	iy <- genArgs$iy
-	mlag <- genArgs$management_lag
+tac.is <- function(stk, ctrl, args, delta_tac_max=NA, delta_tac_min=NA, tracking){
+	ay <- args$ay
+	nsqy <- args$nsqy
+	iy <- args$iy
+	mlag <- args$management_lag
 	it <- dim(stk)[6]
 	# reference value
 	#if(ay==iy) refCatch <- tracking["C.om", ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
@@ -72,14 +72,14 @@ tac.is <- function(stk, ctrl, genArgs, delta_tac_max=NA, delta_tac_min=NA, track
 #' @param imp_control A list with the elements: nsqy, delta_tac_min, delta_tac_max
 #' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
 
-effort.is <- function(stk, ctrl, genArgs, tracking){
-	ay <- genArgs$ay
+effort.is <- function(stk, ctrl, args, tracking){
+	ay <- args$ay
 	it <- dims(stk)$iter
-	iy <- genArgs$iy
-	management_lag <- genArgs$management_lag
-	data_lag <- genArgs$data_lag
+	iy <- args$iy
+	management_lag <- args$management_lag
+	data_lag <- args$data_lag
 	# reference value
-	if(ay==iy) fay <- fbar(stk)[,ac(ay-data_lag)] else fay <- yearMeans(fbar(stk)[,ac(genArgs$sqy)])
+	if(ay==iy) fay <- fbar(stk)[,ac(ay-data_lag)] else fay <- yearMeans(fbar(stk)[,ac(args$sqy)])
 	# target to reach defined by HCR (in f units)
 	trgt <- ctrl@trgtArray[,"val",]
 	# multiplier
@@ -94,9 +94,9 @@ effort.is <- function(stk, ctrl, genArgs, tracking){
 #' @param stk The perceived FLStock.
 #' @param ctrl control file with HCR decision
 
-indicator.is <- function(stk, ctrl, genArgs, tracking, system=c("output", "input"), ...){
+indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"), ...){
 
-  	sqy <- genArgs$sqy
+  	sqy <- args$sqy
   	if(system=='input'){
   		vsq <- yearMeans(fbar(stk)[,ac(sqy)]) 
   		quantity <- 'f'

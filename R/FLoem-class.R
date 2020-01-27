@@ -25,9 +25,9 @@ FLoem <- setClass("FLoem",
 		deviances="list" # these should be FLQuants
 	),
 	prototype=c( # default is perfect info
-	method=function(stk, deviances, observations, genArgs, tracking){
-		dataYears <- genArgs$vy0
-		assessmentYear <- ac(genArgs$ay)
+	method=function(stk, deviances, observations, args, tracking){
+		dataYears <- ac(args$y0:args$dy)
+		assessmentYear <- ac(args$ay)
 		stk0 <- stk[,dataYears]
 		idx0 <- FLIndices(a=FLIndex(index=stock.n(stk)[,dataYears]*0.01))
 		range(idx0[[1]])[c("startf","endf")] <- c(0,0)

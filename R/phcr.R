@@ -8,9 +8,9 @@
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
 # movingF.hcr {{{
-movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, genArgs, hcrpars, tracking) {
-	ay <- genArgs$ay
-	iy <- genArgs$iy
+movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, args, hcrpars, tracking) {
+	ay <- args$ay
+	iy <- args$iy
 	if(ay==iy | (ay-iy)%%interval==0){
 		if(!missing(model)){
 			sr0 <- fmle(as.FLSR(stk, model=model))
@@ -24,7 +24,7 @@ movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, genArgs, hc
 
 
 # indicator.phcr
-indicator.phcr <- function(stk, itrg, genArgs, tracking, ...){
+indicator.phcr <- function(stk, itrg, args, tracking, ...){
 	if(is(itrg, 'FLPar')) hcrpars <- itrg else hcrpars <- FLPar(itrg=itrg) 
 	list(hcrpars=hcrpars, tracking=tracking)	
 }
