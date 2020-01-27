@@ -159,14 +159,20 @@ setMethod("plot", signature(x="FLom", y="FLmse"),
     args <- list(...)
 
     stocks <- lapply(c(list(x, y), args), stock)
- 
+
+    # WINDOW om
+    minyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))
+    stocks[[1]] <- window(stocks[[1]], end=minyear)
+
     # SORT OUT names
     if(is.null(names(stocks)))
       names(stocks) <- rep(character(1), length(stocks))
     idx <- names(stocks) == character(1)
-    names(stocks)[idx] <- unlist(lapply(stocks, name))[idx]
+    if(length(idx) > 0)
+      names(stocks)[idx] <- unlist(lapply(stocks, name))[idx]
     idx <- names(stocks) == character(1)
-    names(stocks)[idx] <- c("OM", paste0("MP", seq(sum(idx))))[idx]
+    if(length(idx) > 0)
+      names(stocks)[idx] <- c("OM", paste0("MP", seq(sum(idx)-1)))[idx]
 
     plot(FLStocks(stocks))
   }
