@@ -6,36 +6,36 @@
 \alias{mpCtrl}
 \alias{initialize,mpCtrl-method}
 \alias{mpCtrl-methods}
-\alias{ctrl.est}
-\alias{ctrl.est-methods}
-\alias{ctrl.est,mpCtrl-method}
-\alias{ctrl.est<-}
-\alias{ctrl.est<--methods}
-\alias{ctrl.est<-,mpCtrl,function-method}
-\alias{ctrl.phcr}
-\alias{ctrl.phcr-methods}
-\alias{ctrl.phcr,mpCtrl-method}
-\alias{ctrl.phcr<-}
-\alias{ctrl.phcr<--methods}
-\alias{ctrl.phcr<-,mpCtrl,function-method}
-\alias{ctrl.hcr}
-\alias{ctrl.hcr-methods}
-\alias{ctrl.hcr,mpCtrl-method}
-\alias{ctrl.hcr<-}
-\alias{ctrl.hcr<--methods}
-\alias{ctrl.hcr<-,mpCtrl,function-method}
-\alias{ctrl.is}
-\alias{ctrl.is-methods}
-\alias{ctrl.is,mpCtrl-method}
-\alias{ctrl.is<-}
-\alias{ctrl.is<--methods}
-\alias{ctrl.is<-,mpCtrl,function-method}
-\alias{ctrl.tm}
-\alias{ctrl.tm-methods}
-\alias{ctrl.tm,mpCtrl-method}
-\alias{ctrl.tm<-}
-\alias{ctrl.tm<--methods}
-\alias{ctrl.tm<-,mpCtrl,function-method}
+\alias{est}
+\alias{est-methods}
+\alias{est,mpCtrl-method}
+\alias{est<-}
+\alias{est<--methods}
+\alias{est<-,mpCtrl,function-method}
+\alias{phcr}
+\alias{phcr-methods}
+\alias{phcr,mpCtrl-method}
+\alias{phcr<-}
+\alias{phcr<--methods}
+\alias{phcr<-,mpCtrl,function-method}
+\alias{hcr}
+\alias{hcr-methods}
+\alias{hcr,mpCtrl-method}
+\alias{hcr<-}
+\alias{hcr<--methods}
+\alias{hcr<-,mpCtrl,function-method}
+\alias{isys}
+\alias{isys-methods}
+\alias{isys,mpCtrl-method}
+\alias{isys<-}
+\alias{isys<--methods}
+\alias{isys<-,mpCtrl,function-method}
+\alias{tm}
+\alias{tm-methods}
+\alias{tm,mpCtrl-method}
+\alias{tm<-}
+\alias{tm<--methods}
+\alias{tm<-,mpCtrl,function-method}
 \alias{show,mpCtrl-method}
 \alias{iters,mpCtrl-method}
 \alias{exists}
@@ -44,45 +44,45 @@
 \usage{
 \S4method{initialize}{mpCtrl}(.Object, ...)
 
-ctrl.est(object, ...)
+est(object, ...)
 
-\S4method{ctrl.est}{mpCtrl}(object)
+\S4method{est}{mpCtrl}(object)
 
-ctrl.est(object) <- value
+est(object) <- value
 
-\S4method{ctrl.est}{mpCtrl,`function`}(object) <- value
+\S4method{est}{mpCtrl,`function`}(object) <- value
 
-ctrl.phcr(object, ...)
+phcr(object, ...)
 
-\S4method{ctrl.phcr}{mpCtrl}(object)
+\S4method{phcr}{mpCtrl}(object)
 
-ctrl.phcr(object) <- value
+phcr(object) <- value
 
-\S4method{ctrl.phcr}{mpCtrl,`function`}(object) <- value
+\S4method{phcr}{mpCtrl,`function`}(object) <- value
 
-ctrl.hcr(object, ...)
+hcr(object, ...)
 
-\S4method{ctrl.hcr}{mpCtrl}(object)
+\S4method{hcr}{mpCtrl}(object)
 
-ctrl.hcr(object) <- value
+hcr(object) <- value
 
-\S4method{ctrl.hcr}{mpCtrl,`function`}(object) <- value
+\S4method{hcr}{mpCtrl,`function`}(object) <- value
 
-ctrl.is(object, ...)
+isys(object, ...)
 
-\S4method{ctrl.is}{mpCtrl}(object)
+\S4method{isys}{mpCtrl}(object)
 
-ctrl.is(object) <- value
+isys(object) <- value
 
-\S4method{ctrl.is}{mpCtrl,`function`}(object) <- value
+\S4method{isys}{mpCtrl,`function`}(object) <- value
 
-ctrl.tm(object, ...)
+tm(object, ...)
 
-\S4method{ctrl.tm}{mpCtrl}(object)
+\S4method{tm}{mpCtrl}(object)
 
-ctrl.tm(object) <- value
+tm(object) <- value
 
-\S4method{ctrl.tm}{mpCtrl,`function`}(object) <- value
+\S4method{tm}{mpCtrl,`function`}(object) <- value
 
 \S4method{show}{mpCtrl}(object)
 
@@ -108,11 +108,11 @@ The \code{mpCtrl} class defines which moules will be runned and carries the spec
 \section{Slots}{
 
 \describe{
-\item{ctrl.est}{\code{mseCtrl} object with estimator of stock abundance specifications.}
-\item{ctrl.phcr}{\code{mseCtrl} object with specifications about parameters needed for harvest control rule which must e computed from estimator results, e.g. Fmsy.}
-\item{ctrl.hcr}{\code{mseCtrl} object with harvest control rule specifications.}
-\item{ctrl.is}{\code{mseCtrl} object with management system specifications, e.g. translation of F into catch limits.}
-\item{ctrl.tm}{\code{mseCtrl} object with technical measures specifications.}
+\item{est}{\code{mseCtrl} object with estimator of stock abundance specifications.}
+\item{phcr}{\code{mseCtrl} object with specifications about parameters needed for harvest control rule which must e computed from estimator results, e.g. Fmsy.}
+\item{hcr}{\code{mseCtrl} object with harvest control rule specifications.}
+\item{is}{\code{mseCtrl} object with management system specifications, e.g. translation of F into catch limits.}
+\item{tm}{\code{mseCtrl} object with technical measures specifications.}
 }
 
 \section{Accessors}{

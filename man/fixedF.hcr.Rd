@@ -4,7 +4,7 @@
 \alias{fixedF.hcr}
 \title{A fixed target f}
 \usage{
-fixedF.hcr(stk, ftrg, genArgs, tracking)
+fixedF.hcr(stk, ftrg, args, tracking)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}

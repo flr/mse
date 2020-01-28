@@ -20,12 +20,8 @@
 \alias{oem,FLmse-method}
 \alias{oem<-}
 \alias{oem<--methods}
-\alias{genArgs}
-\alias{genArgs-methods}
-\alias{genArgs,FLmse-method}
-\alias{genArgs<-}
-\alias{genArgs<--methods}
-\alias{genArgs<-,FLmse,list-method}
+\alias{args,FLmse-method}
+\alias{args<-,FLmse,list-method}
 \title{S4 class \code{FLmse}}
 \usage{
 FLmse(...)
@@ -50,13 +46,9 @@ oem(object, ...)
 
 oem(object) <- value
 
-genArgs(object, ...)
+\S4method{args}{FLmse}(name)
 
-\S4method{genArgs}{FLmse}(object)
-
-genArgs(object) <- value
-
-\S4method{genArgs}{FLmse,list}(object) <- value
+\S4method{args}{FLmse,list}(object) <- value
 }
 \arguments{
 \item{...}{additional argument list that might never be used}
@@ -73,7 +65,7 @@ The \code{FLmse} class stores information relative to the MSE's management proce
 \describe{
 \item{om}{\code{FLom} with the operating model.}
 \item{tracking}{\code{FLQuant} with record of decisions made during the mp cycle.}
-\item{genArgs}{\code{list} with assorted arguments required to run the MSE cycle.}
+\item{args}{\code{list} with assorted arguments required to run the MSE cycle.}
 }
 }
 

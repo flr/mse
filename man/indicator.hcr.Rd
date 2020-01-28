@@ -4,12 +4,12 @@
 \alias{indicator.hcr}
 \title{A indicator based HCR}
 \usage{
-indicator.hcr(stk, hcrpars, genArgs, tracking)
+indicator.hcr(stk, hcrpars, args, tracking)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}
 
-\item{genArgs}{A list with generic arguments to be used by the function if needed.}
+\item{args}{A list with generic arguments to be used by the function if needed.}
 
 \item{tracking}{The tracking matrix.}
 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S4 class <code>FLmse</code> — FLmse-class • mse</title>
+<title>S4 class <code>mpCtrl</code> — mpCtrl-class • mse</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="S4 class <code>FLmse</code> — FLmse-class" />
-<meta property="og:description" content="The FLmse class stores information relative to the MSE's management procedure'." />
+<meta property="og:title" content="S4 class <code>mpCtrl</code> — mpCtrl-class" />
+<meta property="og:description" content="The mpCtrl class defines which moules will be runned and carries the specifications of those modules in mseCtrl elements." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -115,45 +115,82 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>S4 class <code>FLmse</code></h1>
+    <h1>S4 class <code>mpCtrl</code></h1>
     
-    <div class="hidden name"><code>FLmse-class.Rd</code></div>
+    <div class="hidden name"><code>mpCtrl-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>FLmse</code> class stores information relative to the MSE's management procedure'.</p>
+    <p>The <code>mpCtrl</code> class defines which moules will be runned and carries the specifications of those modules in <code>mseCtrl</code> elements.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>FLmse</span>(<span class='no'>...</span>)
+    <pre class="usage"><span class='co'># S4 method for mpCtrl</span>
+<span class='fu'>initialize</span>(<span class='no'>.Object</span>, <span class='no'>...</span>)
 
-<span class='fu'>FLmse</span>(<span class='no'>...</span>)
+<span class='fu'>est</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
-<span class='fu'>tracking</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='co'># S4 method for mpCtrl</span>
+<span class='fu'>est</span>(<span class='no'>object</span>)
 
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>tracking</span>(<span class='no'>object</span>)
+<span class='fu'>est</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
-<span class='fu'>tracking</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='co'># S4 method for mpCtrl,`function`</span>
+<span class='fu'>est</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
-<span class='fu'>control</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>phcr</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>control</span>(<span class='no'>object</span>)
+<span class='co'># S4 method for mpCtrl</span>
+<span class='fu'>phcr</span>(<span class='no'>object</span>)
 
-<span class='fu'>control</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>phcr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
-<span class='fu'>oem</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='co'># S4 method for mpCtrl,`function`</span>
+<span class='fu'>phcr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>oem</span>(<span class='no'>object</span>)
+<span class='fu'>hcr</span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
-<span class='fu'>oem</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='co'># S4 method for mpCtrl</span>
+<span class='fu'>hcr</span>(<span class='no'>object</span>)
 
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span>(<span class='no'>name</span>)
+<span class='fu'>hcr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
 
-<span class='co'># S4 method for FLmse,list</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span></pre>
+<span class='co'># S4 method for mpCtrl,`function`</span>
+<span class='fu'>hcr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+
+<span class='fu'>isys</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S4 method for mpCtrl</span>
+<span class='fu'>isys</span>(<span class='no'>object</span>)
+
+<span class='fu'>isys</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+
+<span class='co'># S4 method for mpCtrl,`function`</span>
+<span class='fu'>isys</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+
+<span class='fu'>tm</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+
+<span class='co'># S4 method for mpCtrl</span>
+<span class='fu'>tm</span>(<span class='no'>object</span>)
+
+<span class='fu'>tm</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+
+<span class='co'># S4 method for mpCtrl,`function`</span>
+<span class='fu'>tm</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+
+<span class='co'># S4 method for mpCtrl</span>
+<span class='fu'>show</span>(<span class='no'>object</span>)
+
+<span class='co'># S4 method for mpCtrl</span>
+<span class='fu'>iters</span>(<span class='no'>object</span>, <span class='no'>iter</span>)
+
+<span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>where</span> <span class='kw'>=</span> -<span class='fl'>1</span>,
+  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/missing.html'>missing</a></span>(<span class='no'>frame</span>)) <span class='fu'><a href='https://rdrr.io/r/base/as.environment.html'>as.environment</a></span>(<span class='no'>where</span>) <span class='kw'>else</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>sys.frame</a></span>(<span class='no'>frame</span>),
+  <span class='no'>frame</span>,
+  <span class='kw'>mode</span> <span class='kw'>=</span> <span class='st'>"any"</span>,
+  <span class='kw'>inherits</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -166,10 +203,6 @@
       <th>object</th>
       <td><p>object of relevant class (see signature of method)</p></td>
     </tr>
-    <tr>
-      <th>value</th>
-      <td><p>the new object</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
@@ -177,43 +210,30 @@
     
 
 <dl class='dl-horizontal'>
-<dt>om</dt><dd><p><code>FLom</code> with the operating model.</p></dd>
-<dt>tracking</dt><dd><p><code>FLQuant</code> with record of decisions made during the mp cycle.</p></dd>
-<dt>args</dt><dd><p><code>list</code> with assorted arguments required to run the MSE cycle.</p></dd>
+<dt>est</dt><dd><p><code>mseCtrl</code> object with estimator of stock abundance specifications.</p></dd>
+<dt>phcr</dt><dd><p><code>mseCtrl</code> object with specifications about parameters needed for harvest control rule which must e computed from estimator results, e.g. Fmsy.</p></dd>
+<dt>hcr</dt><dd><p><code>mseCtrl</code> object with harvest control rule specifications.</p></dd>
+<dt>is</dt><dd><p><code>mseCtrl</code> object with management system specifications, e.g. translation of F into catch limits.</p></dd>
+<dt>tm</dt><dd><p><code>mseCtrl</code> object with technical measures specifications.</p></dd>
 
 </dl>
 
-    <h2 class="hasAnchor" id="accessors"><a class="anchor" href="#accessors"></a>Accessors</h2>
-
-    
-
-<p>All slots in the class have accessor and replacement methods defined that
-allow retrieving and substituting individual slots.</p>
-<p>The values passed for replacement need to be of the class of that slot.
+<p>AccessorsAll slots in the class have accessor and replacement methods defined that
+allow retrieving and substituting individual slots.The values passed for replacement need to be of the class of that slot.
 A numeric vector can also be used when replacing FLQuant slots, and the
 vector will be used to substitute the values in the slot, but not its other
 attributes.</p>
-    <h2 class="hasAnchor" id="constructor"><a class="anchor" href="#constructor"></a>Constructor</h2>
-
-    
-
-<p>A construction method exists for this class that can take named arguments for
+<p>ConstructorA construction method exists for this class that can take named arguments for
 any of its slots. All slots are then created to match the requirements of the
 class validity. If an unnamed <code>FLQuant</code> object is provided, this is used
 for sizing, but not for populating any slot.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#slots">Slots</a></li>
-      <li><a href="#accessors">Accessors</a></li>
-      <li><a href="#constructor">Constructor</a></li>
-      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
