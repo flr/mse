@@ -100,6 +100,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="mi
 					ctrl= iters(ctrl, i),
 					args=args,
 					verbose=verbose)
+				# reduce iter to i
+				call0$args$it <- length(i)
 				out <- do.call(goFish, call0)
 				# RETURN
 				list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
