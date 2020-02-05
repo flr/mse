@@ -4,7 +4,7 @@
 \alias{ices.hcr}
 \title{Evaluate the chosen HCR function}
 \usage{
-ices.hcr(stk, fmin, ftrg, blim, bsafe, genArgs, tracking)
+ices.hcr(stk, fmin, ftrg, blim, bsafe, args, tracking)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}

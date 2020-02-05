@@ -2,9 +2,9 @@ Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
 Version: 2.0.1
 Date: 2020-01-27
-Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut", "cre"),
+Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut"),
   email = "iago.mosqueira@wur.nl"), 
-  person("Ernesto", "Jardim", email = "ernesto.jardim@ec.europa.eu", role = c("aut")))
+  person("Ernesto", "Jardim", email = "ernesto.jardim@ec.europa.eu", role = c("aut", "cre")))
 Description: A set of functions and methods to simplify the development and
   running of Management Strategy Evaluation (MSE) analyses using the FLR 
   packages and classes, and the a4a methods and algorithms. 

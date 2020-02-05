@@ -4,7 +4,7 @@
 \alias{effort.is}
 \title{effort implementation function}
 \usage{
-effort.is(stk, ctrl, genArgs, tracking)
+effort.is(stk, ctrl, args, tracking)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}

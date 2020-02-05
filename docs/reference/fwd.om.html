@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S4 class <code>FLmse</code> — FLmse-class • mse</title>
+<title>A method to project the operating model (OM) — fwd.om • mse</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,11 @@
 
 
 
-<meta property="og:title" content="S4 class <code>FLmse</code> — FLmse-class" />
-<meta property="og:description" content="The FLmse class stores information relative to the MSE's management procedure'." />
+<meta property="og:title" content="A method to project the operating model (OM) — fwd.om" />
+<meta property="og:description" content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
+odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
+libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
+Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -115,105 +118,51 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>S4 class <code>FLmse</code></h1>
+    <h1>A method to project the operating model (OM)</h1>
     
-    <div class="hidden name"><code>FLmse-class.Rd</code></div>
+    <div class="hidden name"><code>fwd.om.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>FLmse</code> class stores information relative to the MSE's management procedure'.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
+odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
+libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
+Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id</p>
     </div>
 
-    <pre class="usage"><span class='fu'>FLmse</span>(<span class='no'>...</span>)
-
-<span class='fu'>FLmse</span>(<span class='no'>...</span>)
-
-<span class='fu'>tracking</span>(<span class='no'>object</span>, <span class='no'>...</span>)
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>tracking</span>(<span class='no'>object</span>)
-
-<span class='fu'>tracking</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='fu'>control</span>(<span class='no'>object</span>, <span class='no'>...</span>)
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>control</span>(<span class='no'>object</span>)
-
-<span class='fu'>control</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='fu'>oem</span>(<span class='no'>object</span>, <span class='no'>...</span>)
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>oem</span>(<span class='no'>object</span>)
-
-<span class='fu'>oem</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span>(<span class='no'>name</span>)
-
-<span class='co'># S4 method for FLmse,list</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span></pre>
+    <pre class="usage"><span class='fu'>fwd.om</span>(<span class='no'>stk</span>, <span class='no'>ctrl</span>, <span class='no'>sr</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>...</th>
-      <td><p>additional argument list that might never be used</p></td>
+      <th>ctrl</th>
+      <td><p>the fwdControl object with objectives and constraints</p></td>
+    </tr>
+    <tr>
+      <th>sr</th>
+      <td><p>a FLSR with the stock-recruitment model</p></td>
     </tr>
     <tr>
       <th>object</th>
-      <td><p>object of relevant class (see signature of method)</p></td>
+      <td><p>the OM as a FLStock</p></td>
     </tr>
     <tr>
-      <th>value</th>
-      <td><p>the new object</p></td>
+      <th>sr.residuals</th>
+      <td><p>a FLQuant with S/R residuals</p></td>
+    </tr>
+    <tr>
+      <th>sr.residuals.mult</th>
+      <td><p>logical about residuals being multiplicative</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
-    
-
-<dl class='dl-horizontal'>
-<dt>om</dt><dd><p><code>FLom</code> with the operating model.</p></dd>
-<dt>tracking</dt><dd><p><code>FLQuant</code> with record of decisions made during the mp cycle.</p></dd>
-<dt>args</dt><dd><p><code>list</code> with assorted arguments required to run the MSE cycle.</p></dd>
-
-</dl>
-
-    <h2 class="hasAnchor" id="accessors"><a class="anchor" href="#accessors"></a>Accessors</h2>
-
-    
-
-<p>All slots in the class have accessor and replacement methods defined that
-allow retrieving and substituting individual slots.</p>
-<p>The values passed for replacement need to be of the class of that slot.
-A numeric vector can also be used when replacing FLQuant slots, and the
-vector will be used to substitute the values in the slot, but not its other
-attributes.</p>
-    <h2 class="hasAnchor" id="constructor"><a class="anchor" href="#constructor"></a>Constructor</h2>
-
-    
-
-<p>A construction method exists for this class that can take named arguments for
-any of its slots. All slots are then created to match the requirements of the
-class validity. If an unnamed <code>FLQuant</code> object is provided, this is used
-for sizing, but not for populating any slot.</p>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#slots">Slots</a></li>
-      <li><a href="#accessors">Accessors</a></li>
-      <li><a href="#constructor">Constructor</a></li>
-      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
