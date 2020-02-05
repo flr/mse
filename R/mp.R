@@ -87,6 +87,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="mi
 			.multicombine=TRUE, 
 			.errorhandling = "stop", 
 			.inorder=TRUE) %dopar% {
+				# in case of parallel each core receives one iter
+				args$it <- 1
 				call0 <- list(
 					stk.om = stk.om[,,,,,i],
 					sr.om = FLCore::iter(sr.om,i),

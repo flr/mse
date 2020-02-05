@@ -6,8 +6,10 @@
 - mp oem default became NULL
 
  BUG FIXES
+- it wrongly passed to goFish fixed
 - oem set of dataYears fixed
 - mp without oem now creates one which is conform the other objects.
+
 
  mse 1.0
  USER-VISIBLE CHANGES
