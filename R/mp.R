@@ -75,7 +75,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="mi
 	if(getDoParWorkers() > 1){
 		cat("Going parallel with ", getDoParWorkers(), " cores !\n")
 		# LOOP and combine
-		lst0 <- foreach(i=1:it, 
+		lst0 <- foreach(j=1:it, 
 			.combine=function(...) {
 				list(
 					stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
@@ -90,16 +90,16 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="mi
 				# in case of parallel each core receives one iter
 				args$it <- 1
 				call0 <- list(
-					stk.om = stk.om[,,,,,i],
-					sr.om = FLCore::iter(sr.om,i),
-					sr.om.res = sr.om.res[,,,,,i],
-					oem = iters(oem, i),
-					tracking = tracking[,,,,,i],
+					stk.om = stk.om[,,,,,j],
+					sr.om = FLCore::iter(sr.om,j),
+					sr.om.res = sr.om.res[,,,,,j],
+					oem = iters(oem, j),
+					tracking = tracking[,,,,,j],
 					sr.om.res.mult=sr.om.res.mult,
-					fb=fb,
+					fb=fb, # needs it selection
 					projection=projection,
-					iem=iem,
-					ctrl= iters(ctrl, i),
+					iem=iem, # needs it selection
+					ctrl= iters(ctrl, j),
 					args=args,
 					verbose=verbose)
 				out <- do.call(goFish, call0)
