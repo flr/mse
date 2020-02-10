@@ -4,9 +4,10 @@ citEntry(
   entry="Article",
   title="The mse package",
   author=personList(
-		person("I.", "Mosqueira")),
+		person("I.", "Mosqueira"),
+		person("E.", "Jardim")),
   journal="Joyurnal of Open Source Software",
-  year="2016",
+  year="2020",
   volume="X",
   pages="XX",
-  textVersion="Mosqueira, I. 2016. The mse package. JOSS, X:XX.")
+  textVersion="Mosqueira, I. and Jardim, E. 2020. The mse package. JOSS, X:XX.")

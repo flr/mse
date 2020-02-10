@@ -22,12 +22,6 @@ library(mse)
 
 # Introduction
 
-# The mse workflow
-
-## Example / Workflow 1
-
-## Example / Workflow 2
-
 # S4 classes
 
 ## FLom
@@ -58,11 +52,7 @@ knitr::include_graphics('diagrams/FLmse.png')
 knitr::include_graphics('diagrams/mp.svg')
 ```
 
-### goFish()
-
 ## performance()
-
-## tunebisect()
 
 # Extending mse with your own functions
 
@@ -91,7 +81,7 @@ knitr::include_graphics('diagrams/mp.svg')
 
 ## Author information
 
-**Iago MOSQUEIRA**. European Commission Joint Research Centre. Ispra. Italy.
+**Iago MOSQUEIRA**. WUR
 **Ernesto JARDIM**. European Commission Joint Research Centre. Ispra. Italy.
 
 # References
