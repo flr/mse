@@ -8,6 +8,7 @@ GITVERS=$(shell (date -d `git log -1 --date=short --pretty=format:"%ad"` +%Y%m%d
 
 R_FILES := $(wildcard $(PKGSRC)/R/*.R)
 HELP_FILES := $(wildcard $(PKGSRC)/man/*.Rd)
+VIGNETTES := $(wildcard $(PKGSRC)/vignettes/*.Rmd)
 
 all: build
 
@@ -21,7 +22,7 @@ NEWS: NEWS.md
 	sed 's/^# / /' NEWS.md > NEWS
 	sed -i 's/^##//' NEWS
 
-docs: $(HELP_FILES) README.md NEWS
+docs: $(HELP_FILES) $(VIGNETTES) README.md NEWS
 	R --vanilla --silent -e "options(repos='http://cran.r-project.org'); pkgdown::build_site(preview=FALSE)"
 
 roxygen: $(R_FILES)
