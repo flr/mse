@@ -60,3 +60,18 @@ check: ../$(PKGNAME)_$(PKGVERS).tar.gz
 clean:
 	cd ..;\
 	rm -rf $(PKGNAME).Rcheck $(PKGNAME)_$(PKGVERS).tar.gz
+
+# TARGETS
+#
+# - README.md: Updates README.md version and date from DESCRIPTION
+# - NEWS: Uppdates NEWS in R format from NEWS.md
+# - docs: Creates html pages at flr-project.org/PKG
+# - roxygen: Runs roxygen to create Rd files
+# - update: Changfes date in DESCRIPTION to last git commit date
+# - release: build docs
+# - build: R CMD build
+# - buildNV: R CMD build without vignettes
+# - install: R CMD INSTALL
+# - checkCRAN: R CMD check --as-cran
+# - check: R CMD check
+# - clean: remove tar.gz and .Rcheck
