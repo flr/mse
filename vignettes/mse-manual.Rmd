@@ -22,6 +22,8 @@ library(mse)
 
 # Introduction
 
+This is an introduction.
+
 # S4 classes
 
 ## FLom
