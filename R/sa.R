@@ -22,7 +22,7 @@ mlc.est <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...){
 	vbObj <- a4aGr(
 	    grMod=~linf*(1-exp(-k*(t-t0))),      
 	    grInvMod=~t0-1/k*log(1-len/linf),      
-	    params=FLPar(linf=vbPars$linf, k=vbPars$k, t0=vbPars$t0, units=c('cm','year-1','year')))
+	    params=FLPar(linf=vbPars["linf"], k=vbPars["k"], t0=vbPars["t0"], units=c('cm','year-1','year')))
 	flq <- flc <- catch.n(stk)
 	flq[] <- predict(vbObj, t=range(stk)["min"]:range(stk)["max"]+0.5)
 	flq <- quantSums(flc*flq)/quantSums(flc)
