@@ -11,14 +11,13 @@
 
 noise.iem <- function(ctrl, fun="rlnorm", mean=0, sd=0.1, multiplicative=TRUE, args, tracking){
   # eh? number of non NA values in target. But if there are NAs then we need to
-  # know their position for the *ctrl@trgtArray later
+  # know their position for the *ctrl@iters later
 	# use decision taken in year considering management lag
-    	#ctrl@trgtArray[,"val",][] <- tracking["metric.is",ac(genArgs$ay-genArgs$management_lag+1)]
-	iem <- list(mean = mean, sd = sd, n = sum(!is.na(ctrl@trgtArray)))
+	iem <- list(mean = mean, sd = sd, n = sum(!is.na(ctrl@iters)))
 	if(multiplicative){
-		ctrl@trgtArray <- do.call(fun, iem) * ctrl@trgtArray
+		ctrl@iters <- do.call(fun, iem) * ctrl@iters
 	} else {
-		ctrl@trgtArray <- do.call(fun, iem) + ctrl@trgtArray
+		ctrl@iters <- do.call(fun, iem) + ctrl@iters
 	}
 	lst <- list(ctrl=ctrl, tracking=tracking)
 	lst

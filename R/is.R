@@ -44,7 +44,7 @@ tac.is <- function(stk, ctrl, args, delta_tac_max=NA, delta_tac_min=NA, tracking
 	# Number of intermediate years (between last data year and ay+1)
 	ninter_yrs <- ay - last_data_yr + mlag - 1
 	# Control object for the STF
-	ctrl <- getCtrl(c(rep(fsq0, times=ninter_yrs), ctrl@trgtArray[,"val",]), "f", (last_data_yr+1):(ay+mlag), it)
+	ctrl <- getCtrl(c(rep(fsq0, times=ninter_yrs), ctrl$value), "f", (last_data_yr+1):(ay+mlag), it)
 	# Number of projection years
 	nproj_yrs <- (ay+mlag) - last_data_yr
 	stkTmp <- stf(stk, nproj_yrs, wts.nyears=nsqy)
@@ -81,7 +81,7 @@ effort.is <- function(stk, ctrl, args, tracking){
 	# reference value
 	if(ay==iy) fay <- fbar(stk)[,ac(ay-data_lag)] else fay <- yearMeans(fbar(stk)[,ac(args$sqy)])
 	# target to reach defined by HCR (in f units)
-	trgt <- ctrl@trgtArray[,"val",]
+	trgt <- ctrl$value
 	# multiplier
 	mult <- trgt/fay
 	# new control file, in relative terms
@@ -106,7 +106,7 @@ indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"),
 	}  	
 	# new control file
 	ctrl@target[,'quantity'] <- quantity
-	ctrl@trgtArray[,'val',] <- ctrl@trgtArray[,'val',]*vsq
+	ctrl$value <- ctrl$value*vsq
 
 	# return
 	list(ctrl = ctrl, tracking = tracking)
