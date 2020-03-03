@@ -3,7 +3,7 @@ import("data.table")
 import("FLCore")
 import("ggplotFL")
 import("foreach")
-import("FLash")
+import("FLasher")
 
 importFrom("FLBRP",
   "refpts",
@@ -45,7 +45,8 @@ export(
   "perfect.oem",
   "perfect.sa",
   "sampling.oem",
-  "tac.is")
+  "tac.is",
+  "tunebisect")
 
 exportClasses(
   "FLiem",

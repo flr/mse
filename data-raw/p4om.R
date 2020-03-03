@@ -8,14 +8,14 @@
 
 library(mse)
 library(FLa4a)
-library(FLasher)
+# library(FLasher)
 library(FLBRP)
 
 data(ple4)
 data(ple4.index)
 
 stk <- ple4
-idx <- FLIndices(SURVEY=ple4.index)
+idx <- FLIndices(BTS=ple4.index)
 
 # Variables
 
@@ -23,7 +23,7 @@ it <- 50 # iterations
 fy <- 2030 # final year
 y0 <- range(stk)["minyear"] # initial data year
 dy <- range(stk)["maxyear"] # final data year
-iy <- 2008 # initial year of projection (also intermediate)
+iy <- 2017 # initial year of projection (also intermediate)
 ny <- fy - iy + 1 # number of years to project from intial year
 nsqy <- 3 # number of years to compute status quo metrics
 vy <- ac(iy:fy) # vector of years to be projected
@@ -32,7 +32,7 @@ vy <- ac(iy:fy) # vector of years to be projected
 
 # fit stock assessment model
 mcsave <- 200
-mcmc <- mcsave*it
+mcmc <- mcsave * it
 fit <- sca(stk, idx, fit="MCMC",
   mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
 
@@ -57,22 +57,33 @@ residuals(srbh) <- devbh
 
 brp <- brp(FLBRP(stk, srbh))
 
-# Set up future assumptions - means of 5 years
+refpts(brp)
+
+foo <- function(object, metrics) {
+
+  res <- mapply(function(x, y) {
+    flp <- FLPar(PAR=object[x[1], x[2]])
+    dimnames(flp)$params <- y
+    return(flp)
+  }, metrics, names(metrics), SIMPLIFY=FALSE)
+
+  Reduce(rbind, res)
+}
+
+mets <- list(FMSY=c("msy", "harvest"), SBMSY=c("msy", "ssb"))
+
+# Set up future assumptions
 stk <- fwdWindow(stk, brp, end=fy)
+idx[["BTS"]] <- window(idx[["BTS"]], end=fy)
 
 # Fleet behaviour
-
 fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
 
 # OM object
-om <- FLom(stock=stk, sr=srbh, refpts=refpts(brp))
-
-save(om, file="../data/p4om.RData", compress="xz")
+om <- FLom(stock=stk, sr=srbh, refpts=foo(refpts(brp), mets),
+  projection=mseCtrl(method=fwd.om))
 
 # OEM
+oem <- FLoem(method=perfect.oem,observations=list(stk=stock(om), idx=idx))
 
-# Indices
-
-# IEM
-
-# save(om, oem, iem, file="../data/p4om.RData", compress="xz")
+save(om, oem, file="../data/p4om.RData", compress="xz")
