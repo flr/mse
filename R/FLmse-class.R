@@ -124,7 +124,7 @@ setReplaceMethod("oem", signature("FLmse", "FLQuant"), function(object, value){
 # args
 
 #' @rdname FLmse-class
-setMethod("args", "FLmse", function(object) object@args)
+setMethod("args", "FLmse", function(name) name@args)
 
 #' @rdname FLmse-class
 setReplaceMethod("args", signature("FLmse", "list"), function(object, value){
