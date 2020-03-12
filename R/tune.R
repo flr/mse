@@ -11,9 +11,9 @@
 #' 
 #' @examples
 
-tunebisect <- function(om, oem="missing", control, metrics, indicator, tune, args,
-  prob=0.5, tol=0.01, maxit=12, verbose=TRUE, pyears=ac(seq(args$iy+1, args$fy)),
-  refpts=refpts(om), ...) {
+tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
+  args, prob=0.5, tol=0.01, maxit=12, verbose=TRUE,
+  pyears=ac(seq(args$iy+1, args$fy)), refpts=refpts(om), ...) {
   
   # TODO CHECKS
 
@@ -28,9 +28,9 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune, arg
 
   rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"), ...)
   
-  pmin <- performance(metrics(stock(rmin), metrics=metrics), indicator=indicator,
-    refpts=refpts, probs=NULL, years=pyears)
-  obmin <- mean(pmin$data) - prob
+  pmin <- performance(metrics(stock(rmin), metrics=metrics), 
+    indicator=indicator, refpts=refpts, probs=NULL, years=pyears)
+  obmin <- mean(pmin$data, na.rm=TRUE) - prob
   
   if(verbose)
     print(paste0("[1] diff: ", format(obmin, digits=2), "; ", names(tune), ": ",
@@ -46,9 +46,9 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune, arg
 
   rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"), ...)
   
-  pmax <- performance(metrics(stock(rmax), metrics=metrics), indicator=indicator,
-    refpts=refpts, probs=NULL, years=pyears)
-  obmax <- mean(pmax$data) - prob
+  pmax <- performance(metrics(stock(rmax), metrics=metrics),
+    indicator=indicator, refpts=refpts, probs=NULL, years=pyears)
+  obmax <- mean(pmax$data, na.rm=TRUE) - prob
   
   if(verbose)
     print(paste0("[2] diff: ", format(obmax, digits=2), "; ", names(tune), ": ",
@@ -74,9 +74,9 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune, arg
       (cmin$hcr@args[[names(tune)]] + cmax$hcr@args[[names(tune)]]) / 2
 
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"), ...)
-    pmid <- performance(metrics(stock(rmid), metrics=metrics), indicator=indicator,
-      refpts=refpts, probs=NULL, years=pyears)
-    obmid <- mean(pmid$data) - prob
+    pmid <- performance(metrics(stock(rmid), metrics=metrics), 
+      indicator=indicator, refpts=refpts, probs=NULL, years=pyears)
+    obmid <- mean(pmid$data, na.rm=TRUE) - prob
 
     if(verbose)
       print(paste0("[", count + 2, "] diff: ", format(obmid, digits=2), "; ",

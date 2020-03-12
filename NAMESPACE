@@ -80,6 +80,7 @@ exportMethods(
   "mcN",
   "method",
   "method<-",
+  "metrics",
   "observations",
   "observations<-",
   "performance",

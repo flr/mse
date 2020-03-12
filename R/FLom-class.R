@@ -303,11 +303,11 @@ setMethod("plot", signature(x="FLom", y="missing"),
 
     stocks[[1]] <- window(stocks[[1]], end=dims(stocks[[2]])$minyear)
 
-    plot(FLStocks(stocks))
-
+    do.call("plot", c(list(x=FLStocks(stocks)), args[!cls]))
+    
     } else {
     
-      plot(stock(x))
+      plot(stock(x), ...)
     
     }
   }

@@ -1,3 +1,10 @@
+# mse 2.1
+
+## NEW FEATURES
+
+- metrics method for FLmse, calss metrics(FLStock).
+
+
 # mse 2.0
  
 ## USER-VISIBLE CHANGES

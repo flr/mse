@@ -186,4 +186,15 @@ setMethod("performance", signature(x="list"),
     }
     return(res)
   }
-) # }}}
+) 
+
+setMethod("performance", signature(x="FLmse"),
+  function(x, indicators,
+    years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
+    metrics=FLCore::metrics(stock(x)), probs=NULL, mp=NULL) {
+      
+      performance(stock(x), indicators, refpts=refpts(x), years=years,
+        metrics=metrics, probs=probs, mp=mp)
+  })
+
+# }}}

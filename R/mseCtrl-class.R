@@ -44,7 +44,7 @@ setMethod("method", "mseCtrl", function(object) object@method)
 
 #' @rdname mseCtrl-class
 #' @aliases method<- method<--methods
-setGeneric("method<-", function(object, value) standardGeneric("method<-"))
+setGeneric("method<-", function(object, ..., value) standardGeneric("method<-"))
 #' @rdname mseCtrl-class
 setReplaceMethod("method", signature("mseCtrl", "function"), function(object, value){
 	object@method <- value
@@ -59,7 +59,7 @@ setMethod("args", "mseCtrl", function(name) name@args)
 
 #' @rdname mseCtrl-class
 #' @aliases args<- args<--methods
-setGeneric("args<-", function(object, value) standardGeneric("args<-"))
+setGeneric("args<-", function(object, ..., value) standardGeneric("args<-"))
 #' @rdname mseCtrl-class
 setReplaceMethod("args", signature("mseCtrl", "list"), function(object, value){
 	object@args <- value

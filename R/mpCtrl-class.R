@@ -144,3 +144,33 @@ setGeneric("exists")
 #' @rdname mseCtrl-class
 setMethod("exists", "mpCtrl", function(x) length(x) != 0)
 
+#' @rdname mpCtrl-class
+#' @aliases method<-,mpCtrl-method
+setReplaceMethod("method", signature(object="mpCtrl", value="function"),
+  function(object, element, value) {
+    object[[element]]@method <- value
+    return(object)
+  })
+
+#' @rdname mpCtrl-class
+#' @aliases method,mpCtrl-method
+setMethod("method", signature("mpCtrl"),
+  function(object, element) {
+    return(object[[element]]@method)
+  })
+
+#' @rdname mpCtrl-class
+#' @aliases args<-,mpCtrl-method
+setReplaceMethod("args", signature(object="mpCtrl", value="function"),
+  function(object, element, value) {
+    object[[element]]@args <- value
+    return(object)
+  })
+
+# DEBUG base::args does not have ...
+#' @rdname mpCtrl-class
+#' @aliases method,mpCtrl-method
+#setMethod("args", signature("mpCtrl"),
+#  function(name, element) {
+#    return(name[[element]]@args)
+#  })

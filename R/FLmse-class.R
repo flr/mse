@@ -148,8 +148,9 @@ setMethod("plot", signature(x="FLom", y="FLmse"),
   function(x, y, ...) {
 
     args <- list(...)
+    fms <- unlist(lapply(args, is, "FLmse"))
 
-    stocks <- lapply(c(list(x, y), args), stock)
+    stocks <- lapply(c(list(x, y), args[fms]), stock)
 
     # WINDOW om
     minyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))
@@ -164,8 +165,8 @@ setMethod("plot", signature(x="FLom", y="FLmse"),
     idx <- names(stocks) == character(1)
     if(length(idx) > 0)
       names(stocks)[idx] <- c("OM", paste0("MP", seq(sum(idx)-1)))[idx]
-
-    plot(FLStocks(stocks))
+    
+    do.call("plot", c(list(x=FLStocks(stocks)), args[!fms]))
   }
 )
 
@@ -219,3 +220,15 @@ setMethod("summary", signature(object="FLmse"),
 
   }
 ) # }}}
+
+# metrics {{{
+
+setMethod("metrics", signature(object="FLmse", metrics="ANY"),
+  function(object, metrics) {
+    metrics(stock(object), metrics)
+})
+
+setMethod("metrics", signature(object="FLmse", metrics="missing"),
+  function(object) {
+    metrics(stock(object))
+}) # }}}
