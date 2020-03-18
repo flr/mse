@@ -165,8 +165,10 @@ setMethod("plot", signature(x="FLom", y="FLmse"),
     idx <- names(stocks) == character(1)
     if(length(idx) > 0)
       names(stocks)[idx] <- c("OM", paste0("MP", seq(sum(idx)-1)))[idx]
-    
-    do.call("plot", c(list(x=FLStocks(stocks)), args[!fms]))
+ 
+    # PLOT FLStocks + args
+    nfs <- unlist(lapply(args, function(x) !is(x, "FLmse")))
+    do.call("plot", c(list(x=FLStocks(stocks)), args[nfs]))
   }
 )
 
