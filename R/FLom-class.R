@@ -213,7 +213,6 @@ fwd.om <- function(stk, ctrl, sr, ...){
 	args$object <- stk
 	args$control <- ctrl
 	args$sr <- sr
-	args$object <- do.call("fwd", args)
 	stk <- do.call("fwd", args)
 	list(object=stk)
 }
