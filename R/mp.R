@@ -215,7 +215,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb,
 		tracking["C.obs",ac(ay)] <- catch(stk0)[,ac(ay-args$data_lag)]
 
 		#==========================================================
-		# MP
+		# EST
 		# Estimator of stock statistics
 		#==========================================================
 		#cat("est\n")
