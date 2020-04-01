@@ -51,7 +51,7 @@ tac.is <- function(stk, ctrl, args, delta_tac_max=NA, delta_tac_min=NA, tracking
 	# Set geomean sr relationship
 	gmean_rec <- c(exp(yearMeans(log(rec(stk)[,ac(sqy)]))))
 	# Project!
-	stkTmp <- fwd(stkTmp, ctrl=ctrl, sr=list(model="mean", params = FLPar(gmean_rec,iter=it)))
+	stkTmp <- fwd(stkTmp, control=ctrl, sr=list(model="geomean", params = FLPar(gmean_rec,iter=it)))
 	# Get TAC for the management year that results from hitting the F in STF
 	TAC <- catch(stkTmp)[,ac(ay+mlag)]
 	# catch stabelizers
