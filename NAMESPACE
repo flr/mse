@@ -20,6 +20,8 @@ importFrom("stats",
   "rf")
 
 export(
+  "catchSSB.hcr",
+  "cpue.hcr",
   "FLiem",
   "effort.is",
   "expandGrid",
