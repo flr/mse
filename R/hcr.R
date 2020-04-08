@@ -115,7 +115,7 @@ indicator.hcr <- function (stk, hcrpars, args, tracking)
     hcrpars <- FLQuant(hcrpars, dimnames=list(iter=dimnames(stk@catch)$iter))
 	mult <- stk@indicator[,ac(dy)]/hcrpars
 	#csq <- yearMeans(catch(stk)[,ac(dy)])
-    ctrl <- getCtrl(mult, NA, ay + mlag, dim(hcrpars)[6])
+    ctrl <- getCtrl(mult, "f", ay + mlag, dim(hcrpars)[6])
     list(ctrl = ctrl, tracking = tracking)
 }
 

@@ -2,8 +2,7 @@
 
 ## NEW FEATURES
 
-- metrics method for FLmse, calss metrics(FLStock).
-
+- metrics method for FLmse, calls metrics(FLStock).
 
 # mse 2.0
  
