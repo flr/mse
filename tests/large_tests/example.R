@@ -21,8 +21,6 @@ library(doParallel)
 
 # LOAD data
 
-#load("om3.RData")
-
 data(ple4)
 data(ple4.indices)
 
