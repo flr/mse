@@ -119,6 +119,76 @@ indicator.hcr <- function (stk, hcrpars, args, tracking)
     list(ctrl = ctrl, tracking = tracking)
 }
 
+# catchSSB.hcr {{{
+
+#' A HCR to set catch based on SSB
+#'
+# hcrparams=FLPar(dlimit=0.10, dtarget=0.40, lambda=1.0, dltac=0.15, dhtac=0.15),
+
+#' @param dtarget
+#' @param dlimit
+#' @param lambda
+#' @param MSY
+#' @examples
+#' data(ple4)
+#' ssb(ple4)[,'1995'] / ssb(ple4)[,1]
+#' catchSSB.hcr(ple4[,ac(1957:1996)], dtarget=0.40, dlimit=0.10, lambda=1,
+#'   MSY=95000, ay=1995, tracking=FLQuant())
+#' lapply(seq(0.30, 0.90, by=0.1), function(x) {
+#'    catchSSB.hcr(ple4[,ac(1957:1996)], dtarget=x, dlimit=0.10, lambda=1,
+#'   MSY=95000, ay=1995, tracking=FLQuant())$ctrl})
+
+catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY, ssb_lag=1,
+  dtaclow=0.85, dtacupp=1.15, ay, tracking) {
+  
+  # COMPUTE depletion
+  dep <- ssb(stk)[, ac(ay - ssb_lag)] / ssb(stk)[, 1]
+
+  # RULE
+  ca <- ifelse(dep <= dlimit, 0,
+    ifelse(dep < dtarget, (lambda * MSY) / (dtarget - dlimit) * (dep - dlimit),
+    lambda * MSY))
+
+  # CONTROL
+  ctrl <- fwdControl(list(quant="catch", value=c(ca), year=ay + 1),
+    # TAC limits
+    list(quant="catch", min=dtaclow, max=dtacupp, relYear=ay - 1, year=ay + 1))
+
+  # TAC limits
+	
+	return(list(ctrl=ctrl, tracking=tracking))
+
+} # }}}
+
+# cpue.hcr {{{
+#' cpue.hcr
+#'
+#' @examples
+#' data(ple4)
+
+cpue.hcr <- function(stk, ay, k1, k2, k3, k4, target=1,
+  dtaclow=0.85, dtacupp=1.15, tracking){
+  
+  # RECOVER slope & mean(cpue)
+  slope <- tracking["cpue.slope", ac(ay)]
+  mcpue <- tracking["cpue.mean", ac(ay)]
+
+  # CALCULATE new tac
+
+  ka <- ifelse(slope > 0, k1, k2)
+  kb <- ifelse(mcpue > target, k3, k4)
+
+  # TAC_y-1 ~ TAC_y * 1 + ka * m + kb * (mcpue - target)
+  tac <- catch(stk)[, ac(ay-1)] * (1 + ka * slope + kb * (mcpue - target))
+
+  ctrl <- fwdControl(list(quant="catch", value=tac, year=ay + 1),
+    # TAC limits
+    list(quant="catch", min=dtaclow, max=dtacupp, relYear=ay - 1, year=ay + 1))
+  
+	return(list(ctrl=ctrl, tracking=tracking))
+} # }}}
+
+
 # Test:
 # library(FLCore)
 # data(ple4)
