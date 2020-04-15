@@ -88,18 +88,32 @@ setReplaceMethod("tracking", signature("FLmse", "FLQuant"), function(object, val
 setGeneric("control", function(object, ...) standardGeneric("control"))
 
 #' @rdname FLmse-class
-setMethod("control", "FLmse", function(object) object@control)
+setMethod("control", "FLmse",
+  function(object, i="missing") {
+    if(missing(i))
+      return(object@control)
+    else
+      return(object@control[[i]])
+  })
 
 #' @rdname FLmse-class
 #' @param value the new object
 #' @aliases control<- control<--methods
-setGeneric("control<-", function(object, value) standardGeneric("control<-"))
+setGeneric("control<-", function(object, ..., value) standardGeneric("control<-"))
 
 #' @rdname FLom-class
-setReplaceMethod("control", signature("FLmse", "FLQuant"), function(object, value){
-	object@control <- value
-	object
+setReplaceMethod("control", signature("FLmse", "mpCtrl"),
+  function(object, value) {
+	  object@control <- value
+	  object
 })
+
+setReplaceMethod("control", signature("FLmse", "mseCtrl"),
+  function(object, i, value) {
+	  object@control[[i]] <- value
+	  object
+})
+
 
 # oem
 
