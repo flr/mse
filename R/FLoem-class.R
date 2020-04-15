@@ -73,7 +73,13 @@ setValidity("FLoem",
 #' @aliases observations observations-methods
 setGeneric("observations", function(object, ...) standardGeneric("observations"))
 #' @rdname FLoem-class
-setMethod("observations", "FLoem", function(object) object@observations)
+setMethod("observations", "FLoem",
+  function(object, i="missing") {
+    if(missing(i))
+      return(object@observations)
+    else
+      return(object@observations[[i]])
+  })
 
 #' @rdname FLoem-class
 #' @param value the new object
