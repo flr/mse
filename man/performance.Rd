@@ -84,8 +84,12 @@ indicators <- list(
   T2=list(~yearVars(C), name="var(C)", desc="Variance in catch"),
   T3=list(~yearVars(F), name="var(F)", desc="Variance in fishing mortality"))
 run <- window(stock(om), start=2000, end=2015)
-performance(run, indicators, refpts=FLPar(MSY=0),
-  metrics=list(C=catch, F=fbar), years=list(20:25, 20:30))
+performance(run, indicators, refpts=FLPar(MSY=110000),
+  metrics=list(C=catch, F=fbar), years=list(2000:2015))
+# Minimum indicator, named list with formula and name
+performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
+  refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
+  years=list(2000:2015))
 }
 \seealso{
 \code{\link{FLQuants}}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/hcr.R
 \name{indicator.hcr}
 \alias{indicator.hcr}
-\title{A indicator based HCR}
+\title{An indicator-based HCR}
 \usage{
 indicator.hcr(stk, hcrpars, args, tracking)
 }

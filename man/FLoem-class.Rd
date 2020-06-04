@@ -16,9 +16,8 @@
 \alias{deviances,FLoem-method}
 \alias{deviances<-}
 \alias{deviances<--methods}
-\alias{deviances<-,FLoem,list-method}
 \alias{show,FLoem-method}
-\alias{iters,FLoem-method}
+\alias{iter,FLoem-method}
 \alias{combine,FLoem,FLoem-method}
 \alias{fleetBehaviour<-,FLom,mseCtrl-method}
 \alias{projection<-,FLom,mseCtrl-method}
@@ -30,7 +29,7 @@ FLoem(...)
 
 observations(object, ...)
 
-\S4method{observations}{FLoem}(object)
+\S4method{observations}{FLoem}(object, ...)
 
 observations(object) <- value
 
@@ -38,15 +37,15 @@ observations(object) <- value
 
 deviances(object, ...)
 
-\S4method{deviances}{FLoem}(object)
+\S4method{deviances}{FLoem}(object, ...)
 
 deviances(object) <- value
 
-\S4method{deviances}{FLoem,list}(object) <- value
+\S4method{deviances}{FLoem}(object, ...)
 
 \S4method{show}{FLoem}(object)
 
-\S4method{iters}{FLoem}(object, iter)
+\S4method{iter}{FLoem}(obj, iter)
 
 \S4method{combine}{FLoem,FLoem}(x, y, ...)
 

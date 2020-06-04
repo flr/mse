@@ -27,7 +27,7 @@
 \alias{projection<--methods}
 \alias{show,FLom-method}
 \alias{tracking<-,FLmse,FLQuant-method}
-\alias{control<-,FLmse,FLQuant-method}
+\alias{control<-,FLmse,mpCtrl-method}
 \alias{oem<-,FLmse,FLQuant-method}
 \title{A class for an operating model (OM)}
 \usage{
@@ -65,7 +65,7 @@ projection(object) <- value
 
 \S4method{tracking}{FLmse,FLQuant}(object) <- value
 
-\S4method{control}{FLmse,FLQuant}(object) <- value
+\S4method{control}{FLmse,mpCtrl}(object) <- value
 
 \S4method{oem}{FLmse,FLQuant}(object) <- value
 }

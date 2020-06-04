@@ -30,7 +30,7 @@ method(object, ...)
 
 \S4method{method}{mseCtrl}(object)
 
-method(object) <- value
+method(object, ...) <- value
 
 \S4method{method}{mseCtrl,`function`}(object) <- value
 
@@ -38,7 +38,7 @@ args(name)
 
 \S4method{args}{mseCtrl}(name)
 
-args(object) <- value
+args(object, ...) <- value
 
 \S4method{args}{mseCtrl,list}(object) <- value
 

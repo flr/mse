@@ -40,6 +40,11 @@
 \alias{iters,mpCtrl-method}
 \alias{exists}
 \alias{exists,mpCtrl-method}
+\alias{method<-,mpCtrl,function-method}
+\alias{method<-,mpCtrl-method}
+\alias{method,mpCtrl-method}
+\alias{args<-,mpCtrl,function-method}
+\alias{args<-,mpCtrl-method}
 \title{S4 class \code{mpCtrl}}
 \usage{
 \S4method{initialize}{mpCtrl}(.Object, ...)
@@ -96,6 +101,12 @@ exists(
   mode = "any",
   inherits = TRUE
 )
+
+\S4method{method}{mpCtrl,`function`}(object, element) <- value
+
+\S4method{method}{mpCtrl}(object, element)
+
+\S4method{args}{mpCtrl,`function`}(object, element) <- value
 }
 \arguments{
 \item{...}{additional argument list that might never be used}
@@ -103,7 +114,7 @@ exists(
 \item{object}{object of relevant class (see signature of method)}
 }
 \description{
-The \code{mpCtrl} class defines which moules will be runned and carries the specifications of those modules in \code{mseCtrl} elements.
+The \code{mpCtrl} class defines which modules will be runned and carries the specifications of those modules in \code{mseCtrl} elements.
 }
 \section{Slots}{
 
