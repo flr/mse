@@ -74,11 +74,19 @@ setValidity("FLoem",
 setGeneric("observations", function(object, ...) standardGeneric("observations"))
 #' @rdname FLoem-class
 setMethod("observations", "FLoem",
-  function(object, i="missing") {
-    if(missing(i))
-      return(object@observations)
-    else
-      return(object@observations[[i]])
+  function(object, ...) {
+    
+    res <- object@observations
+
+    # If extra args, subset lists
+    args <- list(...)
+
+    if(length(args) > 0) {
+      for(i in args)
+        res <- res[[i]]
+    }
+
+    return(res)
   })
 
 #' @rdname FLoem-class
@@ -102,10 +110,21 @@ setMethod("deviances", "FLoem", function(object) object@deviances)
 #' @aliases deviances<- deviances<--methods
 setGeneric("deviances<-", function(object, value) standardGeneric("deviances<-"))
 #' @rdname FLoem-class
-setReplaceMethod("deviances", signature("FLoem", "list"), function(object, value){
-	object@deviances <- value
-	object
-})
+setMethod("deviances", "FLoem",
+  function(object, ...) {
+    
+    res <- object@deviances
+
+    # If extra args, subset lists
+    args <- list(...)
+
+    if(length(args) > 0) {
+      for(i in args)
+        res <- res[[i]]
+    }
+
+    return(res)
+  })
 
 #' @rdname FLoem-class
 setMethod("show", signature(object = "FLoem"),
@@ -122,10 +141,12 @@ setMethod("show", signature(object = "FLoem"),
  })
 
 #' @rdname FLoem-class
-setMethod("iters", signature(object = "FLoem"), function(object, iter){
-	deviances(object) <- lapply(deviances(object), FLCore::iter, iter)
-	observations(object) <- lapply(observations(object), FLCore::iter, iter)
-	object
+setMethod("iter", signature(obj = "FLoem"),
+  function(obj, iter){
+    # TODO Delve deeper into list
+	  deviances(object) <- lapply(deviances(object), FLCore::iter, iter)
+	  observations(object) <- lapply(observations(object), FLCore::iter, iter)
+	  object
 })
 
 #' @rdname FLoem-class
