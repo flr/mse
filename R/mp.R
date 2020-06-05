@@ -9,6 +9,22 @@
 
 # mp {{{
 
+#' mp executes a run of a MP
+#'
+#' @param om The operating model (OM), an object of class *FLom*.
+#' @param oem The observation error model (OEM), an object orf class *FLoem*.
+#' @param iem The implementation error model (IEM), an object of class *FLiem*.
+#' @param ctrl A control structure for the MP run, an object of class *mpCtrl*.
+#' @param args MSE arguments, *list*.
+#' @param scenario Name of the scenario tested in this ru, *character*.
+#' @param tracking Extra elements to add to the standard tracking *FLQuant*.
+#' @param verbose Should output be verbose or not, *logical*.
+#'
+#' @return An object of class *FLmse*.
+#'
+#' @examples
+#' # [TODO:example]
+
 mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="missing", verbose=TRUE){
 
 	# prepare the om
