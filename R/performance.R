@@ -46,8 +46,12 @@ globalVariables("indicator")
 #'   T2=list(~yearVars(C), name="var(C)", desc="Variance in catch"),
 #'   T3=list(~yearVars(F), name="var(F)", desc="Variance in fishing mortality"))
 #' run <- window(stock(om), start=2000, end=2015)
-#' performance(run, indicators, refpts=FLPar(MSY=0),
-#'   metrics=list(C=catch, F=fbar), years=list(20:25, 20:30))
+#' performance(run, indicators, refpts=FLPar(MSY=110000),
+#'   metrics=list(C=catch, F=fbar), years=list(2000:2015))
+#' # Minimum indicator, named list with formula and name
+#' performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
+#'   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
+#'   years=list(2000:2015))
 
 setMethod("performance", signature(x="FLStock"),
   function(x, indicators, refpts=FLPar(),
@@ -71,11 +75,14 @@ setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts=FLPar(), years=dims(x[[1]])$maxyear,
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
     
-    # TODO CHECK indicators
-
     # CREATE years list
     if(!is.list(years))
       years <- setNames(as.list(years), as.character(years))
+
+    # CHECK years
+    if(any(unlist(lapply(years,
+      function(y) !all(as.character(y) %in% dimnames(x[[1]])$year)))))
+      stop("years must be present in input object 'x' dimensions.")
 
     # SET names if not present
     if(is.null(names(years)))
@@ -87,10 +94,10 @@ setMethod("performance", signature(x="FLQuants"),
       # LOOP over indicators
       data.table::rbindlist(lapply(indicators, function(j) {
         # EVAL indicator
-        # TODO CHECK colnames, sort or add if necessary [data, iter]
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
-          c(FLCore::window(x, start=i[1], end=i[length(i)]), as(refpts, 'list'))),
-          drop=FALSE)
+          c(FLCore::window(x, start=i[1], end=i[length(i)]),
+            # REPEAT refpts by year beacuse recycling goes year first
+            lapply(as(refpts, 'list'), rep, each=length(i)))), drop=FALSE)
       }), idcol="indicator", fill=TRUE)[,c("indicator", "data", "iter")]
     }), idcol="year")
     
@@ -195,6 +202,5 @@ setMethod("performance", signature(x="FLmse"),
       
       performance(stock(x), indicators, refpts=refpts(x), years=years,
         metrics=metrics, probs=probs, mp=mp)
-  })
-
-# }}}
+  }
+) # }}}
