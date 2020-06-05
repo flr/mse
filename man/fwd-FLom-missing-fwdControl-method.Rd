@@ -2,12 +2,15 @@
 % Please edit documentation in R/fwd.R
 \name{fwd,FLom,missing,fwdControl-method}
 \alias{fwd,FLom,missing,fwdControl-method}
-\title{res <- fwd(om, control=fwdControl(year=2018:2039, quant="f",
-value=rep(c(refpts(om)$FMSY), 22)))}
+\title{fwd}
 \usage{
 \S4method{fwd}{FLom,missing,fwdControl}(object, control, effort_max = 4, deviances = residuals(sr(object)), ...)
 }
 \description{
-res <- fwd(om, control=fwdControl(year=2018:2039, quant="f",
-value=rep(c(refpts(om)$FMSY), 22)))
+fwd
+}
+\examples{
+data(p4om)
+res <- fwd(om, control=fwdControl(year=2018:2030, quant="f",
+  value=rep(c(refpts(om)$FMSY), 13)))
 }

@@ -3,6 +3,16 @@
  NEW FEATURES
 
 - metrics method for FLmse, calls metrics(FLStock).
+- control(FLmse) and control(FLmse)<- can extract or modify individual list elements.
+- Accessors for FLoem@observations and @deviances now accept a subsetting name,
+  as in observations(FLoem, "stk").
+- Inputs to tunebisect() are now checked for coherence and dimensions.
+- fwd(FLom) calls FLasher::fwd(stock(FLom), sr(FLom), ...).
+
+ BUG FIXES
+
+- Bug in calculation for multiple years, recycling of refpts going first along
+  years, not iters.
 
  mse 2.0
  

@@ -1,6 +1,6 @@
 #' @title S4 class \code{mpCtrl}
 #'
-#' @description The \code{mpCtrl} class defines which moules will be runned and carries the specifications of those modules in \code{mseCtrl} elements.
+#' @description The \code{mpCtrl} class defines which modules will be runned and carries the specifications of those modules in \code{mseCtrl} elements.
 #'
 #' @section Slots:
 #' \describe{

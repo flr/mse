@@ -98,22 +98,21 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
 
-#' A indicator based HCR
+#' An indicator-based HCR
 #'
 #' Get indicator to target. The control argument is a list of parameters used by the HCR.
 #' @param stk The perceived FLStock.
 #' @param itrg The target for the indicator.
 #' @param args A list with generic arguments to be used by the function if needed.
 #' @param tracking The tracking matrix.
-indicator.hcr <- function (stk, hcrpars, args, tracking) 
-{
+indicator.hcr <- function (stk, hcrpars, args, tracking) {
     ay <- args$ay
     dy <- args$dy
   	#sqy <- args$sqy
   	mlag <- args$management_lag
 	if(!is(hcrpars, "FLQuant"))
     hcrpars <- FLQuant(hcrpars, dimnames=list(iter=dimnames(stk@catch)$iter))
-	mult <- stk@indicator[,ac(dy)]/hcrpars
+	mult <- stk@indicator[,ac(dy)] / hcrpars
 	#csq <- yearMeans(catch(stk)[,ac(dy)])
     ctrl <- getCtrl(mult, "f", ay + mlag, dim(hcrpars)[6])
     list(ctrl = ctrl, tracking = tracking)

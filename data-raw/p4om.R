@@ -8,7 +8,6 @@
 
 library(mse)
 library(FLa4a)
-# library(FLasher)
 library(FLBRP)
 
 data(ple4)
@@ -19,11 +18,11 @@ idx <- FLIndices(BTS=ple4.index)
 
 # Variables
 
-it <- 50 # iterations
+it <- 200 # iterations
+iy <- 2017 # initial year of projection (also intermediate)
 fy <- 2030 # final year
 y0 <- range(stk)["minyear"] # initial data year
 dy <- range(stk)["maxyear"] # final data year
-iy <- 2017 # initial year of projection (also intermediate)
 ny <- fy - iy + 1 # number of years to project from intial year
 nsqy <- 3 # number of years to compute status quo metrics
 vy <- ac(iy:fy) # vector of years to be projected
