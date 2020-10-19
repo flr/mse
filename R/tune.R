@@ -13,7 +13,7 @@
 
 tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
   args, prob=0.5, tol=0.01, maxit=12, verbose=TRUE,
-  pyears=ac(seq(args$iy+1, args$fy)), refpts=refpts(om), ...) {
+  pyears=ac(seq(args$iy+1, args$fy)), ...) {
   
   # metrics
 
@@ -43,7 +43,6 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
   if(!(prob >=0 & prob <=1))
     stop("prob must be a value between 0 and 1.")
 
-
   # RUN at min
   cmin <- control
   cmin$hcr@args[names(tune)] <- lapply(tune, '[', 1)
@@ -56,7 +55,7 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
   rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"), ...)
   
   pmin <- performance(metrics(stock(rmin), metrics=metrics), 
-    indicator=indicator, refpts=refpts, probs=NULL, years=pyears)
+    indicator=indicator, refpts=refpts(om), probs=NULL, years=pyears)
   obmin <- mean(pmin$data, na.rm=TRUE) - prob
   
   # PRINT result
@@ -80,7 +79,7 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
   rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"), ...)
   
   pmax <- performance(metrics(stock(rmax), metrics=metrics),
-    indicator=indicator, refpts=refpts, probs=NULL, years=pyears)
+    indicator=indicator, refpts=refpts(om), probs=NULL, years=pyears)
   obmax <- mean(pmax$data, na.rm=TRUE) - prob
   
   # PRINT result
@@ -114,7 +113,7 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
 
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"), ...)
     pmid <- performance(metrics(stock(rmid), metrics=metrics), 
-      indicator=indicator, refpts=refpts, probs=NULL, years=pyears)
+      indicator=indicator, refpts=refpts(om), probs=NULL, years=pyears)
     obmid <- mean(pmid$data, na.rm=TRUE) - prob
 
     # PRINT result

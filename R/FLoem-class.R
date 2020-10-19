@@ -1,4 +1,4 @@
-#' @title S4 class \code{FLoem}
+#save(run0, run1, run2, file="demo/runs.RData", compress="xz")' @title S4 class \code{FLoem}
 #'
 #' @description The \code{FLoem} class stores the information relative to the observation error model of the MSE.
 #'
@@ -110,21 +110,10 @@ setMethod("deviances", "FLoem", function(object) object@deviances)
 #' @aliases deviances<- deviances<--methods
 setGeneric("deviances<-", function(object, value) standardGeneric("deviances<-"))
 #' @rdname FLoem-class
-setMethod("deviances", "FLoem",
-  function(object, ...) {
-    
-    res <- object@deviances
-
-    # If extra args, subset lists
-    args <- list(...)
-
-    if(length(args) > 0) {
-      for(i in args)
-        res <- res[[i]]
-    }
-
-    return(res)
-  })
+setReplaceMethod("deviances", signature("FLoem", "list"), function(object, value){
+	object@deviances <- value
+	object
+})
 
 #' @rdname FLoem-class
 setMethod("show", signature(object = "FLoem"),
@@ -144,9 +133,9 @@ setMethod("show", signature(object = "FLoem"),
 setMethod("iter", signature(obj = "FLoem"),
   function(obj, iter){
     # TODO Delve deeper into list
-	  deviances(object) <- lapply(deviances(object), FLCore::iter, iter)
-	  observations(object) <- lapply(observations(object), FLCore::iter, iter)
-	  object
+	  deviances(obj) <- lapply(deviances(obj), FLCore::iter, iter)
+	  observations(obj) <- lapply(observations(obj), FLCore::iter, iter)
+	  obj
 })
 
 #' @rdname FLoem-class

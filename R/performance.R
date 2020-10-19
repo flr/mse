@@ -52,15 +52,20 @@ globalVariables("indicator")
 #' performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
 #'   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
 #'   years=list(2000:2015))
+#' # return quantiles
+#' performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
+#'   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
+#'   years=list(2000:2015), probs=c(0.05, 0.25, 0.50, 0.75, 0.95))
 
 setMethod("performance", signature(x="FLStock"),
   function(x, indicators, refpts=FLPar(),
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     metrics=FLCore::metrics(x), probs=NULL, mp=NULL) {
       
-      if(is.list(metrics))
+      if(is(metrics, "FLQuants"))
+        flqs <- metrics
+      else if(is.list(metrics) & is.function(metrics))
         flqs <- do.call(FLCore::metrics, list(object=x, metrics))
-
       else if(is.function(metrics))
         flqs <- do.call(metrics, list(x))
 
@@ -72,8 +77,11 @@ setMethod("performance", signature(x="FLStock"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLQuants"),
-  function(x, indicators, refpts=FLPar(), years=dims(x[[1]])$maxyear,
+  function(x, indicators, refpts=FLPar(),
+    years=setNames(list(dimnames(x[[1]])$year), nm=dims(x[[1]])$maxyear),
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
+
+    # TODO CHECK dimensions x, refpts
     
     # CREATE years list
     if(!is.list(years))
@@ -88,6 +96,14 @@ setMethod("performance", signature(x="FLQuants"),
     if(is.null(names(years)))
       names(years) <- as.character(unlist(lapply(years,
         function(x) x[length(x)])))
+
+    # CHECK dimensions
+    if(any(unlist(lapply(x, function(y) any(dim(y)[c(1,3,4,5)] != 1)))))
+      warning("metrics have length > 1 for 'quant', 'unit', 'season' or 'area', recycling over refpts might be wrong.")
+
+    # CHECK indicators are unique
+    if(length(names(indicators)) != length(unique(names(indicators))))
+      stop("'indicators' must have unique names.")
     
     # LOOP over years
     res <- data.table::rbindlist(lapply(years, function(i) {
@@ -96,7 +112,7 @@ setMethod("performance", signature(x="FLQuants"),
         # EVAL indicator
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(FLCore::window(x, start=i[1], end=i[length(i)]),
-            # REPEAT refpts by year beacuse recycling goes year first
+            # REPEAT refpts by year because recycling goes year first
             lapply(as(refpts, 'list'), rep, each=length(i)))), drop=FALSE)
       }), idcol="indicator", fill=TRUE)[,c("indicator", "data", "iter")]
     }), idcol="year")
@@ -114,8 +130,9 @@ setMethod("performance", signature(x="FLQuants"),
     
     # QUANTILES if probs
     if(!is.null(probs)) {
-      res <- res[, as.list(quantile(res, probs=probs, na.rm=TRUE)),
-        keyby=list(indicator, name, year)]
+      # indicator year name data prob
+      res <- res[, .(data=quantile(data, probs=probs, na.rm=TRUE), prob=probs),
+        by=.(indicator, year, name)]
     }
     
     # mp if not NULL
@@ -137,7 +154,6 @@ setMethod("performance", signature(x="FLStocks"),
         indicators, refpts, years, metrics=metrics, probs=probs, mp=mp,
         mc.cores=mc.cores), idcol='run')
     } else {
-
       res <- data.table::rbindlist(lapply(x, performance,
         indicators, refpts, years, metrics=metrics, probs=probs, mp=mp),
         idcol='run')
@@ -196,11 +212,12 @@ setMethod("performance", signature(x="list"),
 ) 
 
 setMethod("performance", signature(x="FLmse"),
-  function(x, indicators,
+  # DEBUG refpts(x): promise already under evaluation: recursive default ...
+  function(x, indicators, refpts=x@refpts,
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     metrics=FLCore::metrics(stock(x)), probs=NULL, mp=NULL) {
       
-      performance(stock(x), indicators, refpts=refpts(x), years=years,
+      performance(stock(x), indicators, refpts=refpts, years=years,
         metrics=metrics, probs=probs, mp=mp)
   }
 ) # }}}
