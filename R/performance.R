@@ -62,9 +62,10 @@ setMethod("performance", signature(x="FLStock"),
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     metrics=FLCore::metrics(x), probs=NULL, mp=NULL) {
       
+      # CREATE or PASS FLQuants
       if(is(metrics, "FLQuants"))
         flqs <- metrics
-      else if(is.list(metrics) & is.function(metrics))
+      else if(is.list(metrics) & is.function(metrics[[1]]))
         flqs <- do.call(FLCore::metrics, list(object=x, metrics))
       else if(is.function(metrics))
         flqs <- do.call(metrics, list(x))
@@ -217,7 +218,9 @@ setMethod("performance", signature(x="FLmse"),
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     metrics=FLCore::metrics(stock(x)), probs=NULL, mp=NULL) {
       
-      performance(stock(x), indicators, refpts=refpts, years=years,
-        metrics=metrics, probs=probs, mp=mp)
+    res <- performance(stock(x), indicators, refpts=refpts, years=years,
+      metrics=metrics, probs=probs, mp=mp)
+
+    return(res)
   }
 ) # }}}
