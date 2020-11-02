@@ -26,11 +26,23 @@ indicators <- list(
   red = list(~yearSums(FLQuant((SB / SBMSY) < 1 & (F / FMSY) > 1)) / dim(SB)[2],
     name = "P(Red)", desc = "Probability of being in Kobe red quadrant"),
   # PSBMSY
-  PSBMSY = list(~yearMeans((SB / SBMSY) >= 1),
-    name = "P(SB>=SB[MSY])",  desc = "Probability of SB greater or equal to SBMSY"),
+  PSBMSY = list(~yearMeans((SB / SBMSY) >= 1), name = "P(SB>=SB[MSY])",
+    desc = "Probability of SB greater or equal to SBMSY"),
   # PBlim
-  PBlim = list(~yearSums((SB / SBlim) > 1) / dim(SB)[2], name = "P(SB>B[limit])", 
+  PBlim = list(~yearMeans((SB / SBlim) > 1), name = "P(SB>SB[limit])", 
     desc = "Probability that spawner biomass is above Blim"),
+  # risk1
+  risk1 = list(~yearMeans(iterMeans((SB / Blim) < 1)),
+    name = "mean(P(SB<B[limit]))", 
+    desc = "ICES Risk 1, mean probability that spawner biomass is below Blim"),
+  # risk2
+  risk2 = list(~yearMeans(iterMeans(((SB / Blim) < 1) > 0)),
+    name = "once(P(SB<B[limit]))", 
+    desc = "ICES Risk 2, probability that spawner biomass is above Blim once"),
+  # risk3
+  risk3 = list(~apply(iterMeans((SB / Blim) < 1), c(1,3:6), max),
+    name = "max(P(SB>B[limit]))", 
+    desc = "ICES Risk 3, max probability that spawner biomass is above Blim"),
   # C
   C = list(~yearMeans(C), name = "mean(C)", desc = "Mean catch over years"),
   # VarC
