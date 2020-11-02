@@ -22,7 +22,6 @@ movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, args, hcrpa
 	list(hcrpars=hcrpars, tracking=tracking)	
 } # }}}
 
-
 # indicator.phcr
 indicator.phcr <- function(stk, itrg, args, tracking, ...){
 	if(is(itrg, 'FLPar')) hcrpars <- itrg else hcrpars <- FLPar(itrg=itrg) 
