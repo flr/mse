@@ -21,7 +21,7 @@
   x,
   indicators,
   refpts = FLPar(),
-  years = dims(x[[1]])$maxyear,
+  years = setNames(list(dimnames(x[[1]])$year), nm = dims(x[[1]])$maxyear),
   probs = c(0.1, 0.25, 0.5, 0.75, 0.9),
   mp = NULL
 )
@@ -56,24 +56,32 @@
 
 \item{years}{Years on which indicators should be computed, defaults to last year of input FLQuants}
 
-\item{run}{Object holding the results of forward projections, as a named \code{FLQuants}}
+\item{run}{Object holding the results of forward projections, as a named
+\code{FLQuants}}
 }
 \value{
-data.frame Results of computing performance indicators
+data.table Results of computing performance indicators.
 }
 \description{
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
-odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
-libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
-Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id
-nunc euismod ante fringilla lobortis. Aliquam ullamcorper in diam non placerat.
+TODO
 }
 \details{
-Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa,
-vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in
-mi. Sed sodales mollis arcu, sit amet venenatis lorem fringilla vel. Vivamus vitae
-ipsum sem. Donec malesuada purus at libero bibendum accumsan. Donec ipsum sapien,
-feugiat blandit arcu in, dapibus dictum felis.
+Each indicator is an object of class list object, with three elements, the
+first two of them compulsory:
+\itemize{
+\item An unnamed element of class \emph{formula}, e.g. \code{yearMeans(SB/SB0)}.
+\item name: A short name to be output on tables and plots, of class character,
+e.g. "SB/SB\link{0}".
+\item desc: A longer description of the indicator, of class character, e.g. "Mean
+spawner biomass relative to unfished"
+}
+
+Each indicator \code{formula} is evaluated against the \emph{metrics} and \emph{refpts} used
+in the function call. Formulas can thus use (i) the names of the \code{FLQuants}
+object or of the object returned by the call to \code{metrics()}, (ii) of the
+\emph{params} in the \emph{refpts} object and, for all classes but \code{FLQuants}, (iii)
+functions that can be called on \emph{object}. See examples below for the
+necessary matching between \emph{metrics}, \emph{refpts} and the indicators formulas.
 }
 \examples{
 
@@ -90,6 +98,10 @@ performance(run, indicators, refpts=FLPar(MSY=110000),
 performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
   years=list(2000:2015))
+# return quantiles
+performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
+  refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
+  years=list(2000:2015), probs=c(0.05, 0.25, 0.50, 0.75, 0.95))
 }
 \seealso{
 \code{\link{FLQuants}}
