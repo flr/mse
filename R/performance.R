@@ -12,24 +12,31 @@ globalVariables("indicator")
 
 #' Compute performance indicators
 #'
-#' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
-#' odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
-#' libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
-#' Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id 
-#' nunc euismod ante fringilla lobortis. Aliquam ullamcorper in diam non placerat. 
+#' TODO
 #'
-#' Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa, 
-#' vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in 
-#' mi. Sed sodales mollis arcu, sit amet venenatis lorem fringilla vel. Vivamus vitae 
-#' ipsum sem. Donec malesuada purus at libero bibendum accumsan. Donec ipsum sapien, 
-#' feugiat blandit arcu in, dapibus dictum felis. 
+#' Each indicator is an object of class list object, with three elements, the
+#' first two of them compulsory:
 #'
-#' @param run Object holding the results of forward projections, as a named \code{FLQuants}
+#' - An unnamed element of class *formula*, e.g. `yearMeans(SB/SB0)`.
+#' - name: A short name to be output on tables and plots, of class character,
+#' e.g. "SB/SB[0]".
+#' - desc: A longer description of the indicator, of class character, e.g. "Mean
+#' spawner biomass relative to unfished"
+#'
+#' Each indicator `formula` is evaluated against the *metrics* and *refpts* used
+#' in the function call. Formulas can thus use (i) the names of the `FLQuants`
+#' object or of the object returned by the call to `metrics()`, (ii) of the
+#' *params* in the *refpts* object and, for all classes but `FLQuants`, (iii)
+#' functions that can be called on *object*. See examples below for the
+#' necessary matching between *metrics*, *refpts* and the indicators formulas.
+#'
+#' @param run Object holding the results of forward projections, as a named
+#' \code{FLQuants}
 #' @param refpts Reference points for calculations, \code{list}
 #' @param indicators Indicators to be computed, as formula, name and description, \code{list}
 #' @param years Years on which indicators should be computed, defaults to last year of input FLQuants
 #'
-#' @return data.frame Results of computing performance indicators 
+#' @return data.table Results of computing performance indicators.
 #'
 #' @name performance
 #' @rdname performance
@@ -39,13 +46,22 @@ globalVariables("indicator")
 #' @keywords utilities
 #' @examples
 #'
+#' # LOAD example FLmse object
 #' data(p4om)
-#' indicators <- list(
-#'   T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]), name="mean(C[t] / C[t-1])",
-#'     desc="Mean absolute proportional change in catch"),
-#'   T2=list(~yearVars(C), name="var(C)", desc="Variance in catch"),
-#'   T3=list(~yearVars(F), name="var(F)", desc="Variance in fishing mortality"))
+#' # GENERATE run from last 16 years of OM
 #' run <- window(stock(om), start=2000, end=2015)
+#' # DEFINE indicators
+#' indicators <- list(
+#'   dCatch=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
+#'     name="mean(C[t] / C[t-1])",
+#'     desc="Mean absolute proportional change in catch"),
+#'   varCatch=list(~yearVars(C),
+#'     name="var(C)",
+#'     desc="Variance in catch"),
+#'   varF=list(~yearVars(F),
+#'     name="var(F)",
+#'     desc="Variance in fishing mortality"))
+#' # COMPUTE performance
 #' performance(run, indicators, refpts=FLPar(MSY=110000),
 #'   metrics=list(C=catch, F=fbar), years=list(2000:2015))
 #' # Minimum indicator, named list with formula and name
@@ -53,9 +69,9 @@ globalVariables("indicator")
 #'   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
 #'   years=list(2000:2015))
 #' # return quantiles
-#' performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
-#'   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
-#'   years=list(2000:2015), probs=c(0.05, 0.25, 0.50, 0.75, 0.95))
+#' performance(run, indicators, refpts=FLPar(MSY=110000),
+#'   metrics=list(C=catch, F=fbar), years=list(2000:2015),
+#'   probs=c(0.05, 0.25, 0.50, 0.75, 0.95))
 
 setMethod("performance", signature(x="FLStock"),
   function(x, indicators, refpts=FLPar(),
@@ -211,6 +227,8 @@ setMethod("performance", signature(x="list"),
     return(res)
   }
 ) 
+
+#' @rdname performance
 
 setMethod("performance", signature(x="FLmse"),
   # DEBUG refpts(x): promise already under evaluation: recursive default ...
