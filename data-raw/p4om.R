@@ -18,7 +18,7 @@ idx <- FLIndices(BTS=ple4.index)
 
 # Variables
 
-it <- 200 # iterations
+it <- 25 # iterations
 iy <- 2017 # initial year of projection (also intermediate)
 fy <- 2030 # final year
 y0 <- range(stk)["minyear"] # initial data year
@@ -79,7 +79,7 @@ idx[["BTS"]] <- window(idx[["BTS"]], end=fy)
 fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
 
 # OM object
-om <- FLom(stock=stk, sr=srbh, refpts=foo(refpts(brp), mets),
+om <- FLom(stock=slim(stk), sr=srbh, refpts=foo(refpts(brp), mets),
   projection=mseCtrl(method=fwd.om))
 
 # OEM
