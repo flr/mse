@@ -8,9 +8,9 @@
 An object of class list.
 }
 \description{
-A fairly cset of performance indicators is provided, coded in the format
-that \code{performance()}requires. The indicators included in this list are
-as follows:
+A set of performance indicators is provided, coded in the format that
+\code{performance()}requires. The indicators included in this list are as
+follows:
 }
 \details{
 \itemize{
@@ -31,7 +31,7 @@ as follows:
 }
 
 Each indicator is itself a list object, with three elements, the first two
-compulsory:
+of them compulsory:
 \itemize{
 \item An unnamed element of class \emph{formula}, e.g. \code{yearMeans(SB/SB0)}.
 \item name: A short name to be output on tables and plots, of class character,

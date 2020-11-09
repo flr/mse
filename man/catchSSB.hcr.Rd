@@ -22,9 +22,10 @@ A HCR to set catch based on SSB
 }
 \examples{
 data(ple4)
-ssb(ple4)[,'1995'] / ssb(ple4)[,1]
+# APPLY hcr
 catchSSB.hcr(ple4[,ac(1957:1996)], dtarget=0.40, dlimit=0.10, lambda=1,
   MSY=95000, ay=1995, tracking=FLQuant())
+# APPLY hcr over a range of dtarget
 lapply(seq(0.30, 0.90, by=0.1), function(x) {
    catchSSB.hcr(ple4[,ac(1957:1996)], dtarget=x, dlimit=0.10, lambda=1,
   MSY=95000, ay=1995, tracking=FLQuant())$ctrl})

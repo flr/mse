@@ -5,6 +5,7 @@
 \alias{performance,FLQuants-method}
 \alias{performance,FLStocks-method}
 \alias{performance,list-method}
+\alias{performance,FLmse-method}
 \title{Compute performance indicators}
 \usage{
 \S4method{performance}{FLStock}(
@@ -48,6 +49,16 @@
   mp = NULL,
   mc.cores = 1
 )
+
+\S4method{performance}{FLmse}(
+  x,
+  indicators,
+  refpts = x@refpts,
+  years = as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
+  metrics = FLCore::metrics(stock(x)),
+  probs = NULL,
+  mp = NULL
+)
 }
 \arguments{
 \item{indicators}{Indicators to be computed, as formula, name and description, \code{list}}
@@ -85,13 +96,22 @@ necessary matching between \emph{metrics}, \emph{refpts} and the indicators form
 }
 \examples{
 
+# LOAD example FLmse object
 data(p4om)
-indicators <- list(
-  T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]), name="mean(C[t] / C[t-1])",
-    desc="Mean absolute proportional change in catch"),
-  T2=list(~yearVars(C), name="var(C)", desc="Variance in catch"),
-  T3=list(~yearVars(F), name="var(F)", desc="Variance in fishing mortality"))
+# GENERATE run from last 16 years of OM
 run <- window(stock(om), start=2000, end=2015)
+# DEFINE indicators
+indicators <- list(
+  dCatch=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
+    name="mean(C[t] / C[t-1])",
+    desc="Mean absolute proportional change in catch"),
+  varCatch=list(~yearVars(C),
+    name="var(C)",
+    desc="Variance in catch"),
+  varF=list(~yearVars(F),
+    name="var(F)",
+    desc="Variance in fishing mortality"))
+# COMPUTE performance
 performance(run, indicators, refpts=FLPar(MSY=110000),
   metrics=list(C=catch, F=fbar), years=list(2000:2015))
 # Minimum indicator, named list with formula and name
@@ -99,9 +119,9 @@ performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
   years=list(2000:2015))
 # return quantiles
-performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
-  refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
-  years=list(2000:2015), probs=c(0.05, 0.25, 0.50, 0.75, 0.95))
+performance(run, indicators, refpts=FLPar(MSY=110000),
+  metrics=list(C=catch, F=fbar), years=list(2000:2015),
+  probs=c(0.05, 0.25, 0.50, 0.75, 0.95))
 }
 \seealso{
 \code{\link{FLQuants}}
