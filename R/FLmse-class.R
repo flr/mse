@@ -28,8 +28,9 @@
 #' @examples
 #'
 
-FLmse <- setClass("FLmse", contains="FLom", 
+FLmse <- setClass("FLmse",
 	slots=c(
+    om="FLo",
 		tracking="FLQuant",
     control="mpCtrl",
     oem="FLoem",

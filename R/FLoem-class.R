@@ -1,5 +1,15 @@
-#save(run0, run1, run2, file="demo/runs.RData", compress="xz")' @title S4 class \code{FLoem}
-#'
+# FLoem-class.R - DESC
+# mse/R/FLoem-class.R
+
+# Copyright European Union, 2018
+# Author: Ernesto JARDIM (MSC) <ernesto.jardim@msc.org>
+#         Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
+#
+# Distributed under the terms of the EUPL-1.2
+
+
+# FLoem {{{
+
 #' @description The \code{FLoem} class stores the information relative to the observation error model of the MSE.
 #'
 #' @section Slots:
@@ -65,14 +75,16 @@ setValidity("FLoem",
 
 })
 
-#
-#  accessor methods
-#
+# }}}
+
+#  accessor methods {{{
 
 #' @rdname FLoem-class
 #' @aliases observations observations-methods
 setGeneric("observations", function(object, ...) standardGeneric("observations"))
+
 #' @rdname FLoem-class
+
 setMethod("observations", "FLoem",
   function(object, ...) {
     
@@ -92,30 +104,53 @@ setMethod("observations", "FLoem",
 #' @rdname FLoem-class
 #' @param value the new object
 #' @aliases observations<- observations<--methods
-setGeneric("observations<-", function(object, value) standardGeneric("observations<-"))
+
+setGeneric("observations<-", function(object, i, value) standardGeneric("observations<-"))
+
 #' @rdname FLoem-class
-setReplaceMethod("observations", signature("FLoem", "list"), function(object, value){
+
+setReplaceMethod("observations", signature(object="FLoem", i="missing", value="list"),
+  function(object, value){
 	object@observations <- value
 	object
 })
 
 #' @rdname FLoem-class
-#' @aliases deviances deviances-methods
-setGeneric("deviances", function(object, ...) standardGeneric("deviances"))
+
+setReplaceMethod("observations", signature(object="FLoem", i="ANY", value="ANY"),
+  function(object, i, value){
+	object@observations[[i]] <- value
+	object
+})
+
 #' @rdname FLoem-class
+#' @aliases deviances deviances-methods
+
+setGeneric("deviances", function(object, ...) standardGeneric("deviances"))
+
+#' @rdname FLoem-class
+
 setMethod("deviances", "FLoem", function(object) object@deviances)
 
 #' @rdname FLoem-class
 #' @param value the new object
 #' @aliases deviances<- deviances<--methods
+
 setGeneric("deviances<-", function(object, value) standardGeneric("deviances<-"))
+
 #' @rdname FLoem-class
+
 setReplaceMethod("deviances", signature("FLoem", "list"), function(object, value){
 	object@deviances <- value
 	object
 })
 
+# }}}
+
+# show {{{
+
 #' @rdname FLoem-class
+
 setMethod("show", signature(object = "FLoem"),
   function(object)
   {
@@ -128,8 +163,12 @@ setMethod("show", signature(object = "FLoem"),
 		cat(summary(object@deviances[[i]]), "\n")
 	}
  })
+# }}}
+
+# iter {{{
 
 #' @rdname FLoem-class
+
 setMethod("iter", signature(obj = "FLoem"),
   function(obj, iter){
     # TODO Delve deeper into list
@@ -138,7 +177,12 @@ setMethod("iter", signature(obj = "FLoem"),
 	  obj
 })
 
+# }}}
+
+# combine {{{
+
 #' @rdname FLoem-class
+
 setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
 	
   args <- c(list(x, y), list(...))
@@ -158,10 +202,4 @@ setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
 		return(obj)
 	}
 })
-
-#
-# Other methods
-#
-
-
-
+# }}}

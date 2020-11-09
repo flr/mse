@@ -11,6 +11,8 @@
 
 flsval <- list(object="stk", test="!is(object, \"FLS\")", msg="\"stk must be of class FLStock\"")
 
+flssval <- list(object="stk", test="!is(object, \"FLStocks\")", msg="\"stk must be of class FLStocks\"")
+
 flival <- list(object="idx", test= "!is(object, \"FLIndices\")", msg="\"idx must be of class FLIndices\"")
 
 flpval <- list(object="hcrpars", test= "!is(object, \"FLPar\")", msg="\"hcrpars must be of class FLPar\"")
@@ -19,25 +21,34 @@ flfval <- list(object="ctrl", test= "!is(object, \"fwdControl\")", msg="\"ctrl m
 
 flqval <- list(object="flq", test= "!is(object, \"FLQuant\")", msg="\"flq must be of class FLQuant\"")
 
+floval <- list(object="om", test="!is(object, \"FLo\")", msg="\"om must be of class FLo\"")
+
+
 # mpDispatch {{{
+
 mpDispatch <- function(ioval, ...){
+
 	args <- list(...)
 	method <- args$method
 	args$method <- NULL
-	# checks in
+	
+  # checks in
 	for(i in ioval$iv){
 		object <- args[i$object]
 		str <- paste("if(", i$test, ")", i$msg, sep=" ")
 		eval(parse(text=str))
 	}
-	# dispatch
+	
+  # dispatch
 	out <- do.call(method, args)
-	# checks out
+	
+  # checks out
 	for(i in ioval$ov){
 		object <- out[i$object]
 		str <- paste("if(", i$test, ")", i$msg, sep=" ")
 		eval(parse(text=str))
 	}
-	out
+	
+  out
 } # }}}
 
