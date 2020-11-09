@@ -4,7 +4,8 @@ Version: 2.1.0.9101
 Date: 2020-10-19
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut"),
   email = "iago.mosqueira@wur.nl"), 
-  person("Ernesto", "Jardim", email = "ernesto.jardim@ec.europa.eu", role = c("aut", "cre")))
+  person("Ernesto", "Jardim", email = "ernesto.jardim@ec.europa.eu",
+  role = c("aut", "cre")))
 Description: A set of functions and methods to simplify the development and
   running of Management Strategy Evaluation (MSE) analyses using the FLR 
   packages and classes, and the a4a methods and algorithms. 
@@ -30,7 +31,9 @@ Collate:
   'mseCtrl-class.R'
   'mpCtrl-class.R'
   'FLoem-class.R'
+  'FLo-class.R'
   'FLom-class.R'
+  'FLomBF-class.R'
   'FLiem-class.R'
   'FLmse-class.R'
   'dispatch.R'
@@ -50,10 +53,12 @@ Collate:
   'run.R'
   'tune.R'
   'fwd.R'
+  'data.R'
+  'db.R'
 VignetteBuilder: knitr
-Roxygen: list(markdown = TRUE)
 License: EUPL
 LazyLoad: Yes
 LazyData: No
 BugReports: https://github.com/iagomosqueira/mse/issues
-RoxygenNote: 7.1.0
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1

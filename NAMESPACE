@@ -7,10 +7,13 @@ import("FLasher")
 
 importFrom("FLBRP",
   "refpts",
+  "refpts<-",
   "brp",
   "FLBRP")
+
 importFrom("utils",
   "setTxtProgressBar")
+
 importFrom("stats",
   "coef",
   "coefficients",
@@ -48,6 +51,7 @@ export(
   "perfect.sa",
   "sampling.oem",
   "tac.is",
+  "track",
   "tunebisect")
 
 exportClasses(
@@ -55,15 +59,18 @@ exportClasses(
   "FLmse",
   "FLoem",
   "FLom",
+  "FLomBF",
   "mpCtrl",
   "mseCtrl")
 
 exportMethods(
   "args",
   "args<-",
+  "catch",
   "control",
   "deviances",
   "deviances<-",
+  "discards",
   "est",
   "est<-",
   "exists",
@@ -78,6 +85,7 @@ exportMethods(
   "isys",
   "isys<-",
   "iter",
+  "landings",
   "mcN",
   "method",
   "method<-",
@@ -91,9 +99,12 @@ exportMethods(
   "phcr<-",
   "projection",
   "projection<-",
+  "rec",
   "sr<-",
+  "ssb",
   "tm",
   "tm<-",
+  "tsb",
   "tracking",
   "tracking<-")
   

@@ -1,20 +1,26 @@
+---
+title:
+author: 
+tags:
+---
 
-- CHANGED FLmp to FLmse
-- ADDED mp.R: mp()
-- ADDED dispatch.R: flsval(), flival(), flpval(), flfval(), flqval()
-- RENAMED a4ampDispatch() to mpDispatch()
-- ADDED oem.R: sampling.eom(), RENAMED perfect.oem()
-- ADDED sa.R: perfect.sa()
-- ADDED hcr.R: ices.hcr(), RENAMED fixedF.hcr(), RENAMED movingF.hcr()
-- ADDED iem.R: noise.iem()
-- ADDED is.R: tac.is(), effort.is()
-- ADDED tm.R: map.tm()
-- ADDED phcr.R: RENAMED movingF.hcr()
+- FLomBF class composed of
+  - biols (*FLBiols*)
+  - fisheries (*FLFisheries*)
+  - refpts (*FLPars*)
 
-- @FLXSA, ADDED xsa.sa
+- Parent class *FLo* from which both *FLom* and *FLOmBF* derive.
 
-# TODO
+- goFish turned into a method for *FLom* or *FLomBF*.
 
-- FIX noise.iem for FLasher: functions that change fwdControl defined in FLash/FLasher?
-- MOVE FLRP to FLBRP
-- @FLAssess, ADD vpa.sa
+- oem methods now take as input the full om, rathee than stk (*FLStock*).
+
+- TODO tracking is now by biols, stored in 'units'. No tracking by fishery.
+
+# PROPOSALS
+
+- CHANGE est to output FLStock  or FLQuants (metrics)
+  - sa and ind will work the same
+  - phcr to convert FLKStock to FLQuants
+  - hcr only needs metrics, not full FLStock (?)
+- 
