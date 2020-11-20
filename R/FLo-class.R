@@ -79,8 +79,11 @@ setMethod("summary", signature(object="FLo"),
 
     # refpts
     cat("-- refpts\n")
-    print(refpts(object), reduced=TRUE)
-
+    
+    for(i in names(refpts(object))) {
+      cat(i, ":\n", sep="")
+      print(refpts(object)[[i]], reduced=TRUE)
+    }
     cat("\n")
 
     # fleetBehaviour
@@ -103,3 +106,10 @@ setMethod("summary", signature(object="FLo"),
 
 # }}}
 
+# metrics {{{
+setMethod("metrics", signature(object="FLo", metrics="list"),
+  function(object, metrics) {
+    return(lapply(metrics, function(x)
+      do.call(x, list(object))))
+  }
+) # }}}

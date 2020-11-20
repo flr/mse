@@ -7,12 +7,8 @@
 # Distributed under the terms of the EUPL-1.2
 
 
-# library(mse)
-load_all()
-
-# library(FLjjm)
-load_all("~/Projects/CJM_MSE/hcr/FLjjm")
-
+library(mse)
+library(FLjjm)
 
 # --- CJM 2 stocks
 
@@ -26,7 +22,7 @@ oem <- readFLoemjjm(name="mod1.00_2stk", path="cjm_2stk")
 
 # EXPAND to future
 
-omf <- fwdWindow(om, end=2035)
+om <- fwdWindow(om, end=2035)
 
 # SETUP future stocks
 
@@ -48,11 +44,4 @@ observations(oem)$ctl$n_proj_yrs <- 0
 
 # SAVE
 
-save(om, omf, oem, file="../data/cjm_2stk.RData", compress="xz")
-
-
-# --- CJM 1 stock
-
-
-
-
+save(om, oem, file="../data/cjm.RData", compress="xz")

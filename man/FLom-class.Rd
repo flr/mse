@@ -11,9 +11,10 @@
 \alias{sr<-}
 \alias{sr<-,FLom,FLSR-method}
 \alias{show,FLom-method}
+\alias{om<-,FLmse,FLo-method}
 \alias{tracking<-,FLmse,FLQuant-method}
 \alias{control<-,FLmse,mpCtrl-method}
-\alias{oem<-,FLmse,FLQuant-method}
+\alias{oem<-,FLmse,FLoem-method}
 \title{A class for an operating model (OM)}
 \usage{
 FLom(...)
@@ -32,11 +33,13 @@ sr(object) <- value
 
 \S4method{show}{FLom}(object)
 
+\S4method{om}{FLmse,FLo}(object) <- value
+
 \S4method{tracking}{FLmse,FLQuant}(object) <- value
 
 \S4method{control}{FLmse,mpCtrl}(object) <- value
 
-\S4method{oem}{FLmse,FLQuant}(object) <- value
+\S4method{oem}{FLmse,FLoem}(object) <- value
 }
 \arguments{
 \item{...}{additional argument list that might never be used}

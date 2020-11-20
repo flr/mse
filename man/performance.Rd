@@ -2,12 +2,21 @@
 % Please edit documentation in R/performance.R
 \name{performance}
 \alias{performance}
-\alias{performance,FLQuants-method}
+\alias{performance,FLStock-method}
 \alias{performance,FLStocks-method}
 \alias{performance,list-method}
-\alias{performance,FLmse-method}
+\alias{performance,FLom-method}
 \title{Compute performance indicators}
 \usage{
+\S4method{performance}{FLQuants}(
+  x,
+  indicators,
+  refpts = FLPar(),
+  years = setNames(list(dimnames(x[[1]])$year), nm = dims(x[[1]])$maxyear),
+  probs = c(0.1, 0.25, 0.5, 0.75, 0.9),
+  mp = NULL
+)
+
 \S4method{performance}{FLStock}(
   x,
   indicators,
@@ -15,15 +24,6 @@
   years = as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
   metrics = FLCore::metrics(x),
   probs = NULL,
-  mp = NULL
-)
-
-\S4method{performance}{FLQuants}(
-  x,
-  indicators,
-  refpts = FLPar(),
-  years = setNames(list(dimnames(x[[1]])$year), nm = dims(x[[1]])$maxyear),
-  probs = c(0.1, 0.25, 0.5, 0.75, 0.9),
   mp = NULL
 )
 
@@ -50,12 +50,12 @@
   mc.cores = 1
 )
 
-\S4method{performance}{FLmse}(
+\S4method{performance}{FLom}(
   x,
   indicators,
   refpts = x@refpts,
   years = as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
-  metrics = FLCore::metrics(stock(x)),
+  metrics = NULL,
   probs = NULL,
   mp = NULL
 )

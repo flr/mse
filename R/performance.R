@@ -73,26 +73,6 @@ globalVariables("indicator")
 #'   metrics=list(C=catch, F=fbar), years=list(2000:2015),
 #'   probs=c(0.05, 0.25, 0.50, 0.75, 0.95))
 
-setMethod("performance", signature(x="FLStock"),
-  function(x, indicators, refpts=FLPar(),
-    years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
-    metrics=FLCore::metrics(x), probs=NULL, mp=NULL) {
-      
-      # CREATE or PASS FLQuants
-      if(is(metrics, "FLQuants"))
-        flqs <- metrics
-      else if(is.list(metrics) & is.function(metrics[[1]]))
-        flqs <- do.call(FLCore::metrics, list(object=x, metrics))
-      else if(is.function(metrics))
-        flqs <- do.call(metrics, list(x))
-
-      return(performance(flqs, refpts=refpts,
-      indicators=indicators, years=years, probs=probs, mp=mp))
-  }
-)
-
-#' @rdname performance
-
 setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts=FLPar(),
     years=setNames(list(dimnames(x[[1]])$year), nm=dims(x[[1]])$maxyear),
@@ -157,6 +137,26 @@ setMethod("performance", signature(x="FLQuants"),
       res[, mp:=mp]
 	  
     return(res)
+  }
+)
+
+#' @rdname performance
+
+setMethod("performance", signature(x="FLStock"),
+  function(x, indicators, refpts=FLPar(),
+    years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
+    metrics=FLCore::metrics(x), probs=NULL, mp=NULL) {
+      
+      # CREATE or PASS FLQuants
+      if(is(metrics, "FLQuants"))
+        flqs <- metrics
+      else if(is.list(metrics) & is.function(metrics[[1]]))
+        flqs <- do.call(FLCore::metrics, list(object=x, metrics))
+      else if(is.function(metrics))
+        flqs <- do.call(metrics, list(x))
+
+      return(performance(flqs, refpts=refpts,
+      indicators=indicators, years=years, probs=probs, mp=mp))
   }
 )
 
@@ -230,15 +230,46 @@ setMethod("performance", signature(x="list"),
 
 #' @rdname performance
 
-setMethod("performance", signature(x="FLmse"),
-  # DEBUG refpts(x): promise already under evaluation: recursive default ...
+setMethod("performance", signature(x="FLom"),
   function(x, indicators, refpts=x@refpts,
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
-    metrics=FLCore::metrics(stock(x)), probs=NULL, mp=NULL) {
-      
-    res <- performance(stock(x), indicators, refpts=refpts, years=years,
-      metrics=metrics, probs=probs, mp=mp)
+    metrics=NULL, probs=NULL, mp=NULL) {
 
-    return(res)
+    mets <- metrics(x, metrics)
+
+    mets <- lapply(setNames(nm=names(mets[[1]])),
+      function(i) FLQuants(lapply(X=mets, FUN="[[", i)))
+
+    res <- mapply(function(xx, rr)
+      performance(x=xx, indicators=indicators, refpts=rr, years=years),
+      xx=mets, rr=refpts(x), SIMPLIFY=FALSE)
+
+    return(rbindlist(res, idcol="biol"))
   }
-) # }}}
+)
+
+setMethod("performance", signature(x="FLomBF"),
+  function(x, indicators, refpts=x@refpts, metrics,
+    years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
+    probs=NULL, mp=NULL) {
+
+    mets <- metrics(window(x, end=years[length(years)]), metrics)
+
+    mets <- lapply(setNames(nm=names(mets[[1]])),
+      function(i) FLQuants(lapply(X=mets, FUN="[[", i)))
+
+    res <- mapply(function(xx, rr)
+      performance(x=xx, indicators=indicators, refpts=rr, years=years,
+        probs=probs, mp=mp), xx=mets, rr=refpts(x), SIMPLIFY=FALSE)
+
+    return(rbindlist(res, idcol="biol"))
+  }
+)
+
+setMethod("performance", signature(x="FLmse"),
+  function(x, ...) {
+    performance(x@om, ...)
+  }
+)
+
+# }}}

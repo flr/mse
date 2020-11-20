@@ -12,9 +12,6 @@
 #' @param metrics List of metrics to be computed on relevant slots
 #'
 #' @return A `data.table` object
-#' @examples
-#' data(p4om)
-#' db(om)
 
 setGeneric("db", function(object, ...) standardGeneric("db"))
 

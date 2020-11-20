@@ -7,6 +7,32 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
+# default.oem {{{
+default.oem <- function(object) {
+
+  # OBSERVATIONS
+
+  # indices
+  idx <- lapply(biols(object), function(x) FLIndex(index=n(x),
+    range=c(startf=0, endf=0)))
+
+  # stocks
+  # TODO stk <- as.FLStocks(biols, fisheries)
+
+  # DEVIANCES
+
+  # catch.n
+  cn <- lapply(catch.n(fisheries(object)), function(x) x * 0 + 1)
+
+  # index
+
+  obs <- list(idx=idx)
+  dev <- list(stk=FLQuants(catch.n=cn))
+	
+  return(FLoem(method=perfect.oem, observations=obs, deviances=dev))
+}
+# }}}
+
 # sampling.oem {{{
 
 sampling.oem <- function(stk, deviances, observations, args, tracking,
@@ -60,39 +86,3 @@ perfect.oem <- function(stk, deviances, observations, args, tracking){
 	range(idx0[[1]])[c("startf","endf")] <- c(0,0)
 	list(stk=stk0, idx=idx0, observations=observations, tracking=tracking)
 } # }}}
-
-# sample lengths
-
-#sampling_lengths.oem <- function(stk, deviances, observations, args, tracking, ...) {
-
-#	dataYears <- args$y0:args$dy
-#	mxy <- ac(max(dataYears))
-#	assessmentYear <- ac(args$ay)
-
-#	 carry on stock information in the observations for "short-cut" approach
-#	stock.n(observations$stk)[,assessmentYear] <- stock.n(stk)[,assessmentYear]	
-#	harvest(observations$stk)[,assessmentYear] <- harvest(stk)[,assessmentYear]	
-#	
-#	 catch.n
-#	 note it's adding 1 individual to avoid sca from crashing
-#	flq <- observations$stk@catch.ml
-#	flq[,mxy] <- quantSums(catch.n(stk)[,mxy]*deviances$stk$catch.n[,mxy]*deviances$stk$catch.la[,mxy])/quantSums(catch.n(stk)[,mxy]*deviances$stk$catch.n[,mxy])
-#	attr(observations$stk, "catch.ml")<- flq
-#	stk0 <- observations$stk[,ac(dataYears)]
-#	 return
-#	list(stk=stk0, idx=FLIndices(), observations=observations, tracking=tracking)
-#}  }}}
-
-
-
-
-
-
-
-
-
-
-
-
-
-

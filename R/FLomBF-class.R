@@ -14,7 +14,33 @@ FLomBF <- setClass("FLomBF",
     biols="FLBiols",
 		refpts="FLPars",
     fisheries="FLFisheries")
-) # }}}
+) 
+
+#' @rdname FLomBF-class
+#' @template bothargs
+#' @aliases FLomBF FLomBF-methods
+setGeneric("FLomBF")
+
+setMethod("initialize", "FLomBF",
+    function(.Object,
+             ...,
+             biols, fisheries, refpts, fleetBehaviour, projection) {
+      if (!missing(biols)) .Object@biols <- biols
+      if (!missing(fisheries)) .Object@fisheries <- fisheries
+      if (!missing(refpts)) .Object@refpts <- refpts
+      if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
+      if (!missing(projection)) .Object@projection <- projection
+      .Object <- callNextMethod(.Object, ...)
+      .Object
+})
+
+setValidity("FLomBF",
+  function(object) {
+    TRUE
+})
+
+
+# }}}
 
 # accessors: biols, fisheries, refpts, sr {{{
 
@@ -115,6 +141,43 @@ setMethod("sr", signature(object="FLomBF"),
     return(res)
   })
 # }}}
+
+# summary {{{
+
+setMethod("summary", signature(object="FLomBF"),
+  function(object) {
+
+    # biols
+    bis <- biols(om)
+    nmb <- names(bis)
+    pad <- max(nchar(paste0(nmb, ":")))
+
+    cat("-- biols\n")
+    cat(strrep(" ", pad), paste("min\tmax\tfrom\tto\n"))
+    for(i in names(bis)) {
+      cat(i, strrep(" ", pad - nchar(i) - 1) ,": ", sep="")
+		  cat(range(bis[[i]])[-3], "\n", sep="\t")
+    }
+
+    # fisheries
+    fis <- fisheries(om)
+    nmf <- names(fis)
+    pad <- max(nchar(paste0(nmf, ":")))
+
+    cat("\n-- fisheries\n")
+    cat(strrep(" ", pad), paste("from\tto\tcatches\n"))
+    for(i in names(fis)) {
+      cat(i, strrep(" ", pad - nchar(i) - 1) ,": ", sep="")
+      cat(unname(unlist(dims(fis[[i]])
+        [c("minyear", "maxyear")])), sep="\t")
+      cat("\t", paste0(names(fis[[i]]), collapse=", "), "\n", sep="")
+    }
+    cat("\n")
+
+    # other slots
+    callNextMethod()
+  }
+) # }}}
 
 # window {{{
 setMethod("window", signature(x="FLomBF"),
@@ -279,14 +342,10 @@ setMethod("harvest", signature(object="FLomBF", catch="missing"),
     can <- catch.n(fisheries(object))
 
     # SINGLE biol
-    #if(length(ns) == 1) {
-    #  return(harvest(ns[[1]], catch=Reduce("%++%" , can), m=ms[[1]]))
-    #} else {
       res <- mapply(function(x, y, z) harvest(x, catch=y, m=z), x=ns, y=can,
         z=ms, SIMPLIFY=FALSE)
 
-      return(res)
-    #}
+    return(res)
   }
 ) # }}}
 
@@ -322,33 +381,3 @@ setMethod("project", signature(object="FLomBF"),
     return(projection(object)@method(object, control))
   }
 ) # }}}
-
-# TODO CHECK project
-# WRITE tests
-
-
-# DO default oem ---
-
-do.oem <- function(object) {
-
-  # OBSERVATIONS
-
-  # indices
-  idx <- lapply(biols(object), function(x) FLIndex(index=n(x),
-    range=c(startf=0, endf=0)))
-
-  # stocks
-  # TODO stk <- as.FLStocks(biols, fisheries)
-
-  # DEVIANCES
-
-  # catch.n
-  cn <- lapply(catch.n(fisheries(object)), function(x) x * 0 + 1)
-
-  # index
-
-  obs <- list(idx=idx)
-  dev <- list(stk=FLQuants(catch.n=cn))
-	
-  return(FLoem(method=perfect.oem, observations=obs, deviances=dev))
-}
