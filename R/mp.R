@@ -25,7 +25,8 @@
 #' @examples
 #' # [TODO:example]
 
-mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="missing", verbose=TRUE){
+mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
+  tracking="missing", verbose=TRUE, parallel=TRUE){
 
   # EXTRACT args
 
@@ -72,7 +73,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="mi
     iter=1:args$it))
 
   # SET tracking by OM class DEBUG
-  if(is(om, "FLomBF")) {
+  if(is(om, "FLombf")) {
     tracking <- list(
       FLQuants(lapply(setNames(nm=names(biols(om))), function(x) tracking)),
       control=as.list(setNames(nm=names(ctrl)[names(ctrl) %in% steps])))
@@ -104,7 +105,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test", tracking="mi
 
 	# PREPARE for parallel if needed
 
-	if(getDoParWorkers() > 1){
+	if(isTRUE(parallel) & getDoParWorkers() > 1){
 
     # DEBUG
     stop("NOT DONE YET ---")
@@ -391,9 +392,9 @@ agoFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb,
 	list(stk.om=stk.om, tracking=tracking, oem=oem, args=args)
 } # }}}
 
-# goFish(FLomBF) {{{
+# goFish(FLombf) {{{
 
-setMethod("goFish", signature(om="FLomBF"),
+setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) {
 
 	it <- args$it
@@ -421,13 +422,13 @@ setMethod("goFish", signature(om="FLomBF"),
     
     # years for status quo computations 
 		sqy <- args$sqy <- ac(seq(ay - nsqy - data_lag + 1, dy))
-
-   	# TRACK om
-    track(tracking, "F.om", ay) <- window(fbar(om), start=ay, end=ay)
-    track(tracking, "B.om", ay) <- window(ssb(om), start=ay, end=ay)
-    track(tracking, "C.om", ay) <- window(catch(om), start=ay, end=ay)
-
-		# --- OEM: Observation Error Model
+    
+    # TRACK om
+    track(tracking, "F.om", ay) <- window(fbar(om), start=dy, end=dy)
+    track(tracking, "B.om", ay) <- window(ssb(om), start=dy, end=dy)
+    track(tracking, "C.om", ay) <- window(catch(om), start=dy, end=dy)
+    
+    # --- OEM: Observation Error Model
 		ctrl.oem <- args(oem)
 		ctrl.oem$method <- method(oem)
 		ctrl.oem$deviances <- deviances(oem)
@@ -443,12 +444,11 @@ setMethod("goFish", signature(om="FLomBF"),
 		idx0 <- o.out$idx
 		observations(oem) <- o.out$observations
 		tracking <- o.out$tracking
-    ac(ay-args$data_lag)
+
     track(tracking, "C.obs", ay) <- window(catch(om),
       start=ac(ay-args$data_lag), end=ac(ay-args$data_lag))
 
 		# --- EST: Estimator of stock statistics
-		
     if (!is.null(ctrl0$est)) {
 			ctrl.est <- args(ctrl0$est)
 			ctrl.est$method <- method(ctrl0$est)
@@ -461,12 +461,18 @@ setMethod("goFish", signature(om="FLomBF"),
 			out.assess <- do.call("mpDispatch", ctrl.est)
 			
       stk0 <- out.assess$stk
+     
+      # DEBUG GENERALIZE, update
+      args(ctrl0$est)$dat <- out.assess$dat
+      args(ctrl0$est)$ctl <- out.assess$ctl
+
 			tracking <- out.assess$tracking
 		}
     # TODO How to handle 1-stock OM and 2-stock SA
-    # track(tracking, "F.est", ay) <- window(fbar(stk0), start=ay, end=ay)
-    # track(tracking, "B.om", ay) <- window(ssb(stk0), start=ay, end=ay)
-    # track(tracking, "C.om", ay) <- window(catch(stk0), start=ay, end=ay)
+    track(tracking, "F.est", ay) <- window(fbar(stk0), start=dy, end=dy)
+    track(tracking, "B.est", ay) <- window(ssb(stk0), start=dy, end=dy)
+    # DEBUG stk0 areas
+    track(tracking, "C.om", ay) <- areaSums(window(catch(stk0), start=dy, end=dy))
 
 		# --- HCR parametrization
 		
@@ -508,7 +514,7 @@ setMethod("goFish", signature(om="FLomBF"),
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+args$management_lag, it)
     }
 
-    add(tracking, "hcr") <- ctrl
+    # DEBUG add(tracking, "hcr") <- ctrl
 
 		#----------------------------------------------------------
 		# Implementation system
@@ -616,10 +622,10 @@ setMethod("goFish", signature(om="FLomBF"),
     
     om <- do.call("mpDispatch", ctrl.om)$object
 
-    trackctl[[ac(ay)]] <- rbindlist(tracking$control, idcol="step")
+    # DEBUG trackctl[[ac(ay)]] <- rbindlist(tracking$control, idcol="step")
 	}
   
-  tracking <- rbindlist(trackctl)
+  # DEBUG tracking <- rbindlist(trackctl)
 
 	list(om=om, tracking=tracking, oem=oem, args=args)
 
