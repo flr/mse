@@ -11,12 +11,25 @@
 
 setClass("FLo",
   slots=c(
-		fleetBehaviour="mseCtrl",
-		projection="mseCtrl"))
+    name="character",
+    fleetBehaviour="mseCtrl",
+    projection="mseCtrl"))
 
 # }}}
 
 # accessors methods {{{
+
+#' @rdname FLo-class
+
+setMethod("name", "FLo", function(object) object@name)
+
+#' @rdname FLo-class
+#' @param value Object to assign in slot
+
+setReplaceMethod("name", signature("FLo", "character"), function(object, value){
+	object@name <- value
+	object
+})
 
 #' @rdname FLo-class
 
@@ -103,7 +116,6 @@ setMethod("summary", signature(object="FLo"),
     cat("", unlist(args(projection)), "\n", sep="\t")
   }
 )
-
 # }}}
 
 # metrics {{{
