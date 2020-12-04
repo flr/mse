@@ -1,7 +1,7 @@
 import("methods")
 import("data.table")
-import("FLCore")
 import("ggplotFL")
+import("FLCore")
 import("foreach")
 import("FLasher")
 
@@ -60,13 +60,18 @@ exportClasses(
   "FLmse",
   "FLoem",
   "FLom",
-  "FLomBF",
+  "FLombf",
   "mpCtrl",
   "mseCtrl")
 
 exportMethods(
+  "[",
   "args",
   "args<-",
+  "biol",
+  "biol<-",
+  "biols",
+  "biols<-",
   "catch",
   "control",
   "db",
@@ -76,12 +81,17 @@ exportMethods(
   "est",
   "est<-",
   "exists",
+  "FCB",
+  "FCB<-",
+  "fec",
+  "fisheries",
+  "fisheries<-",
   "fleetBehaviour",
   "fleetBehaviour<-",
   "FLmse",
   "FLoem",
   "FLom",
-  "FLomBF",
+  "FLombf",
   "fwd",
   "hcr",
   "hcr<-",
@@ -89,10 +99,13 @@ exportMethods(
   "isys<-",
   "iter",
   "landings",
+  "m",
+  "mat",
   "mcN",
   "method",
   "method<-",
   "metrics",
+  "n",
   "observations",
   "observations<-",
   "oem",
@@ -109,5 +122,5 @@ exportMethods(
   "tm<-",
   "tsb",
   "tracking",
-  "tracking<-")
-  
+  "tracking<-",
+  "wt")

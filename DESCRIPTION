@@ -1,7 +1,7 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.1.0.9101
-Date: 2020-10-19
+Version: 2.1.0.9110
+Date: 2020-12-04
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut"),
   email = "iago.mosqueira@wur.nl"), 
   person("Ernesto", "Jardim", email = "ernesto.jardim@ec.europa.eu",
@@ -33,7 +33,7 @@ Collate:
   'FLoem-class.R'
   'FLo-class.R'
   'FLom-class.R'
-  'FLomBF-class.R'
+  'FLombf-class.R'
   'FLiem-class.R'
   'FLmse-class.R'
   'dispatch.R'

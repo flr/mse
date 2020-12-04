@@ -14,7 +14,7 @@ library(FLjjm)
 
 # READ FLomBF, 2 stocks
 
-om <- readFLomjjm("mod1.00_2stk", path="cjm_2stk")
+om <- readFLomjjm(name="mod1.00_2stk", path="cjm_2stk")
 
 # READ FLoem
 
@@ -44,4 +44,5 @@ observations(oem)$ctl$n_proj_yrs <- 0
 
 # SAVE
 
+detach("package:FLjjm")
 save(om, oem, file="../data/cjm.RData", compress="xz")
