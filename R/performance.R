@@ -248,7 +248,7 @@ setMethod("performance", signature(x="FLom"),
   }
 )
 
-setMethod("performance", signature(x="FLomBF"),
+setMethod("performance", signature(x="FLombf"),
   function(x, indicators, refpts=x@refpts, metrics,
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     probs=NULL, mp=NULL) {
