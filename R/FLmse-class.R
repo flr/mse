@@ -28,10 +28,9 @@
 #' @examples
 #'
 
-FLmse <- setClass("FLmse",
+FLmse <- setClass("FLmse", contains="FLom", 
 	slots=c(
-    om="FLo",
-		tracking="list",
+		tracking="FLQuant",
     control="mpCtrl",
     oem="FLoem",
     # TODO args vs. mpargs
@@ -61,26 +60,6 @@ setMethod("initialize", "FLmse",
 }) # }}}
 
 # accessor methods {{{
-
-# om
-
-#' @rdname FLmse-class
-#' @aliases om om-methods
-setGeneric("om", function(object, ...) standardGeneric("om"))
-
-#' @rdname FLmse-class
-setMethod("om", "FLmse", function(object) object@om)
-
-#' @rdname FLmse-class
-#' @param value the new object
-#' @aliases om<- om<--methods
-setGeneric("om<-", function(object, value) standardGeneric("om<-"))
-
-#' @rdname FLom-class
-setReplaceMethod("om", signature("FLmse", "FLo"), function(object, value){
-	object@oem <- value
-	object
-})
 
 # tracking
 
@@ -135,6 +114,7 @@ setReplaceMethod("control", signature("FLmse", "mseCtrl"),
 	  object
 })
 
+
 # oem
 
 #' @rdname FLmse-class
@@ -150,7 +130,7 @@ setMethod("oem", "FLmse", function(object) object@oem)
 setGeneric("oem<-", function(object, value) standardGeneric("oem<-"))
 
 #' @rdname FLom-class
-setReplaceMethod("oem", signature("FLmse", "FLoem"), function(object, value){
+setReplaceMethod("oem", signature("FLmse", "FLQuant"), function(object, value){
 	object@oem <- value
 	object
 })
@@ -219,13 +199,13 @@ setMethod("summary", signature(object="FLmse"),
 
     # tracking
     cat("-- tracking\n")
-    # TODO tracking <- yearMeans(tracking(object))
+    tracking <- yearMeans(tracking(object))
  
     # CONVERT dimnames$year to range 
-    # ydns <- dimnames(tracking(object))$year
-    # dimnames(tracking)$year <- paste(c(ydns[1], ydns[length(ydns)]), collapse="-")
+    ydns <- dimnames(tracking(object))$year
+    dimnames(tracking)$year <- paste(c(ydns[1], ydns[length(ydns)]), collapse="-")
 
-    # cat(show(tracking), "\n")
+    cat(show(tracking), "\n")
 
     # control
     cat("-- control\n")

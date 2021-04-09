@@ -6,14 +6,14 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-library(FLasher)
+library(FLash)
 library(FLBRP)
 library(mse)
 
 # LOAD OM (FLStock + FLSR)
 data(cod)
 
-cob <- brp(FLBRP(cod, sr=cos))
+cob <- FLBRP::brp(FLBRP::FLBRP(cod, sr=cos))
 refpts <- FLPar(SBMSY=c(refpts(cob)["msy","ssb"]), FMSY=c(refpts(cob)["msy", "harvest"]))
 
 # PREPARE OMP

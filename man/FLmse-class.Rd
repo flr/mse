@@ -5,11 +5,6 @@
 \alias{FLmse-class}
 \alias{FLmse}
 \alias{FLmse-methods}
-\alias{om}
-\alias{om-methods}
-\alias{om,FLmse-method}
-\alias{om<-}
-\alias{om<--methods}
 \alias{tracking}
 \alias{tracking-methods}
 \alias{tracking,FLmse-method}
@@ -32,12 +27,6 @@
 FLmse(...)
 
 FLmse(...)
-
-om(object, ...)
-
-\S4method{om}{FLmse}(object)
-
-om(object) <- value
 
 tracking(object, ...)
 

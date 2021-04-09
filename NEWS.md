@@ -1,17 +1,3 @@
-# mse 2.2
-
-## NEW FEATURES
-
-- The FLom class now derives from a parent virtual class FLo.
-- A FLombf class contains slots @biols, of class FLBiols, and @fisheries, of
-  class FLFisheries.
-- mp() now class a goFish method for each of the FLo-derived classes: FLom and
-  FLombf.
-- oem modules need to take an FLo-based object as input.
-- tracking is handled by methods dealing with stock being of either FLStock or
-  FLStocks class.
-- Added performance(FLombf) to be called by performance(FLmse).
-
 # mse 2.1
 
 ## NEW FEATURES

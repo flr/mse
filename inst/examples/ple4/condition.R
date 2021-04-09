@@ -24,13 +24,12 @@ idx <- ple4.indices["BTS-Combined (all)"]
 
 # VARIABLES
 
-it <- 500 # iterations
+it <- 300 # iterations
 
 fy <- 2030 # final year
 y0 <- range(stk)["minyear"] # initial OM year
 dy <- range(stk)["maxyear"] # final OM year
 iy <- dy # initial year of projection (also intermediate)
-vy <- ac(seq(y0, dy))
 nsqy <- 3 # number of years to compute status quo metrics
 
 mpargs <- list(fy=fy, y0=y0, iy=iy, nsqy=nsqy)
@@ -41,11 +40,11 @@ mcsave <- 500
 mcmc <- mcsave * it
 
 fit <- sca(stk, idx, fit="MCMC",
-  mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.499))
+  mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
 
 # UPDATE stock
 
-stk <- slim(stk + fit)
+stk <- stk + fit
 
 # skin to keep one iteration
 stk0 <- qapply(stk, iterMedians)
