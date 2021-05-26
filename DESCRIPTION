@@ -1,32 +1,66 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.1.0.9100
-Date: 2020-06-05
+Version: 2.1.0.9112
+Date: 2020-12-11
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut"),
   email = "iago.mosqueira@wur.nl"), 
-  person("Ernesto", "Jardim", email = "ernesto.jardim@ec.europa.eu", role = c("aut", "cre")))
+  person("Ernesto", "Jardim", email = "ernesto.jardim@ec.europa.eu",
+  role = c("aut", "cre")))
 Description: A set of functions and methods to simplify the development and
   running of Management Strategy Evaluation (MSE) analyses using the FLR 
   packages and classes, and the a4a methods and algorithms. 
-Depends: R(>= 3.5), methods, FLCore(>= 2.6.11), ggplotFL, data.table,
-        FLasher, FLBRP
-Imports: foreach
+Depends:
+  R(>= 3.5),
+  methods,
+  FLCore(>= 2.6.11),
+  ggplotFL,
+  data.table,
+  FLasher,
+  FLBRP
+Imports:
+  foreach,
+  progressr
 Additional_repositories: http://flr-project.org/R
-Suggests: testthat, knitr, rmarkdown, FLa4a, doParallel
-Collate: 'generics.R' 'mseCtrl-class.R' 'mpCtrl-class.R'
-        'FLoem-class.R' 'FLom-class.R' 'FLiem-class.R' 'FLmse-class.R'
-        'dispatch.R' 'control.R' 'fb.R' 'hcr.R' 'iem.R' 'is.R' 'mp.R'
-        'oem.R' 'phcr.R' 'sa.R' 'tm.R' 'grid.R' 'mc.R' 'performance.R'
-        'run.R' 'tune.R' 'fwd.R'
+Suggests:
+  testthat,
+  knitr,
+  rmarkdown,
+  FLa4a,
+  doParallel
+Collate:
+  'generics.R'
+  'mseCtrl-class.R'
+  'mpCtrl-class.R'
+  'FLoem-class.R'
+  'FLo-class.R'
+  'FLom-class.R'
+  'FLombf-class.R'
+  'FLiem-class.R'
+  'FLmse-class.R'
+  'dispatch.R'
+  'control.R'
+  'fb.R'
+  'hcr.R'
+  'iem.R'
+  'is.R'
+  'mp.R'
+  'oem.R'
+  'phcr.R'
+  'sa.R'
+  'tm.R'
+  'grid.R'
+  'mc.R'
+  'performance.R'
+  'run.R'
+  'tune.R'
+  'tracking.R'
+  'fwd.R'
+  'data.R'
+  'db.R'
 VignetteBuilder: knitr
-Roxygen: list(markdown = TRUE)
 License: EUPL
 LazyLoad: Yes
 LazyData: No
 BugReports: https://github.com/iagomosqueira/mse/issues
-RoxygenNote: 7.1.0
-NeedsCompilation: no
-Packaged: 2020-06-05 05:39:27 UTC; mosquia
-Author: Iago Mosqueira [aut],
-  Ernesto Jardim [aut, cre]
-Maintainer: Ernesto Jardim <ernesto.jardim@ec.europa.eu>
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1

@@ -1,5 +1,5 @@
 # generics.R - DESC
-# /generics.R
+# mse/R/generics.R
 
 # Copyright European Union, 2017
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@jrc.ec.europa.eu>
@@ -9,6 +9,8 @@
 setGeneric("performance", function(x, ...) standardGeneric("performance"))
 
 setGeneric("mcN", function(x, ...) standardGeneric("mcN"))
+
+# find.original.name {{{
 
 find.original.name <- function(fun) {
 
@@ -32,5 +34,4 @@ find.original.name <- function(fun) {
   }
   return("NULL")
 }
-
-
+# }}}

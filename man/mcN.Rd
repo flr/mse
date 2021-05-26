@@ -4,7 +4,7 @@
 \alias{mcN}
 \title{Compute number of necessary Monte Carlo runs}
 \usage{
-\S4method{mcN}{FLQuant}(x, s, E = 5, z = 1.96, start = 100, by = 1)
+\S4method{mcN}{FLQuant}(x, E = 5, z = 1.96, start = 100, by = 1)
 }
 \arguments{
 \item{E}{The required percentage error of the mean, \emph{numeric}.}

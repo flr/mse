@@ -15,27 +15,27 @@
 setMethod("fwd", signature(object="FLom", fishery="missing",
   control="fwdControl"),
 
-  function(object, control, maxF=4, deviances=residuals(sr(object)), ...) {
-    
-    stock <- fwd(stock(object), control=control, sr=sr(object), deviances=deviances,
-      maxF=maxF, ...)
+  function(object, control, effort_max=4, deviances=residuals(sr(object)), ...) {
 
-    stock(object) <- stock
+    stock <- fwd(stock(om), control=control, sr=sr(om), deviances=deviances,
+      effort_max=effort_max, ...)
 
-    return(object)
+    stock(om) <- stock
+
+    return(om)
   }
 )
 
 #' res <- fwd(om, fbar=FLQuant(c(refpts(om)$FMSY), dimnames=list(year=2018:2039, iter=1:250)))
 
 setMethod("fwd", signature(object="FLom", fishery="missing", control="missing"),
-  function(object, maxF=4, deviances=residuals(sr(object)), ...) {
+  function(object, effort_max=4, deviances=residuals(sr(object)), ...) {
 
-    stock <- fwd(stock(object), sr=sr(object), deviances=deviances,
-      maxF=maxF, ...)
+    stock <- fwd(stock(om), sr=sr(om), deviances=deviances,
+      effort_max=effort_max, ...)
 
-    stock(object) <- stock
+    stock(om) <- stock
 
-    return(object)
+    return(om)
   }
 )

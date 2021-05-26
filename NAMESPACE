@@ -1,16 +1,20 @@
 import("methods")
 import("data.table")
-import("FLCore")
 import("ggplotFL")
+import("FLCore")
 import("foreach")
+import("progressr")
 import("FLasher")
 
 importFrom("FLBRP",
   "refpts",
+  "refpts<-",
   "brp",
   "FLBRP")
+
 importFrom("utils",
   "setTxtProgressBar")
+
 importFrom("stats",
   "coef",
   "coefficients",
@@ -22,10 +26,11 @@ importFrom("stats",
 export(
   "catchSSB.hcr",
   "cpue.hcr",
-  "FLiem",
+  "default.oem",
   "effort.is",
   "expandGrid",
   "fixedF.hcr",
+  "FLiem",
   "fwd.om",
   "getCtrl",
   "goFish",
@@ -48,6 +53,7 @@ export(
   "perfect.sa",
   "sampling.oem",
   "tac.is",
+  "track",
   "tunebisect")
 
 exportClasses(
@@ -55,51 +61,70 @@ exportClasses(
   "FLmse",
   "FLoem",
   "FLom",
+  "FLombf",
   "mpCtrl",
   "mseCtrl")
 
 exportMethods(
+  "[",
   "args",
   "args<-",
+  "biol",
+  "biol<-",
+  "biols",
+  "biols<-",
   "catch",
   "control",
+  "db",
   "deviances",
   "deviances<-",
-  "catch",
   "discards",
   "est",
   "est<-",
   "exists",
+  "FCB",
+  "FCB<-",
+  "fec",
+  "fisheries",
+  "fisheries<-",
   "fleetBehaviour",
   "fleetBehaviour<-",
   "FLmse",
   "FLoem",
   "FLom",
+  "FLombf",
   "fwd",
   "hcr",
   "hcr<-",
+  "index.hat",
   "isys",
   "isys<-",
   "iter",
   "landings",
+  "m",
+  "mat",
   "mcN",
   "method",
   "method<-",
   "metrics",
+  "n",
   "observations",
   "observations<-",
   "oem",
   "oem<-",
+  "om",
+  "om<-",
   "performance",
   "phcr",
   "phcr<-",
   "projection",
   "projection<-",
   "rec",
-  "ssb",
   "sr<-",
+  "ssb",
   "tm",
   "tm<-",
+  "tsb",
   "tracking",
-  "tracking<-")
-  
+  "tracking<-",
+  "wt")
