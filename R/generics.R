@@ -1,12 +1,17 @@
 # generics.R - DESC
 # mse/R/generics.R
 
-# Copyright European Union, 2017
+# Copyright European Union, 2018-2021
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@jrc.ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-setGeneric("performance", function(x, ...) standardGeneric("performance"))
+# 
+
+# performance
+
+
+# mcN
 
 setGeneric("mcN", function(x, ...) standardGeneric("mcN"))
 

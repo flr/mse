@@ -28,7 +28,6 @@ Suggests:
   FLa4a,
   doParallel
 Collate:
-  'generics.R'
   'mseCtrl-class.R'
   'mpCtrl-class.R'
   'FLoem-class.R'

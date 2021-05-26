@@ -8,6 +8,8 @@
 
 globalVariables("indicator")
 
+setGeneric("performance", function(x, ...) standardGeneric("performance"))
+
 # performance {{{
 
 #' Compute performance indicators

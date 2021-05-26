@@ -274,3 +274,10 @@ fwd.om <- function(stk, ctrl, sr, ...){
 	list(object=stk)
 }
 # }}}
+
+# dims {{{
+setMethod("dims", signature(obj="FLom"),
+  function(obj) {
+    dims(stock(obj))
+  }
+) # }}}

@@ -17,7 +17,3 @@ A \code{data.table} object
 \description{
 Creates a single table of output from an FLmse object
 }
-\examples{
-data(p4om)
-db(om)
-}

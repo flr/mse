@@ -587,3 +587,14 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
   function(object) {
     metrics(object, list(SB=ssb, C=catch, F=fbar))
 }) # }}}
+
+# stock {{{
+setMethod("stock", signature(object="FLombf"),
+  function(object) {
+
+    # DEBUG SLOW!
+    return(window(suppressWarnings(as.FLStock(om@biols[[1]], om@fisheries,
+    full=TRUE))))
+  }
+)
+# }}}

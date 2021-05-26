@@ -12,7 +12,8 @@ mp(
   args,
   scenario = "test",
   tracking = "missing",
-  verbose = TRUE
+  verbose = TRUE,
+  parallel = TRUE
 )
 }
 \arguments{

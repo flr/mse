@@ -7,31 +7,71 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-# default.oem {{{
-default.oem <- function(object) {
 
-  # OBSERVATIONS
+# perfect.oem {{{
 
-  # indices:
-  idx <- lapply(biols(:
+#' [TODO:description]
+#'
+#' @param om [TODO:description]
+#' @param deviances [TODO:description]
+#' @param observations [TODO:description]
+#' @param args [TODO:description]
+#' @param tracking [TODO:description]
+#'
+#' @return [TODO:description]
+#' @export
+#'
+#' @examples
+#' data(cjm)
+#' perfect.oem(om, deviances=NULL, observations=NULL,
+#'   args=list(y0=1970, dy=2020), tracking=FLQuant())
+
+perfect.oem <- function(om, deviances, observations, args, tracking) {
+
+  # GET perfect stock
+	stk <- window(stock(om), start=args$y0, end=args$dy, extend=FALSE)
+
+  # SET perfect at-age FLIndex
+  idx <- FLIndices(A=FLIndex(index=stock.n(stk) * 0.01,
     range=c(startf=0, endf=0)))
 
-  # stocks
-  # TODO stk <- as.FLStocks(biols, fisheries)
+	list(stk=stk, idx=idx, observations=observations, tracking=tracking)
 
-  # DEVIANCES
+} # }}}
 
-  # catch.n
-  cn <- lapply(catch.n(fisheries(object)), function(x) x * 0 + 1)
 
-  # index
-
-  obs <- list(idx=idx)
-  dev <- list(stk=FLQuants(catch.n=cn))
-	
-  return(FLoem(method=perfect.oem, observations=obs, deviances=dev))
+#{{{
+#' catch.oem()   
+#'
+#' Function to set up forecast horizon of index.q for oem in mp
+#'   
+#' @param stk.om input object of the class FLom from package mse 
+#' @param ce option to specify a fixed catch error (CV), overwriting catch variations estimates   
+#' @param args list of generic args that match those for mp()..list(iy,fy,nsqy,nblocks=it,seed) 
+#' @return catch.dev in the form of multiplicative lognormal errors
+#' @export
+catch.oem <- function(stk.om,ce=NULL,args){ 
+  catch.dev <- log(stk.om@stock@catch.n)
+  catch.dev <- catch.dev-iterMeans(catch.dev)
+  # compute varcov for multivariate normal randomization
+  vy = args$y0:args$fy
+  if(is.null(ce)){
+  Sig <- apply(catch.dev[,ac(args$y0:args$dy),1,1,,drop=TRUE], 3, function(x) cov(t(x)))
+  Sig <- apply(Sig, 1, mean)
+  Sig <- matrix(Sig, ncol=dim(catch.dev)[1])
+  # randomize
+  catch.dev[,ac(vy)][] <- t(mvrnorm((args$it) * length(vy), rep(0, nrow(Sig)), Sig))
+  } else {
+    catch.dev[,ac(vy)][] <- rlnorm((args$it) * length(vy),0,ce)
+  }
+  # exponentiate for OEM object
+  return((catch.dev))
 }
-# }}}
+#}}}
+
+
+
+
 
 # sampling.oem {{{
 
@@ -78,13 +118,4 @@ sampling.oem <- function(object, deviances, observations, args, tracking,
 	list(stk=stk0, idx=idx0, observations=observations, tracking=tracking)
 } # }}}
 
-# perfect.oem {{{
 
-perfect.oem <- function(stk, deviances, observations, args, tracking){
-	dataYears <- ac(args$y0:args$dy)
-	assessmentYear <- ac(args$ay)
-	stk0 <- stk[,dataYears]
-	idx0 <- FLIndices(a=FLIndex(index=stock.n(stk)[,dataYears]*0.01))
-	range(idx0[[1]])[c("startf","endf")] <- c(0,0)
-	list(stk=stk0, idx=idx0, observations=observations, tracking=tracking)
-} # }}}
