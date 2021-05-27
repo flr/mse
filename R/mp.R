@@ -292,7 +292,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb,
 		} else {
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+args$management_lag, it)
 		}
-		tracking["metric.hcr", ac(ay)] <- ctrl$value[1,]
+		tracking["metric.hcr", ac(ay)] <- ctrl$value
 		
 		#----------------------------------------------------------
 		# Implementation system
@@ -310,7 +310,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb,
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		}		
-		tracking["metric.is", ac(ay)] <- ctrl$value[1,]
+		tracking["metric.is", ac(ay)] <- ctrl$value
 
 		#----------------------------------------------------------
 		# Technical measures
@@ -343,7 +343,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb,
 			ctrl <- out$ctrl
 			tracking <- out$tracking
 		}
-		tracking["metric.iem",ac(ay)] <- ctrl$value[1,]
+		tracking["metric.iem",ac(ay)] <- ctrl$value
 
 		#==========================================================
 		# OM
@@ -362,7 +362,7 @@ goFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb,
 			tracking <- out$tracking
 		}
 	  # TODO value()
-		tracking["metric.fb",ac(ay)] <- ctrl$value[1,]
+		tracking["metric.fb",ac(ay)] <- ctrl$value
 
 		#----------------------------------------------------------
 		# stock dynamics and OM projections
