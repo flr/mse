@@ -31,6 +31,8 @@
 #'  plot(se~iters, itse, type='l')
 #'  }
 
+setGeneric("mcN", function(x, ...) standardGeneric("mcN"))
+
 setMethod("mcN", signature(x="FLQuant"),
   function(x, E=5, z=1.96, start=100, by=1) {
 

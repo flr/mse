@@ -2,6 +2,9 @@
 # mse/R/FLom-class.R
 
 # Copyright European Union, 2018
+# Author: Ernesto JARDIM (MSC) <ernesto.jardim@msc.org>
+#         Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
+#
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
 

@@ -35,19 +35,19 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
   if(is.null(iy))
     stop("Intermediate year (iy) missing in 'args'.")
 
-  # y0 default to minyear
+  # y0, defaults to minyear
   y0 <- args$y0 <- if(is.null(args$y0)) dims(om)$minyear else args$y0
 
-  # fy defaults to maxyear
+  # fy, defaults to maxyear
   fy <- args$fy <- if(is.null(args$fy)) dims(om)$maxyear else args$fy
   
-  # nsq defaults to 3
+  # nsq, defaults to 3
   nsqy <- args$nsqy <- if(is.null(args$nsqy)) 3 else args$nsqy
 
   # vector of years to be projected
 	vy <- args$vy <- ac(seq(iy, fy))
 
-	# om$its
+	# it, om$iter
 	it <- args$it <- dims(om)$iter
 
   # data_lag: time in years between data and assessment year (ay)
@@ -205,7 +205,7 @@ agoFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb,
 		gc()
 		if(verbose) cat(i, " > ")
 		ay <- args$ay <- an(i)
-		dy <- args$dy <- ay-data_lag
+		dy <- args$dy <- ay - data_lag
     # years for status quo computations 
 		sqy <- args$sqy <- ac((ay-data_lag):(ay-nsqy-data_lag+1))
 
