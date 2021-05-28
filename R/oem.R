@@ -42,7 +42,6 @@ perfect.oem <- function(om, deviances, observations, args, tracking) {
 
 } # }}}
 
-
 # sampling.oem {{{
 
 #' @examples
@@ -51,13 +50,12 @@ perfect.oem <- function(om, deviances, observations, args, tracking) {
 #' oem@deviances$stk <- FLQuants(catch.n=catch.n(stock(om)) %=% 0.1)
 #' oem@observations$idx[[1]] <- propagate(oem@observations$idx[[1]], 25)
 #' sampling.oem(om, deviances=deviances(oem), observations=observations(oem),
-#'   args=list(y0=1970, dy=2017, ay=2018, freq=1), tracking=FLQuant(), oe="both")
-
+#'   args=list(y0=2000, dy=2021, ay=2022, freq=1), tracking=FLQuant(), oe="both")
 
 sampling.oem <- function(om, deviances, observations, args, tracking,
   oe=c("both","index","catch")) {
 
-  # CHECK TODO but check oe
+  # CHECK necessary deviances
   if(!(oe %in% c("both", "catch") & "stk" %in% names(deviances)))
     stop(paste("sampling.oem requires deviances for 'stk' if oe = ", oe))
   
@@ -103,7 +101,9 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
   # APPLY survey() with deviances$index.q as index.q
 
   idx <- Map(function(x, y) {
-    res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs], index.q=y[, dyrs])
+    
+    res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
+      index.q=y[, dyrs])
     
     # SET 0s to min / 2
     res[res == 0] <- min(res[res > 0] / 2)
