@@ -30,6 +30,7 @@ Suggests:
 Collate:
   'mseCtrl-class.R'
   'mpCtrl-class.R'
+  'oem.R'
   'FLoem-class.R'
   'FLo-class.R'
   'FLom-class.R'
@@ -43,7 +44,6 @@ Collate:
   'iem.R'
   'is.R'
   'mp.R'
-  'oem.R'
   'phcr.R'
   'sa.R'
   'tm.R'

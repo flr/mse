@@ -26,7 +26,6 @@ importFrom("stats",
 export(
   "catchSSB.hcr",
   "cpue.hcr",
-  "default.oem",
   "effort.is",
   "expandGrid",
   "fixedF.hcr",
