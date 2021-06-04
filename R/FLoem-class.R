@@ -125,6 +125,11 @@ setMethod("deviances", "FLoem",
 
     return(res)
   })
+#' @rdname FLoem-class
+setReplaceMethod("deviances", signature("FLoem", "list"), function(object, value){
+  object@deviances <- value
+  object
+})
 
 #' @rdname FLoem-class
 setMethod("show", signature(object = "FLoem"),
@@ -141,8 +146,8 @@ setMethod("show", signature(object = "FLoem"),
  })
 
 #' @rdname FLoem-class
-setMethod("iter", signature(obj = "FLoem"),
-  function(obj, iter){
+setMethod("iters", signature(object = "FLoem"),
+  function(object, iter){
     # TODO Delve deeper into list
 	  deviances(object) <- lapply(deviances(object), FLCore::iter, iter)
 	  observations(object) <- lapply(observations(object), FLCore::iter, iter)
