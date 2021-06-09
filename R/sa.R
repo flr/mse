@@ -37,6 +37,10 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
 }
 # }}}
 
+
+
+
+
 # mean length of the catch - length based estimator
 mlc.est <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
   
@@ -60,4 +64,3 @@ mlc.est <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
   
   list(stk = stk, tracking = tracking)
 }
-

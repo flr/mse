@@ -7,6 +7,57 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
+
+# catchSSB.hcr {{{
+
+#' A HCR to set total catch based on SSB depletion level
+#'
+#' @param stk The perceived FLStock.
+#' @param dtarget=0.40 Depletion level from which catch is decreased.
+#' @param dlimit=0.10 Depletion level at which fishing is stopped.
+#' @param lambda=1 Multiplier for MSY level.
+#' @param MSY Assumed or estimated MSY.
+#' @param dtaclow=0.85 Maximum proportional decrease in allowable catch.
+#' @param dtacupp=1.15 Maximum proportional increase in allowable catch.
+#' @param args MSE arguments, class *list*.
+#' @param tracking Structure for tracking modules outputs.
+#'
+#' @return A *list* with elements *ctrl*, of class *fwdControl*, and *tracking*.
+#'
+#' @examples
+#' data(ple4om)
+#' catchSSB.hcr(stock(om), MSY=140000, args=list(ay=2018, data_lag=1),
+#'   tracking=FLQuant())
+#' # APPLY hcr over a range of dtarget values
+#' lapply(seq(0.30, 0.90, by=0.1), function(x) {
+#'   catchSSB.hcr(stock(om), MSY=140000, dtarget=x, args=list(ay=2018, data_lag=1),
+#'   tracking=FLQuant())$ctrl } )
+
+catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
+  dtaclow=0.85, dtacupp=1.15, args, tracking) {
+  
+  # args
+  ay <- args$ay
+  data_lag <- args$data_lag
+
+  # COMPUTE depletion
+  dep <- ssb(stk)[, ac(ay - data_lag)] / ssb(stk)[, 1]
+
+  # RULE
+  ca <- ifelse(dep <= dlimit, 0,
+    ifelse(dep < dtarget, (lambda * MSY) / (dtarget - dlimit) * (dep - dlimit),
+    lambda * MSY))
+
+  # CONTROL
+  ctrl <- fwdControl(list(quant="catch", value=c(ca), year=ay + 1),
+    # TAC limits
+    list(quant="catch", min=dtaclow, max=dtacupp, relYear=ay - 1, year=ay + 1))
+
+	return(list(ctrl=ctrl, tracking=tracking))
+
+} # }}}
+
+
 #' Evaluate the chosen HCR function
 #'
 #' Evaluate the chosen HCR function using the current stock perception and a control
@@ -43,22 +94,46 @@
 #' F = ftrg is the maximum F, F = fmin is the minimum F.
 #' F is set in year ay, based on SSB in year ay - ssb_lag.
 #' The control argument is a list of parameters used by the HCR.
+#'
 #' @param stk The perceived FLStock.
-#' @param control A list with the elements fmin, ftrg, blim, bsafe and ssb_lag, all of which are numeric.
-#' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
+#' @param fmin Minimum fishing mortality.
+#' @param ftrg [TODO:description]
+#' @param blim [TODO:description]
+#' @param bsafe [TODO:description]
+#' @param args MSE arguments, class *list*.
+#' @param tracking Structure for tracking modules outputs.
+#'
+#' @return A *list* with elements *ctrl*, of class *fwdControl*, and *tracking*.
+#' @examples
+#' data(ple4om)
+#' # Test for year when SSB > bsafe
+#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, blim=200000, bsafe=300000,
+#'   args=list(ay=2018, data_lag=1, management_lag=1), tracking=FLQuant())
+#' # Test for year when SSB < bsafe
+#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, blim=200000, bsafe=300000,
+#'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
+
 ices.hcr <- function(stk, fmin, ftrg, blim, bsafe, args, tracking){
+
+  # args
 	ay <- args$ay
-	ssb_lag <- ifelse(is.null(args$ssb_lag), 1, args$ssb_lag)
-	# rule
+	ssb_lag <- args$data_lag
+	man_lag <- args$management_lag
+
+  # GET ssb metric
 	ssb <- ssb(stk)[, ac(ay-ssb_lag)]
+
+	# APPLY rule
+
 	fout <- FLQuant(fmin, dimnames=list(iter=dimnames(ssb)$iter))
 	fout[ssb >= bsafe] <- ftrg
 	inbetween <- (ssb < bsafe) & (ssb > blim)
 	gradient <- (ftrg - fmin) / (bsafe - blim)
 	fout[inbetween] <- (ssb[inbetween] - blim) * gradient + fmin
-	# create control file
-	ctrl <- getCtrl(c(fout), "f", ay+args$management_lag, dim(fout)[6])
-	# return
+	
+  # CREATE control file
+  ctrl <- fwdControl(year=ay + man_lag, quant="fbar", value=c(fout))
+
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
 
@@ -118,67 +193,6 @@ indicator.hcr <- function (stk, hcrpars, args, tracking) {
     list(ctrl = ctrl, tracking = tracking)
 }
 
-# catchSSB.hcr {{{
-
-#'
-# hcrparams=FLPar(dlimit=0.10, dtarget=0.40, lambda=1.0, dltac=0.15, dhtac=0.15),
-
-#' @param dtarget
-#' @param dlimit
-#' @param lambda
-#' @param MSY
-#' @examples
-#' data(ple4)
-#' # APPLY hcr
-#' catchSSB.hcr(ple4[,ac(1957:1996)], dtarget=0.40, dlimit=0.10, lambda=1,
-#'   MSY=95000, ay=1995, tracking=FLQuant())
-#' # APPLY hcr over a range of dtarget
-#' lapply(seq(0.30, 0.90, by=0.1), function(x) {
-#'    catchSSB.hcr(ple4[,ac(1957:1996)], dtarget=x, dlimit=0.10, lambda=1,
-#'   MSY=95000, ay=1995, tracking=FLQuant())$ctrl})
-
-
-
-#' A HCR to set total catch based on SSB
-#'
-#' @param stk The perceived FLStock.
-#' @param dtarget=0.40 Depletion level from which catch is decreased.
-#' @param dlimit=0.10 Depletion level at which fishing is stopped.
-#' @param lambda=1 Responsiveness of the rule
-#' @param MSY [TODO:description]
-#' @param dtaclow=0.85 [TODO:description]
-#' @param dtacupp=1.15 [TODO:description]
-#' @param args [TODO:description]
-#' @param tracking [TODO:description]
-#'
-#' @return [TODO:description]
-#' @export
-#'
-#' @examples
-#' [TODO:example]
-catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
-  dtaclow=0.85, dtacupp=1.15, args, tracking) {
-  
-  # args
-  ay <- args$ay
-  data_lag <- args$data_lag
-
-  # COMPUTE depletion
-  dep <- ssb(stk)[, ac(ay - data_lag)] / ssb(stk)[, 1]
-
-  # RULE
-  ca <- ifelse(dep <= dlimit, 0,
-    ifelse(dep < dtarget, (lambda * MSY) / (dtarget - dlimit) * (dep - dlimit),
-    lambda * MSY))
-
-  # CONTROL
-  ctrl <- fwdControl(list(quant="catch", value=c(ca), year=ay + 1),
-    # TAC limits
-    list(quant="catch", min=dtaclow, max=dtacupp, relYear=ay - 1, year=ay + 1))
-
-	return(list(ctrl=ctrl, tracking=tracking))
-
-} # }}}
 
 # cpue.hcr {{{
 #' cpue.hcr

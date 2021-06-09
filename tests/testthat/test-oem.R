@@ -32,7 +32,7 @@ obs <- method(oem)(om, deviances=deviances(oem), observations=observations(oem),
 
 catch.n(obs$stk) / window(catch.n(observations(oem, "stk")), end=2017)
 
-
+# TEST w/ FLIndexBiomass
 
 
 plot(FLQuants(OEM=catch.n(obs$stk), OBS=catch.n(observations(oem, "stk"))))

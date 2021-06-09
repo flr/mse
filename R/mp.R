@@ -205,9 +205,8 @@ setMethod("goFish", signature(om="FLo"),
   trackctl <- setNames(as.list(vy[-length(vy)]), nm=vy[-length(vy)])
 
 	# go fish
-
-  # DEBUG END at fy - data_lag
-	for(i in vy[-length(vy)]) {
+	
+  for(i in vy) {
 		
     if(verbose) cat(i, " > ")
 

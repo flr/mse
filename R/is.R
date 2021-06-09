@@ -25,44 +25,59 @@
 #' @param EFF0 The tracking array
 #' @param EFF Not used by this function but may be used by the other implementation functions
 
-tac.is <- function(stk, ctrl, args, delta_tac_max=NA, delta_tac_min=NA, tracking){
-	ay <- args$ay
-	nsqy <- args$nsqy
-	iy <- args$iy
-	mlag <- args$management_lag
-	it <- dim(stk)[6]
-	# reference value
-	#if(ay==iy) refCatch <- tracking["C.om", ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
-	if(ay==iy) refCatch <- catch(stk)[, ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
-	# Year range of perceived stock
-	yrs <- as.numeric(dimnames(stock.n(stk))$year)
-	last_data_yr <- yrs[length(yrs)]
-	# Status quo years
-	sqy <- (last_data_yr-nsqy+1):last_data_yr
-	# Get the Fbar for the intermediate years
-	fsq0 <- yearMeans(fbar(stk)[,ac(sqy)])
-	# Number of intermediate years (between last data year and ay+1)
-	ninter_yrs <- ay - last_data_yr + mlag - 1
-	# Control object for the STF
-	ctrl <- getCtrl(c(rep(fsq0, times=ninter_yrs), ctrl$value), "f", (last_data_yr+1):(ay+mlag), it)
-	# Number of projection years
-	nproj_yrs <- (ay+mlag) - last_data_yr
-	stkTmp <- stf(stk, nproj_yrs, wts.nyears=nsqy)
+args <- list(ay=2010, iy=2010, management_lag=1, nsqy=3, dy=2009)
+
+stk <- window(stock(om), end=args$dy)
+
+
+tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1, tracking) {
+
+  # EXTRACT args
+
+  ay <- args$ay
+  dy <- args$dy
+  iy <- args$iy
+  mlag <- args$management_lag
+  nsqy <- args$nsqy
+
+  # PREPARE stk until ay + mlag, biology as in lasy nsqy years
+
+  fut <- stf(stk, end=ay + mlag, wts.nyears=nsqy)
+
+  # SET recruitment
+
 	# Set geomean sr relationship
-	gmean_rec <- c(exp(yearMeans(log(rec(stk)[,ac(sqy)]))))
-	# Project!
-	stkTmp <- fwd(stkTmp, control=ctrl, sr=list(model="geomean", params = FLPar(gmean_rec,iter=it)))
-	# Get TAC for the management year that results from hitting the F in STF
-	TAC <- catch(stkTmp)[,ac(ay+mlag)]
-	# catch stabelizers
-	upper_limit <- refCatch * delta_tac_max
-	lower_limit <- refCatch * delta_tac_min
-	TAC <- pmin(c(upper_limit), c(TAC), na.rm=TRUE)
-	TAC <- pmax(c(lower_limit), c(TAC), na.rm=TRUE)
-	# new control file
-	ctrl <- getCtrl(c(TAC), "catch", ay+mlag, it)
-	list(ctrl = ctrl, tracking = tracking)
-} # }}}
+  gmnrec <- exp(yearMeans(log(window(rec(stk), end=-(recyrs)))))
+  srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
+
+  # GET F dy
+
+  # GET TAC dy / ay - 1
+  if(ay == iy)
+    tac <- catch(stk)[, ac(dy)]
+  else
+    tac <- track(tracking, "metric.is", dy)
+
+  # DEBUG: ay, dy + 1, ay - dlag + 1?
+  fctrl <- fwdControl(list(year=dy + 1, quant="fbar", value=fbar(stk)[, ac(dy)]),
+    list(year=dy + 1, quant="catch", max=tac))
+
+  fut <- fwd(fut, sr=srr, control=fctrl)
+
+  TAC <- c(catch(fut)[, ac(ay)])
+
+  pmin(TAC, TAC * dtacupp, na.rm=TRUE)
+  pmax(TAC, TAC * dtaclow, na.rm=TRUE)
+
+  ctrl <- fwdControl(list(year=ay + mlag, quant="catch", value=TAC))
+
+  return(list(ctrl=ctrl, tracking=tracking))
+}
+
+# }}}
+
+
+
 
 # effort.is {{{
 
