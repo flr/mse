@@ -54,6 +54,27 @@ knitr::include_graphics('diagrams/FLmse.png')
 knitr::include_graphics('diagrams/mp.svg')
 ```
 
+### args
+
+The *mp()* function takes as input a named list called *args*. These are arguments of the MSE run, and determine the time frame, frequency of application and lags. Only one argument is required:
+
+- *iy*, intermediate year. Only required element in *args*. The first year in which the procedure is applied.
+
+For all other, default values are generated acording to the *om* object dimensions, or from internal defaults, as follows:
+
+- *y0*, first year. Defaults to start of *om*.
+- *fy*, final year. Defaults to last year of *om*.
+- nsqy, number of years to use for *status quo* calculations. Defaults to 3.
+- *it*, number of iterations. Defaults to iterations in *om*.
+- *data_lag*, difference between final year of data and *iy*. Defaults to 1.
+- *management_lag*, number of years between year of year of application and implementation.
+- *frq*, frequency. How often is the procedure to be applied, and for how long is a recommendation valid. Defaults to 1.
+
+All these values can be simply overiden by including them in the *args* argument to *mp()*. The complete list of arguments is available to every *@method* function in any element in the MSE control. In addition, these year dimension nbames vector, generated inside *mp()*, can also be used in any module function:
+
+- *vy*, the years in which the procedure is to be applied, from *iy* to *fy*. A character vector.
+
+
 ## performance()
 
 # Extending mse with your own functions

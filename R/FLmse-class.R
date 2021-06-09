@@ -182,7 +182,8 @@ setMethod("sr", signature(object="FLmse"),
 # plot {{{
 setMethod("plot", signature(x="FLmse", y="missing"),
   function(x, ...) {
-    plot(stock(x), ...)
+    # PLOT om
+    plot(om(x), ...)
   }
 ) 
 
@@ -192,7 +193,7 @@ setMethod("plot", signature(x="FLom", y="FLmse"),
     args <- list(...)
     fms <- unlist(lapply(args, is, "FLmse"))
 
-    stocks <- lapply(c(list(x, y), args[fms]), stock)
+    stocks <- lapply(c(list(x, y), args[fms]), om)
 
     # WINDOW om
     minyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))

@@ -53,7 +53,6 @@ Collate:
   'run.R'
   'tune.R'
   'tracking.R'
-  'fwd.R'
   'data.R'
   'db.R'
 VignetteBuilder: knitr

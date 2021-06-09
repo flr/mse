@@ -14,11 +14,18 @@ track <- function(list, metric, year) {
 }
 
 `track<-` <- function(list, metric, year, value) {
-  if(is(value, "FLQuant"))
+
+  if(is(value, "FLQuant")) {
     list[[1]][[1]][metric, ac(year)] <- value
-  if(is(value, "FLQuants"))
+  
+  } else if(is(value, "numeric")) {
+    list[[1]][[1]][metric, ac(year)] <- value
+  
+  } else if(is(value, "FLQuants")) {
     for(i in names(value))
       list[[1]][[i]][metric, ac(year)] <- value[[i]]
+  }
+  
   return(list)
 }
 

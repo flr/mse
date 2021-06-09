@@ -12,6 +12,15 @@
 
 #' A perfect observation of catch and abundances-at-age.
 #'
+#' This observation error model function generates a set of perfect observations
+#' on catches, biology and abundance. Direct observations are made of the stock,
+#' while a single age-structured index of abundance, in numbers, is created with
+#' a fixed catchability of 0.01. *deviances* on either *stk$catch.n* or
+#' *idx$index*, if given, are applied.
+#'
+#' This *oem* function generates a full observation time series every time step,
+#' and does not append them to existing objects in *observations*.
+#'
 #' @param om An operating model, class *FLom* or *FLombf*.
 #' @param observations A list of past observations, extended to the end of *om*, class *list*.
 #' @param deviances A named list of observation deviances, class *list*.
@@ -21,18 +30,26 @@
 #' @return A named *list* with elements *stk* (*FLStock*), *idx* (*FLIndices*), *deviances*, *observations* and *tracking*.
 #'
 #' @examples
-#' data(cjm)
-#' perfect.oem(om, deviances=NULL, observations=NULL,
-#'   args=list(y0=1970, dy=2020), tracking=FLQuant())
+#' # On FLom
+#' data(ple4om)
+#' obs <- perfect.oem(om, deviances=NULL, observations=NULL,
+#'   args=list(y0=1957, dy=2017), tracking=FLQuant())
 
-perfect.oem <- function(om, deviances, observations, args, tracking) {
+perfect.oem <- function(om, deviances, observations, args, tracking, ...) {
+
+  # DIMENSIONS
+  y0 <- ac(args$y0)
+  dy <- ac(args$dy)
 
   # GET perfect stock
-	stk <- window(stock(om), start=args$y0, end=args$dy, extend=FALSE)
+	stk <- window(stock(om), start=y0, end=dy, extend=FALSE)
 
-  # SET perfect at-age FLIndex
+  # SET perfect at-age FLIndex per stock
+  # TODO GET name from observations
   idx <- FLIndices(A=FLIndex(index=stock.n(stk) * 0.01,
-    range=c(startf=0, endf=0)))
+    catch.n=catch.n(stk), catch.wt=stock.wt(stk),
+    sel.pattern=catch.sel(stk), index.q=stock.n(stk) %=% 1 / 0.01,
+    effort=fbar(stk), range=c(startf=0, endf=0)))
 
   # STORE observations
   observations$stk <- stk
@@ -45,21 +62,21 @@ perfect.oem <- function(om, deviances, observations, args, tracking) {
 # sampling.oem {{{
 
 #' @examples
-#' data(p4om)
+#' data(ple4om)
 #' oem@deviances$idx <- lapply(oem@observations$idx, function(x) index(x) %=% 0.1)
 #' oem@deviances$stk <- FLQuants(catch.n=catch.n(stock(om)) %=% 0.1)
 #' oem@observations$idx[[1]] <- propagate(oem@observations$idx[[1]], 25)
 #' sampling.oem(om, deviances=deviances(oem), observations=observations(oem),
-#'   args=list(y0=2000, dy=2021, ay=2022, freq=1), tracking=FLQuant(), oe="both")
+#'   args=list(y0=2000, dy=2021, ay=2022, frq=1), tracking=FLQuant(), oe="both")
 
 sampling.oem <- function(om, deviances, observations, args, tracking,
-  oe=c("both","index","catch")) {
+  oe=c("both","index","catch"), ...) {
 
   # CHECK necessary deviances
-  if(!(oe %in% c("both", "catch") & "stk" %in% names(deviances)))
+  if(any(oe %in% c("both", "catch")) & ! "stk" %in% names(deviances))
     stop(paste("sampling.oem requires deviances for 'stk' if oe = ", oe))
   
-  if(!(oe %in% c("both", "index") & "idx" %in% names(deviances)))
+  if(any(oe %in% c("both", "index")) & ! "idx" %in% names(deviances))
     stop(paste("sampling.oem requires deviances for 'idx' if oe = ", oe))
   
   # DIMENSIONS
@@ -68,7 +85,7 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
   yrs <- ac(seq(args$y0, args$dy))
 
   # Data years
-  dyrs <- ac(seq(args$dy - args$freq + 1, args$dy))
+  dyrs <- ac(seq(args$dy - args$frq + 1, args$dy))
 
   # Assessment year
   ay <- ac(args$ay)
@@ -119,3 +136,19 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
   list(stk=stk0, idx=idx0, observations=observations, tracking=tracking)
 
 } # }}}
+
+# default.oem {{{
+default.oem <- function(om) {
+  
+  # observations match OM
+  obs <- list(idx=FLIndices(A=as(stock(om), 'FLIndex')), stk=stock(om))
+
+  # deviances are NULL
+  devs <- list(idx=FLQuants(index.q=index.q(obs$idx$A) %=% 1),
+    stk=FLQuants(catch.n=catch.n(obs$stk) %=% 1))
+
+  # method is perfect.oem
+
+  return(FLoem(method=perfect.oem, observations=obs, deviances=devs))
+}
+# }}}

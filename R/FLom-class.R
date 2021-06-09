@@ -132,6 +132,64 @@ setReplaceMethod("sr", signature("FLom", "FLSR"), function(object, value){
 
 # }}}
 
+# catch, landings, discards {{{
+
+setMethod("catch", signature(object="FLom"),
+  function(object) {
+    return(catch(stock(object)))
+  }
+)
+
+setMethod("landings", signature(object="FLom"),
+  function(object) {
+    return(landings(stock(object)))
+  }
+)
+
+setMethod("discards", signature(object="FLom"),
+  function(object) {
+    return(discards(stock(object)))
+  }
+)
+# }}}
+
+# ssb, tsb {{{
+
+setMethod("ssb", signature(object="FLom"),
+  function(object) {
+
+    return(ssb(stock(object)))
+  }
+)
+
+setMethod("tsb", signature(object="FLom"),
+  function(object) {
+
+    return(tsb(stock(object)))
+  }
+)
+# }}}
+
+# harvest {{{
+
+setMethod("harvest", signature(object="FLom", catch="missing"),
+  function(object) {
+    return(harvest(stock(object)))
+  }
+) 
+
+# }}}
+
+# fbar {{{
+
+setMethod("fbar", signature(object="FLom"),
+  function(object) {
+    return(fbar(stock(object)))
+  }
+) 
+
+# }}}
+
 # show, summary {{{
 
 #' @rdname FLom-class
@@ -250,7 +308,54 @@ setMethod("plot", signature(x="FLom", y="missing"),
   }
 ) # }}}
 
+# dims {{{
+setMethod("dims", signature(obj="FLom"),
+  function(obj) {
+    dims(stock(obj))
+  }
+) # }}}
+
+# window {{{
+setMethod("window", signature(x="FLom"),
+  function(x, ...) {
+
+    x@stock <- window(x@stock, ...)
+
+    return(x)
+  })
+# }}}
+
+# fwdWindow {{{
+
+setMethod("fwdWindow", signature(x="FLom", y="missing"),
+  function(x, end=dims(x)$maxyear, nsq=3, ...) {
+
+    stock(x) <- fwdWindow(stock(x), end=end, nsq=nsq, ...)
+
+    return(x)
+
+  }
+) # }}}
+
 # fwd {{{
+
+#' @examples
+#' data(p4om)
+#' res <- fwd(om, control=fwdControl(year=2018:2030, quant="f",
+#'   value=rep(c(refpts(om)$FMSY), 13)))
+
+setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl"),
+  function(object, control, maxF=4, ...) {
+    
+    stock(object) <- fwd(stock(object), sr=sr(object), control=control,
+      maxF=maxF, ...)
+
+    return(object)
+  })
+
+# }}}
+
+# fwd.om {{{
 
 #' A method to project the operating model (OM)
 #'
@@ -268,19 +373,15 @@ setMethod("plot", signature(x="FLom", y="missing"),
 #' @param sr.residuals a FLQuant with S/R residuals
 #' @param sr.residuals.mult logical about residuals being multiplicative
  
-fwd.om <- function(stk, ctrl, sr, ...){
-	args <- list(...)
-	args$object <- stk
+fwd.om <- function(om, ctrl, ...){
+	
+  args <- list(...)
+
+	args$object <- om
 	args$control <- ctrl
-	args$sr <- sr
-	stk <- do.call("fwd", args)
-	list(object=stk)
+	
+  om <- do.call("fwd", args)
+
+	list(object=om)
 }
 # }}}
-
-# dims {{{
-setMethod("dims", signature(obj="FLom"),
-  function(obj) {
-    dims(stock(obj))
-  }
-) # }}}

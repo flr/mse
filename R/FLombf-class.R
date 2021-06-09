@@ -593,8 +593,13 @@ setMethod("stock", signature(object="FLombf"),
   function(object) {
 
     # DEBUG SLOW!
-    return(window(suppressWarnings(as.FLStock(om@biols[[1]], om@fisheries,
-    full=TRUE))))
+    res <- FLStocks(lapply(biols(object), as.FLStock,
+      fisheries=om@fisheries, full=TRUE))
+
+    if(length(res) == 1)
+      return(res[[1]])
+    else
+      return(res)
   }
 )
 # }}}

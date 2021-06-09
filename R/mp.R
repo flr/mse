@@ -28,7 +28,7 @@
 mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
   tracking="missing", verbose=TRUE, parallel=TRUE){
 
-  # EXTRACT args
+  # --- EXTRACT args
 
   iy <- args$iy
 
@@ -52,7 +52,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 
   # data_lag: time in years between data and assessment year (ay)
   data_lag <- args$data_lag <- if(is.null(args$data_lag)) 1 else args$data_lag
-	
+
   # management_lag: time in years between ay and implementation
   management_lag <- args$management_lag <-
     if(is.null(args$management_lag)) 1 else args$management_lag
@@ -60,7 +60,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
   # frq defaults to 1
   frq <- args$frq <- if(is.null(args$frq)) 1 else args$frq
 
-	# INIT tracking
+	# --- INIT tracking
+
 	metric <- c("C.obs", "F.est", "B.est", "C.est", "conv.est",
     "F.om", "B.om", "C.om")
   steps <- c("phcr", "hcr", "is", "tm", "iem", "fb")
@@ -93,6 +94,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 	# PREPARE objects for loop call
   projection <- projection(om)
 
+  # SET fleetBehaviour to NULL if not given
   if (exists(fleetBehaviour(om)))
     fb <- fleetBehaviour(om)
   else 
@@ -164,7 +166,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 			lst0 <- list(om=out$om, tracking=out$tracking, oem=out$oem)
 		}
 	
-	# GET objects back from loop
+  # GET objects back from loop
 	om <- lst0$om
 	tracking <- lst0$tracking
 	oem <- lst0$oem
@@ -183,220 +185,11 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 setGeneric("goFish", function(om, ...)
     standardGeneric('goFish'))
 
-# goFish {{{
-
-agoFish <- function(stk.om, sr.om, sr.om.res, sr.om.res.mult, fb,
-  projection, oem, iem, tracking, ctrl, args, verbose) {
-
-	it <- args$it
-	y0 <- args$y0 # initial data year
-	fy <- args$fy # final year
-	iy <- args$iy # initial year of projection (also intermediate)
-	nsqy <- args$nsqy # number of years to compute status quo metrics
-	vy <- args$vy # vector of years to be projected
-	data_lag <- args$data_lag
-	# need to rename ctrl to avoid breaking code
-	ctrl0 <- ctrl
-
-	#============================================================
-	# go fish
-	for(i in vy[-length(vy)]) {
-
-		gc()
-		if(verbose) cat(i, " > ")
-		ay <- args$ay <- an(i)
-		dy <- args$dy <- ay - data_lag
-    # years for status quo computations 
-		sqy <- args$sqy <- ac((ay-data_lag):(ay-nsqy-data_lag+1))
-
-   	# TRACK om
-		tracking["F.om", ac(ay)] <- fbar(stk.om)[,ac(ay)]    
-		tracking["B.om", ac(ay)] <- ssb(stk.om)[,ac(ay)]    
-		tracking["C.om", ac(ay)] <- catch(stk.om)[,ac(ay)]    
-
-		#==========================================================
-		# OEM
-		#==========================================================
-		#cat("oem\n")
-		ctrl.oem <- args(oem)
-		ctrl.oem$method <- method(oem)
-		ctrl.oem$deviances <- deviances(oem)
-		ctrl.oem$observations <- observations(oem)
-		ctrl.oem$stk <- stk.om
-		ctrl.oem$args <- args #vy0 <- vy0
-		#ctrl.oem$ay <- ay
-		ctrl.oem$tracking <- tracking
-		ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
-		o.out <- do.call("mpDispatch", ctrl.oem)
-		stk0 <- o.out$stk
-		idx0 <- o.out$idx
-		observations(oem) <- o.out$observations
-		tracking <- o.out$tracking
-		tracking["C.obs",ac(ay)] <- catch(stk0)[,ac(ay-args$data_lag)]
-
-		#==========================================================
-		# EST
-		# Estimator of stock statistics
-		#==========================================================
-		#cat("est\n")
-		if (!is.null(ctrl0$est)){
-			ctrl.est <- args(ctrl0$est)
-			ctrl.est$method <- method(ctrl0$est)
-			ctrl.est$stk <- stk0
-			ctrl.est$idx <- idx0
-			ctrl.est$args <- args #ay <- ay
-			ctrl.est$tracking <- tracking
-			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
-			out.assess <- do.call("mpDispatch", ctrl.est)
-			stk0 <- out.assess$stk
-			tracking <- out.assess$tracking
-		}
-		tracking["C.est",ac(ay)] <- catch(stk0)[,ac(ay-args$data_lag)]
-		tracking["F.est",ac(ay)] <- fbar(stk0)[,ac(ay-args$data_lag)]
-		tracking["B.est",ac(ay)] <- ssb(stk0)[,ac(ay-args$data_lag)]
-
-		#----------------------------------------------------------
-		# HCR parametrization
-		#----------------------------------------------------------
-		#cat("phcr\n")
-		if (!is.null(ctrl0$phcr)){
-			ctrl.phcr <- args(ctrl0$phcr)
-			ctrl.phcr$method <- method(ctrl0$phcr) 
-			ctrl.phcr$stk <- stk0
-			ctrl.phcr$args <- args #ay <- ay
-			#ctrl.phcr$iy <- iy
-			ctrl.phcr$tracking <- tracking
-			if(exists("hcrpars")) ctrl.phcr$hcrpars <- hcrpars
-			ctrl.phcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flpval))
-			out <- do.call("mpDispatch", ctrl.phcr)
-			hcrpars <- out$hcrpars
-			tracking <- out$tracking
-		}
-		# EJ: don't like this hack but seems to work ...
-		# by default stores the first par in tracking
-		if(exists("hcrpars")){
-			tracking["metric.phcr", ac(ay)] <- hcrpars[1,1,,drop=TRUE]
-		 }
-
-		#----------------------------------------------------------
-		# HCR
-		#----------------------------------------------------------
-		#cat("hcr\n")
-		if (!is.null(ctrl0$hcr)){
-			ctrl.hcr <- args(ctrl0$hcr)
-			ctrl.hcr$method <- method(ctrl0$hcr)
-			ctrl.hcr$stk <- stk0
-			ctrl.hcr$args <- args #ay <- ay
-			ctrl.hcr$tracking <- tracking
-			if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
-			ctrl.hcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flfval))
-			out <- do.call("mpDispatch", ctrl.hcr)
-			ctrl <- out$ctrl
-			tracking <- out$tracking
-		} else {
-			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+args$management_lag, it)
-		}
-		tracking["metric.hcr", ac(ay)] <- ctrl$value
-		
-		#----------------------------------------------------------
-		# Implementation system
-		#----------------------------------------------------------
-		#cat("is\n")
-		if (!is.null(ctrl0$isys)){
-			ctrl.is <- args(ctrl0$isys)
-			ctrl.is$method <- method(ctrl0$isys)
-			ctrl.is$ctrl <- ctrl
-			ctrl.is$stk <- stk0
-			ctrl.is$args <- args #ay <- ay
-			ctrl.is$tracking <- tracking
-			ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval), ov=list(t1=flfval))
-			out <- do.call("mpDispatch", ctrl.is)
-			ctrl <- out$ctrl
-			tracking <- out$tracking
-		}		
-		tracking["metric.is", ac(ay)] <- ctrl$value
-
-		#----------------------------------------------------------
-		# Technical measures
-		#----------------------------------------------------------
-		#cat("tm\n")
-		if (!is.null(ctrl0$tm)){
-			ctrl.tm <- args(ctrl0$tm)
-			ctrl.tm$method <- method(ctrl0$tm)
-			ctrl.tm$stk <- stk0
-			ctrl.tm$args <- args #sqy <- sqy
-			ctrl.tm$tracking <- tracking
-			ctrl.tm$ioval <- list(iv=list(t1=flsval), ov=list(t1=flqval))
-			out <- do.call("mpDispatch", ctrl.tm)
-			attr(ctrl, "snew") <- out$flq
-			tracking <- out$tracking
-		}
-
-		#==========================================================
-		# IEM
-		#==========================================================
-		#cat("iem\n")
-		if(!is.null(iem)){
-			ctrl.iem <- args(iem)
-			ctrl.iem$method <- method(iem)
-			ctrl.iem$ctrl <- ctrl
-			ctrl.iem$args <- args
-			ctrl.iem$tracking <- tracking
-			ctrl.iem$ioval <- list(iv=list(t1=flfval), ov=list(t1=flfval))
-			out <- do.call("mpDispatch", ctrl.iem)
-			ctrl <- out$ctrl
-			tracking <- out$tracking
-		}
-		tracking["metric.iem",ac(ay)] <- ctrl$value
-
-		#==========================================================
-		# OM
-		# fleet dynamics/behaviour
-		#==========================================================
-		#cat("fb\n")
-		if (!is.null(fb)){
-			ctrl.fb <- args(fb)
-			ctrl.fb$method <- method(fb)
-			ctrl.fb$ctrl <- ctrl
-			ctrl.fb$args <- args
-			ctrl.fb$tracking <- tracking
-			ctrl.fb$ioval <- list(iv=list(t1=flfval), ov=list(t1=flfval))
-			out <- do.call("mpDispatch", ctrl.fb)
-			ctrl <- out$ctrl
-			tracking <- out$tracking
-		}
-	  # TODO value()
-		tracking["metric.fb",ac(ay)] <- ctrl$value
-
-		#----------------------------------------------------------
-		# stock dynamics and OM projections
-		#----------------------------------------------------------
-		#cat("om\n")
-		if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[,ac(ay+1)] <- 
-      attr(ctrl, "snew")
-		ctrl.om <- args(projection)
-
-		# update with decision made having into account management lag
-		ctrl <- getCtrl(tracking["metric.iem", ac(args$ay-args$management_lag+1)],
-      ac(ctrl$quant), ay+1, it, ctrl$relYear)   		
-		ctrl.om$ctrl <- ctrl
-		ctrl.om$stk <- stk.om
-		ctrl.om$sr <- sr.om
-		ctrl.om$deviances <- sr.om.res
-		# ctrl.om$sr.residuals.mult <- sr.om.res.mult
-		ctrl.om$method <- method(projection)
-		ctrl.om$ioval <- list(iv=list(t1=flsval, t2=flfval), ov=list(t1=flsval))
-		stk.om <- do.call("mpDispatch", ctrl.om)$object
-
-	}
-	list(stk.om=stk.om, tracking=tracking, oem=oem, args=args)
-} # }}}
-
 # goFish(FLombf) {{{
 
-setMethod("goFish", signature(om="FLombf"),
+setMethod("goFish", signature(om="FLo"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) {
-	
+  
   it <- args$it     # number of iterations
 	y0 <- args$y0     # initial data year
 	fy <- args$fy     # final year
@@ -415,10 +208,10 @@ setMethod("goFish", signature(om="FLombf"),
 
   # DEBUG END at fy - data_lag
 	for(i in vy[-length(vy)]) {
+		
+    if(verbose) cat(i, " > ")
 
-		gc()
-		if(verbose) cat(i, " > ")
-		ay <- args$ay <- an(i)
+    ay <- args$ay <- an(i)
 		dy <- args$dy <- ay - data_lag
     
     # years for status quo computations 
@@ -430,6 +223,7 @@ setMethod("goFish", signature(om="FLombf"),
     track(tracking, "C.om", ay) <- window(catch(om), start=dy, end=dy)
     
     # --- OEM: Observation Error Model
+
 		ctrl.oem <- args(oem)
 		ctrl.oem$method <- method(oem)
 		ctrl.oem$deviances <- deviances(oem)
@@ -536,7 +330,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
 			tracking <- out$tracking
       
-      add(tracking, "isys") <- ctrl
+      # add(tracking, "isys") <- ctrl
 		}		
 
 		#----------------------------------------------------------
@@ -625,6 +419,7 @@ setMethod("goFish", signature(om="FLombf"),
     om <- do.call("mpDispatch", ctrl.om)$object
 
     # DEBUG trackctl[[ac(ay)]] <- rbindlist(tracking$control, idcol="step")
+		gc()
 	}
   
   # DEBUG tracking <- rbindlist(trackctl)
