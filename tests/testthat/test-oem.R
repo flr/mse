@@ -6,8 +6,11 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
+load_all()
 
 data(ple4om)
+
+om <- fwd(om, control=fwdControl(year=2018:2030, quant="fbar", value=0.15))
 
 # --- perfect.oem
 
@@ -48,6 +51,9 @@ deviances(oem)$idx <- FLQuants(A=deviances(oem)$idx[[1]],
 
 # TODO deviances(oem, 'idx')
 
+method(oem) <- sampling.oem
+
 obs <- method(oem)(om, deviances=deviances(oem), observations=observations(oem),
   args=list(y0=1957, dy=2018, ay=2019, frq=1), tracking=FLQuant(), oe="both")
 
+obs$idx
