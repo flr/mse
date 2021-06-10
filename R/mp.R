@@ -29,7 +29,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
   tracking="missing", verbose=TRUE, parallel=TRUE){
 
   # --- EXTRACT args
-
+browser()
   iy <- args$iy
 
   if(is.null(iy))

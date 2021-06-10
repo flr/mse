@@ -59,15 +59,15 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1,
   # GET TAC dy / ay - 1
 
   if(ay == iy)
-    prev_tac <- initac
+    prev_tac <- rep(c(initac), length=args$it)
   else
     prev_tac <- c(tracking[[1]]["isys", ac(dy)])
 
-  # FORECAST for ay - dlag + 1
-  # DEBUG TAC max in year 1?
+  # FORECAST for ay - dlag + 1 DEBUG TAC vs Fsquo in year 1?
+
   fctrl <- fwdControl(
     list(year=seq(ay - dlag + 1, length=mlag), quant="fbar",
-    value=rep(c(fbar(stk)[, ac(dy)]), mlag)),
+      value=rep(c(fbar(stk)[, ac(dy)]), mlag)),
     list(year=ay + mlag, quant="fbar", value=ctrl$value))
 
   fut <- fwd(fut, sr=srr, control=fctrl)
@@ -91,7 +91,6 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1,
 }
 
 # }}}
-
 
 # effort.is {{{
 
@@ -118,6 +117,8 @@ effort.is <- function(stk, ctrl, args, tracking){
 	list(ctrl = ctrl, tracking = tracking)
 } # }}}
 
+# indicator.is {{{
+
 #' indicator implementation function
 #'
 #' @param stk The perceived FLStock.
@@ -140,37 +141,3 @@ indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"),
 	# return
 	list(ctrl = ctrl, tracking = tracking)
 } # }}}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

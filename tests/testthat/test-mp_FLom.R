@@ -137,36 +137,14 @@ args(ctrl.sc$hcr) <- list(ftrg=0.57, blim=16200,fmin=0.05,bsafe=21400)
 
 method(oem) <- sampling.oem
 
-
 an <- mp(om, oem, iem, args=mpargs, ctrl=ctrl.sc)
 
 ctrl <- mpCtrl(list(
     est = mseCtrl(method=perfect.sa),
     hcr = ctrl.sc$hcr,
-    isys = mseCtrl(method=tac.is,args=list(initac=27599))
+    isys = mseCtrl(method=tac.is,args=list(initac=27599, dtaclow=0.85, dtacupp=1.15))
 ))
 an <- mp(om, oem, iem, args=mpargs, ctrl=ctrl)
-
-
-# Short-Cut
-shortcut = list()
-for(i in 1:length(mps)){
-  ctrl.sc <- mpCtrl(list(
-    est = mseCtrl(method=perfect.sa),
-    hcr = hcrs[[i]],
-    isys = mseCtrl(method=tac.is,args=list(initac=27599))
-  ))
-  shortcut[[i]] = mp(om, oem=oem, ctrl=ctrl.sc, args=mpargs)
-}
-
-stks.sc=FLStocks(lapply(shortcut,function(x)stock(om(x))))
-stks.sc@names = paste(mps)
-OM = FLStocks(OM=window(stk_fci,end=iy))
-p1l1=plot(FLStocks(c(OM,stks.sc)))
-p1l1 + facet_wrap(~qname, scales="free")+xlim(2010,2033)+ggtitle("Short-Cut MSE: 0.7xFmsy")
-
-not doing the job yet
-
 
 
 
