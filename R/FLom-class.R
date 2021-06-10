@@ -410,7 +410,11 @@ setMethod("iter", signature(obj="FLo"),
 
 # combine {{{
 
-#' @rdname FLo-class
+#' @rdname FLom-class
+#' @examples
+#' data(ple4om)
+#' comb <- combine(iter(om, 1:10), iter(om, 11:25))
+#' all.equal(om, comb)
 
 setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 	
@@ -422,20 +426,11 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 	
   } else {
 
-    stock <- combine(stock(x), stock(y))
-    sr <- combine(sr(x), sr(y))
-    refpts <- combine(refpts(x), refpts(y))
+    stock(x) <- combine(stock(x), stock(y))
+    sr(x) <- combine(sr(x), sr(y))
+    refpts(x) <- cbind(refpts(x), refpts(y))
 
-		obj <- x
-		dev <- deviances(obj)
-		obs <- observations(obj)
-		for(i in 1:length(dev))
-      dev[[i]] <- combine(deviances(x)[[i]], deviances(y)[[i]])
-		for(i in 1:length(obs))
-      obs [[i]] <- combine(observations(x)[[i]], observations(y)[[i]])
-		dev -> deviances(obj)
-		obs -> observations(obj)
-		return(obj)
+    return(x)
 	}
 })
 # }}}

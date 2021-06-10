@@ -9,7 +9,6 @@
 
 data(ple4om)
 
-
 # args
 
 mpargs <- list(iy=1994, fy=2021)
@@ -81,5 +80,19 @@ ggplot(res, aes(x=ssb, y=f)) +
   geom_segment(x=blim, xend=bsafe, y=fmin, yend=ftrg) +
   geom_segment(x=bsafe, xend=max(res$ssb), y=ftrg, yend=ftrg) +
   ylab(expression(bar(F))) + xlab("SSB (t)")
+
+
+# TEST parallel
+
+library(doParallel)
+registerDoParallel(1)
+
+ctrl <- mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, blim=200000,
+    bsafe=300000)),
+  isys = mseCtrl(method=tac.is)))
+
+rp3 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
 
 

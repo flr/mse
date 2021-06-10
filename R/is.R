@@ -90,8 +90,6 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1,
 # }}}
 
 
-
-
 # effort.is {{{
 
 #' effort implementation function

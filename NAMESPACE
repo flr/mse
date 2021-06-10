@@ -53,7 +53,6 @@ export(
   "perfect.sa",
   "sampling.oem",
   "tac.is",
-  "track",
   "tunebisect")
 
 exportClasses(
@@ -126,6 +125,7 @@ exportMethods(
   "tm",
   "tm<-",
   "tsb",
+  "track<-",
   "tracking",
   "tracking<-",
   "wt")

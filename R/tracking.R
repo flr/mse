@@ -6,30 +6,32 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
+setGeneric("track<-", function(object, ..., value)
+  standardGeneric("track<-"))
 
-# tracking FLQuant / FLQuants
+setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
+  function(object, step, year=value$year, ..., value) {
 
-track <- function(list, metric, year) {
-    lapply(list[[1]], "[", metric, ac(year))
-}
+    object[[1]][step, ac(year)] <- value$value
 
-`track<-` <- function(list, metric, year, value) {
-
-  if(is(value, "FLQuant")) {
-    list[[1]][[1]][metric, ac(year)] <- value
-  
-  } else if(is(value, "numeric")) {
-    list[[1]][[1]][metric, ac(year)] <- value
-  
-  } else if(is(value, "FLQuants")) {
-    for(i in names(value))
-      list[[1]][[i]][metric, ac(year)] <- value[[i]]
+    return(object)
   }
-  
-  return(list)
-}
+)
 
-`add<-` <- function(list, step, value) {
-  list[["control"]][[step]] <- as(value, "data.frame")
-  return(list) 
-}
+setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
+  function(object, step, year=dimnames(value)$year, ..., value) {
+
+    object[[1]][step, ac(year)] <- c(value)
+
+    return(object)
+  }
+)
+
+setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
+  function(object, step, year=dimnames(value)$year, ..., value) {
+
+    object[[1]][step, ac(year)] <- c(value)
+
+    return(object)
+  }
+)

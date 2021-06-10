@@ -31,7 +31,7 @@
 FLmse <- setClass("FLmse",
 	slots=c(
     om="FLo",
-		tracking="list",
+		tracking="FLQuants",
     control="mpCtrl",
     oem="FLoem",
     # TODO args vs. mpargs
@@ -86,17 +86,34 @@ setReplaceMethod("om", signature("FLmse", "FLo"), function(object, value){
 setGeneric("tracking", function(object, ...) standardGeneric("tracking"))
 
 #' @rdname FLmse-class
-setMethod("tracking", "FLmse", function(object) object@tracking)
+setMethod("tracking", "FLmse", function(object) {
+  if(length(object@tracking) == 1)
+    return(object@tracking[[1]])
+  else
+    return(object@tracking)
+  }
+)
 
 #' @rdname FLmse-class
 #' @param value the new object
 #' @aliases tracking<- tracking<--methods
-setGeneric("tracking<-", function(object, value) standardGeneric("tracking<-"))
+setGeneric("tracking<-", function(object, ..., value) standardGeneric("tracking<-"))
 
 #' @rdname FLom-class
-setReplaceMethod("tracking", signature("FLmse", "FLQuant"), function(object, value){
-	object@tracking <- value
-	object
+setReplaceMethod("tracking", signature("FLmse", "FLQuants"),
+  function(object, value) {
+	  object@tracking <- value
+  	object
+})
+
+setReplaceMethod("tracking", signature("FLmse", "FLQuant"),
+  function(object, biol, value) {
+    if(length(object@tracking) == 1)
+  	  object@tracking[[1]] <- value
+    else
+  	  object@tracking[[biol]] <- value
+
+  	object
 })
 
 # control

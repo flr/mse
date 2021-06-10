@@ -64,25 +64,16 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 
 	metric <- c("C.obs", "F.est", "B.est", "C.est", "conv.est",
     "F.om", "B.om", "C.om")
-  steps <- c("phcr", "hcr", "is", "tm", "iem", "fb")
+  steps <- c("phcr", "hcr", "isys", "tm", "iem", "fb")
 
 	if (!missing(tracking))
     metric <- c(tracking, metric)
-  
-  tracking <- FLQuant(NA, dimnames=list(metric=metric,
-    year=unique(c((iy - args$management_lag + 1):iy, vy)),
-    iter=1:args$it))
 
-  # SET tracking by OM class DEBUG
-  if(is(om, "FLombf")) {
-    tracking <- list(
-      FLQuants(lapply(setNames(nm=names(biols(om))), function(x) tracking)),
-      control=as.list(setNames(nm=names(ctrl)[names(ctrl) %in% steps])))
-  } else {
-	  tracking <- list(
-      FLQuants(tracking), 
-      control=as.list(setNames(nm=names(ctrl)[names(ctrl) %in% steps])))
-  }
+  # TODO MULTIPLY for FLombf
+  tracking <- FLQuants(FLQuant(NA, dimnames=list(
+    metric=c(metric, steps[steps %in% names(ctrl)]),
+    year=unique(c((iy - args$management_lag + 1):iy, vy)),
+    iter=1:args$it)))
 
   # GET historical from OM DEBUG different fron original
   hyrs <- ac(c(iy - args$management_lag + 1, iy))
@@ -106,10 +97,10 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 	}
 
 	# PREPARE for parallel if needed
+  cores <- getDoParWorkers()
 
-	if(isTRUE(parallel)){# & getDoParWorkers() > 1){
+	if(isTRUE(parallel) & cores > 1){
 
-    cores <- getDoParWorkers()
 		cat("Going parallel with ", cores, " cores !\n")
 
     its <- split(seq(it), sort(seq(it) %% 2))
@@ -117,7 +108,6 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
     # LOOP and combine
 		lst0 <- foreach(j=its, 
 			.combine=function(...) {
-        browser()
 				list(
           # TODO combine(FLom)
 					om=do.call('combine', lapply(list(...), '[[', 'om')),
@@ -130,11 +120,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 			.errorhandling = "pass", 
 			.inorder=TRUE) %dopar% {
 
-				# in case of parallel each core receives one iter
-				args$it <- 1
-        
 				call0 <- list(
-          om <- iter(om, j),
+          om = iter(om, j),
 					oem = iter(oem, j),
           tracking = iter(tracking[[1]], j),
 					fb=fb, # needs it selection
@@ -143,6 +130,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 					ctrl= iters(ctrl, j),
 					args=args,
 					verbose=verbose)
+
+        browser()
 
 				out <- do.call(goFish, call0)
 				list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
@@ -200,9 +189,6 @@ setMethod("goFish", signature(om="FLo"),
 
   # COPY ctrl
 	ctrl0 <- ctrl
-
-  # CREATE list for tracking$controls
-  trackctl <- setNames(as.list(vy[-length(vy)]), nm=vy[-length(vy)])
 
 	# go fish
 	
@@ -263,11 +249,10 @@ setMethod("goFish", signature(om="FLo"),
       }
 			tracking <- out.assess$tracking
 		}
-    # TODO How to handle 1-stock OM and 2-stock SA
+
     track(tracking, "F.est", ay) <- window(fbar(stk0), start=dy, end=dy)
     track(tracking, "B.est", ay) <- window(ssb(stk0), start=dy, end=dy)
-    # DEBUG stk0 areas
-    track(tracking, "C.om", ay) <- areaSums(window(catch(stk0), start=dy, end=dy))
+    track(tracking, "C.est", ay) <- window(catch(stk0), start=dy, end=dy)
 
 		# --- HCR parametrization
 		
@@ -309,7 +294,7 @@ setMethod("goFish", signature(om="FLo"),
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+args$management_lag, it)
     }
 
-    # DEBUG add(tracking, "hcr") <- ctrl
+    track(tracking, "hcr", ay) <- ctrl
 
 		#----------------------------------------------------------
 		# Implementation system
@@ -328,8 +313,8 @@ setMethod("goFish", signature(om="FLo"),
 			
       ctrl <- out$ctrl
 			tracking <- out$tracking
-      
-      # add(tracking, "isys") <- ctrl
+
+      track(tracking, "isys", ay) <- ctrl
 		}		
 
 		#----------------------------------------------------------
@@ -349,7 +334,7 @@ setMethod("goFish", signature(om="FLo"),
       attr(ctrl, "snew") <- out$flq
 			tracking <- out$tracking
 
-      add(tracking, "tm") <- ctrl
+      track(tracking, "tm", ay) <- ctrl
 		}
 
 		#==========================================================
@@ -369,7 +354,7 @@ setMethod("goFish", signature(om="FLo"),
       ctrl <- out$ctrl
 			tracking <- out$tracking
       
-      add(tracking, "iem") <- ctrl
+      track(tracking, "iem", ay) <- ctrl
 		}
 
 		#==========================================================
@@ -390,7 +375,7 @@ setMethod("goFish", signature(om="FLo"),
       ctrl <- out$ctrl
 			tracking <- out$tracking
       
-      add(tracking, "fb") <- ctrl
+      track(tracking, "fb", ay) <- ctrl
 		}
 
 		#----------------------------------------------------------
@@ -411,18 +396,14 @@ setMethod("goFish", signature(om="FLo"),
 		ctrl.om <- args(projection)
     ctrl.om$ctrl <- ctrl
 		ctrl.om$om <- om
-		# ctrl.om$deviances <- sr.om.res
 		ctrl.om$method <- method(projection)
 		ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
     
     om <- do.call("mpDispatch", ctrl.om)$object
 
-    # DEBUG trackctl[[ac(ay)]] <- rbindlist(tracking$control, idcol="step")
 		gc()
 	}
   
-  # DEBUG tracking <- rbindlist(trackctl)
-
   # RETURN
 	list(om=window(om, start=iy, end=fy), tracking=tracking, oem=oem, args=args)
 
