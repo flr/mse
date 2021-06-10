@@ -143,7 +143,7 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
       # ASSIGN in dyrs    
       index(x)[, dyrs] <- res
 
-      return(x)
+      return(window(x, end=dy))
 
     }, x=idx[upi], y=deviances$idx[upi])
 
@@ -154,8 +154,7 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
   }
 
   # return
-  list(stk=stk0, idx=window(idx, end=dy, extend=FALSE),
-    observations=observations, tracking=tracking)
+  list(stk=stk0, idx=idx, observations=observations, tracking=tracking)
 
 } # }}}
 
