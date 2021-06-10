@@ -190,7 +190,7 @@ setMethod("goFish", signature(om="FLo"),
 	ctrl0 <- ctrl
 
 	# go fish
-	
+
   for(i in vy) {
     
     if(verbose) cat(i, " > ")
@@ -287,6 +287,7 @@ setMethod("goFish", signature(om="FLo"),
 
 			out <- do.call("mpDispatch", ctrl.hcr)
       ctrl <- out$ctrl
+
 			tracking <- out$tracking
 		} else {
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
@@ -385,23 +386,18 @@ setMethod("goFish", signature(om="FLo"),
 		#----------------------------------------------------------
 
     # DEBUG WHY this?
-    if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[, ac(ay+1)] <- 
-      attr(ctrl, "snew")
+    #if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[, ac(ay+1)] <- 
+    #  attr(ctrl, "snew")
 
-		# DEBUG update with decision made having into account management lag
-		#ctrl <- getCtrl(tracking["metric.iem", ac(args$ay-args$management_lag+1)],
-    #  ac(ctrl$quant), ay+1, it, ctrl$relYear)
-
-    # APPLY management_lag
-    ctrl$year <- args$ay - args$management_lag + 1
-		
 		ctrl.om <- args(projection)
     ctrl.om$ctrl <- ctrl
 		ctrl.om$om <- om
 		ctrl.om$method <- method(projection)
 		ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
-
+    
     om <- do.call("mpDispatch", ctrl.om)$object
+
+    cat(" (", ctrl.om$ctrl$year, ") ")
 
 		gc()
 	}

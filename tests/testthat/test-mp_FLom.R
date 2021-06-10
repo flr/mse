@@ -1,4 +1,4 @@
- # test-mp_FLom.R - DESC
+# test-mp_FLom.R - DESC
 # /test-mp_FLom.R
 
 # Copyright Iago MOSQUEIRA (WMR), 2021
@@ -12,7 +12,9 @@ data(ple4om)
 # args
 
 mpargs <- list(iy=2017, fy=2025)
-mpargs <- list(iy=2017, fy=2025, management_lag=2)
+mpargs <- list(iy=2017, fy=2025, management_lag=0)
+mpargs <- list(iy=2016, fy=2025, management_lag=2)
+mpargs <- list(iy=2015, fy=2025, management_lag=3)
 
 # perfect.sa + fixedF.hcr: fbar=0.3
 
@@ -20,9 +22,11 @@ ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=FLQuant(0.3)))))
 
-r0 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
+r0 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
 plot(om(r0))
+
+ssb(r0)
 
 # perfect.sa + catchSSB.hcr: dtarget=0.40, dlimit=0.10
 

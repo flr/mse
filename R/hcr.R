@@ -122,6 +122,7 @@ ices.hcr <- function(stk, ftrg, blim, bsafe, fmin=0, args, tracking){
 #' @param stk The perceived FLStock.
 #' @param control A list with the element ftrg (numeric).
 fixedF.hcr <- function(stk, ftrg, args, tracking){
+
 	ay <- args$ay
 	# rule 
 	if(!is(ftrg, "FLQuant"))
