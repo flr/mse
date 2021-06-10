@@ -24,13 +24,18 @@
 #' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
 #' @param EFF0 The tracking array
 #' @param EFF Not used by this function but may be used by the other implementation functions
+#' @examples
+#' data(ple4om)
+#' res <- catchSSB.hcr(stock(om), MSY=140000, args=list(ay=2018, data_lag=1),
+#'   tracking=FLQuant())
+#' 
+# args <- list(ay=2010, iy=2010, management_lag=1, nsqy=3, dy=2009)
+# stk <- window(stock(om), end=args$dy)
 
-args <- list(ay=2010, iy=2010, management_lag=1, nsqy=3, dy=2009)
+# ADD initial TAC, initac=catch(stk[, args$iy])
 
-stk <- window(stock(om), end=args$dy)
-
-
-tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1, tracking) {
+tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1,
+  fmin=0, initac=100000, tracking) {
 
   # EXTRACT args
 
@@ -38,9 +43,10 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1, tracking) 
   dy <- args$dy
   iy <- args$iy
   mlag <- args$management_lag
+  dlag <- args$data_lag
   nsqy <- args$nsqy
 
-  # PREPARE stk until ay + mlag, biology as in lasy nsqy years
+  # PREPARE stk until ay + mlag, biology as in last nsqy years
 
   fut <- stf(stk, end=ay + mlag, wts.nyears=nsqy)
 
@@ -50,25 +56,32 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1, tracking) 
   gmnrec <- exp(yearMeans(log(window(rec(stk), end=-(recyrs)))))
   srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
 
-  # GET F dy
-
   # GET TAC dy / ay - 1
-  if(ay == iy)
-    tac <- catch(stk)[, ac(dy)]
-  else
-    tac <- track(tracking, "metric.is", dy)
 
-  # DEBUG: ay, dy + 1, ay - dlag + 1?
-  fctrl <- fwdControl(list(year=dy + 1, quant="fbar", value=fbar(stk)[, ac(dy)]),
-    list(year=dy + 1, quant="catch", max=tac))
+  if(ay == iy)
+    tac <- initac
+  else
+    tac <- 100000
+    # tac <- track(tracking, "metric.is", dy)
+
+  # FORECAST for ay - dlag + 1
+
+  fctrl <- fwdControl(list(year=ay - dlag + 1, quant="fbar", value=fbar(stk)[, ac(dy)]),
+  # DEBUG TAC max in year 1?
+    list(year=ay + mlag, quant="fbar", value=ctrl$value))
 
   fut <- fwd(fut, sr=srr, control=fctrl)
 
-  TAC <- c(catch(fut)[, ac(ay)])
+  # EXTRACT catches
+  TAC <- c(catch(fut)[, ac(ay + mlag)])
 
-  pmin(TAC, TAC * dtacupp, na.rm=TRUE)
-  pmax(TAC, TAC * dtaclow, na.rm=TRUE)
+  # 
+  i <- c(fbar(fut)[, ac(ay + mlag)] > fmin)
 
+  TAC <- pmin(TAC, tac * dtacupp, na.rm=TRUE)
+  TAC[i] <- pmax(TAC[i], tac[i] * dtaclow, na.rm=TRUE)
+
+  # CONSTRUCT fwdControl
   ctrl <- fwdControl(list(year=ay + mlag, quant="catch", value=TAC))
 
   return(list(ctrl=ctrl, tracking=tracking))

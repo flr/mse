@@ -22,7 +22,9 @@ ctrl <- mpCtrl(list(
 
 r0 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
 
-# perfect.sa + catchSSB.hcr: dtarget=0.40
+plot(om(r0))
+
+# perfect.sa + catchSSB.hcr: dtarget=0.40, dlimit=0.10
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
@@ -31,7 +33,9 @@ ctrl <- mpCtrl(list(
 
 r1 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
 
-# perfect.sa + ices.hcr: blim=200k, bsafe=300k
+plot(om(r1))
+
+# perfect.sa + ices.hcr: blim=200k, bsafe=300k, ftrg=0.15
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
@@ -40,20 +44,30 @@ ctrl <- mpCtrl(list(
 
 r2 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
 
+plot(om(r2))
+
+# perfect.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
+
+ctrl <- mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, blim=200000,
+    bsafe=300000)),
+  isys = mseCtrl(method=tac.is)))
+
+r3 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
+
+plot(om(r3))
+
+# PLOTS
 
 library(patchwork)
 
-p0 <- plot(om(r0))
-p1 <- plot(om(r1))
-p2 <- plot(om(r2))
-
-max_dims <- get_max_dim(p0, p1, p2)
-
-set_dim(p0, max_dims) + set_dim(p1, max_dims) + set_dim(p2, max_dims)
-
-p0 + p1 + p2
-
-
+(plot(om(r0)) + ggtitle("fixedF.hcr(fbar=0.3)")) +
+(plot(om(r1)) + ggtitle("catchSSB(dtarget=0.40, dlim=0.10)")) +
+(plot(om(r2)) + ggtitle("ices.hcr(blim=200k, bsafe=300k, ftrg=0.15)")) +
+(plot(om(r3)) + ggtitle("ices.hcr(...) + tac.is"))
+ 
+# 
 res <- data.frame(ssb=c(ssb(stk)[, ac(ayrs)]), f=fs, ay=ayrs, dy=ayrs-1, my=ayrs+1)
 
 iterSums(ssb(om(r0)) <
@@ -67,17 +81,5 @@ ggplot(res, aes(x=ssb, y=f)) +
   geom_segment(x=blim, xend=bsafe, y=fmin, yend=ftrg) +
   geom_segment(x=bsafe, xend=max(res$ssb), y=ftrg, yend=ftrg) +
   ylab(expression(bar(F))) + xlab("SSB (t)")
-
-
-# perfect.sa + ices.hcr + tac.is: blim=200k, bsafe=300k
-
-ctrl <- mpCtrl(list(
-  est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, blim=200000,
-    bsafe=300000)),
-  isys = mseCtrl(method=tac.is)))
-
-r3 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
-
 
 

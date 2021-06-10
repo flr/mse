@@ -385,3 +385,57 @@ fwd.om <- function(om, ctrl, ...){
 	list(object=om)
 }
 # }}}
+
+# iter {{{
+
+setMethod("iter", signature(obj="FLo"),
+  function(obj, iter) {
+
+    # stock
+    stock(obj) <- iter(stock(obj), iter)
+    
+    # refpts
+    refpts(obj) <- iter(refpts(obj), iter)
+
+    # sr
+    sr(obj) <- iter(sr(obj), iter)
+
+    # fleeBehaviour
+
+    # projection
+
+    return(obj)
+  }
+) # }}}
+
+# combine {{{
+
+#' @rdname FLo-class
+
+setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
+	
+  args <- c(list(x, y), list(...))
+
+	if(length(args) > 2) {
+
+		return(combine(combine(x, y), ...))
+	
+  } else {
+
+    stock <- combine(stock(x), stock(y))
+    sr <- combine(sr(x), sr(y))
+    refpts <- combine(refpts(x), refpts(y))
+
+		obj <- x
+		dev <- deviances(obj)
+		obs <- observations(obj)
+		for(i in 1:length(dev))
+      dev[[i]] <- combine(deviances(x)[[i]], deviances(y)[[i]])
+		for(i in 1:length(obs))
+      obs [[i]] <- combine(observations(x)[[i]], observations(y)[[i]])
+		dev -> deviances(obj)
+		obs -> observations(obj)
+		return(obj)
+	}
+})
+# }}}

@@ -57,30 +57,6 @@ catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
 
 } # }}}
 
-
-#' Evaluate the chosen HCR function
-#'
-#' Evaluate the chosen HCR function using the current stock perception and a control
-#' @param method Name of the chosen HCR function.
-#' @param stk The perceived stock.
-#' @param ay The current year. The management control (e.g. F or effort) will be set in ay+1.
-#' @param EFF Effort array (if effort management is being used).
-#' @param EFF0 Tracking array.
-#' @param control The control object for the chosen HCR function. A list of parameters.
-#h <- function(...){
-#	args <- list(...)
-#	method <- args$method
-#	args$method <- NULL
-#	# Check inputs
-#	if(!is(args$stk,"FLStock")) stop("stk argument must be an FLStock")
-#	# dispatch
-#	ctrl <- do.call(method, args)
-#	# check outputs
-#	if(!is(ctrl, "fwdControl")) stop("The HCR must return and object of class fwdControl")	
-#	# return
-#	ctrl  
-#}
-
 # ices.hcr {{{
 
 #' The typical HCR used by ICES

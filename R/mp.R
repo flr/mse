@@ -107,18 +107,20 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 
 	# PREPARE for parallel if needed
 
-	if(isTRUE(parallel) & getDoParWorkers() > 1){
+	if(isTRUE(parallel)){# & getDoParWorkers() > 1){
 
-    # DEBUG
-    stop("NOT DONE YET ---")
+    cores <- getDoParWorkers()
+		cat("Going parallel with ", cores, " cores !\n")
 
-		cat("Going parallel with ", getDoParWorkers(), " cores !\n")
-		
+    its <- split(seq(it), sort(seq(it) %% 2))
+
     # LOOP and combine
-		lst0 <- foreach(j=1:it, 
+		lst0 <- foreach(j=its, 
 			.combine=function(...) {
+        browser()
 				list(
-					stk.om=do.call('combine', lapply(list(...), '[[', 'stk.om')),
+          # TODO combine(FLom)
+					om=do.call('combine', lapply(list(...), '[[', 'om')),
 					tracking=do.call('combine', lapply(list(...), '[[', 'tracking')),
 					oem=do.call('combine', lapply(list(...), '[[', 'oem'))
 				)
@@ -130,13 +132,11 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 
 				# in case of parallel each core receives one iter
 				args$it <- 1
+        
 				call0 <- list(
-					stk.om = stk.om[,,,,,j],
-					sr.om = FLCore::iter(sr.om,j),
-					#sr.om.res = sr.om.res[,,,,,j],
-					oem = iters(oem, j),
-					tracking = tracking[,,,,,j],
-					#sr.om.res.mult=sr.om.res.mult,
+          om <- iter(om, j),
+					oem = iter(oem, j),
+          tracking = iter(tracking[[1]], j),
 					fb=fb, # needs it selection
 					projection=projection,
 					iem=iem, # needs it selection
