@@ -139,3 +139,20 @@ rp3 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
 
 
 an <- mp(om, oem, args=mpargs, ctrl=ctrl.sc)
+
+
+function (ctrl, fun = "rlnorm", mean = 0, sd = 0.1, multiplicative = TRUE, 
+    args, tracking) {
+    iem <- list(mean = mean, sd = sd, n = sum(!is.na(ctrl@iters)))
+    if (multiplicative) {
+        ctrl@iters <- do.call(fun, iem) * ctrl@iters
+    }
+    else {
+        ctrl@iters <- do.call(fun, iem) + ctrl@iters
+    }
+    lst <- list(ctrl = ctrl, tracking = tracking)
+    lst
+}
+
+
+an <- mp(om, oem, iem, args=mpargs, ctrl=ctrl.sc)

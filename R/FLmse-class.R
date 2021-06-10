@@ -210,7 +210,7 @@ setMethod("plot", signature(x="FLom", y="FLmse"),
     args <- list(...)
     fms <- unlist(lapply(args, is, "FLmse"))
 
-    stocks <- lapply(c(list(x, y), args[fms]), om)
+    stocks <- lapply(c(list(x, om(y)), args[fms]), stock)
 
     # WINDOW om
     minyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))

@@ -270,9 +270,9 @@ setMethod("goFish", signature(om="FLo"),
       hcrpars <- out$hcrpars
 			tracking <- out$tracking
 		}
-		# EJ: don't like this hack but seems to work ...
-		# by default stores the first par in tracking
-		if(exists("hcrpars")){
+
+		# TODO REVIEW & TEST
+    if(exists("hcrpars")){
 			tracking["metric.phcr", ac(ay)] <- hcrpars[1,1,,drop=TRUE]
 		 }
 
@@ -342,7 +342,8 @@ setMethod("goFish", signature(om="FLo"),
 		#==========================================================
 		#cat("iem\n")
 		if(!is.null(iem)){
-			ctrl.iem <- args(iem)
+			
+      ctrl.iem <- args(iem)
 			ctrl.iem$method <- method(iem)
 			ctrl.iem$ctrl <- ctrl
 			ctrl.iem$args <- args
