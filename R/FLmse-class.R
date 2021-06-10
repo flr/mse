@@ -292,3 +292,13 @@ setMethod("metrics", signature(object="FLmse", metrics="missing"),
   function(object) {
     metrics(om(object))
 }) # }}}
+
+# om accessors {{{
+
+setMethod("stock", "FLmse", function(object) stock(om(object)))
+
+setMethod("ssb", "FLmse", function(object) ssb(stock(om(object))))
+
+setMethod("catch", "FLmse", function(object) catch(stock(om(object))))
+
+# }}}

@@ -32,10 +32,10 @@
 # args <- list(ay=2010, iy=2010, management_lag=1, nsqy=3, dy=2009)
 # stk <- window(stock(om), end=args$dy)
 
-# ADD initial TAC, initac=catch(stk[, args$iy])
+# ADD initial TAC, initac=catch(stk[, ac(iy)])
 
 tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1,
-  fmin=0, initac=100000, tracking) {
+  fmin=0, initac=catch(stk[, ac(iy - 1)]), tracking) {
 
   # EXTRACT args
 
@@ -59,15 +59,15 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1,
   # GET TAC dy / ay - 1
 
   if(ay == iy)
-    tac <- initac
+    prev_tac <- initac
   else
-    tac <- 100000
-    # tac <- track(tracking, "metric.is", dy)
+    prev_tac <- c(tracking[[1]]["isys", ac(dy)])
 
   # FORECAST for ay - dlag + 1
-
-  fctrl <- fwdControl(list(year=ay - dlag + 1, quant="fbar", value=fbar(stk)[, ac(dy)]),
   # DEBUG TAC max in year 1?
+  fctrl <- fwdControl(
+    list(year=seq(ay - dlag + 1, length=mlag), quant="fbar",
+    value=rep(c(fbar(stk)[, ac(dy)]), mlag)),
     list(year=ay + mlag, quant="fbar", value=ctrl$value))
 
   fut <- fwd(fut, sr=srr, control=fctrl)
@@ -75,11 +75,14 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1,
   # EXTRACT catches
   TAC <- c(catch(fut)[, ac(ay + mlag)])
 
-  # 
+  # APPLY upper TAC limit
+  TAC <- pmin(TAC, c(prev_tac) * dtacupp, na.rm=TRUE)
+
+  # ID iters where F > fmin
   i <- c(fbar(fut)[, ac(ay + mlag)] > fmin)
 
-  TAC <- pmin(TAC, tac * dtacupp, na.rm=TRUE)
-  TAC[i] <- pmax(TAC[i], tac[i] * dtaclow, na.rm=TRUE)
+  # APPLY lower TAC limit, only if F > fmin
+  TAC[i] <- pmax(TAC[i], c(prev_tac)[i] * dtaclow, na.rm=TRUE)
 
   # CONSTRUCT fwdControl
   ctrl <- fwdControl(list(year=ay + mlag, quant="catch", value=TAC))

@@ -124,9 +124,9 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
           om = iter(om, j),
 					oem = iter(oem, j),
           tracking = iter(tracking[[1]], j),
-					fb=fb, # needs it selection
+					fb=fb,    # TODO needs it selection
 					projection=projection,
-					iem=iem, # needs it selection
+					iem=iem,  # TODO needs it selection
 					ctrl= iters(ctrl, j),
 					args=args,
 					verbose=verbose)
@@ -290,7 +290,7 @@ setMethod("goFish", signature(om="FLo"),
       ctrl <- out$ctrl
 			tracking <- out$tracking
 		} else {
-			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay+args$management_lag, it)
+			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
     }
 
     track(tracking, "hcr", ay) <- ctrl
@@ -300,6 +300,7 @@ setMethod("goFish", signature(om="FLo"),
 		#----------------------------------------------------------
 		#cat("is\n")
 		if (!is.null(ctrl0$isys)){
+
 			ctrl.is <- args(ctrl0$isys)
 			ctrl.is$method <- method(ctrl0$isys)
 			ctrl.is$ctrl <- ctrl
@@ -321,6 +322,7 @@ setMethod("goFish", signature(om="FLo"),
 		#----------------------------------------------------------
 		#cat("tm\n")
 		if (!is.null(ctrl0$tm)){
+
 			ctrl.tm <- args(ctrl0$tm)
 			ctrl.tm$method <- method(ctrl0$tm)
 			ctrl.tm$stk <- stk0
@@ -363,6 +365,7 @@ setMethod("goFish", signature(om="FLo"),
 		#==========================================================
 		#cat("fb\n")
 		if (!is.null(fb)){
+
 			ctrl.fb <- args(fb)
 			ctrl.fb$method <- method(fb)
 			ctrl.fb$ctrl <- ctrl
@@ -381,9 +384,9 @@ setMethod("goFish", signature(om="FLo"),
 		#----------------------------------------------------------
 		# stock dynamics and OM projections
 		#----------------------------------------------------------
-    
+
     # DEBUG WHY this?
-    if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[,ac(ay+1)] <- 
+    if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[, ac(ay+1)] <- 
       attr(ctrl, "snew")
 
 		# DEBUG update with decision made having into account management lag

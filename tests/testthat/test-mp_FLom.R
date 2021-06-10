@@ -1,4 +1,4 @@
-# test-mp_FLom.R - DESC
+ # test-mp_FLom.R - DESC
 # /test-mp_FLom.R
 
 # Copyright Iago MOSQUEIRA (WMR), 2021
@@ -11,7 +11,8 @@ data(ple4om)
 
 # args
 
-mpargs <- list(iy=1994, fy=2021)
+mpargs <- list(iy=2017, fy=2025)
+mpargs <- list(iy=2017, fy=2025, management_lag=2)
 
 # perfect.sa + fixedF.hcr: fbar=0.3
 
@@ -51,7 +52,7 @@ ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, blim=200000,
     bsafe=300000)),
-  isys = mseCtrl(method=tac.is)))
+  isys = mseCtrl(method=tac.is, args=list(initac=25000))))
 
 r3 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
 
@@ -61,7 +62,7 @@ plot(om(r3))
 
 library(FLa4a)
 
-mpargs <- list(iy=1994, fy=1996)
+mpargs <- list(iy=2017, fy=2025)
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=sca.sa),
@@ -72,30 +73,6 @@ ctrl <- mpCtrl(list(
 r4 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
 
 plot(om(r4))
-
-
-sca.sa <- function(stk, idx, args, update=TRUE, dfm=c(0.75, 0.75), ...){
-
-	args0 <- list(...)
-	
-  if(update) args0$fmodel <- defaultFmod(stk, dfm=dfm)
-	
-  stk <- replaceZeros(stk)
-	idx <- replaceZeros(idx)
-	
-  args0$stock <- stk
-	args0$indices <- idx
-	if(is.null(args0$fit)) args0$fit <- 'MP'
-	tracking <- args0$tracking
-	args0$tracking <- NULL
-	fit <- do.call('sca', args0)
-	stk <- stk + fit
-	track(tracking, "conv.est", ac(range(stk)["maxyear"] + 1)) <- fit@fitSumm["maxgrad",]
-	list(stk = stk, tracking = tracking)
-}
-
-
-
 
 
 # PLOTS
@@ -162,3 +139,36 @@ method(oem) <- sampling.oem
 
 
 an <- mp(om, oem, iem, args=mpargs, ctrl=ctrl.sc)
+
+ctrl <- mpCtrl(list(
+    est = mseCtrl(method=perfect.sa),
+    hcr = ctrl.sc$hcr,
+    isys = mseCtrl(method=tac.is,args=list(initac=27599))
+))
+an <- mp(om, oem, iem, args=mpargs, ctrl=ctrl)
+
+
+# Short-Cut
+shortcut = list()
+for(i in 1:length(mps)){
+  ctrl.sc <- mpCtrl(list(
+    est = mseCtrl(method=perfect.sa),
+    hcr = hcrs[[i]],
+    isys = mseCtrl(method=tac.is,args=list(initac=27599))
+  ))
+  shortcut[[i]] = mp(om, oem=oem, ctrl=ctrl.sc, args=mpargs)
+}
+
+stks.sc=FLStocks(lapply(shortcut,function(x)stock(om(x))))
+stks.sc@names = paste(mps)
+OM = FLStocks(OM=window(stk_fci,end=iy))
+p1l1=plot(FLStocks(c(OM,stks.sc)))
+p1l1 + facet_wrap(~qname, scales="free")+xlim(2010,2033)+ggtitle("Short-Cut MSE: 0.7xFmsy")
+
+not doing the job yet
+
+
+
+
+
+

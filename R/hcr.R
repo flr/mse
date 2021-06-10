@@ -97,7 +97,7 @@ ices.hcr <- function(stk, ftrg, blim, bsafe, fmin=0, args, tracking){
 	man_lag <- args$management_lag
 
   # GET ssb metric
-	ssb <- ssb(stk)[, ac(ay-ssb_lag)]
+	ssb <- ssb(stk)[, ac(ay - ssb_lag)]
 
 	# APPLY rule
 

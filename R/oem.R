@@ -92,7 +92,7 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
 
   # GET perfect stock
 	stk <- window(stock(om), start=y0, end=dy, extend=FALSE)
-  
+
   # STK: catch.n
   if(any(oe %in% c("both","catch"))) {
 
