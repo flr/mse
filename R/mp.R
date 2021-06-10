@@ -29,7 +29,6 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
   tracking="missing", verbose=TRUE, parallel=TRUE){
 
   # --- EXTRACT args
-browser()
   iy <- args$iy
 
   if(is.null(iy))
@@ -76,8 +75,8 @@ browser()
     iter=1:args$it)))
 
   # GET historical from OM DEBUG different fron original
-  hyrs <- ac(c(iy - args$management_lag + 1, iy))
-  track(tracking, "F.om", hyrs) <- window(catch(om), start=hyrs[1], end=hyrs[2])
+  # hyrs <- ac(c(iy - args$management_lag + 1, iy))
+  # track(tracking, "F.om", hyrs) <- window(catch(om), start=hyrs[1], end=hyrs[2])
 	
 	# SET seed
 	if (!is.null(args$seed)) set.seed(args$seed)

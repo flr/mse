@@ -63,12 +63,20 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=1,
   else
     prev_tac <- c(tracking[[1]]["isys", ac(dy)])
 
-  # FORECAST for ay - dlag + 1 DEBUG TAC vs Fsquo in year 1?
+  # FORECAST for iyrs and my IF mlag > 0, else only my
+  # DEBUG TAC vs Fsquo in year 1?
 
-  fctrl <- fwdControl(
-    list(year=seq(ay - dlag + 1, length=mlag), quant="fbar",
-      value=rep(c(fbar(stk)[, ac(dy)]), mlag)),
-    list(year=ay + mlag, quant="fbar", value=ctrl$value))
+  if(mlag > 0) {
+
+    fctrl <- fwdControl(
+      list(year=seq(ay - dlag + 1, length=mlag), quant="fbar",
+        value=rep(c(fbar(stk)[, ac(dy)]), mlag)),
+      list(year=ay + mlag, quant="fbar", value=ctrl$value))
+  } else {
+
+    fctrl <- fwdControl(
+      list(year=ay + mlag, quant="fbar", value=ctrl$value))
+  }
 
   fut <- fwd(fut, sr=srr, control=fctrl)
 
