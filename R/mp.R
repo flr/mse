@@ -193,7 +193,7 @@ setMethod("goFish", signature(om="FLo"),
 	# go fish
 	
   for(i in vy) {
-		
+    
     if(verbose) cat(i, " > ")
 
     ay <- args$ay <- an(i)
@@ -287,7 +287,6 @@ setMethod("goFish", signature(om="FLo"),
 			ctrl.hcr$ioval <- list(iv=list(t1=flssval), ov=list(t1=flfval))
 
 			out <- do.call("mpDispatch", ctrl.hcr)
-			
       ctrl <- out$ctrl
 			tracking <- out$tracking
 		} else {
@@ -399,7 +398,7 @@ setMethod("goFish", signature(om="FLo"),
 		ctrl.om$om <- om
 		ctrl.om$method <- method(projection)
 		ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
-    
+
     om <- do.call("mpDispatch", ctrl.om)$object
 
 		gc()

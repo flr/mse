@@ -99,8 +99,21 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
     # ADD 1 individual to avoid some methods crashing on 0s
     catch.n(observations$stk)[, dyrs] <- catch.n(stk)[, dyrs] *
       deviances$stk$catch.n[, dyrs] + 1
+    
+    # TODO landings and discards
+    #landings.n(observations$stk)[, dyrs] <- landings.n(stk)[, dyrs] *
+    #  deviances$stk$landings.n[, dyrs] + 1
+    # landings(observations$stk)[, dyrs] <- computeLandings(observations$stk[, dyrs])
+
+    #discards.n(observations$stk)[, dyrs] <- discards.n(stk)[, dyrs] *
+    #  deviances$stk$discards.n[, dyrs] + 1
+    # discards(observations$stk)[, dyrs] <- computeDiscards(observations$stk[, dyrs])
 
     catch(observations$stk)[, dyrs] <- computeCatch(observations$stk[, dyrs])
+
+    # SHORTCUT 
+    stock.n(observations$stk)[, dyrs] <- stock.n(stk)[, dyrs]
+    harvest(observations$stk)[, dyrs] <- harvest(stk)[, dyrs]
 
     # SET output stock
     stk0 <- observations$stk[, yrs]
@@ -110,27 +123,35 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
   }
 
   # IDX: indices, index.q
-  idx <- observations$idx
-
-  # CHOOSE indices to be updated (maxyear >= dy)
-  upi <- unlist(lapply(idx, function(x) range(x, "maxyear") > args$dy))
-
-  # APPLY survey() with deviances$idx as index.q
-
-  idx[upi] <- Map(function(x, y) {
+  if(any(oe %in% c("both","indices"))) {
     
-    res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
-      index.q=y[, dyrs])
+    idx <- observations$idx
+
+    # CHOOSE indices to be updated (maxyear >= dy)
+    upi <- unlist(lapply(idx, function(x) range(x, "maxyear") > args$dy))
+
+    # APPLY survey() with deviances$idx as index.q
+
+    idx[upi] <- Map(function(x, y) {
+
+      res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
+        index.q=y[, dyrs])
     
-    # SET 0s to min / 2
-    res[res == 0] <- min(res[res > 0] / 2)
+      # SET 0s to min / 2
+      res[res == 0] <- min(res[res > 0] / 2)
 
-    # ASSIGN in dyrs    
-    index(x)[, dyrs] <- res
+      # ASSIGN in dyrs    
+      index(x)[, dyrs] <- res
 
-    return(x)
+      return(x)
 
-  }, x=idx[upi], y=deviances$idx[upi])
+    }, x=idx[upi], y=deviances$idx[upi])
+
+    observations$idx <- idx
+
+  } else {
+    idx <- observations$idx
+  }
 
   # return
   list(stk=stk0, idx=idx, observations=observations, tracking=tracking)

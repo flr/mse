@@ -155,4 +155,10 @@ function (ctrl, fun = "rlnorm", mean = 0, sd = 0.1, multiplicative = TRUE,
 }
 
 
+method(ctrl.sc$hcr) <- ices.hcr
+args(ctrl.sc$hcr) <- list(ftrg=0.57, blim=16200,fmin=0.05,bsafe=21400)
+
+method(oem) <- sampling.oem
+
+
 an <- mp(om, oem, iem, args=mpargs, ctrl=ctrl.sc)

@@ -89,7 +89,7 @@ catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
 #' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, blim=200000, bsafe=300000,
 #'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
 
-ices.hcr <- function(stk, fmin, ftrg, blim, bsafe, args, tracking){
+ices.hcr <- function(stk, ftrg, blim, bsafe, fmin=0, args, tracking){
 
   # args
 	ay <- args$ay
