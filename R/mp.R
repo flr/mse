@@ -63,8 +63,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 	# --- INIT tracking
 
 	metric <- c("C.obs", "F.est", "B.est", "C.est", "conv.est",
-    "F.om", "B.om", "C.om")
-  steps <- c("phcr", "hcr", "isys", "tm", "iem", "fb")
+    "F.om", "B.om", "C.om", "iem")
+  steps <- c("phcr", "hcr", "isys", "tm", "fb")
 
 	if (!missing(tracking))
     metric <- c(tracking, metric)

@@ -6,6 +6,8 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
+# track<- {{{
+
 setGeneric("track<-", function(object, ..., value)
   standardGeneric("track<-"))
 
@@ -35,3 +37,6 @@ setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
     return(object)
   }
 )
+# }}}
+
+# plot

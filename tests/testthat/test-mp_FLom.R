@@ -57,6 +57,47 @@ r3 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
 
 plot(om(r3))
 
+# a4a.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
+
+library(FLa4a)
+
+mpargs <- list(iy=1994, fy=1996)
+
+ctrl <- mpCtrl(list(
+  est = mseCtrl(method=sca.sa),
+  hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, blim=200000,
+    bsafe=300000)),
+  isys = mseCtrl(method=tac.is)))
+
+r4 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
+
+plot(om(r4))
+
+
+sca.sa <- function(stk, idx, args, update=TRUE, dfm=c(0.75, 0.75), ...){
+
+	args0 <- list(...)
+	
+  if(update) args0$fmodel <- defaultFmod(stk, dfm=dfm)
+	
+  stk <- replaceZeros(stk)
+	idx <- replaceZeros(idx)
+	
+  args0$stock <- stk
+	args0$indices <- idx
+	if(is.null(args0$fit)) args0$fit <- 'MP'
+	tracking <- args0$tracking
+	args0$tracking <- NULL
+	fit <- do.call('sca', args0)
+	stk <- stk + fit
+	track(tracking, "conv.est", ac(range(stk)["maxyear"] + 1)) <- fit@fitSumm["maxgrad",]
+	list(stk = stk, tracking = tracking)
+}
+
+
+
+
+
 # PLOTS
 
 library(patchwork)
@@ -96,3 +137,5 @@ ctrl <- mpCtrl(list(
 rp3 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
 
 
+
+an <- mp(om, oem, args=mpargs, ctrl=ctrl.sc)
