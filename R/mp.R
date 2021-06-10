@@ -397,8 +397,6 @@ setMethod("goFish", signature(om="FLo"),
     
     om <- do.call("mpDispatch", ctrl.om)$object
 
-    cat(" (", ctrl.om$ctrl$year, ") ")
-
 		gc()
 	}
   
