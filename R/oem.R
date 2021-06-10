@@ -110,14 +110,14 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
   }
 
   # IDX: indices, index.q
-  idx0 <- observations$idx
+  idx <- observations$idx
 
   # CHOOSE indices to be updated (maxyear >= dy)
-  upi <- unlist(lapply(idx0, function(x) range(x, "maxyear") > args$dy))
+  upi <- unlist(lapply(idx, function(x) range(x, "maxyear") > args$dy))
 
-  # APPLY survey() with deviances$index.q as index.q
+  # APPLY survey() with deviances$idx as index.q
 
-  idx <- Map(function(x, y) {
+  idx[upi] <- Map(function(x, y) {
     
     res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
       index.q=y[, dyrs])
@@ -130,10 +130,10 @@ sampling.oem <- function(om, deviances, observations, args, tracking,
 
     return(x)
 
-  }, x=idx0[upi], y=deviances$idx[upi])
+  }, x=idx[upi], y=deviances$idx[upi])
 
   # return
-  list(stk=stk0, idx=idx0, observations=observations, tracking=tracking)
+  list(stk=stk0, idx=idx, observations=observations, tracking=tracking)
 
 } # }}}
 

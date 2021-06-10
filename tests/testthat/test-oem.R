@@ -37,3 +37,17 @@ catch.n(obs$stk) / window(catch.n(observations(oem, "stk")), end=2017)
 
 plot(FLQuants(OEM=catch.n(obs$stk), OBS=catch.n(observations(oem, "stk"))))
 
+
+# TEST index not to be updated (ends before iy)
+
+observations(oem)$idx <- FLIndices(A=observations(oem)$idx[[1]],
+  B=window(observations(oem)$idx[[1]], end=2015))
+
+deviances(oem)$idx <- FLQuants(A=deviances(oem)$idx[[1]], 
+  B=window(deviances(oem)$idx[[1]], end=2015))
+
+# TODO deviances(oem, 'idx')
+
+obs <- method(oem)(om, deviances=deviances(oem), observations=observations(oem),
+  args=list(y0=1957, dy=2018, ay=2019, frq=1), tracking=FLQuant(), oe="both")
+
