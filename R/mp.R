@@ -397,6 +397,7 @@ setMethod("goFish", signature(om="FLo"),
     ctrl.om$ctrl <- ctrl
 		ctrl.om$om <- om
 		ctrl.om$method <- method(projection)
+    ctrl.om$deviances <- residuals(sr(om))
 		ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
     
     om <- do.call("mpDispatch", ctrl.om)$object
