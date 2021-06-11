@@ -103,7 +103,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 
 		cat("Going parallel with ", cores, " cores !\n")
 
-    its <- split(seq(it), sort(seq(it) %% 2))
+    # SPLIT iters along cores
+    its <- split(seq(it), sort(seq(it) %% cores))
 
     # LOOP and combine
 		lst0 <- foreach(j=its, 
