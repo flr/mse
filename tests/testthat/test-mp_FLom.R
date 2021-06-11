@@ -7,66 +7,74 @@
 # Distributed under the terms of the EUPL-1.2
 
 
+
+# TEST
+
+load_all()
+library(testthat)
+
+# DATA: om, oem
+
 data(ple4om)
 
-# args
 
-mpargs <- list(iy=2017, fy=2025)
-mpargs <- list(iy=2017, fy=2025, management_lag=0)
-mpargs <- list(iy=2016, fy=2025, management_lag=2)
-mpargs <- list(iy=2015, fy=2025, management_lag=3)
+# --- SIMPLE tests:
 
-# perfect.sa + fixedF.hcr: fbar=0.3
+mpargs <- list(iy=2017)
+
+# RUN 1: perfect.sa + fixedF.hcr: fbar=0.3
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=FLQuant(0.3)))))
 
-r0 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
+r1 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
-plot(om(r0))
+fbar(r1)
 
-ssb(r0)
+plot(om, R1=r1)
 
-# perfect.sa + catchSSB.hcr: dtarget=0.40, dlimit=0.10
+
+# RUN 2: perfect.sa + catchSSB.hcr: dtarget=0.40, dlimit=0.10
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=catchSSB.hcr, args=list(dtarget=0.40, dlimit=0.10,
   lambda=1, MSY=100000))))
 
-r1 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
+r2 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
-plot(om(r1))
+plot(om, R2=r2)
 
-# perfect.sa + ices.hcr: blim=200k, bsafe=300k, ftrg=0.15
 
-ctrl <- mpCtrl(list(
-  est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, blim=200000,
-    bsafe=300000))))
-
-r2 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
-
-plot(om(r2))
-
-# perfect.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
+# RUN 3: perfect.sa + ices.hcr: blim=200k, bsafe=300k, ftrg=0.15
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, blim=200000,
-    bsafe=300000)),
+  hcr = mseCtrl(method=ices.hcr,
+    args=list(fmin=0.05, ftrg=0.15, blim=200000, bsafe=300000))))
+
+r3 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
+
+plot(om, R3=r3)
+
+
+# RUN 4: perfect.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
+
+ctrl <- mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=ices.hcr,
+    args=list(fmin=0.05, ftrg=0.15, blim=200000, bsafe=300000)),
   isys = mseCtrl(method=tac.is, args=list(initac=25000))))
 
-r3 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
+r4 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
-plot(om(r3))
+plot(om, R4=r4)
 
-# a4a.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
+
+# RUN 5: a4a.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
 
 library(FLa4a)
-
-mpargs <- list(iy=2017, fy=2025)
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=sca.sa),
@@ -74,9 +82,9 @@ ctrl <- mpCtrl(list(
     bsafe=300000)),
   isys = mseCtrl(method=tac.is)))
 
-r4 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
+r5 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
-plot(om(r4))
+plot(om, r5)
 
 
 # PLOTS

@@ -32,15 +32,15 @@ indicators <- list(
   PBlim = list(~yearMeans((SB / SBlim) > 1), name = "P(SB>SB[limit])", 
     desc = "Probability that spawner biomass is above Blim"),
   # risk1
-  risk1 = list(~yearMeans(iterMeans((SB / Blim) < 1)),
+  risk1 = list(~yearMeans(iterMeans((SB / SBlim) < 1)),
     name = "mean(P(SB<B[limit]))", 
     desc = "ICES Risk 1, mean probability that spawner biomass is below Blim"),
   # risk2
-  risk2 = list(~yearMeans(iterMeans(((SB / Blim) < 1) > 0)),
+  risk2 = list(~yearMeans(iterMeans(((SB / SBlim) < 1) > 0)),
     name = "once(P(SB<B[limit]))", 
     desc = "ICES Risk 2, probability that spawner biomass is above Blim once"),
   # risk3
-  risk3 = list(~apply(iterMeans((SB / Blim) < 1), c(1,3:6), max),
+  risk3 = list(~apply(iterMeans((SB / SBlim) < 1), c(1,3:6), max),
     name = "max(P(SB>B[limit]))", 
     desc = "ICES Risk 3, max probability that spawner biomass is above Blim"),
   # C

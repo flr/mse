@@ -75,6 +75,7 @@ exportMethods(
   "catch",
   "control",
   "db",
+  "debug",
   "deviances",
   "deviances<-",
   "discards",
@@ -128,4 +129,5 @@ exportMethods(
   "track<-",
   "tracking",
   "tracking<-",
+  "undebug",
   "wt")

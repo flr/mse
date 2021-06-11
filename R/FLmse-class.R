@@ -182,19 +182,15 @@ setReplaceMethod("args", signature("FLmse", "list"), function(object, value){
 
 # }}}
 
-# om accessors {{{
+# @om accessors {{{
 
-setMethod("refpts", signature(object="FLmse"),
-  function(object) {
-    return(refpts(om(object)))
-  }
-)
+setMethod("stock", "FLmse", function(object) stock(om(object)))
 
-setMethod("sr", signature(object="FLmse"),
-  function(object) {
-    return(sr(om(object)))
-  }
-) # }}}
+setMethod("sr", "FLmse", function(object) sr(om(object)))
+
+setMethod("refpts", "FLmse", function(object) refpts(om(object)))
+
+# }}}
 
 # plot {{{
 setMethod("plot", signature(x="FLmse", y="missing"),
@@ -291,14 +287,20 @@ setMethod("metrics", signature(object="FLmse", metrics="ANY"),
 setMethod("metrics", signature(object="FLmse", metrics="missing"),
   function(object) {
     metrics(om(object))
-}) # }}}
+}) 
+
+# standard metrics
+
+setMethod("ssb", "FLmse", function(object) ssb(om(object)))
+
+setMethod("catch", "FLmse", function(object) catch(om(object)))
+
+setMethod("fbar", "FLmse", function(object) fbar(om(object)))
+
+setMethod("rec", "FLmse", function(object) rec(om(object)))
+
+# }}}
 
 # om accessors {{{
-
-setMethod("stock", "FLmse", function(object) stock(om(object)))
-
-setMethod("ssb", "FLmse", function(object) ssb(stock(om(object))))
-
-setMethod("catch", "FLmse", function(object) catch(stock(om(object))))
 
 # }}}

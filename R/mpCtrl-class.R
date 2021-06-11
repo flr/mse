@@ -195,3 +195,31 @@ setReplaceMethod("args", signature(object="mpCtrl", value="function"),
 #    return(name[[element]]@args)
 #  })
 # }}}
+
+# debug & undebug  {{{
+
+setGeneric("debug", useAsDefault = base::debug)
+
+setMethod("debug", signature(fun="mpCtrl", text="character"),
+  function(fun, text) {
+    debug(fun[[text]]@method)
+  }
+)
+
+setGeneric("undebug", useAsDefault = base::undebug)
+
+setMethod("undebug", signature(fun="mpCtrl", signature="character"),
+  function(fun, signature) {
+    undebug(fun[[signature]]@method)
+  }
+)
+
+setMethod("undebug", signature(fun="mpCtrl", signature="missing"),
+  function(fun, signature) {
+    for(i in names(fun)) {
+      if(isdebugged(fun[[i]]@method))
+        undebug(fun[[i]]@method)
+    }
+  }
+)
+# }}}

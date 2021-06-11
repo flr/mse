@@ -43,9 +43,6 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
   # nsq, defaults to 3
   nsqy <- args$nsqy <- if(is.null(args$nsqy)) 3 else args$nsqy
 
-  # vector of years to be projected
-	vy <- args$vy <- ac(seq(iy, fy))
-
 	# it, om$iter
 	it <- args$it <- dims(om)$iter
 
@@ -58,6 +55,10 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
   
   # frq defaults to 1
   frq <- args$frq <- if(is.null(args$frq)) 1 else args$frq
+
+  # vector of years to be projected TODO frq
+	vy <- args$vy <- ac(seq(iy, fy - management_lag))
+
 
 	# --- INIT tracking
 

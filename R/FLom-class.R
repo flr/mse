@@ -190,6 +190,16 @@ setMethod("fbar", signature(object="FLom"),
 
 # }}}
 
+# rec {{{
+
+setMethod("rec", signature(object="FLom"),
+  function(object) {
+    return(rec(stock(object)))
+  }
+) 
+
+# }}}
+
 # show, summary {{{
 
 #' @rdname FLom-class
