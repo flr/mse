@@ -70,7 +70,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
     metric <- c(tracking, metric)
 
   # TODO MULTIPLY for FLombf
-  tracking <- FLQuants(FLQuant(NA, dimnames=list(
+  tracking <- FLQuants("NA"=FLQuant(NA, dimnames=list(
     metric=c(metric, steps[steps %in% names(ctrl)]),
     year=unique(c((iy - args$management_lag + 1):iy, vy)),
     iter=1:args$it)))
@@ -108,11 +108,11 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
     # LOOP and combine
 		lst0 <- foreach(j=its, 
 			.combine=function(...) {
+        res <- list(...)
 				list(
-          # TODO combine(FLom)
-					om=do.call('combine', lapply(list(...), '[[', 'om')),
-					tracking=do.call('combine', lapply(list(...), '[[', 'tracking')),
-					oem=do.call('combine', lapply(list(...), '[[', 'oem'))
+          om = Reduce("combine", lapply(res, '[[', 1)),
+          tracking = Reduce("combine", lapply(res, '[[', 2)),
+          oem = Reduce("combine", lapply(res, '[[', 3))
 				)
 			}, 
 			.packages="mse", 
@@ -123,18 +123,17 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 				call0 <- list(
           om = iter(om, j),
 					oem = iter(oem, j),
-          tracking = iter(tracking[[1]], j),
+          tracking = lapply(tracking, iter, j),
 					fb=fb,    # TODO needs it selection
 					projection=projection,
 					iem=iem,  # TODO needs it selection
 					ctrl= iters(ctrl, j),
-					args=args,
+					args=c(args[!names(args) %in% "it"], it=length(j)),
 					verbose=verbose)
 
-        browser()
-
 				out <- do.call(goFish, call0)
-				list(stk.om=out$stk.om, tracking=out$tracking, oem=out$oem)
+				
+        list(om=out$om, tracking=out$tracking, oem=out$oem)
 			}
 		} else {
 
