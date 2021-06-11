@@ -63,7 +63,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 	# --- INIT tracking
 
 	metric <- c("C.obs", "F.est", "B.est", "C.est", "conv.est",
-    "F.om", "B.om", "C.om", "iem")
+    "F.om", "B.om", "C.om", "iem", "time")
   steps <- c("phcr", "hcr", "isys", "tm", "fb")
 
 	if (!missing(tracking))
@@ -195,6 +195,9 @@ setMethod("goFish", signature(om="FLo"),
   for(i in vy) {
     
     if(verbose) cat(i, " > ")
+ 
+    # time (start)   
+    track(tracking, "time", i) <- as.numeric(Sys.time())
 
     ay <- args$ay <- an(i)
 		dy <- args$dy <- ay - data_lag
@@ -397,6 +400,9 @@ setMethod("goFish", signature(om="FLo"),
 		ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
     
     om <- do.call("mpDispatch", ctrl.om)$object
+
+    # time (end)   
+    track(tracking, "time", ay) <- as.numeric(Sys.time()) - tracking[[1]]["time", i]
 
 		gc()
 	}

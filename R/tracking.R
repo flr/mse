@@ -8,7 +8,6 @@
 
 # track<- {{{
 
-
 setGeneric("track<-", function(object, ..., value)
   standardGeneric("track<-"))
 
@@ -106,6 +105,3 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
 )
 
 # }}}
-
-
-# plot

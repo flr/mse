@@ -83,33 +83,11 @@ ctrl <- mpCtrl(list(
   isys = mseCtrl(method=tac.is)))
 
 r5 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
+r5 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl, parallel=TRUE)
 
 plot(om, r5)
 
-
-# PLOTS
-
-library(patchwork)
-
-(plot(om(r0)) + ggtitle("fixedF.hcr(fbar=0.3)")) +
-(plot(om(r1)) + ggtitle("catchSSB(dtarget=0.40, dlim=0.10)")) +
-(plot(om(r2)) + ggtitle("ices.hcr(blim=200k, bsafe=300k, ftrg=0.15)")) +
-(plot(om(r3)) + ggtitle("ices.hcr(...) + tac.is"))
- 
-# 
-res <- data.frame(ssb=c(ssb(stk)[, ac(ayrs)]), f=fs, ay=ayrs, dy=ayrs-1, my=ayrs+1)
-
-iterSums(ssb(om(r0)) <
-fbar(om(r0))
-
-ggplot(res, aes(x=ssb, y=f)) +
-  # geom_text(aes(label=ay))
-  geom_point() +
-  xlim(c(0, NA)) + ylim(c(0, NA)) +
-  geom_segment(x=0, xend=blim, y=fmin, yend=fmin) +
-  geom_segment(x=blim, xend=bsafe, y=fmin, yend=ftrg) +
-  geom_segment(x=bsafe, xend=max(res$ssb), y=ftrg, yend=ftrg) +
-  ylab(expression(bar(F))) + xlab("SSB (t)")
+plot(om, R1=r1, R2=r2, R3=r3, R4=r4, R5=r5)
 
 
 # TEST parallel
@@ -123,42 +101,5 @@ ctrl <- mpCtrl(list(
     bsafe=300000)),
   isys = mseCtrl(method=tac.is)))
 
-rp3 <- mp(window(om, end=mpargs$fy), oem=oem, args=mpargs, ctrl=ctrl)
-
-
-
-an <- mp(om, oem, args=mpargs, ctrl=ctrl.sc)
-
-
-function (ctrl, fun = "rlnorm", mean = 0, sd = 0.1, multiplicative = TRUE, 
-    args, tracking) {
-    iem <- list(mean = mean, sd = sd, n = sum(!is.na(ctrl@iters)))
-    if (multiplicative) {
-        ctrl@iters <- do.call(fun, iem) * ctrl@iters
-    }
-    else {
-        ctrl@iters <- do.call(fun, iem) + ctrl@iters
-    }
-    lst <- list(ctrl = ctrl, tracking = tracking)
-    lst
-}
-
-
-method(ctrl.sc$hcr) <- ices.hcr
-args(ctrl.sc$hcr) <- list(ftrg=0.57, blim=16200,fmin=0.05,bsafe=21400)
-
-method(oem) <- sampling.oem
-
-an <- mp(om, oem, iem, args=mpargs, ctrl=ctrl.sc)
-
-ctrl <- mpCtrl(list(
-    est = mseCtrl(method=perfect.sa),
-    hcr = ctrl.sc$hcr,
-    isys = mseCtrl(method=tac.is,args=list(initac=27599, dtaclow=0.85, dtacupp=1.15))
-))
-an <- mp(om, oem, iem, args=mpargs, ctrl=ctrl)
-
-
-
-
+rp3 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl, parallel=TRUE)
 
