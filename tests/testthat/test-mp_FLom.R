@@ -83,23 +83,15 @@ ctrl <- mpCtrl(list(
   isys = mseCtrl(method=tac.is)))
 
 r5 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
-r5 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl, parallel=TRUE)
+
+library(doParallel)
+registerDoParallel(3)
+
+r5p <- mp(om, oem=oem, args=mpargs, ctrl=ctrl, parallel=TRUE)
+
+all.equal(r5, r5p)
 
 plot(om, r5)
 
 plot(om, R1=r1, R2=r2, R3=r3, R4=r4, R5=r5)
-
-
-# TEST parallel
-
-library(doParallel)
-registerDoParallel(1)
-
-ctrl <- mpCtrl(list(
-  est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, blim=200000,
-    bsafe=300000)),
-  isys = mseCtrl(method=tac.is)))
-
-rp3 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl, parallel=TRUE)
 
