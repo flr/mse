@@ -392,7 +392,7 @@ fwd.om <- function(om, ctrl, ...){
 	
   om <- do.call("fwd", args)
 
-	list(object=om)
+	list(om=om)
 }
 # }}}
 

@@ -22,5 +22,3 @@ noise.iem <- function(ctrl, fun="rlnorm", mean=0, sd=0.1, multiplicative=TRUE, a
 	lst <- list(ctrl=ctrl, tracking=tracking)
 	lst
 } # }}}
-
-

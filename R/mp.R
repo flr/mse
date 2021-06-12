@@ -219,7 +219,8 @@ setMethod("goFish", signature(om="FLo"),
 		ctrl.oem$om <- om
 		ctrl.oem$args <- args
 		ctrl.oem$tracking <- tracking
-		ctrl.oem$ioval <- list(iv=list(t1=floval), ov=list(t1=flssval, t2=flival))
+		ctrl.oem$ioval <- list(iv=list(t1=floval), ov=list(t1=flsval, t2=flival))
+    ctrl.oem$step <- "oem"
 	
     o.out <- do.call("mpDispatch", ctrl.oem)
 
@@ -239,7 +240,8 @@ setMethod("goFish", signature(om="FLo"),
 			ctrl.est$idx <- idx0
 			ctrl.est$args <- args #ay <- ay
 			ctrl.est$tracking <- tracking
-			ctrl.est$ioval <- list(iv=list(t1=flssval, t2=flival), ov=list(t1=flssval))
+			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
+      ctrl.est$step <- "est"
       
       out.assess <- do.call("mpDispatch", ctrl.est)
       
@@ -267,6 +269,7 @@ setMethod("goFish", signature(om="FLo"),
 			ctrl.phcr$tracking <- tracking
 			if(exists("hcrpars")) ctrl.phcr$hcrpars <- hcrpars
       ctrl.phcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flpval))
+      ctrl.phcr$step <- "phcr"
 			
       out <- do.call("mpDispatch", ctrl.phcr)
 			
@@ -287,7 +290,8 @@ setMethod("goFish", signature(om="FLo"),
 			ctrl.hcr$args <- args #ay <- ay
 			ctrl.hcr$tracking <- tracking
 			if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
-			ctrl.hcr$ioval <- list(iv=list(t1=flssval), ov=list(t1=flfval))
+			ctrl.hcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flfval))
+      ctrl.hcr$step <- "hcr"
 
 			out <- do.call("mpDispatch", ctrl.hcr)
       ctrl <- out$ctrl
@@ -312,6 +316,7 @@ setMethod("goFish", signature(om="FLo"),
 			ctrl.is$args <- args #ay <- ay
 			ctrl.is$tracking <- tracking
 			ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval), ov=list(t1=flfval))
+      ctrl.is$step <- "isys"
 
 			out <- do.call("mpDispatch", ctrl.is)
 			
@@ -333,6 +338,7 @@ setMethod("goFish", signature(om="FLo"),
 			ctrl.tm$args <- args #sqy <- sqy
 			ctrl.tm$tracking <- tracking
 			ctrl.tm$ioval <- list(iv=list(t1=flsval), ov=list(t1=flqval))
+      ctrl.ym$step <- "tm"
 			
       out <- do.call("mpDispatch", ctrl.tm)
 			
@@ -354,6 +360,7 @@ setMethod("goFish", signature(om="FLo"),
 			ctrl.iem$args <- args
 			ctrl.iem$tracking <- tracking
 			ctrl.iem$ioval <- list(iv=list(t1=flfval), ov=list(t1=flfval))
+      ctrl.iem$step <- "iem"
 
 			out <- do.call("mpDispatch", ctrl.iem)
 			
@@ -376,6 +383,7 @@ setMethod("goFish", signature(om="FLo"),
 			ctrl.fb$args <- args
 			ctrl.fb$tracking <- tracking
 			ctrl.fb$ioval <- list(iv=list(t1=flfval), ov=list(t1=flfval))
+      ctrl.fb$step <- "fb"
 
       out <- do.call("mpDispatch", ctrl.fb)
 
@@ -399,8 +407,9 @@ setMethod("goFish", signature(om="FLo"),
 		ctrl.om$method <- method(projection)
     ctrl.om$deviances <- residuals(sr(om))
 		ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
+    ctrl.om$step <- "om"
     
-    om <- do.call("mpDispatch", ctrl.om)$object
+    om <- do.call("mpDispatch", ctrl.om)$om
 
     # time (end)   
     track(tracking, "time", ay) <- as.numeric(Sys.time()) - tracking[[1]]["time", i]

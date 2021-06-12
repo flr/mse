@@ -86,13 +86,20 @@ setReplaceMethod("om", signature("FLmse", "FLo"), function(object, value){
 setGeneric("tracking", function(object, ...) standardGeneric("tracking"))
 
 #' @rdname FLmse-class
-setMethod("tracking", "FLmse", function(object) {
-  if(length(object@tracking) == 1)
-    return(object@tracking[[1]])
-  else
-    return(object@tracking)
-  }
-)
+
+setMethod("tracking", signature("FLmse"),
+  function(object, biol="missing") {
+
+    if(length(object@tracking) == 1)
+  	  return(object@tracking[[1]])
+    else
+      if(missing(biol))
+  	    return(object@tracking)
+      else
+  	    return(object@tracking[[biol]])
+
+  	object
+})
 
 #' @rdname FLmse-class
 #' @param value the new object
@@ -100,6 +107,7 @@ setMethod("tracking", "FLmse", function(object) {
 setGeneric("tracking<-", function(object, ..., value) standardGeneric("tracking<-"))
 
 #' @rdname FLom-class
+
 setReplaceMethod("tracking", signature("FLmse", "FLQuants"),
   function(object, value) {
 	  object@tracking <- value
@@ -107,7 +115,7 @@ setReplaceMethod("tracking", signature("FLmse", "FLQuants"),
 })
 
 setReplaceMethod("tracking", signature("FLmse", "FLQuant"),
-  function(object, biol, value) {
+  function(object, biol="missing", value) {
     if(length(object@tracking) == 1)
   	  object@tracking[[1]] <- value
     else

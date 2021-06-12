@@ -34,28 +34,33 @@ floval <- list(object="om", test="!is(object, \"FLo\")",
 
 # mpDispatch {{{
 
-mpDispatch <- function(ioval, ...){
+mpDispatch <- function(ioval, ..., step){
 
+  # GET arguments
 	args <- list(...)
+
+  # EXTRACT method and REMOVE from args
+
 	method <- args$method
 	args$method <- NULL
 	
-  # checks in
+  # CHECK input objects
 	for(i in ioval$iv){
-		object <- args[i$object]
-		str <- paste("if(", i$test, ")", i$msg, sep=" ")
+		object <- args[[i$object]]
+		str <- paste("if(", i$test, ") stop(", i$msg, ")", sep=" ")
 		eval(parse(text=str))
 	}
 	
-  # dispatch
+  # DISPATCH
 	out <- do.call(method, args)
 	
-  # checks out
+  # CHECK output objects
 	for(i in ioval$ov){
-		object <- out[i$object]
-		str <- paste("if(", i$test, ")", i$msg, sep=" ")
+		object <- out[[i$object]]
+		str <- paste("if(", i$test, ") stop(", i$msg, ")", sep=" ")
 		eval(parse(text=str))
 	}
 	
-  out
-} # }}}
+  return(out)
+} 
+# }}}
