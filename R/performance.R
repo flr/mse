@@ -233,20 +233,10 @@ setMethod("performance", signature(x="list"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLom"),
-  function(x, indicators, refpts=x@refpts,
-    years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
-    metrics=NULL, probs=NULL, mp=NULL) {
+  function(x, refpts=x@refpts, ...) {
+
+    return(performance(stock(x), refpts=refpts, ...))
     
-    mets <- metrics(x, metrics)
-
-    mets <- lapply(setNames(nm=names(mets[[1]])),
-      function(i) FLQuants(lapply(X=mets, FUN="[[", i)))
-
-    res <- mapply(function(xx, rr)
-      performance(x=xx, indicators=indicators, refpts=rr, years=years),
-      xx=mets, rr=refpts(x), SIMPLIFY=FALSE)
-
-    return(rbindlist(res, idcol="biol"))
   }
 )
 
