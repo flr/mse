@@ -47,6 +47,15 @@ r2 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 plot(om, R2=r2)
 
 
+performance(r2, indicators=indicators["SBMSY"], metrics=list(SB=ssb))
+
+performance(om(r2), indicators=indicators["SBMSY"], metrics=list(SB=ssb))
+
+
+performance(stock(om(r2)), indicators=indicators["SBMSY"],
+  metrics=list(SB=ssb), refpts=refpts(om(r2)))
+
+
 # RUN 3: perfect.sa + ices.hcr: blim=200k, bsafe=300k, ftrg=0.15
 
 ctrl <- mpCtrl(list(
