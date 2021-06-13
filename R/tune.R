@@ -15,7 +15,8 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
   args, prob=0.5, tol=0.01, maxit=12, verbose=TRUE,
   pyears=ac(seq(args$iy+1, args$fy)), ...) {
   
-  # metrics
+  # args
+  args$fy <- if(is.null(args$fy)) dims(om)$maxyear else args$fy
 
   # CHECK years
   if(!all(unique(unlist(pyears)) %in% seq(args$iy, args$fy)))
