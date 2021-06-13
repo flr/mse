@@ -444,3 +444,10 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 	}
 })
 # }}}
+
+
+# metrics {{{
+setMethod("metrics", signature(object="FLom", metrics="missing"),
+  function(object) {
+    metrics(object, list(SB=ssb, C=catch, F=fbar))
+}) # }}}
