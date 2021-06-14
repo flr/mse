@@ -17,12 +17,12 @@ library(testthat)
 
 data(ple4om)
 
-
-# --- SIMPLE tests:
+# args
 
 mpargs <- list(iy=2017)
 
-# RUN 1: perfect.sa + fixedF.hcr: fbar=0.3
+
+# --- RUN 1: perfect.sa + fixedF.hcr: fbar=0.3
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
@@ -30,33 +30,48 @@ ctrl <- mpCtrl(list(
 
 r1 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
-fbar(r1)
-
 plot(om, R1=r1)
 
+ctrl <- mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=FLQuant(0.5)))))
 
-# RUN 2: perfect.sa + catchSSB.hcr: dtarget=0.40, dlimit=0.10
+r1b <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
+
+plot(om, R1=r1, R1b=r1b)
+
+
+# --- RUN 2: perfect.sa + catchSSB.hcr: dtarget=0.40, dlimit=0.10
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=catchSSB.hcr, args=list(dtarget=0.40, dlimit=0.10,
-  lambda=1, MSY=100000))))
+  lambda=1, MSY=6000))))
 
 r2 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
 plot(om, R2=r2)
 
-
 performance(r2, indicators=indicators["SBMSY"], metrics=list(SB=ssb))
 
-performance(om(r2), indicators=indicators["SBMSY"], metrics=list(SB=ssb))
+dep <- function(x)
+  ssb(x) %/% ssb(x)[,1]
+inddep <- list(~yearMeans(DEP), names="DEP", desc="Depletion")
+
+performance(r2, indicators=list(DEP=inddep), metrics=list(DEP=dep))[, mean(data)]
 
 
-performance(stock(om(r2)), indicators=indicators["SBMSY"],
-  metrics=list(SB=ssb), refpts=refpts(om(r2)))
+ctrl <- mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=catchSSB.hcr, args=list(dtarget=0.25, dlimit=0.10,
+  lambda=1, MSY=100000))))
+
+r2b <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
+
+plot(om, R2=r2, R2b=r2b)
 
 
-# RUN 3: perfect.sa + ices.hcr: blim=200k, bsafe=300k, ftrg=0.15
+# --- RUN 3: perfect.sa + ices.hcr: blim=200k, bsafe=300k, ftrg=0.15
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
@@ -65,10 +80,19 @@ ctrl <- mpCtrl(list(
 
 r3 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
-plot(om, R3=r3)
+
+ctrl <- mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=ices.hcr,
+    args=list(fmin=0.05, ftrg=0.30, blim=200000, bsafe=300000))))
+
+r3b <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
 
-# RUN 4: perfect.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
+plot(om, R3=r3, R3b=r3b)
+
+
+# --- RUN 4: perfect.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
@@ -78,10 +102,20 @@ ctrl <- mpCtrl(list(
 
 r4 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
-plot(om, R4=r4)
+
+ctrl <- mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=ices.hcr,
+    args=list(fmin=0.05, ftrg=0.25, blim=200000, bsafe=300000)),
+  isys = mseCtrl(method=tac.is, args=list(initac=25000))))
+
+r4b <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
 
-# RUN 5: a4a.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
+plot(om, R4=r4, R4b=r4b)
+
+
+# --- RUN 5: a4a.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
 
 library(FLa4a)
 

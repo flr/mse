@@ -142,9 +142,11 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 #' catchSSB.hcr(stock(om), MSY=140000, args=list(ay=2018, data_lag=1),
 #'   tracking=FLQuant())
 #' # APPLY hcr over a range of dtarget values
-#' lapply(seq(0.30, 0.90, by=0.1), function(x) {
+#' lapply(seq(0.30, 0.80, by=0.1), function(x) {
 #'   catchSSB.hcr(stock(om), MSY=140000, dtarget=x, args=list(ay=2018, data_lag=1),
 #'   tracking=FLQuant())$ctrl } )
+
+# DEBUG
 
 catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
   dtaclow=0.85, dtacupp=1.15, args, tracking) {

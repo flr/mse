@@ -66,9 +66,62 @@ t3 <- tunebisect(om, oem=oem, args=mpargs, control=ctrl, metrics=list(SB=ssb),
 performance(t3, indicators=indicators["PSBMSY"], years=list(2020:2030),
   metrics=list(SB=ssb))[, mean(data)]
 
-
 control(t3)$hcr@args$ftrg
 
 plot(om, R2=r2, T2=t2)
 
+
+# --- grid
+
+library(doParallel)
+registerDoParallel(2)
+
+rp <- mp(om, oem=oem, args=mpargs, ctrl=ctrl, parallel=TRUE)
+
+ctrlb <- ctrl
+ctrlb$hcr@args$ftrg <- 0.30
+ctrls <- list(a=ctrl, b=ctrlb)
+
+foo <- function(om, oem, args, ctrls) {
+
+  res <- lapply(ctrls, function(x)
+    mp(om, oem=oem, args=mpargs, ctrl=x, parallel=TRUE)
+    )
+
+plot(om, res[[1]], res[[1]])
+
+
+
+
+
+
+
+
+ops <- list(a=ctrl, b=ctrlb)
+
+res <-
+  foreach(op = ops) %:% 
+    foreach(i = 1) %do% {
+    mp(om, oem=oem, args=mpargs, ctrl=op, parallel=TRUE)
+    }
+
+plot(om(res[[1]][[1]]),
+res[[2]][[1]])
+
+all.equal(res[[1]][[1]], res[[2]][[1]])
+
+res[[1]][[1]]@control$hcr@args
+res[[2]][[1]]@control$hcr@args
+
+res <-
+  foreach(op = ops) %:% 
+    mp(om, oem=oem, args=mpargs, ctrl=op, parallel=TRUE)
+
+
+x <-
+    foreach(b = bvec, .combine = 'cbind') %:%
+        foreach(a = avec, .combine = 'c') %do% {
+            sim(a, b)
+        }
+x
 

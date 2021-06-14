@@ -19,7 +19,7 @@ idx <- FLIndices(BTS=ple4.index)
 
 # Variables
 
-it <- 25 # iterations
+it <- 50 # iterations
 iy <- 2017 # initial year of projection (also intermediate)
 fy <- 2030 # final year
 y0 <- range(stk)["minyear"] # initial data year
@@ -88,10 +88,10 @@ om <- FLom(stock=slim(stk), sr=srbh, refpts=foo(refpts(brp), mets),
 set.seed(3621)
 
 oem <- FLoem(method=perfect.oem,
-  observations=list(stk=stock(om), idx=lapply(idx, propagate, 25)),
+  observations=list(stk=stock(om), idx=lapply(idx, propagate, it)),
   deviances=list(
-    stk=FLQuants(catch.n=rlnorm(25, catch.n(stock(om)) %=% 0, 0.1)),
-    idx=lapply(idx, function(x) rlnorm(25, index(x) %=% 0, 0.3))
+    stk=FLQuants(catch.n=rlnorm(it, catch.n(stock(om)) %=% 0, 0.1)),
+    idx=lapply(idx, function(x) rlnorm(it, index(x) %=% 0, 0.3))
   ))
 
 # SAVE

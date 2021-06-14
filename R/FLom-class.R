@@ -445,7 +445,6 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 })
 # }}}
 
-
 # metrics {{{
 setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
