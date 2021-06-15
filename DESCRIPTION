@@ -55,6 +55,7 @@ Collate:
   'tracking.R'
   'data.R'
   'db.R'
+  'utilities.R'
 VignetteBuilder: knitr
 License: EUPL
 LazyLoad: Yes

@@ -11,6 +11,7 @@
 - tracking is handled by methods dealing with stock being of either FLStock or
   FLStocks class.
 - Added performance(FLombf) to be called by performance(FLmse).
+- merge(FLQuant, data.table) method to assemble output tables.
 
 # mse 2.1
 

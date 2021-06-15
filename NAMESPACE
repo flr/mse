@@ -104,6 +104,7 @@ exportMethods(
   "m",
   "mat",
   "mcN",
+  "merge",
   "method",
   "method<-",
   "metrics",
