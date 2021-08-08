@@ -49,7 +49,7 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #' @examples
 #'
 #' # LOAD example FLmse object
-#' data(p4om)
+#' data(ple4om)
 #' # GENERATE run from last 16 years of OM
 #' run <- window(stock(om), start=2000, end=2015)
 #' # DEFINE indicators
@@ -73,7 +73,7 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #' # return quantiles
 #' performance(run, indicators, refpts=FLPar(MSY=110000),
 #'   metrics=list(C=catch, F=fbar), years=list(2000:2015),
-#'   probs=c(0.05, 0.25, 0.50, 0.75, 0.95))
+#'   probs =  c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95))
 
 setMethod("performance", signature(x="FLQuants"),
   function(x, indicators, refpts=FLPar(),

@@ -101,7 +101,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 
 	if(isTRUE(parallel) & cores > 1){
 
-		cat("Going parallel with ", cores, " cores !\n")
+		cat("Going parallel with", cores, "cores !\n")
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))

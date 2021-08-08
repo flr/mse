@@ -26,12 +26,12 @@ plot(ssb(stk) %/% ssb(stk)[,1]) + ylim(c(0,NA)) +
 
 dep <- ssb(stk) %/% ssb(stk)[, 1]
 
-# GET catches set by hcr for ayrs
+# GET catches set by hcr for ayrs: dtarget=0.4, dlimit=0.10
 
 ayrs <- 1980:2017
 
 tacs <- unlist(lapply(ayrs, function(x) {
-  catchSSB.hcr(stk, MSY=140000, dtarget=0.40, args=list(ay=x, data_lag=1),
+  catchSSB.hcr(stk, MSY=140000, dtarget=0.40, dlimit=0.10, args=list(ay=x, data_lag=1),
     tracking=FLQuant())$ctrl[1,]$value 
   } 
 ))

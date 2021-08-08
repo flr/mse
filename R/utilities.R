@@ -23,4 +23,18 @@ setMethod("merge", signature(x="FLQuant", y="data.table"),
 
 # }}}
 
+.combinegoFish <- function(...) {
+  
+  res <- list(...)
+	
+  return(
+  list(
+    om = Reduce("combine", lapply(res, '[[', 1)),
+    tracking = Reduce("combine", lapply(res, '[[', 2)),
+    oem = Reduce("combine", lapply(res, '[[', 3))
+		)
+  )
+} 
+
+
 

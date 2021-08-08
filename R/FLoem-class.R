@@ -188,14 +188,21 @@ setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
 		return(combine(combine(x, y), ...))
 	} else {
 		obj <- x
-		dev <- deviances(obj)
+		
+    dev <- deviances(obj)
 		obs <- observations(obj)
+    
+    if(length(dev) > 0)
 		for(i in 1:length(dev))
       dev[[i]] <- combine(deviances(x)[[i]], deviances(y)[[i]])
-		for(i in 1:length(obs))
+		
+    if(length(obs) > 0)
+    for(i in 1:length(obs))
       obs [[i]] <- combine(observations(x)[[i]], observations(y)[[i]])
-		dev -> deviances(obj)
-		obs -> observations(obj)
+
+		deviances(obj) <- dev
+		observations(obj) <- obs
+
 		return(obj)
 	}
 })
