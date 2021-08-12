@@ -6,10 +6,10 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
-#' Example set of performance indicators
+#' Example set of performance statistics
 #'
-#' A set of performance indicators is provided, coded in the format that
-#' `performance()`requires. The indicators included in this list are as
+#' A set of performance statistics is provided, coded in the format that
+#' `performance()`requires. The statistics included in this list are as
 #' follows:
 #'
 #' - SB0: Mean spawner biomass relative to unfished.
@@ -39,11 +39,11 @@
 #' @docType data
 #' @keywords datasets
 #' @format An object of class list.
-#' @name indicators
-#' @rdname indicators
+#' @name statistics
+#' @rdname statistics
 NULL
 
-#' Kobe indicators
+#' Kobe statistics
 #' 
 #' Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa, 
 #' vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in 
@@ -54,8 +54,8 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @format An object of class list.
-#' @name kobeindicators
-#' @rdname kobeindicators
+#' @name kobestatistics
+#' @rdname kobestatistics
 NULL
 
 #' FLom object for North sea plaice

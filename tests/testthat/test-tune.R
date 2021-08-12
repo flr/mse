@@ -15,7 +15,7 @@ library(testthat)
 # DATA: om, oem
 
 data(ple4om)
-data(indicators)
+data(statistics)
 
 
 # --- SIMPLE tests:
@@ -39,11 +39,11 @@ plot(FLQuants(Map(append, metrics(om), metrics(r2)))) +
   ylim(c(0, NA)) +
   geom_flpar(data=FLPars(SB=refpts(om)$SBMSY, F=refpts(om)$FMSY), x=1990)
 
-performance(r2, indicators=indicators["PSBMSY"], metrics=list(SB=ssb))[, mean(data)]
+performance(r2, statistics=statistics["PSBMSY"], metrics=list(SB=ssb))[, mean(data)]
 
 t2 <- tunebisect(om, oem=oem, args=mpargs, control=ctrl, metrics=list(SB=ssb),
   tune=list(dtarget=c(0.10, 0.90)), pyears=list(2020:2030),
-  indicator=indicators['PSBMSY'])
+  indicator=statistics['PSBMSY'])
 
 plot(om, R2=r2, T2=t2)
 
@@ -57,13 +57,13 @@ ctrl <- mpCtrl(list(
 
 r3 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
-performance(r3, indicators=indicators["PSBMSY"], metrics=list(SB=ssb))[, mean(data)]
+performance(r3, statistics=statistics["PSBMSY"], metrics=list(SB=ssb))[, mean(data)]
 
 t3 <- tunebisect(om, oem=oem, args=mpargs, control=ctrl, metrics=list(SB=ssb),
   tune=list(ftrg=c(0.05, 0.40)), pyears=list(2020:2030),
-  indicator=indicators['PSBMSY'])
+  indicator=statistics['PSBMSY'])
 
-performance(t3, indicators=indicators["PSBMSY"], years=list(2020:2030),
+performance(t3, statistics=statistics["PSBMSY"], years=list(2020:2030),
   metrics=list(SB=ssb))[, mean(data)]
 
 control(t3)$hcr@args$ftrg

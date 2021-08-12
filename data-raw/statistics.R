@@ -1,12 +1,12 @@
-# indicators.R - DESC
-# /indicators.R
+# statistics.R - DESC
+# /statistics.R
 
 # Copyright European Union, 2018
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-indicators <- list(
+statistics <- list(
   # SB0
   SB0 = list(~yearMeans(SB/SB0), name = "SB/SB[0]",
     desc = "Mean spawner biomass relative to unfished"),
@@ -53,7 +53,7 @@ indicators <- list(
     desc = "Probability of fishery shutdown")
   )
 
-kobeindicators <- list(
+kobestatistics <- list(
   # green
   green = list(~iterSums(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) < 1)) / dim(SB)[6],
     name = "P(Green)", desc = "Probability of being in Kobe green quadrant"),
@@ -68,4 +68,4 @@ kobeindicators <- list(
     name = "P(Red)", desc = "Probability of being in Kobe red quadrant")
 )
 
-save(indicators, kobeindicators, file="../data/indicators.RData", compress="xz")
+save(statistics, kobestatistics, file="../data/statistics.RData", compress="xz")

@@ -16,12 +16,12 @@ utils::globalVariables(c("i", "run"))
 #' @description
 #' Carry out multiple runs of an MP for a given dataset over a grid of values
 #' for the MP/HCR paramaters, in order to find the parameter combination(s) that
-#' give the best performance over the chosen indicators, a.k.a. *tuning*
+#' give the best performance over the chosen statistics, a.k.a. *tuning*
 #' @details DETAILS
 #' @param mp A function executing a projection applying a given MP, see \code{\link{mseBasic}} for an example
 #' @param grid A name list of *mp* argument values to loop along
-#' @param indicators A list of performance indicators
-#' @param refpts The reference points needed to compute the indicators, *FLPar*
+#' @param statistics A list of performance statistics
+#' @param refpts The reference points needed to compute the statistics, *FLPar*
 #' @param ... Any other arguments to be passed on to *mp*
 #' @return A list or aggregatecd FLR object, depending on the output of *mp*
 #' @examples 
@@ -33,7 +33,7 @@ utils::globalVariables(c("i", "run"))
 #' @seealso 
 #'  \code{\link[mse]{mseBasic}},\code{\link[mse]{performance}}
 
-tune <- function(mp, grid, indicators, refpts, ...) {
+tune <- function(mp, grid, statistics, refpts, ...) {
 
   # PARSE args
   args <- list(...)
@@ -58,7 +58,7 @@ tune <- function(mp, grid, indicators, refpts, ...) {
     # UPDATE pb
     setTxtProgressBar(pb, i)
 
-    cbind(performance(run, indicators=indicators, refpts=refpts), df[i,])
+    cbind(performance(run, statistics=statistics, refpts=refpts), df[i,])
   }
 
   close(pb) 

@@ -52,13 +52,13 @@ r2 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
 plot(om, R2=r2)
 
-performance(r2, indicators=indicators["SBMSY"], metrics=list(SB=ssb))
+performance(r2, statistics=statistics["SBMSY"], metrics=list(SB=ssb))
 
 dep <- function(x)
   ssb(x) %/% ssb(x)[,1]
 inddep <- list(~yearMeans(DEP), names="DEP", desc="Depletion")
 
-performance(r2, indicators=list(DEP=inddep), metrics=list(DEP=dep))[, mean(data)]
+performance(r2, statistics=list(DEP=inddep), metrics=list(DEP=dep))[, mean(data)]
 
 
 ctrl <- mpCtrl(list(

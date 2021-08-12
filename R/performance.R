@@ -12,7 +12,7 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 
 # performance {{{
 
-#' Compute performance indicators
+#' Compute performance statistics
 #'
 #' TODO
 #'
@@ -30,15 +30,15 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #' object or of the object returned by the call to `metrics()`, (ii) of the
 #' *params* in the *refpts* object and, for all classes but `FLQuants`, (iii)
 #' functions that can be called on *object*. See examples below for the
-#' necessary matching between *metrics*, *refpts* and the indicators formulas.
+#' necessary matching between *metrics*, *refpts* and the statistics formulas.
 #'
 #' @param run Object holding the results of forward projections, as a named
 #' \code{FLQuants}
 #' @param refpts Reference points for calculations, \code{list}
-#' @param indicators Indicators to be computed, as formula, name and description, \code{list}
-#' @param years Years on which indicators should be computed, defaults to last year of input FLQuants
+#' @param statistics statistics to be computed, as formula, name and description, \code{list}
+#' @param years Years on which statistics should be computed, defaults to last year of input FLQuants
 #'
-#' @return data.table Results of computing performance indicators.
+#' @return data.table Results of computing performance statistics.
 #'
 #' @name performance
 #' @rdname performance
@@ -52,8 +52,8 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #' data(ple4om)
 #' # GENERATE run from last 16 years of OM
 #' run <- window(stock(om), start=2000, end=2015)
-#' # DEFINE indicators
-#' indicators <- list(
+#' # DEFINE statistics
+#' statistics <- list(
 #'   dCatch=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
 #'     name="mean(C[t] / C[t-1])",
 #'     desc="Mean absolute proportional change in catch"),
@@ -64,19 +64,29 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #'     name="var(F)",
 #'     desc="Variance in fishing mortality"))
 #' # COMPUTE performance
-#' performance(run, indicators, refpts=FLPar(MSY=110000),
+#' performance(run, statistics, refpts=FLPar(MSY=110000),
 #'   metrics=list(C=catch, F=fbar), years=list(2000:2015))
 #' # Minimum indicator, named list with formula and name
-#' performance(run, indicators=list(CMSY=list(~C/MSY, name="CMSY")),
+#' performance(run, statistics=list(CMSY=list(~C/MSY, name="CMSY")),
 #'   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
 #'   years=list(2000:2015))
 #' # return quantiles
-#' performance(run, indicators, refpts=FLPar(MSY=110000),
+#' performance(run, statistics, refpts=FLPar(MSY=110000),
 #'   metrics=list(C=catch, F=fbar), years=list(2000:2015),
 #'   probs =  c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95))
+#' # DEFINE statistics without summaries
+#' statistics <- list(
+#'   CMSY=list(~C/MSY,
+#'     name="CMSY",
+#'     desc="Catch over MSY"))
+#' # COMPUTE performance
+#' perf <- performance(run, statistics, refpts=FLPar(MSY=110000),
+#'   metrics=list(C=catch), years=list(2000:2015))
+#' # COMPUTE summaries
+#' perf[, .(CMSY=mean(data))]
 
 setMethod("performance", signature(x="FLQuants"),
-  function(x, indicators, refpts=FLPar(),
+  function(x, statistics, refpts=FLPar(),
     years=setNames(list(dimnames(x[[1]])$year), nm=dims(x[[1]])$maxyear),
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
 
@@ -100,14 +110,14 @@ setMethod("performance", signature(x="FLQuants"),
     if(any(unlist(lapply(x, function(y) any(dim(y)[c(1,3,4,5)] != 1)))))
       warning("metrics have length > 1 for 'quant', 'unit', 'season' or 'area', recycling over refpts might be wrong.")
 
-    # CHECK indicators are unique
-    if(length(names(indicators)) != length(unique(names(indicators))))
-      stop("'indicators' must have unique names.")
+    # CHECK statistics are unique
+    if(length(names(statistics)) != length(unique(names(statistics))))
+      stop("'statistics' must have unique names.")
     
     # LOOP over years
     res <- data.table::rbindlist(lapply(years, function(i) {
-      # LOOP over indicators
-      data.table::rbindlist(lapply(indicators, function(j) {
+      # LOOP over statistics
+      data.table::rbindlist(lapply(statistics, function(j) {
         # EVAL indicator
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(FLCore::window(x, start=i[1], end=i[length(i)]),
@@ -120,7 +130,7 @@ setMethod("performance", signature(x="FLQuants"),
     setkey(res, indicator, year)
     
     # ADD indicator name(s)
-    inds <- lapply(indicators, '[[', 'name')
+    inds <- lapply(statistics, '[[', 'name')
     inds <- data.table(indicator=names(inds), name=unlist(inds))
     setkey(inds, indicator)
 
@@ -145,7 +155,7 @@ setMethod("performance", signature(x="FLQuants"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLStock"),
-  function(x, indicators, refpts=FLPar(),
+  function(x, statistics, refpts=FLPar(),
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     metrics=FLCore::metrics(x), probs=NULL, mp=NULL) {
       
@@ -158,23 +168,23 @@ setMethod("performance", signature(x="FLStock"),
         flqs <- do.call(metrics, list(x))
 
       return(performance(flqs, refpts=refpts,
-      indicators=indicators, years=years, probs=probs, mp=mp))
+      statistics=statistics, years=years, probs=probs, mp=mp))
   }
 )
 
 #' @rdname performance
 
 setMethod("performance", signature(x="FLStocks"),
-  function(x, indicators, refpts=FLPar(), years=dims(x[[1]])$maxyear,
+  function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,
     metrics=FLCore::metrics, probs=NULL, grid=missing, mp=NULL, mc.cores=1) {
 
     if(mc.cores > 1) {
       res <- data.table::rbindlist(parallel::mclapply(x, performance,
-        indicators, refpts, years, metrics=metrics, probs=probs, mp=mp,
+        statistics, refpts, years, metrics=metrics, probs=probs, mp=mp,
         mc.cores=mc.cores), idcol='run')
     } else {
       res <- data.table::rbindlist(lapply(x, performance,
-        indicators, refpts, years, metrics=metrics, probs=probs, mp=mp),
+        statistics, refpts, years, metrics=metrics, probs=probs, mp=mp),
         idcol='run')
     }
     
@@ -198,7 +208,7 @@ setMethod("performance", signature(x="FLStocks"),
 #' @rdname performance
 
 setMethod("performance", signature(x="list"),
-  function(x, indicators, refpts=FLPar(), years=dims(x[[1]])$maxyear,
+  function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,
     probs=NULL, grid=missing, mp=NULL, mc.cores=1) {
 
     if(!all(unlist(lapply(x, is, 'FLQuants'))))
@@ -206,11 +216,11 @@ setMethod("performance", signature(x="list"),
 
     if(mc.cores > 1) {
       res <- data.table::rbindlist(parallel::mclapply(x, performance,
-        indicators, refpts, years, probs=probs, mp=mp, mc.cores=mc.cores),
+        statistics, refpts, years, probs=probs, mp=mp, mc.cores=mc.cores),
         idcol='run')
     } else {
       res <- data.table::rbindlist(lapply(x, performance,
-        indicators, refpts, years, probs=probs, mp=mp), idcol='run')
+        statistics, refpts, years, probs=probs, mp=mp), idcol='run')
     }
     
     # mp=run if not NULL
@@ -241,7 +251,7 @@ setMethod("performance", signature(x="FLom"),
 )
 
 setMethod("performance", signature(x="FLombf"),
-  function(x, indicators, refpts=x@refpts, metrics,
+  function(x, statistics, refpts=x@refpts, metrics,
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     probs=NULL, mp=NULL) {
     
@@ -251,7 +261,7 @@ setMethod("performance", signature(x="FLombf"),
       function(i) FLQuants(lapply(X=mets, FUN="[[", i)))
 
     res <- mapply(function(xx, rr) {
-      performance(x=xx, indicators=indicators, refpts=rr, years=years,
+      performance(x=xx, statistics=statistics, refpts=rr, years=years,
         probs=probs, mp=mp)
       }, xx=mets, rr=x@refpts, SIMPLIFY=FALSE)
 

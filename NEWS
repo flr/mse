@@ -13,6 +13,14 @@
 - Added performance(FLombf) to be called by performance(FLmse).
 - merge(FLQuant, data.table) method to assemble output tables.
 
+USER-VISIBLE CHANGES
+
+- Argument indicators in performance() has been renamed statistics, to clarify
+  the rile of that element. Indicator is now restricted to refer to empirical
+  metrics obtained from operating model observations that are used to provide
+  indications of changes in stock status. For example, catch rates by fleet.
+
+
  mse 2.1
 
  NEW FEATURES
