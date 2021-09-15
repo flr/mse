@@ -26,7 +26,7 @@
 #' # [TODO:example]
 
 mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
-  tracking="missing", verbose=TRUE, parallel=TRUE){
+  tracking="missing", verbose=TRUE, parallel=FALSE){
 
   # --- EXTRACT args
   iy <- args$iy
@@ -62,17 +62,22 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 
 	# --- INIT tracking
 
-	metric <- c("C.obs", "F.est", "B.est", "C.est", "conv.est",
-    "F.om", "B.om", "C.om", "iem", "time")
-  steps <- c("phcr", "hcr", "isys", "tm", "fb")
+  metric <- c("F.om", "B.om", "C.om", "C.obs", "F.est", "B.est", "C.est",
+    "conv.est")
+  steps <- c("phcr", "hcr", "isys", "tm", "fb", "iem")
 
 	if (!missing(tracking))
-    metric <- c(tracking, metric)
+    metric <- c(metric, tracking)
 
   # TODO MULTIPLY for FLombf
+
+  dms <- dimnames(stock(om))
+
   tracking <- FLQuants("NA"=FLQuant(NA, dimnames=list(
-    metric=c(metric, steps[steps %in% names(ctrl)]),
+    metric=c(metric, steps[steps %in% names(ctrl)], "time", "fwd"),
     year=unique(c((iy - args$management_lag + 1):iy, vy)),
+#    unit=dms$unit,
+    season=dms$season,
     iter=1:args$it)))
 
   # GET historical from OM DEBUG different fron original
@@ -99,7 +104,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 	# PREPARE for parallel if needed
   cores <- getDoParWorkers()
 
-	if(isTRUE(parallel) & cores > 1){
+	if(isTRUE(parallel)) {
 
 		cat("Going parallel with", cores, "cores !\n")
 
@@ -124,15 +129,19 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 				call0 <- list(
           om = iter(om, j),
 					oem = iter(oem, j),
-          tracking = lapply(tracking, iter, j),
+          tracking = iter(tracking, j),
 					fb=fb,    # TODO needs it selection
 					projection=projection,
 					iem=iem,  # TODO needs it selection
 					ctrl= iters(ctrl, j),
 					args=c(args[!names(args) %in% "it"], it=length(j)),
 					verbose=verbose)
+				
+        out <- do.call(goFish, call0)
 
-				out <- do.call(goFish, call0)
+        # CHECK output
+        if(all(!names(out) == c("om", "tracking", "oem", "args")))
+          stop("Output of individual cores is not correct")
 				
         list(om=out$om, tracking=out$tracking, oem=out$oem)
 			}
@@ -150,11 +159,14 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 				ctrl=ctrl,
 				args=args,
 				verbose=verbose)
-      
-			out <- do.call(goFish, call0)
+			
+      out <- do.call(goFish, call0)
+
 			lst0 <- list(om=out$om, tracking=out$tracking, oem=out$oem)
 		}
-	
+
+  # TODO CHECK outputs
+
   # GET objects back from loop
 	om <- lst0$om
 	tracking <- lst0$tracking
@@ -163,21 +175,17 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 	if(verbose) cat("\n")
 
 	# --- RETURN
-  res <- new("FLmse", om=om, args=args, oem=oem, control=ctrl,
-    tracking = tracking)
+  res <- new("FLmse", om=lst0$om, args=args, oem=lst0$oem, control=ctrl,
+    tracking = lst0$tracking)
 	
 	return(res)
 }
 
 # }}}
 
-setGeneric("goFish", function(om, ...)
-    standardGeneric('goFish'))
+# goFish {{{
 
-# goFish(FLombf) {{{
-
-setMethod("goFish", signature(om="FLo"),
-  function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) {
+goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) {
   
   it <- args$it     # number of iterations
 	y0 <- args$y0     # initial data year
@@ -195,7 +203,7 @@ setMethod("goFish", signature(om="FLo"),
   for(i in vy) {
     
     if(verbose) cat(i, " > ")
-    
+
     # time (start)   
     track(tracking, "time", i) <- as.numeric(Sys.time())
 
@@ -206,9 +214,9 @@ setMethod("goFish", signature(om="FLo"),
 		sqy <- args$sqy <- ac(seq(ay - nsqy - data_lag + 1, dy))
     
     # TRACK om
-    track(tracking, "F.om", ay) <- window(fbar(om), start=dy, end=dy)
-    track(tracking, "B.om", ay) <- window(ssb(om), start=dy, end=dy)
-    track(tracking, "C.om", ay) <- window(catch(om), start=dy, end=dy)
+    track(tracking, "F.om", ay) <- unitMeans(window(fbar(om), start=dy, end=dy))
+    track(tracking, "B.om", ay) <- unitSums(window(ssb(om), start=dy, end=dy))
+    track(tracking, "C.om", ay) <- unitSums(window(catch(om), start=dy, end=dy))
     
     # --- OEM: Observation Error Model
 
@@ -229,10 +237,10 @@ setMethod("goFish", signature(om="FLo"),
 		observations(oem) <- o.out$observations
 		tracking <- o.out$tracking
 
-    track(tracking, "C.obs", ay) <- window(catch(om),
-      start=ac(ay-args$data_lag), end=ac(ay-args$data_lag))
+    track(tracking, "C.obs", ay) <- unitSums(window(catch(om),
+      start=dy, end=dy))
 
-		# --- EST: Estimator of stock statistics
+		# --- est: Estimator of stock statistics
     if (!is.null(ctrl0$est)) {
 			ctrl.est <- args(ctrl0$est)
 			ctrl.est$method <- method(ctrl0$est)
@@ -255,11 +263,11 @@ setMethod("goFish", signature(om="FLo"),
 			tracking <- out.assess$tracking
 		}
 
-    track(tracking, "F.est", ay) <- window(fbar(stk0), start=dy, end=dy)
-    track(tracking, "B.est", ay) <- window(ssb(stk0), start=dy, end=dy)
-    track(tracking, "C.est", ay) <- window(catch(stk0), start=dy, end=dy)
+    track(tracking, "F.est", ay) <- unitMeans(window(fbar(stk0), start=dy, end=dy))
+    track(tracking, "B.est", ay) <- unitSums(window(ssb(stk0), start=dy, end=dy))
+    track(tracking, "C.est", ay) <- unitSums(window(catch(stk0), start=dy, end=dy))
 
-		# --- HCR parametrization
+		# --- phcr: HCR parameterization
 		
     if (!is.null(ctrl0$phcr)){
 			ctrl.phcr <- args(ctrl0$phcr)
@@ -282,7 +290,8 @@ setMethod("goFish", signature(om="FLo"),
 			tracking["metric.phcr", ac(ay)] <- hcrpars[1,1,,drop=TRUE]
 		 }
 
-		# --- Harvest Control Rule
+		# --- hcr: Harvest Control Rule
+
 		if (!is.null(ctrl0$hcr)){
 			ctrl.hcr <- args(ctrl0$hcr)
 			ctrl.hcr$method <- method(ctrl0$hcr)
@@ -413,6 +422,7 @@ setMethod("goFish", signature(om="FLo"),
 
     # time (end)   
     track(tracking, "time", ay) <- as.numeric(Sys.time()) - tracking[[1]]["time", i]
+    track(tracking, "fwd", ay) <- ctrl
 
 		gc()
 	}
@@ -420,5 +430,4 @@ setMethod("goFish", signature(om="FLo"),
   # RETURN
 	list(om=window(om, start=iy, end=fy), tracking=tracking, oem=oem, args=args)
 
-  }
-) # }}}
+  } # }}}

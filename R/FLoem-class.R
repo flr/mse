@@ -168,10 +168,15 @@ setMethod("show", signature(object = "FLoem"),
 
 setMethod("iter", signature(obj = "FLoem"),
   function(obj, iter){
-    # TODO Delve deeper into list
-	  deviances(obj) <- lapply(deviances(obj), FLCore::iter, iter)
+
+    # DEVIANCES, nested lapply (idx/stk - (slot) - element)
+	  deviances(obj) <- lapply(deviances(obj),
+      function(x) lapply(x, FLCore::iter, iter))
+
+    # OBSERVATIONS
 	  observations(obj) <- lapply(observations(obj), FLCore::iter, iter)
-	  obj
+
+    return(obj)
 })
 
 # }}}
@@ -181,7 +186,7 @@ setMethod("iter", signature(obj = "FLoem"),
 #' @rdname FLoem-class
 
 setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
-	
+  
   args <- c(list(x, y), list(...))
 
 	if(length(args) > 2) {
@@ -192,13 +197,13 @@ setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
     dev <- deviances(obj)
 		obs <- observations(obj)
     
-    if(length(dev) > 0)
-		for(i in 1:length(dev))
-      dev[[i]] <- combine(deviances(x)[[i]], deviances(y)[[i]])
+#    if(length(dev) > 0)
+#		  for(i in seq(length(dev)))
+#        dev[[i]] <- combine(deviances(x)[[i]], deviances(y)[[i]])
 		
     if(length(obs) > 0)
-    for(i in 1:length(obs))
-      obs [[i]] <- combine(observations(x)[[i]], observations(y)[[i]])
+      for(i in seq(length(obs)))
+        obs [[i]] <- combine(observations(x)[[i]], observations(y)[[i]])
 
 		deviances(obj) <- dev
 		observations(obj) <- obs

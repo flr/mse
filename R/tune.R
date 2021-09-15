@@ -11,7 +11,7 @@
 #' 
 #' @examples
 
-tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
+tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   args, prob=0.5, tol=0.01, maxit=12, verbose=TRUE,
   pyears=ac(seq(args$iy+1, args$fy)), ...) {
   
@@ -20,7 +20,7 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
 
   # CHECK years
   if(!all(unique(unlist(pyears)) %in% seq(args$iy, args$fy)))
-    stop("Years for indicator computation 'pyears' outside of 'args' year range (iy:fy).")
+    stop("Years for statistic computation 'pyears' outside of 'args' year range (iy:fy).")
 
   # CHECK that tune names match args(control$hcr)
   if(!names(tune) %in% names(args(control$hcr)))
@@ -35,9 +35,9 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
   if(length(tune[[1]]) != 2)
     stop("Range of argument for tuning has more than 2 values, need min and max.")
 
-  # CHECK indicator: single indicator as length 1 list
-  if(length(indicator) != 1) {
-    stop("'indicator' must be a named list of length 1 with formula, 'name', and 'desc'")
+  # CHECK statistic: single statistic as length 1 list
+  if(length(statistic) != 1) {
+    stop("'statistic' must be a named list of length 1 with formula, 'name', and 'desc'")
   }
 
   # 0 < prob < 1
@@ -53,10 +53,11 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
     print(paste0("[1] ", names(tune), ": ",
       unlist(cmin$hcr@args[names(tune)])))
 
-  rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"), ...)
+  rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
+    verbose=FALSE, ...)
   
   pmin <- performance(rmin, metrics=metrics, 
-    indicator=indicator, refpts=refpts(om), probs=NULL, years=pyears)
+    statistic=statistic, refpts=refpts(om), probs=NULL, years=pyears)
   obmin <- mean(pmin$data, na.rm=TRUE) - prob
   
   # PRINT result
@@ -77,16 +78,16 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
     print(paste0("[2] ", names(tune), ": ",
       unlist(cmax$hcr@args[names(tune)])))
 
-  rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"), ...)
+  rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
+    verbose=FALSE, ...)
   
   pmax <- performance(rmax, metrics=metrics,
-    indicator=indicator, refpts=refpts(om), probs=NULL, years=pyears)
+    statistic=statistic, refpts=refpts(om), probs=NULL, years=pyears)
   obmax <- mean(pmax$data, na.rm=TRUE) - prob
   
   # PRINT result
   if(verbose)
-    print(paste0("[2] diff: ", format(obmax, digits=2), "; ", names(tune), ": ",
-      unlist(cmax$hcr@args[names(tune)])))
+    print(paste0("[2] diff: ", format(obmax, digits=2)))
   
   # CHECK cmax result
   if(isTRUE(all.equal(obmax, 0, tolerance=tol)))
@@ -112,9 +113,10 @@ tunebisect <- function(om, oem="missing", control, metrics, indicator, tune,
       print(paste0("[", count + 2, "] ", names(tune), ": ",
         unlist(cmid$hcr@args[names(tune)])))
 
-    rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"), ...)
+    rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
+      verbose=FALSE, ...)
     pmid <- performance(rmid, metrics=metrics, 
-      indicator=indicator, refpts=refpts(om), probs=NULL, years=pyears)
+      statistics=statistic, refpts=refpts(om), probs=NULL, years=pyears)
     obmid <- mean(pmid$data, na.rm=TRUE) - prob
 
     # PRINT result

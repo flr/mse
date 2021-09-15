@@ -12,7 +12,7 @@
 
 #' The typical HCR used by ICES
 #'
-#' The typical HCR used by ICES which sets a target F based on the SSB based on 4 parameters: blim, bsafe, fmin and ftrg.
+#' The typical HCR used by ICES which sets a target F based on the SSB based on 4 parameters: sblim, sbsafe, fmin and ftrg.
 #' F increases linearly between SSB = blim and SSB = bsafe, from F = fmin to F = ftrg.
 #' If:
 #' - B < Blim, F = Fbycatch;
@@ -24,8 +24,8 @@
 #' @param stk The perceived FLStock.
 #' @param fmin Minimum fishing mortality.
 #' @param ftrg [TODO:description]
-#' @param blim [TODO:description]
-#' @param bsafe [TODO:description]
+#' @param sblim [TODO:description]
+#' @param sbsafe [TODO:description]
 #' @param args MSE arguments, class *list*.
 #' @param tracking Structure for tracking modules outputs.
 #'
@@ -33,13 +33,13 @@
 #' @examples
 #' data(ple4om)
 #' # Test for year when SSB > bsafe
-#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, blim=200000, bsafe=300000,
+#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, bsafe=300000,
 #'   args=list(ay=2018, data_lag=1, management_lag=1), tracking=FLQuant())
 #' # Test for year when SSB < bsafe
-#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, blim=200000, bsafe=300000,
+#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, bsafe=300000,
 #'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
 
-ices.hcr <- function(stk, ftrg, blim, bsafe, fmin=0, args, tracking){
+ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0, args, tracking){
 
   # args
 	ay <- args$ay
@@ -47,15 +47,15 @@ ices.hcr <- function(stk, ftrg, blim, bsafe, fmin=0, args, tracking){
 	man_lag <- args$management_lag
 
   # GET ssb metric
-	ssb <- ssb(stk)[, ac(ay - data_lag)]
+	ssb <- unitSums(ssb(stk)[, ac(ay - data_lag)])
 
 	# APPLY rule
 
 	fout <- FLQuant(fmin, dimnames=list(iter=dimnames(ssb)$iter))
-	fout[ssb >= bsafe] <- ftrg
-	inbetween <- (ssb < bsafe) & (ssb > blim)
-	gradient <- (ftrg - fmin) / (bsafe - blim)
-	fout[inbetween] <- (ssb[inbetween] - blim) * gradient + fmin
+	fout[ssb >= sbsafe] <- ftrg
+	inbetween <- (ssb < sbsafe) & (ssb > sblim)
+	gradient <- (ftrg - fmin) / (sbsafe - sblim)
+	fout[inbetween] <- (ssb[inbetween] - sblim) * gradient + fmin
 	
   # CREATE control file
   ctrl <- fwdControl(year=ay + man_lag, quant="fbar", value=c(fout))
@@ -88,7 +88,7 @@ fixedF.hcr <- function(stk, ftrg, args, tracking){
 
 	# create control file
   ctrl <- fwdControl(year=ay + mlag, quant="fbar", value=c(ftrg))
-	
+
 	# return
 	list(ctrl=ctrl, tracking=tracking)
 
@@ -155,8 +155,8 @@ catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
   ay <- args$ay
   data_lag <- args$data_lag
 
-  # COMPUTE depletion
-  dep <- ssb(stk)[, ac(ay - data_lag)] / ssb(stk)[, 1]
+  # COMPUTE depletion, across units
+  dep <- unitSums(ssb(stk)[, ac(ay - data_lag)] / ssb(stk)[, 1])
 
   # RULE
   ca <- ifelse(dep <= dlimit, 0,

@@ -14,25 +14,27 @@ setGeneric("track<-", function(object, ..., value)
 #' @rdname tracking
 #' @examples
 #' tracking <- FLQuants(FLQuant(dimnames=list(metric="hcr",
-#'   year=1990:1992), units=""))
+#'   year=1990:1992, iter=1:10), units=""))
 #' track(tracking, "hcr", 1990) <- fwdControl(year=1990, quant="fbar", value=0.15)
 #' tracking
 
 setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
-  function(object, step, year=value$year, ..., value) {
-
+  function(object, step, year=value$year, iter=seq(dim(object[[1]])[6]), ..., value) {
+    
     # SINGLE stock
-    if(all(is.na(value$biol))) {
 
-      object[[1]][step, ac(year)] <- value$value
+    if(all(is.na(value$biol))) {
+      object[[1]][step, ac(year),,,, iter] <- value@iters[1, 'value',]
 
     # MULTIPLE stocks
+
     } else {
 
       ids <- unique(value$biol)
 
       for(i in ids) {
-        object[[i]][step, ac(year)] <- value$value[value$biol == i]
+        object[[i]][step, ac(year),,,,, iter] <- value@iters[(value$biol == i)[1],
+          'value', ]
       }
     }
 
