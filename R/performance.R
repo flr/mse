@@ -6,7 +6,7 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-globalVariables("indicator")
+globalVariables("statistic")
 
 setGeneric("performance", function(x, ...) standardGeneric("performance"))
 
@@ -16,16 +16,16 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #'
 #' TODO
 #'
-#' Each indicator is an object of class list object, with three elements, the
+#' Each statistics is an object of class list object, with three elements, the
 #' first two of them compulsory:
 #'
 #' - An unnamed element of class *formula*, e.g. `yearMeans(SB/SB0)`.
 #' - name: A short name to be output on tables and plots, of class character,
 #' e.g. "SB/SB[0]".
-#' - desc: A longer description of the indicator, of class character, e.g. "Mean
+#' - desc: A longer description of the statistics, of class character, e.g. "Mean
 #' spawner biomass relative to unfished"
 #'
-#' Each indicator `formula` is evaluated against the *metrics* and *refpts* used
+#' Each statistic `formula` is evaluated against the *metrics* and *refpts* used
 #' in the function call. Formulas can thus use (i) the names of the `FLQuants`
 #' object or of the object returned by the call to `metrics()`, (ii) of the
 #' *params* in the *refpts* object and, for all classes but `FLQuants`, (iii)
@@ -66,7 +66,7 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #' # COMPUTE performance
 #' performance(run, statistics, refpts=FLPar(MSY=110000),
 #'   metrics=list(C=catch, F=fbar), years=list(2000:2015))
-#' # Minimum indicator, named list with formula and name
+#' # Minimum statistic, named list with formula and name
 #' performance(run, statistics=list(CMSY=list(~C/MSY, name="CMSY")),
 #'   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
 #'   years=list(2000:2015))
@@ -113,35 +113,37 @@ setMethod("performance", signature(x="FLQuants"),
     # CHECK statistics are unique
     if(length(names(statistics)) != length(unique(names(statistics))))
       stop("'statistics' must have unique names.")
+
+    # TODO CHECK functions and elements exist (e.g. rescale)
     
     # LOOP over years
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over statistics
       data.table::rbindlist(lapply(statistics, function(j) {
-        # EVAL indicator
+        # EVAL statistic
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(FLCore::window(x, start=i[1], end=i[length(i)]),
             # REPEAT refpts by year because recycling goes year first
             lapply(as(refpts, 'list'), rep, each=length(i)))), drop=FALSE)
-      }), idcol="indicator", fill=TRUE)[,c("indicator", "data", "iter")]
+      }), idcol="statistic", fill=TRUE)[,c("statistic", "data", "iter")]
     }), idcol="year")
     
     # Set DT keys
-    setkey(res, indicator, year)
+    setkey(res, statistic, year)
     
-    # ADD indicator name(s)
+    # ADD statistic name(s)
     inds <- lapply(statistics, '[[', 'name')
-    inds <- data.table(indicator=names(inds), name=unlist(inds))
-    setkey(inds, indicator)
+    inds <- data.table(statistic=names(inds), name=unlist(inds))
+    setkey(inds, statistic)
 
     # MERGE
-    res <- merge(res, inds, by='indicator')
+    res <- merge(res, inds, by='statistic')
     
     # QUANTILES if probs
     if(!is.null(probs)) {
-      # indicator year name data prob
+      # statistic year name data prob
       res <- res[, .(data=quantile(data, probs=probs, na.rm=TRUE), prob=probs),
-        by=.(indicator, year, name)]
+        by=.(statistic, year, name)]
     }
     
     # mp if not NULL
@@ -209,7 +211,16 @@ setMethod("performance", signature(x="FLStocks"),
 
 setMethod("performance", signature(x="list"),
   function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,
-    probs=NULL, grid=missing, mp=NULL, mc.cores=1) {
+    probs=NULL, grid="missing", mp=NULL, mc.cores=1, ...) {
+    
+    # HANDLE list(mse)
+    if(all(unlist(lapply(x, is, 'FLmse')))) {
+      return(rbindlist(lapply(x, function(i) do.call(performance,
+        c(list(x=i, refpts=refpts(i), statistics=statistics, years=years,
+        probs=probs), list(...)))), idcol="mp"))
+    }
+
+    # ELSE assume list of FLQuants
 
     if(!all(unlist(lapply(x, is, 'FLQuants'))))
       stop("input list must contain objects of class FLQuants")

@@ -287,8 +287,16 @@ setMethod("summary", signature(object="FLom"),
 ) # }}}
 
 # plot {{{
+
+setMethod("plot", signature(x="FLom", y="list"),
+  function(x, y) {
+
+    do.call("plot", c(list(x=x), y))
+  }
+)
+
 setMethod("plot", signature(x="FLom", y="missing"),
-  function(x, ...) {
+  function(x, window=TRUE, ...) {
 
     # PARSE args for FLmse objects
     args <- list(...)
@@ -306,7 +314,13 @@ setMethod("plot", signature(x="FLom", y="missing"),
       names(stocks)[idx] <- 
         c("OM", paste0("MP", seq(length(cls))))[idx]
 
-    stocks[[1]] <- window(stocks[[1]], end=dims(stocks[[2]])$minyear)
+    # WINDOW om
+    if(window)
+      maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))
+    else
+      maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$maxyear)))
+    
+    stocks[[1]] <- window(stocks[[1]], end=maxyear)
 
     do.call("plot", c(list(x=FLStocks(stocks)), args[!cls]))
     

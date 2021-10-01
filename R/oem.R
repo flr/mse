@@ -35,7 +35,8 @@
 #' obs <- perfect.oem(om, deviances=NULL, observations=NULL,
 #'   args=list(y0=1957, dy=2017), tracking=FLQuant())
 
-perfect.oem <- function(om, deviances, observations, args, tracking, ...) {
+perfect.oem <- function(om, deviances, observations, args, tracking,
+  biomass=FALSE, ...) {
 
   # DIMENSIONS
   y0 <- ac(args$y0)
@@ -44,120 +45,25 @@ perfect.oem <- function(om, deviances, observations, args, tracking, ...) {
   # GET perfect stock
 	stk <- window(stock(om), start=y0, end=dy, extend=FALSE)
 
-  # SET perfect at-age FLIndex per stock
-  # TODO GET name from observations
-  idx <- FLIndices(A=FLIndex(index=stock.n(stk) * 0.01,
-    catch.n=catch.n(stk), catch.wt=stock.wt(stk),
-    sel.pattern=catch.sel(stk), index.q=stock.n(stk) %=% 1 / 0.01,
-    effort=fbar(stk), range=c(startf=0, endf=0)))
+  # SET perfect FLIndex per stock
+  if(biomass) {
+    abu <- catch(stk) / fbar(stk)
+    idx <- FLIndices(A=FLIndexBiomass(index=abu %/% abu[,1],
+      sel.pattern=catch.sel(stk), index.q=expand(abu[,1],
+        year=dimnames(abu)$year, fill=TRUE),
+      effort=fbar(stk), range=c(startf=0, endf=0)))
+  } else {
+    idx <- FLIndices(A=FLIndex(index=stock.n(stk) * 0.01,
+      catch.n=catch.n(stk), catch.wt=stock.wt(stk),
+      sel.pattern=catch.sel(stk), index.q=stock.n(stk) %=% 1 / 0.01,
+      effort=fbar(stk), range=c(startf=0, endf=0)))
+  }
 
   # STORE observations
   observations$stk <- stk
   observations$idx <- idx
 
 	list(stk=stk, idx=idx, observations=observations, tracking=tracking)
-
-} # }}}
-
-# sampling.oem {{{
-
-#' @examples
-#' data(ple4om)
-#' oem@deviances$idx <- lapply(oem@observations$idx, function(x) index(x) %=% 0.1)
-#' oem@deviances$stk <- FLQuants(catch.n=catch.n(stock(om)) %=% 0.1)
-#' oem@observations$idx[[1]] <- propagate(oem@observations$idx[[1]], 25)
-#' sampling.oem(om, deviances=deviances(oem), observations=observations(oem),
-#'   args=list(y0=2000, dy=2021, ay=2022, frq=1), tracking=FLQuant(), oe="both")
-
-sampling.oem <- function(om, deviances, observations, args, tracking,
-  oe=c("both","index","catch"), ...) {
-
-  # CHECK necessary deviances
-  if(any(oe %in% c("both", "catch")) & ! "stk" %in% names(deviances))
-    stop(paste("sampling.oem requires deviances for 'stk' if oe = ", oe))
-  
-  if(any(oe %in% c("both", "index")) & ! "idx" %in% names(deviances))
-    stop(paste("sampling.oem requires deviances for 'idx' if oe = ", oe))
-  
-  # DIMENSIONS
-  y0 <- ac(args$y0)
-  dy <- ac(args$dy)
-  yrs <- ac(seq(args$y0, args$dy))
-
-  # Data years
-  dyrs <- ac(seq(args$dy - args$frq + 1, args$dy))
-
-  # Assessment year
-  ay <- ac(args$ay)
-
-  # GET perfect stock
-	stk0 <- window(stock(om), start=y0, end=dy, extend=FALSE)
-
-  # STK: catch.n
-  if(any(oe %in% c("both","catch"))) {
-
-    # ADD 1 individual to avoid some methods crashing on 0s
-    catch.n(observations$stk)[, dyrs] <- catch.n(stk0)[, dyrs] *
-      deviances$stk$catch.n[, dyrs] + 1
-
-    # FOR loop over deviances$stk
-    
-    # TODO landings and discards
-    #landings.n(observations$stk)[, dyrs] <- landings.n(stk)[, dyrs] *
-    #  deviances$stk$landings.n[, dyrs] + 1
-    # landings(observations$stk)[, dyrs] <- computeLandings(observations$stk[, dyrs])
-
-    #discards.n(observations$stk)[, dyrs] <- discards.n(stk)[, dyrs] *
-    #  deviances$stk$discards.n[, dyrs] + 1
-    # discards(observations$stk)[, dyrs] <- computeDiscards(observations$stk[, dyrs])
-
-    # COMPUTE depending on inputs
-    catch(observations$stk)[, dyrs] <- computeCatch(observations$stk[, dyrs])
-
-    # SHORTCUT 
-    stock.n(observations$stk)[, dyrs] <- stock.n(stk0)[, dyrs]
-    harvest(observations$stk)[, dyrs] <- harvest(stk0)[, dyrs]
-
-    # SET output stock
-    stk <- observations$stk[, yrs]
-
-  } else {
-    stk <- stk0[, yrs]
-  }
-
-  # IDX: indices, index.q
-  if(any(oe %in% c("both","indices"))) {
-    
-    idx <- observations$idx
-
-    # CHOOSE indices to be updated (maxyear >= dy)
-    upi <- unlist(lapply(idx, function(x) range(x, "maxyear") > args$dy))
-
-    # APPLY survey() with deviances$idx$index.q as index.q
-
-    idx[upi] <- Map(function(x, y) {
-      
-      res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
-        index.q=y[, dyrs])
-    
-      # SET 0s to min / 2
-      res[res == 0] <- min(res[res > 0] / 2)
-
-      # ASSIGN in dyrs    
-      index(x)[, dyrs] <- res
-
-      return(window(x, end=dy))
-
-    }, x=idx[upi], y=deviances$idx$index.q[upi])
-
-    observations$idx[[1]][,dyrs] <- idx[[1]][,dyrs]
-
-  } else {
-    idx <- observations$idx
-  }
-
-  # return
-  list(stk=stk, idx=idx, observations=observations, tracking=tracking)
 
 } # }}}
 
@@ -223,13 +129,13 @@ sampling.oem <- function(om, deviances, observations, args, tracking, ...) {
   upi <- unlist(lapply(idx, function(x) unname(range(x, "maxyear")) > args$dy))
 
   # lapply(idx[upi], index.q)
+  if(!is.null(deviances$idx)) {
 
-  if(!is.null(deviances$stk)) {
-
-    # APPLY survey() with deviances$idx$index.q as index.q
+    # APPLY survey() with deviances$idx as index.q
 
     idx[upi] <- Map(function(x, y) {
       
+      # CREATE survey obs
       res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
         index.q=y[, dyrs])
 
@@ -246,7 +152,8 @@ sampling.oem <- function(om, deviances, observations, args, tracking, ...) {
 
     }, x=idx[upi], y=deviances$idx[upi])
 
-    observations$idx[[1]][,dyrs] <- idx[[1]][,dyrs]
+    for(i in seq(idx[upi]))
+      observations$idx[upi][[i]][, dyrs] <- idx[upi][[i]][, dyrs]
 
   } else {
     idx <- observations$idx

@@ -37,9 +37,9 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
 }
 # }}}
 
+# mlc.ind
 
-
-
+# cpue.ind
 
 # mean length of the catch - length based estimator
 mlc.est <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {

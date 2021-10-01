@@ -13,14 +13,14 @@
 
 tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   args, prob=0.5, tol=0.01, maxit=12, verbose=TRUE,
-  pyears=ac(seq(args$iy+1, args$fy)), ...) {
+  years=ac(seq(args$iy+1, args$fy)), ...) {
   
   # args
   args$fy <- if(is.null(args$fy)) dims(om)$maxyear else args$fy
 
   # CHECK years
-  if(!all(unique(unlist(pyears)) %in% seq(args$iy, args$fy)))
-    stop("Years for statistic computation 'pyears' outside of 'args' year range (iy:fy).")
+  if(!all(unique(unlist(years)) %in% seq(args$iy, args$fy)))
+    stop("Years for statistic computation 'years' outside of 'args' year range (iy:fy).")
 
   # CHECK that tune names match args(control$hcr)
   if(!names(tune) %in% names(args(control$hcr)))
@@ -40,11 +40,12 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     stop("'statistic' must be a named list of length 1 with formula, 'name', and 'desc'")
   }
 
-  # 0 < prob < 1
+  # CHECK 0 < prob < 1
   if(!(prob >=0 & prob <=1))
     stop("prob must be a value between 0 and 1.")
 
-  # RUN at min
+  # --- RUN at min
+
   cmin <- control
   cmin$hcr@args[names(tune)] <- lapply(tune, '[', 1)
 
@@ -57,7 +58,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     verbose=FALSE, ...)
   
   pmin <- performance(rmin, metrics=metrics, 
-    statistic=statistic, refpts=refpts(om), probs=NULL, years=pyears)
+    statistic=statistic, refpts=refpts(om), probs=NULL, years=years)
   obmin <- mean(pmin$data, na.rm=TRUE) - prob
   
   # PRINT result
@@ -69,7 +70,8 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   if(isTRUE(all.equal(obmin, 0, tolerance=tol)))
     return(rmin)
   
-  # RUN at max
+  # --- RUN at max
+
   cmax <- control
   cmax$hcr@args[names(tune)] <- lapply(tune, '[', 2)
 
@@ -82,7 +84,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     verbose=FALSE, ...)
   
   pmax <- performance(rmax, metrics=metrics,
-    statistic=statistic, refpts=refpts(om), probs=NULL, years=pyears)
+    statistic=statistic, refpts=refpts(om), probs=NULL, years=years)
   obmax <- mean(pmax$data, na.rm=TRUE) - prob
   
   # PRINT result
@@ -99,7 +101,8 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     return(list(min=rmin, max=rmax))
   }
 
-  # LOOP bisecting
+  # --- LOOP bisecting
+
   count <- 0
   while(count <= maxit) {
 
@@ -116,7 +119,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
       verbose=FALSE, ...)
     pmid <- performance(rmid, metrics=metrics, 
-      statistics=statistic, refpts=refpts(om), probs=NULL, years=pyears)
+      statistics=statistic, refpts=refpts(om), probs=NULL, years=years)
     obmid <- mean(pmid$data, na.rm=TRUE) - prob
 
     # PRINT result

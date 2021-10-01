@@ -29,6 +29,7 @@ export(
   "default.oem",
   "effort.is",
   "expandGrid",
+  "fixedC.hcr",
   "fixedF.hcr",
   "FLiem",
   "fwd.om",

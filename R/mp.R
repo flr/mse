@@ -26,7 +26,7 @@
 #' # [TODO:example]
 
 mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
-  tracking="missing", verbose=TRUE, parallel=FALSE){
+  tracking="missing", verbose=TRUE, parallel=TRUE){
 
   # --- EXTRACT args
   iy <- args$iy
@@ -56,15 +56,14 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
   # frq defaults to 1
   frq <- args$frq <- if(is.null(args$frq)) 1 else args$frq
 
-  # vector of years to be projected TODO frq
-	vy <- args$vy <- ac(seq(iy, fy - management_lag))
-
+  # vector of years to be projected
+	vy <- args$vy <- ac(seq(iy, fy - management_lag, by=frq))
 
 	# --- INIT tracking
-
+  
   metric <- c("F.om", "B.om", "C.om", "C.obs", "F.est", "B.est", "C.est",
-    "conv.est")
-  steps <- c("phcr", "hcr", "isys", "tm", "fb", "iem")
+    "conv.est", "iem")
+  steps <- c("phcr", "hcr", "isys", "tm", "fb")
 
 	if (!missing(tracking))
     metric <- c(metric, tracking)
@@ -72,11 +71,11 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
   # TODO MULTIPLY for FLombf
 
   dms <- dimnames(stock(om))
-
+  
   tracking <- FLQuants("NA"=FLQuant(NA, dimnames=list(
     metric=c(metric, steps[steps %in% names(ctrl)], "time", "fwd"),
-    year=unique(c((iy - args$management_lag + 1):iy, vy)),
-#    unit=dms$unit,
+    year=ac(seq(iy, fy - management_lag + 1)),
+#    year=unique(c((iy - args$management_lag + 1):iy, ac(seq(iy, fy - management_lag + 1)))),
     season=dms$season,
     iter=1:args$it)))
 
@@ -104,9 +103,10 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 	# PREPARE for parallel if needed
   cores <- getDoParWorkers()
 
-	if(isTRUE(parallel)) {
+	if(isTRUE(parallel) & cores > 1) {
 
-		cat("Going parallel with", cores, "cores !\n")
+    if(verbose)
+		  cat("Going parallel with", cores, "cores !\n")
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
@@ -147,7 +147,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 			}
 		} else {
 
-			cat("Going single core !\n")
+      if(verbose)
+  			cat("Going single core !\n")
 
 			call0 <- list(
 				om = om,
@@ -166,7 +167,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 		}
 
   # TODO CHECK outputs
-
+  
   # GET objects back from loop
 	om <- lst0$om
 	tracking <- lst0$tracking
@@ -194,6 +195,7 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
 	nsqy <- args$nsqy # number of years to compute status quo metrics
 	vy <- args$vy     # vector of years to be projected
 	data_lag <- args$data_lag  # years between assessment and last data
+  frq <- args$frq   # frequency
 
   # COPY ctrl
 	ctrl0 <- ctrl
@@ -213,14 +215,14 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
     # years for status quo computations 
 		sqy <- args$sqy <- ac(seq(ay - nsqy - data_lag + 1, dy))
     
-    # TRACK om
+    # TRACK om TODO GAP?
     track(tracking, "F.om", ay) <- unitMeans(window(fbar(om), start=dy, end=dy))
     track(tracking, "B.om", ay) <- unitSums(window(ssb(om), start=dy, end=dy))
     track(tracking, "C.om", ay) <- unitSums(window(catch(om), start=dy, end=dy))
     
     # --- OEM: Observation Error Model
-
-		ctrl.oem <- args(oem)
+		
+    ctrl.oem <- args(oem)
 		ctrl.oem$method <- method(oem)
 		ctrl.oem$deviances <- deviances(oem)
 		ctrl.oem$observations <- observations(oem)
@@ -237,12 +239,14 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
 		observations(oem) <- o.out$observations
 		tracking <- o.out$tracking
 
-    track(tracking, "C.obs", ay) <- unitSums(window(catch(om),
-      start=dy, end=dy))
+    track(tracking, "C.obs", seq(ay, ay+frq-1)) <- unitSums(window(catch(om),
+      start=dy, end=dy + frq - 1))
+
 
 		# --- est: Estimator of stock statistics
+
     if (!is.null(ctrl0$est)) {
-			ctrl.est <- args(ctrl0$est)
+      ctrl.est <- args(ctrl0$est)
 			ctrl.est$method <- method(ctrl0$est)
 			ctrl.est$stk <- stk0
 			ctrl.est$idx <- idx0
@@ -263,14 +267,18 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
 			tracking <- out.assess$tracking
 		}
 
-    track(tracking, "F.est", ay) <- unitMeans(window(fbar(stk0), start=dy, end=dy))
-    track(tracking, "B.est", ay) <- unitSums(window(ssb(stk0), start=dy, end=dy))
-    track(tracking, "C.est", ay) <- unitSums(window(catch(stk0), start=dy, end=dy))
+    track(tracking, "F.est", seq(ay, ay+frq-1)) <- unitMeans(window(fbar(stk0),
+      start=dy, end=dy + frq - 1))
+    track(tracking, "B.est", seq(ay, ay+frq-1)) <- unitSums(window(ssb(stk0),
+      start=dy, end=dy + frq - 1))
+    track(tracking, "C.est", seq(ay, ay+frq-1)) <- unitSums(window(catch(stk0),
+      start=dy, end=dy + frq - 1))
 
 		# --- phcr: HCR parameterization
 		
     if (!is.null(ctrl0$phcr)){
-			ctrl.phcr <- args(ctrl0$phcr)
+			
+      ctrl.phcr <- args(ctrl0$phcr)
 		  ctrl.phcr$method <- method(ctrl0$phcr) 
 			ctrl.phcr$stk <- stk0
 			ctrl.phcr$args <- args
@@ -287,13 +295,14 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
 
 		# TODO REVIEW & TEST
     if(exists("hcrpars")){
-			tracking["metric.phcr", ac(ay)] <- hcrpars[1,1,,drop=TRUE]
+      track(tracking, "metric.phcr", seq(ay, ay+frq-1)) <- hcrpars[1,1,,drop=TRUE]
 		 }
 
 		# --- hcr: Harvest Control Rule
 
 		if (!is.null(ctrl0$hcr)){
-			ctrl.hcr <- args(ctrl0$hcr)
+			
+      ctrl.hcr <- args(ctrl0$hcr)
 			ctrl.hcr$method <- method(ctrl0$hcr)
 			ctrl.hcr$stk <- stk0
 			ctrl.hcr$args <- args #ay <- ay
@@ -310,12 +319,11 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
     }
 
-    track(tracking, "hcr", ay) <- ctrl
+    track(tracking, "hcr", seq(ay, ay+frq-1)) <- ctrl
 
 		#----------------------------------------------------------
 		# Implementation system
 		#----------------------------------------------------------
-		#cat("is\n")
 		if (!is.null(ctrl0$isys)){
 
 			ctrl.is <- args(ctrl0$isys)
@@ -332,13 +340,12 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
       ctrl <- out$ctrl
 			tracking <- out$tracking
 
-      track(tracking, "isys", ay) <- ctrl
+      track(tracking, "isys", seq(ay, ay+frq-1)) <- ctrl
 		}		
 
 		#----------------------------------------------------------
 		# Technical measures
 		#----------------------------------------------------------
-		#cat("tm\n")
 		if (!is.null(ctrl0$tm)){
 
 			ctrl.tm <- args(ctrl0$tm)
@@ -354,7 +361,7 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
       attr(ctrl, "snew") <- out$flq
 			tracking <- out$tracking
 
-      track(tracking, "tm", ay) <- ctrl
+      track(tracking, "tm", seq(ay, ay+frq-1)) <- ctrl
 		}
 
 		#==========================================================
@@ -376,7 +383,7 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
       ctrl <- out$ctrl
 			tracking <- out$tracking
       
-      track(tracking, "iem", ay) <- ctrl
+      track(tracking, "iem", seq(ay, ay+frq-1)) <- ctrl
 		}
 
 		#==========================================================
@@ -399,7 +406,7 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
       ctrl <- out$ctrl
 			tracking <- out$tracking
       
-      track(tracking, "fb", ay) <- ctrl
+      track(tracking, "fb", seq(ay, ay+frq-1)) <- ctrl
 		}
 
 		#----------------------------------------------------------
@@ -421,8 +428,8 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
     om <- do.call("mpDispatch", ctrl.om)$om
 
     # time (end)   
+    track(tracking, "fwd", seq(ay, ay+frq-1)) <- ctrl
     track(tracking, "time", ay) <- as.numeric(Sys.time()) - tracking[[1]]["time", i]
-    track(tracking, "fwd", ay) <- ctrl
 
 		gc()
 	}

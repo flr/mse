@@ -81,13 +81,38 @@ fixedF.hcr <- function(stk, ftrg, args, tracking){
   # args
 	ay <- args$ay
   mlag <- args$management_lag
+  frq <- args$frq
 
-	# rule 
-	if(!is(ftrg, "FLQuant"))
-    ftrg <- FLQuant(ftrg, dimnames=list(iter=dimnames(stk@catch)$iter))
+	# create control object
+  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="fbar", value=c(ftrg))
 
-	# create control file
-  ctrl <- fwdControl(year=ay + mlag, quant="fbar", value=c(ftrg))
+	# return
+	list(ctrl=ctrl, tracking=tracking)
+
+} # }}}
+
+# fixedC.hcr {{{
+
+#' A fixed catch HCR
+#'
+#' No matter what get C = ctrg
+#' The control argument is a list of parameters used by the HCR.
+#' @param stk The perceived FLStock.
+#' @param control A list with the element ctrg (numeric).
+#' @examples
+#' data(ple4om)
+#' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1),
+#'   tracking=FLQuant())
+
+fixedC.hcr <- function(stk, ctrg, args, tracking){
+
+  # args
+	ay <- args$ay
+  mlag <- args$management_lag
+  frq <- args$frq
+
+	# create control object
+  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="catch", value=c(ctrg))
 
 	# return
 	list(ctrl=ctrl, tracking=tracking)
@@ -149,24 +174,43 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 # DEBUG
 
 catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
-  dtaclow=0.85, dtacupp=1.15, args, tracking) {
+  dtaclow=0.85, dtacupp=1.15, yrs=1, args, tracking) {
   
   # args
   ay <- args$ay
   data_lag <- args$data_lag
+  man_lag <- args$management_lag
+  frq <- args$frq
+
+  # SET tac limits if NA
+  if(is.na(dtaclow))
+    dtaclow <- 1e-8
+  if(is.na(dtacupp))
+    dtacupp <- 1e8
 
   # COMPUTE depletion, across units
-  dep <- unitSums(ssb(stk)[, ac(ay - data_lag)] / ssb(stk)[, 1])
+  dep <- yearMeans(unitSums(window(stock(stk), start=ay - data_lag - yrs,
+    end=ay - data_lag))) / unitSums(stock(stk)[, 1])
 
   # RULE
-  ca <- ifelse(dep <= dlimit, 0,
+  ca <- ifelse(dep <= dlimit, 1e-8,
     ifelse(dep < dtarget, (lambda * MSY) / (dtarget - dlimit) * (dep - dlimit),
     lambda * MSY))
 
+  # IF NA, set to previous TAC
+  if(any(is.na(ca)))
+    ca[is.na(ca)] <- tracking[[1]]['hcr', ac(ay - 1)][is.na(ca)]
+
   # CONTROL
-  ctrl <- fwdControl(list(quant="catch", value=c(ca), year=ay + 1),
-    # TAC limits
-    list(quant="catch", min=dtaclow, max=dtacupp, relYear=ay - 1, year=ay + 1))
+  ctrl <- fwdControl(
+    # TAC for frq years
+    c(lapply(seq(ay + man_lag, ay + frq), function(x)
+      list(quant="catch", value=c(ca), year=x)),
+    # TAC change limits
+    lapply(seq(ay + man_lag, ay + frq), function(x)
+      list(quant="catch", min=rep(dtaclow, dim(ca)[6]), max=rep(dtacupp, dim(ca)[6]),
+        year=x, relYear=x-1)))
+  )
 
 	return(list(ctrl=ctrl, tracking=tracking))
 

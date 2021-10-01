@@ -7,7 +7,7 @@
 # Distributed under the terms of the EUPL-1.2
 
 
-# --- catchSSB {{{
+# --- catchSSB.hcr {{{
 
 # DATA & arguments
 
@@ -50,7 +50,6 @@ ggplot(res, aes(x=dep, y=tac)) +
   ylab("TAC (t)") + xlab("Depletion")
 
 # }}}
-
 
 # --- ices {{{
 
