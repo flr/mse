@@ -154,3 +154,50 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   return(rmid)
 
 } # }}}
+
+# tunegrid: GRID tuning {{{
+
+#' @examples
+#' data(ple4om)
+#' tes <- tunegrid(om, oem, control, metric=list(SB=ssb), statistic=stats['S8'],
+#'   grid=grid, args=mseargs, years=list(2030:2039), iters=1:100)
+
+tunegrid <- function(om, oem="missing", control, metric, statistic, grid, args,
+  years=ac(seq(args$iy+1, args$fy)), parallel=FALSE, verbose=FALSE, 
+  iters=dims(om)$iter, ...) {
+
+  if(!missing(iters)) {
+    om <- iter(om, iters)
+    oem <- iter(oem, iters)
+  }
+
+  fixed <- as.data.frame(args(control$hcr)[!names(args(control$hcr)) %in% names(grid)])
+
+  # dopar LOOP over grid
+
+  res <- foreach(i=seq(dim(grid)[1]), .errorhandling = "remove") %dopar% {
+
+    # TODO ADD progressr
+
+    cat("[", i, "]\n")
+
+    # ASSIGN new control$hcr@args values
+    args(control$hcr)[names(grid)] <- grid[i,]
+
+    # RUN mp
+    run <- mp(om=om, oem=oem, ctrl=control,
+      args=args, parallel=parallel, verbose=verbose, ...)
+
+    # COMPUTE performance & BIND to grid
+    cbind(performance(run, metric=metric, statistic=statistic,
+      years=years), grid[i,, drop=FALSE], fixed)
+  }
+
+  # TODO ADD empty row for missing or use try()and .combine
+
+  res <- rbindlist(res, idcol="run")
+
+  return(res)
+}
+
+# }}}

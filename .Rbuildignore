@@ -1,4 +1,5 @@
 Makefile
+docs
 appveyor.yml
 .travis.yml
 ^.*\.Rproj$

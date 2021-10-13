@@ -1,7 +1,7 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.1.0.9301
-Date: 2021-08-12
+Version: 2.1.0.9303
+Date: 2021-10-01
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut"),
   email = "iago.mosqueira@wur.nl"), 
   person("Ernesto", "Jardim", email = "ernesto.jardim@msc.org",

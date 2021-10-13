@@ -12,9 +12,6 @@ importFrom("FLBRP",
   "brp",
   "FLBRP")
 
-importFrom("utils",
-  "setTxtProgressBar")
-
 importFrom("stats",
   "coef",
   "coefficients",
@@ -54,7 +51,8 @@ export(
   "perfect.sa",
   "sampling.oem",
   "tac.is",
-  "tunebisect")
+  "tunebisect",
+  "tunegrid")
 
 exportClasses(
   "FLiem",
