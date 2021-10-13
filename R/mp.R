@@ -1,4 +1,4 @@
-# mp.R - DESC
+\\\\# mp.R - DESC
 # mse/R/mp.R
 
 # Copyright European Union, 2018
@@ -105,22 +105,20 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 
 	if(isTRUE(parallel) & cores > 1) {
 
-    if(verbose)
-		  cat("Going parallel with", cores, "cores !\n")
-
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
 
     # LOOP and combine
 		lst0 <- foreach(j=its, 
-			.combine=function(...) {
+ 		  .combine=function(...) {
         res <- list(...)
-				list(
-          om = Reduce("combine", lapply(res, '[[', 1)),
-          tracking = Reduce("combine", lapply(res, '[[', 2)),
-          oem = Reduce("combine", lapply(res, '[[', 3))
-				)
-			}, 
+        id <- lapply(res, function(x) is(x[[1]], 'FLo'))
+ 				list(
+           om = Reduce("combine", lapply(res, '[[', 1)),
+           tracking = Reduce("combine", lapply(res, '[[', 2)),
+           oem = Reduce("combine", lapply(res, '[[', 3))
+ 				)
+ 			}, 
 			.packages="mse", 
 			.multicombine=TRUE, 
 			.errorhandling = "pass", 
@@ -138,17 +136,14 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 					verbose=verbose)
 				
         out <- do.call(goFish, call0)
-
+        
         # CHECK output
-        if(all(!names(out) == c("om", "tracking", "oem", "args")))
+        if(!all(names(out) == c("om", "tracking", "oem", "args")))
           stop("Output of individual cores is not correct")
 				
         list(om=out$om, tracking=out$tracking, oem=out$oem)
 			}
 		} else {
-
-      if(verbose)
-  			cat("Going single core !\n")
 
 			call0 <- list(
 				om = om,
@@ -167,7 +162,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 		}
 
   # TODO CHECK outputs
-  
+
   # GET objects back from loop
 	om <- lst0$om
 	tracking <- lst0$tracking
@@ -221,7 +216,7 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
     track(tracking, "C.om", ay) <- unitSums(window(catch(om), start=dy, end=dy))
     
     # --- OEM: Observation Error Model
-		
+    
     ctrl.oem <- args(oem)
 		ctrl.oem$method <- method(oem)
 		ctrl.oem$deviances <- deviances(oem)

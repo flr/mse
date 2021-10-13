@@ -122,3 +122,11 @@ setGeneric("exists")
 
 setMethod("exists", "mseCtrl", function(x) !is.null(body(x@method)))
 # }}}
+
+# debug {{{
+setMethod("debug", signature(fun="mseCtrl", text="missing"),
+  function(fun) {
+    debug(fun@method)
+  }
+)
+# }}}
