@@ -22,12 +22,10 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
   function(object, step, year=value$year, iter=seq(dim(object[[1]])[6]), ..., value) {
     
     # SINGLE stock
-
-    if(all(is.na(value$biol))) {
+    if(length(unique(value$biol)) == 1) {
       object[[1]][step, ac(year),,,, iter] <- value@iters[1, 'value',]
 
     # MULTIPLE stocks
-
     } else {
 
       ids <- unique(value$biol)
@@ -53,6 +51,10 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
 setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
   function(object, step, year=dimnames(value)$year, ..., value) {
 
+    # CHECK step exists
+    if(!step %in% dimnames(object[[1]])[[1]])
+      stop(paste("tracking does not contain the required step:", step))
+
     object[[1]][step, ac(year)] <- c(value)
 
     return(object)
@@ -61,6 +63,10 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
 
 setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
   function(object, step, year=dimnames(value)$year, ..., value) {
+
+    # CHECK step exists
+    if(!step %in% dimnames(object[[1]])[[1]])
+      stop(paste("tracking does not contain the required step:", step))
 
     if(length(object) == 1)
       object[[1]][step, ac(year)] <- c(value)
@@ -98,6 +104,10 @@ setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
 
 setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
   function(object, step, year=dimnames(value)$year, ..., value) {
+
+    # CHECK step exists
+    if(!step %in% dimnames(object[[1]])[[1]])
+      stop(paste("tracking does not contain the required step:", step))
     
     for(i in names(object))
       object[[i]][step, ac(year)] <- value[[i]]
