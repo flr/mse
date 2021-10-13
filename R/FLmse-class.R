@@ -209,7 +209,7 @@ setMethod("plot", signature(x="FLmse", y="missing"),
 ) 
 
 setMethod("plot", signature(x="FLom", y="FLmse"),
-  function(x, y, window=TRUE, ...) {
+  function(x, y, ..., window=TRUE) {
 
     args <- list(...)
     fms <- unlist(lapply(args, is, "FLmse"))
@@ -217,7 +217,7 @@ setMethod("plot", signature(x="FLom", y="FLmse"),
     stocks <- lapply(c(list(x, om(y)), args[fms]), stock)
 
     # WINDOW om
-    if(window)
+    if(isTRUE(window))
       maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))
     else
       maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$maxyear)))
