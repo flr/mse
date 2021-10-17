@@ -1,4 +1,4 @@
-\\\\# mp.R - DESC
+# mp.R - DESC
 # mse/R/mp.R
 
 # Copyright European Union, 2018
@@ -61,8 +61,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
 
 	# --- INIT tracking
   
-  metric <- c("F.om", "B.om", "C.om", "C.obs", "F.est", "B.est", "C.est",
-    "conv.est", "iem")
+  metric <- c("F.om", "B.om", "SB.om", "C.om", "C.obs",
+    "F.est", "B.est", "SB.est", "C.est", "conv.est", "iem")
   steps <- c("phcr", "hcr", "isys", "tm", "fb")
 
 	if (!missing(tracking))
@@ -121,7 +121,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
  			}, 
 			.packages="mse", 
 			.multicombine=TRUE, 
-			.errorhandling = "pass", 
+			.errorhandling = "remove", 
 			.inorder=TRUE) %dopar% {
 
 				call0 <- list(
@@ -212,7 +212,8 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
     
     # TRACK om TODO GAP?
     track(tracking, "F.om", ay) <- unitMeans(window(fbar(om), start=dy, end=dy))
-    track(tracking, "B.om", ay) <- unitSums(window(ssb(om), start=dy, end=dy))
+    track(tracking, "B.om", ay) <- unitSums(window(tsb(om), start=dy, end=dy))
+    track(tracking, "SB.om", ay) <- unitSums(window(ssb(om), start=dy, end=dy))
     track(tracking, "C.om", ay) <- unitSums(window(catch(om), start=dy, end=dy))
     
     # --- OEM: Observation Error Model
@@ -264,7 +265,9 @@ goFish <- function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) 
 
     track(tracking, "F.est", seq(ay, ay+frq-1)) <- unitMeans(window(fbar(stk0),
       start=dy, end=dy + frq - 1))
-    track(tracking, "B.est", seq(ay, ay+frq-1)) <- unitSums(window(ssb(stk0),
+    track(tracking, "B.est", seq(ay, ay+frq-1)) <- unitSums(window(stock(stk0),
+      start=dy, end=dy + frq - 1))
+    track(tracking, "SB.est", seq(ay, ay+frq-1)) <- unitSums(window(ssb(stk0),
       start=dy, end=dy + frq - 1))
     track(tracking, "C.est", seq(ay, ay+frq-1)) <- unitSums(window(catch(stk0),
       start=dy, end=dy + frq - 1))
