@@ -104,7 +104,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
 
 setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
   function(object, step, year=dimnames(value)$year, ..., value) {
-
+    
     # CHECK step exists
     if(!step %in% dimnames(object[[1]])[[1]])
       stop(paste("tracking does not contain the required step:", step))

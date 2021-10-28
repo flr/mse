@@ -12,6 +12,7 @@
   FLStocks class.
 - Added performance(FLombf) to be called by performance(FLmse).
 - merge(FLQuant, data.table) method to assemble output tables.
+- debugf() method for FLom and FLombf, applies to projection slot.
 
 ## USER-VISIBLE CHANGES
 
@@ -19,6 +20,7 @@
   the role of that element. Indicator is now restricted to refer to empirical
   metrics obtained from operating model observations that are used to provide
   indications of changes in stock status. For example, catch rates by fleet.
+- dims(FLombf) returns unit and season data.
 
 # mse 2.1
 

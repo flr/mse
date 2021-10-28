@@ -54,7 +54,7 @@ checkCRAN: ../$(PKGNAME)_$(PKGVERS).tar.gz ## R CMD check --as-cran
 	cd ..;\
 	R CMD check $(PKGNAME)_$(PKGVERS).tar.gz --as-cran
 
-check: ../$(PKGNAME)_$(PKGVERS).tar.gz  ## R CMD check
+check: roxygen ../$(PKGNAME)_$(PKGVERS).tar.gz  ## R CMD check
 	cd ..;\
 	R CMD check $(PKGNAME)_$(PKGVERS).tar.gz
 

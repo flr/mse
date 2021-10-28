@@ -77,6 +77,8 @@ exportMethods(
   "debug",
   "deviances",
   "deviances<-",
+  "dims",
+  "dimnames",
   "discards",
   "est",
   "est<-",

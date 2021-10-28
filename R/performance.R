@@ -127,8 +127,6 @@ setMethod("performance", signature(x="FLQuants"),
     if(length(names(statistics)) != length(unique(names(statistics))))
       stop("'statistics' must have unique names.")
 
-    # TODO CHECK functions and elements exist (e.g. rescale)
-    
     # LOOP over years
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over statistics
