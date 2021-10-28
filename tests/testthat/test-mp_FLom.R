@@ -52,6 +52,8 @@ r2 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
 plot(om, R2=r2)
 
+data(statistics)
+
 performance(r2, statistics=statistics["SBMSY"], metrics=list(SB=ssb))
 
 dep <- function(x)
@@ -59,7 +61,6 @@ dep <- function(x)
 inddep <- list(~yearMeans(DEP), names="DEP", desc="Depletion")
 
 performance(r2, statistics=list(DEP=inddep), metrics=list(DEP=dep))[, mean(data)]
-
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
@@ -71,12 +72,12 @@ r2b <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 plot(om, R2=r2, R2b=r2b)
 
 
-# --- RUN 3: perfect.sa + ices.hcr: blim=200k, bsafe=300k, ftrg=0.15
+# --- RUN 3: perfect.sa + ices.hcr: sblim=200k, sbsafe=300k, ftrg=0.15
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=ices.hcr,
-    args=list(fmin=0.05, ftrg=0.15, blim=200000, bsafe=300000))))
+    args=list(fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000))))
 
 r3 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
@@ -84,7 +85,7 @@ r3 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=ices.hcr,
-    args=list(fmin=0.05, ftrg=0.30, blim=200000, bsafe=300000))))
+    args=list(fmin=0.05, ftrg=0.30, sblim=200000, sbsafe=300000))))
 
 r3b <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
@@ -92,12 +93,12 @@ r3b <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 plot(om, R3=r3, R3b=r3b)
 
 
-# --- RUN 4: perfect.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
+# --- RUN 4: perfect.sa + ices.hcr + tac.is: sblim=200k, sbsafe=300k, ftrg=0.15
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=ices.hcr,
-    args=list(fmin=0.05, ftrg=0.15, blim=200000, bsafe=300000)),
+    args=list(fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000)),
   isys = mseCtrl(method=tac.is, args=list(initac=25000))))
 
 r4 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
@@ -106,7 +107,7 @@ r4 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=ices.hcr,
-    args=list(fmin=0.05, ftrg=0.25, blim=200000, bsafe=300000)),
+    args=list(fmin=0.05, ftrg=0.25, sblim=200000, sbsafe=300000)),
   isys = mseCtrl(method=tac.is, args=list(initac=25000))))
 
 r4b <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
@@ -115,20 +116,20 @@ r4b <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 plot(om, R4=r4, R4b=r4b)
 
 
-# --- RUN 5: a4a.sa + ices.hcr + tac.is: blim=200k, bsafe=300k, ftrg=0.15
+# --- RUN 5: a4a.sa + ices.hcr + tac.is: sblim=200k, sbsafe=300k, ftrg=0.15
 
 library(FLa4a)
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=sca.sa),
-  hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, blim=200000,
-    bsafe=300000)),
+  hcr = mseCtrl(method=ices.hcr, args=list(fmin=0.05, ftrg=0.15, sblim=200000,
+    sbsafe=300000)),
   isys = mseCtrl(method=tac.is)))
 
 r5 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
 library(doParallel)
-registerDoParallel(3)
+registerDoParallel(2)
 
 r5p <- mp(om, oem=oem, args=mpargs, ctrl=ctrl, parallel=TRUE)
 
