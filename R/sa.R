@@ -25,7 +25,7 @@
 #' @examples
 #' data(ple4om)
 #' perfect.sa(stock(om), FLIndices(), args=list(ay=2018, dy=2017),
-#'   tracking=FLQuant(dimnames=list(metric="conv.est", year=2018)))
+#'   tracking=FLQuants(FLQuant(dimnames=list(metric="conv.est", year=2018))))
 
 perfect.sa <- function(stk, idx, args, tracking, ...) {
   

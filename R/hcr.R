@@ -33,10 +33,10 @@
 #' @examples
 #' data(ple4om)
 #' # Test for year when SSB > bsafe
-#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, bsafe=300000,
+#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
 #'   args=list(ay=2018, data_lag=1, management_lag=1), tracking=FLQuant())
 #' # Test for year when SSB < bsafe
-#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, bsafe=300000,
+#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
 #'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
 
 ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0, args, tracking){
@@ -73,8 +73,8 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0, args, tracking){
 #' @param control A list with the element ftrg (numeric).
 #' @examples
 #' data(ple4om)
-#' fixedF.hcr(stock(om), ftrg=0.15, args=list(ay=2017, management_lag=1),
-#'   tracking=FLQuant())
+#' fixedF.hcr(stock(om), ftrg=0.15, args=list(ay=2017, management_lag=1,
+#'   frq=1), tracking=FLQuant())
 
 fixedF.hcr <- function(stk, ftrg, args, tracking){
 
@@ -101,8 +101,8 @@ fixedF.hcr <- function(stk, ftrg, args, tracking){
 #' @param control A list with the element ctrg (numeric).
 #' @examples
 #' data(ple4om)
-#' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1),
-#'   tracking=FLQuant())
+#' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1,
+#'   frq=1), tracking=FLQuant())
 
 fixedC.hcr <- function(stk, ctrg, args, tracking){
 
@@ -134,6 +134,7 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
 #' @examples
 
 movingF.hcr <- function(stk, hcrpars, args, tracking){
+
 	ay <- args$ay
 	# rule 
 	if(!is(hcrpars, "FLQuant"))
@@ -164,14 +165,13 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 #'
 #' @examples
 #' data(ple4om)
-#' catchSSB.hcr(stock(om), MSY=140000, args=list(ay=2018, data_lag=1),
-#'   tracking=FLQuant())
+#' catchSSB.hcr(stock(om), MSY=140000, tracking=FLQuant(),
+#' args=list(ay=2018, data_lag=1, management_lag=1, frq=1))
 #' # APPLY hcr over a range of dtarget values
 #' lapply(seq(0.30, 0.80, by=0.1), function(x) {
-#'   catchSSB.hcr(stock(om), MSY=140000, dtarget=x, args=list(ay=2018, data_lag=1),
+#'   catchSSB.hcr(stock(om), MSY=140000, dtarget=x,
+#'   args=list(ay=2018, data_lag=1, management_lag=1, frq=1),
 #'   tracking=FLQuant())$ctrl } )
-
-# DEBUG
 
 catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
   dtaclow=0.85, dtacupp=1.15, yrs=1, args, tracking) {
