@@ -468,6 +468,13 @@ setMethod("dims", signature(obj="FLombf"),
   }
 ) # }}}
 
+# dimnames {{{
+setMethod("dimnames", signature(x="FLombf"),
+  function(x) {
+    dimnames(biols(x)[[1]])
+  }
+) # }}}
+
 # fwd (FLombf) {{{
 
 setMethod("fwd", signature(object="FLombf", fishery="missing", control="fwdControl"), 
