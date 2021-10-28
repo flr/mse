@@ -339,6 +339,13 @@ setMethod("dims", signature(obj="FLom"),
   }
 ) # }}}
 
+# dimnames {{{
+setMethod("dimnames", signature(x="FLom"),
+  function(x) {
+    dimnames(stock(x))
+  }
+) # }}}
+
 # window {{{
 setMethod("window", signature(x="FLom"),
   function(x, ...) {
