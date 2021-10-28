@@ -461,6 +461,8 @@ setMethod("dims", signature(obj="FLombf"),
     list(
       minyear=min(unlist(lapply(dis, "[[", "minyear"))),
       maxyear=max(unlist(lapply(dis, "[[", "maxyear"))),
+      unit=max(unlist(lapply(dis, "[[", "unit"))),
+      season=max(unlist(lapply(dis, "[[", "season"))),
       iter=max(unlist(lapply(dis, "[[", "iter")))
     )
   }
@@ -594,11 +596,8 @@ setMethod("stock", signature(object="FLombf"),
 
     # DEBUG SLOW!
     res <- FLStocks(lapply(biols(object), as.FLStock,
-      fisheries=om@fisheries, full=TRUE))
+      fisheries=fisheries(object), full=TRUE))
 
-    if(length(res) == 1)
-      return(res[[1]])
-    else
       return(res)
   }
 )
