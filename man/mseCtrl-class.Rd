@@ -30,7 +30,7 @@ method(object, ...)
 
 \S4method{method}{mseCtrl}(object)
 
-method(object) <- value
+method(object, ...) <- value
 
 \S4method{method}{mseCtrl,`function`}(object) <- value
 
@@ -38,7 +38,7 @@ args(name)
 
 \S4method{args}{mseCtrl}(name)
 
-args(object) <- value
+args(object, ...) <- value
 
 \S4method{args}{mseCtrl,list}(object) <- value
 
@@ -63,14 +63,20 @@ exists(
 \item{object}{object of relevant class (see signature of method)}
 }
 \description{
-The \code{mseCtrl} class stores information about how a specific module will be run.
+The \code{mseCtrl} class stores information about how a specific
+module will be run. The function contained in the \emph{method} slot will be
+called with three sets of argument: those contained in the \emph{args} slot, the
+\emph{args} argument to the call to the \emph{mp} function, and the inputs defined by
+type of module being defined by a particular object. Please see the "Module
+dispatch" section in the \emph{mse} Technical Manual.
 }
 \section{Slots}{
 
 \describe{
-\item{method}{\code{character} with the name of the method to be run. Note a function of method must exist in the environment with the same name.}
-\item{args}{\code{list} with arguments to be passed to the function defined in \code{method}}
-}
+\item{\code{method}}{The function to be run in the module call, class \emph{function}.}
+
+\item{\code{args}}{Arguments to be passed to the method, of class \emph{list}.}
+}}
 
 \section{Accessors}{
 
@@ -91,3 +97,13 @@ class validity. If an unnamed \code{FLQuant} object is provided, this is used
 for sizing, but not for populating any slot.
 }
 
+\examples{
+ctl <- mseCtrl(method=function(stk, args, alpha) ssb(stk) * alpha,
+  args=list(alpha=0.5))
+ctl
+method(ctl)
+method(ctl) <- function(stk, args, beta) ssb(stk) * beta
+args(ctl)
+args(ctl) <- list(beta=0.9)
+exists(ctl)
+}

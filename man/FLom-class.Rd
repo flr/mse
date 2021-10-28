@@ -9,26 +9,13 @@
 \alias{stock<-,FLom,FLStock-method}
 \alias{sr,FLom-method}
 \alias{sr<-}
-\alias{sr<--methods}
 \alias{sr<-,FLom,FLSR-method}
-\alias{refpts,FLom-method}
-\alias{refpts}
-\alias{refpts-methods}
-\alias{refpts<-,FLom,FLPar-method}
-\alias{fleetBehaviour}
-\alias{fleetBehaviour-methods}
-\alias{fleetBehaviour,FLom-method}
-\alias{fleetBehaviour<-}
-\alias{fleetBehaviour<--methods}
-\alias{projection}
-\alias{projection-methods}
-\alias{projection,FLom-method}
-\alias{projection<-}
-\alias{projection<--methods}
 \alias{show,FLom-method}
-\alias{tracking<-,FLmse,FLQuant-method}
-\alias{control<-,FLmse,FLQuant-method}
-\alias{oem<-,FLmse,FLQuant-method}
+\alias{combine,FLom,FLom-method}
+\alias{om<-,FLmse,FLo-method}
+\alias{tracking<-,FLmse,FLQuants-method}
+\alias{control<-,FLmse,mpCtrl-method}
+\alias{oem<-,FLmse,FLoem-method}
 \title{A class for an operating model (OM)}
 \usage{
 FLom(...)
@@ -45,36 +32,24 @@ sr(object) <- value
 
 \S4method{sr}{FLom,FLSR}(object) <- value
 
-\S4method{refpts}{FLom}(object)
-
-\S4method{refpts}{FLom,FLPar}(object) <- value
-
-fleetBehaviour(object, ...)
-
-\S4method{fleetBehaviour}{FLom}(object)
-
-fleetBehaviour(object) <- value
-
-projection(object, ...)
-
-\S4method{projection}{FLom}(object)
-
-projection(object) <- value
-
 \S4method{show}{FLom}(object)
 
-\S4method{tracking}{FLmse,FLQuant}(object) <- value
+\S4method{combine}{FLom,FLom}(x, y, ...)
 
-\S4method{control}{FLmse,FLQuant}(object) <- value
+\S4method{om}{FLmse,FLo}(object) <- value
 
-\S4method{oem}{FLmse,FLQuant}(object) <- value
+\S4method{tracking}{FLmse,FLQuants}(object) <- value
+
+\S4method{control}{FLmse,mpCtrl}(object) <- value
+
+\S4method{oem}{FLmse,FLoem}(object) <- value
 }
 \arguments{
 \item{...}{additional argument list that might never be used}
 
 \item{object}{object of relevant class (see signature of method)}
 
-\item{value}{the new object}
+\item{value}{Object to assign in slot}
 }
 \description{
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
@@ -134,6 +109,9 @@ Methods exist for various calculations based on values stored in the class:
 
 \examples{
 
+data(ple4om)
+comb <- combine(iter(om, 1:10), iter(om, 11:25))
+all.equal(om, comb)
 }
 \seealso{
 \link{FLComp}

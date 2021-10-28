@@ -28,9 +28,10 @@
 #' @examples
 #'
 
-FLmse <- setClass("FLmse", contains="FLom", 
+FLmse <- setClass("FLmse",
 	slots=c(
-		tracking="FLQuant",
+    om="FLo",
+		tracking="FLQuants",
     control="mpCtrl",
     oem="FLoem",
     # TODO args vs. mpargs
@@ -46,11 +47,8 @@ setGeneric("FLmse")
 setMethod("initialize", "FLmse",
     function(.Object,
              ...,
-             stock, sr, refpts, fleetBehaviour, tracking, control, oem, args) {
-      if (!missing(stock)) .Object@stock <- stock 
-      if (!missing(sr)) .Object@sr <- sr
-      if (!missing(refpts)) .Object@refpts <- refpts
-      if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
+             om, tracking, control, oem, args) {
+      if (!missing(om)) .Object@om <- om 
       if (!missing(tracking)) .Object@tracking <- tracking
       if (!missing(control)) .Object@control <- control
       if (!missing(oem)) .Object@oem <- oem
@@ -61,6 +59,26 @@ setMethod("initialize", "FLmse",
 
 # accessor methods {{{
 
+# om
+
+#' @rdname FLmse-class
+#' @aliases om om-methods
+setGeneric("om", function(object, ...) standardGeneric("om"))
+
+#' @rdname FLmse-class
+setMethod("om", "FLmse", function(object) object@om)
+
+#' @rdname FLmse-class
+#' @param value the new object
+#' @aliases om<- om<--methods
+setGeneric("om<-", function(object, value) standardGeneric("om<-"))
+
+#' @rdname FLom-class
+setReplaceMethod("om", signature("FLmse", "FLo"), function(object, value){
+	object@oem <- value
+	object
+})
+
 # tracking
 
 #' @rdname FLmse-class
@@ -68,17 +86,42 @@ setMethod("initialize", "FLmse",
 setGeneric("tracking", function(object, ...) standardGeneric("tracking"))
 
 #' @rdname FLmse-class
-setMethod("tracking", "FLmse", function(object) object@tracking)
+
+setMethod("tracking", signature("FLmse"),
+  function(object, biol="missing") {
+
+    if(length(object@tracking) == 1)
+  	  return(object@tracking[[1]])
+    else
+      if(missing(biol))
+  	    return(object@tracking)
+      else
+  	    return(object@tracking[[biol]])
+
+  	object
+})
 
 #' @rdname FLmse-class
 #' @param value the new object
 #' @aliases tracking<- tracking<--methods
-setGeneric("tracking<-", function(object, value) standardGeneric("tracking<-"))
+setGeneric("tracking<-", function(object, ..., value) standardGeneric("tracking<-"))
 
 #' @rdname FLom-class
-setReplaceMethod("tracking", signature("FLmse", "FLQuant"), function(object, value){
-	object@tracking <- value
-	object
+
+setReplaceMethod("tracking", signature("FLmse", "FLQuants"),
+  function(object, value) {
+	  object@tracking <- value
+  	object
+})
+
+setReplaceMethod("tracking", signature("FLmse", "FLQuant"),
+  function(object, biol="missing", value) {
+    if(length(object@tracking) == 1)
+  	  object@tracking[[1]] <- value
+    else
+  	  object@tracking[[biol]] <- value
+
+  	object
 })
 
 # control
@@ -88,17 +131,30 @@ setReplaceMethod("tracking", signature("FLmse", "FLQuant"), function(object, val
 setGeneric("control", function(object, ...) standardGeneric("control"))
 
 #' @rdname FLmse-class
-setMethod("control", "FLmse", function(object) object@control)
+setMethod("control", "FLmse",
+  function(object, i="missing") {
+    if(missing(i))
+      return(object@control)
+    else
+      return(object@control[[i]])
+  })
 
 #' @rdname FLmse-class
 #' @param value the new object
 #' @aliases control<- control<--methods
-setGeneric("control<-", function(object, value) standardGeneric("control<-"))
+setGeneric("control<-", function(object, ..., value) standardGeneric("control<-"))
 
 #' @rdname FLom-class
-setReplaceMethod("control", signature("FLmse", "FLQuant"), function(object, value){
-	object@control <- value
-	object
+setReplaceMethod("control", signature("FLmse", "mpCtrl"),
+  function(object, value) {
+	  object@control <- value
+	  object
+})
+
+setReplaceMethod("control", signature("FLmse", "mseCtrl"),
+  function(object, i, value) {
+	  object@control[[i]] <- value
+	  object
 })
 
 # oem
@@ -116,7 +172,7 @@ setMethod("oem", "FLmse", function(object) object@oem)
 setGeneric("oem<-", function(object, value) standardGeneric("oem<-"))
 
 #' @rdname FLom-class
-setReplaceMethod("oem", signature("FLmse", "FLQuant"), function(object, value){
+setReplaceMethod("oem", signature("FLmse", "FLoem"), function(object, value){
 	object@oem <- value
 	object
 })
@@ -134,23 +190,39 @@ setReplaceMethod("args", signature("FLmse", "list"), function(object, value){
 
 # }}}
 
+# @om accessors {{{
+
+setMethod("stock", "FLmse", function(object) stock(om(object)))
+
+setMethod("sr", "FLmse", function(object) sr(om(object)))
+
+setMethod("refpts", "FLmse", function(object) refpts(om(object)))
+
+# }}}
+
 # plot {{{
 setMethod("plot", signature(x="FLmse", y="missing"),
   function(x, ...) {
-    plot(stock(x), ...)
+    # PLOT om
+    plot(om(x), ...)
   }
 ) 
 
 setMethod("plot", signature(x="FLom", y="FLmse"),
-  function(x, y, ...) {
+  function(x, y, ..., window=TRUE) {
 
     args <- list(...)
+    fms <- unlist(lapply(args, is, "FLmse"))
 
-    stocks <- lapply(c(list(x, y), args), stock)
+    stocks <- lapply(c(list(x, om(y)), args[fms]), stock)
 
     # WINDOW om
-    minyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))
-    stocks[[1]] <- window(stocks[[1]], end=minyear)
+    if(isTRUE(window))
+      maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))
+    else
+      maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$maxyear)))
+    
+    stocks[[1]] <- window(stocks[[1]], end=maxyear)
 
     # SORT OUT names
     if(is.null(names(stocks)))
@@ -161,12 +233,12 @@ setMethod("plot", signature(x="FLom", y="FLmse"),
     idx <- names(stocks) == character(1)
     if(length(idx) > 0)
       names(stocks)[idx] <- c("OM", paste0("MP", seq(sum(idx)-1)))[idx]
-
-    plot(FLStocks(stocks))
+ 
+    # PLOT FLStocks + args
+    nfs <- unlist(lapply(args, function(x) !is(x, "FLmse")))
+    do.call("plot", c(list(x=FLStocks(stocks)), args[nfs]))
   }
 )
-
-
 # }}}
 
 # summary {{{
@@ -179,13 +251,13 @@ setMethod("summary", signature(object="FLmse"),
 
     # tracking
     cat("-- tracking\n")
-    tracking <- yearMeans(tracking(object))
+    # TODO tracking <- yearMeans(tracking(object))
  
     # CONVERT dimnames$year to range 
-    ydns <- dimnames(tracking(object))$year
-    dimnames(tracking)$year <- paste(c(ydns[1], ydns[length(ydns)]), collapse="-")
+    # ydns <- dimnames(tracking(object))$year
+    # dimnames(tracking)$year <- paste(c(ydns[1], ydns[length(ydns)]), collapse="-")
 
-    cat(show(tracking), "\n")
+    # cat(show(tracking), "\n")
 
     # control
     cat("-- control\n")
@@ -216,3 +288,31 @@ setMethod("summary", signature(object="FLmse"),
 
   }
 ) # }}}
+
+# metrics {{{
+
+setMethod("metrics", signature(object="FLmse", metrics="ANY"),
+  function(object, metrics) {
+    metrics(om(object), metrics)
+})
+
+setMethod("metrics", signature(object="FLmse", metrics="missing"),
+  function(object) {
+    metrics(om(object))
+}) 
+
+# standard metrics
+
+setMethod("ssb", "FLmse", function(object) ssb(om(object)))
+
+setMethod("catch", "FLmse", function(object) catch(om(object)))
+
+setMethod("fbar", "FLmse", function(object) fbar(om(object)))
+
+setMethod("rec", "FLmse", function(object) rec(om(object)))
+
+# }}}
+
+# om accessors {{{
+
+# }}}

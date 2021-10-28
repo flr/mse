@@ -4,14 +4,14 @@
 \alias{fwd.om}
 \title{A method to project the operating model (OM)}
 \usage{
-fwd.om(stk, ctrl, sr, ...)
+fwd.om(om, ctrl, ...)
 }
 \arguments{
 \item{ctrl}{the fwdControl object with objectives and constraints}
 
-\item{sr}{a FLSR with the stock-recruitment model}
-
 \item{object}{the OM as a FLStock}
+
+\item{sr}{a FLSR with the stock-recruitment model}
 
 \item{sr.residuals}{a FLQuant with S/R residuals}
 

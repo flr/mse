@@ -24,45 +24,78 @@
 #' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
 #' @param EFF0 The tracking array
 #' @param EFF Not used by this function but may be used by the other implementation functions
+#' @examples
+#' data(ple4om)
 
-tac.is <- function(stk, ctrl, args, delta_tac_max=NA, delta_tac_min=NA, tracking){
-	ay <- args$ay
-	nsqy <- args$nsqy
-	iy <- args$iy
-	mlag <- args$management_lag
-	it <- dim(stk)[6]
-	# reference value
-	#if(ay==iy) refCatch <- tracking["C.om", ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
-	if(ay==iy) refCatch <- catch(stk)[, ac(ay-1)] else refCatch <- tracking["metric.is", ac(ay-1)]
-	# Year range of perceived stock
-	yrs <- as.numeric(dimnames(stock.n(stk))$year)
-	last_data_yr <- yrs[length(yrs)]
-	# Status quo years
-	sqy <- (last_data_yr-nsqy+1):last_data_yr
-	# Get the Fbar for the intermediate years
-	fsq0 <- yearMeans(fbar(stk)[,ac(sqy)])
-	# Number of intermediate years (between last data year and ay+1)
-	ninter_yrs <- ay - last_data_yr + mlag - 1
-	# Control object for the STF
-	ctrl <- getCtrl(c(rep(fsq0, times=ninter_yrs), ctrl@trgtArray[,"val",]), "f", (last_data_yr+1):(ay+mlag), it)
-	# Number of projection years
-	nproj_yrs <- (ay+mlag) - last_data_yr
-	stkTmp <- stf(stk, nproj_yrs, wts.nyears=nsqy)
+# ADD initial TAC, initac=catch(stk[, ac(iy)])
+
+tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=10,
+  fmin=0, initac=catch(stk[, ac(iy - 1)]), tracking) {
+
+  # EXTRACT args
+
+  ay <- args$ay
+  dy <- args$dy
+  iy <- args$iy
+  mlag <- args$management_lag
+  dlag <- args$data_lag
+  nsqy <- args$nsqy
+
+  # PREPARE stk until ay + mlag, biology as in last nsqy years
+
+  fut <- stf(stk, end=ay + mlag, wts.nyears=nsqy)
+
+  # SET recruitment
+
 	# Set geomean sr relationship
-	gmean_rec <- c(exp(yearMeans(log(rec(stk)[,ac(sqy)]))))
-	# Project!
-	stkTmp <- fwd(stkTmp, ctrl=ctrl, sr=list(model="mean", params = FLPar(gmean_rec,iter=it)))
-	# Get TAC for the management year that results from hitting the F in STF
-	TAC <- catch(stkTmp)[,ac(ay+mlag)]
-	# catch stabelizers
-	upper_limit <- refCatch * delta_tac_max
-	lower_limit <- refCatch * delta_tac_min
-	TAC <- pmin(c(upper_limit), c(TAC), na.rm=TRUE)
-	TAC <- pmax(c(lower_limit), c(TAC), na.rm=TRUE)
-	# new control file
-	ctrl <- getCtrl(c(TAC), "catch", ay+mlag, it)
-	list(ctrl = ctrl, tracking = tracking)
-} # }}}
+  # gmnrec <- exp(yearMeans(log(window(rec(stk), end=-(recyrs)))))
+  # TODO recyrs
+  gmnrec <- exp(yearMeans(log(rec(stk)[, rev(dimnames(stk)$year)[2:recyrs+1]])))
+  srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
+  
+  # GET TAC dy / ay - 1
+
+  if(ay == iy)
+    prev_tac <- rep(c(initac), length=args$it)
+  else
+    prev_tac <- c(tracking[[1]]["isys", ac(dy)])
+
+  # FORECAST for iyrs and my IF mlag > 0, else only my
+  # DEBUG TAC vs Fsquo in year 1?
+
+  if(mlag > 0) {
+
+    fctrl <- fwdControl(
+      list(year=seq(ay - dlag + 1, length=mlag), quant="fbar",
+        value=rep(c(fbar(stk)[, ac(dy)]), mlag)),
+      list(year=ay + mlag, quant="fbar", value=ctrl$value))
+  } else {
+
+    fctrl <- fwdControl(
+      list(year=ay + mlag, quant="fbar", value=ctrl$value))
+  }
+
+  fut <- fwd(fut, sr=srr, control=fctrl)
+
+  # EXTRACT catches
+  TAC <- c(catch(fut)[, ac(ay + mlag)])
+
+  # APPLY upper TAC limit
+  TAC <- pmin(TAC, c(prev_tac) * dtacupp, na.rm=TRUE)
+
+  # ID iters where F > fmin
+  i <- c(fbar(fut)[, ac(ay + mlag)] > fmin)
+
+  # APPLY lower TAC limit, only if F > fmin
+  TAC[i] <- pmax(TAC[i], c(prev_tac)[i] * dtaclow, na.rm=TRUE)
+
+  # CONSTRUCT fwdControl
+  ctrl <- fwdControl(list(year=ay + mlag, quant="catch", value=TAC))
+
+  return(list(ctrl=ctrl, tracking=tracking))
+}
+
+# }}}
 
 # effort.is {{{
 
@@ -81,13 +114,15 @@ effort.is <- function(stk, ctrl, args, tracking){
 	# reference value
 	if(ay==iy) fay <- fbar(stk)[,ac(ay-data_lag)] else fay <- yearMeans(fbar(stk)[,ac(args$sqy)])
 	# target to reach defined by HCR (in f units)
-	trgt <- ctrl@trgtArray[,"val",]
+	trgt <- ctrl$value
 	# multiplier
 	mult <- trgt/fay
 	# new control file, in relative terms
 	ctrl <- getCtrl(mult, "f", ay+management_lag, it, rel.year=ay-data_lag)
 	list(ctrl = ctrl, tracking = tracking)
 } # }}}
+
+# indicator.is {{{
 
 #' indicator implementation function
 #'
@@ -106,42 +141,8 @@ indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"),
 	}  	
 	# new control file
 	ctrl@target[,'quantity'] <- quantity
-	ctrl@trgtArray[,'val',] <- ctrl@trgtArray[,'val',]*vsq
+	ctrl$value <- ctrl$value*vsq
 
 	# return
 	list(ctrl = ctrl, tracking = tracking)
 } # }}}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

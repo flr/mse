@@ -4,12 +4,12 @@
 \alias{mcN}
 \title{Compute number of necessary Monte Carlo runs}
 \usage{
-\S4method{mcN}{FLQuant}(x, s, E = 5, z = 1.96, start = 100, by = 1)
+mcN(x, ...)
 }
 \arguments{
-\item{E}{The required percentage error of the mean, \emph{numeric}.}
-
 \item{z}{Value of Z for a given confidence level for a normally distributed random variable, default is 1.96 for a 95\\% CI, \emph{numeric}.}
+
+\item{E}{The required percentage error of the mean, \emph{numeric}.}
 }
 \description{
 The \code{mcN} function implements the simple method of Bukaci et al. (2016) to

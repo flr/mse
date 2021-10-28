@@ -2,23 +2,46 @@
 % Please edit documentation in R/hcr.R
 \name{ices.hcr}
 \alias{ices.hcr}
-\title{Evaluate the chosen HCR function}
+\title{The typical HCR used by ICES}
 \usage{
-ices.hcr(stk, fmin, ftrg, blim, bsafe, args, tracking)
+ices.hcr(stk, ftrg, sblim, sbsafe, fmin = 0, args, tracking)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}
 
-\item{method}{Name of the chosen HCR function.}
+\item{ftrg}{\link{TODO:description}}
 
-\item{EFF}{Effort array (if effort management is being used).}
+\item{sblim}{\link{TODO:description}}
 
-\item{EFF0}{Tracking array.}
+\item{sbsafe}{\link{TODO:description}}
 
-\item{control}{A list with the elements fmin, ftrg, blim, bsafe and ssb_lag, all of which are numeric.}
+\item{fmin}{Minimum fishing mortality.}
 
-\item{ay}{The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).}
+\item{args}{MSE arguments, class \emph{list}.}
+
+\item{tracking}{Structure for tracking modules outputs.}
+}
+\value{
+A \emph{list} with elements \emph{ctrl}, of class \emph{fwdControl}, and \emph{tracking}.
 }
 \description{
-Evaluate the chosen HCR function using the current stock perception and a control
+The typical HCR used by ICES which sets a target F based on the SSB based on 4 parameters: sblim, sbsafe, fmin and ftrg.
+F increases linearly between SSB = blim and SSB = bsafe, from F = fmin to F = ftrg.
+If:
+\itemize{
+\item B < Blim, F = Fbycatch;
+\item B > trigger, F = Fmsy;
+\item B > Blim & B < trigger, F linear between Fbycatch and Fmsy;
+\item F = ftrg is the maximum F, F = fmin is the minimum F.
+F is set in year ay, based on SSB in year ay - data_lag
+}
+}
+\examples{
+data(ple4om)
+# Test for year when SSB > bsafe
+ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+  args=list(ay=2018, data_lag=1, management_lag=1), tracking=FLQuant())
+# Test for year when SSB < bsafe
+ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+  args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
 }

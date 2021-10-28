@@ -20,8 +20,10 @@ hyperstability.fb <- function(ctrl, beta=1, maxF=2, alpha=maxF^(1-beta), trackin
 	# mimick a hyperstability scenario.
 	# alpha = maxF^(1-beta) # linear meets curve at maxF
 	
-  ctrl@trgtArray[ctrl@target[,"quantity"]=="f",,] <- alpha * ctrl@trgtArray[ctrl@target[,"quantity"]=="f",,]^beta
-	list(ctrl=ctrl, tracking=tracking)
+  ctrl$value[ctrl$quant == 'f'] <- alpha *
+    ctrl$value[ctrl$quant == 'f']^beta
+	
+  list(ctrl=ctrl, tracking=tracking)
 	
 } # }}}
 

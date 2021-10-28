@@ -9,19 +9,22 @@
 
 # movingF.hcr {{{
 movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, args, hcrpars, tracking) {
+
+  # args
 	ay <- args$ay
 	iy <- args$iy
-	if(ay==iy | (ay-iy)%%interval==0){
+
+  # RUN brp() with or without SR fit
+	if(ay == iy | (ay - iy) %% interval == 0){
 		if(!missing(model)){
 			sr0 <- fmle(as.FLSR(stk, model=model))
-			hcrpars <- refpts(brp(FLBRP(stk, sr0)))[frp,"harvest"]
+			hcrpars <- refpts(brp(FLBRP(stk, sr0)))[tolower(frp),"harvest"]
 		} else {
-			hcrpars <- refpts(brp(FLBRP(stk)))[frp,"harvest"]
+			hcrpars <- refpts(brp(FLBRP(stk)))[tolower(frp),"harvest"]
 		}
 	}
 	list(hcrpars=hcrpars, tracking=tracking)	
 } # }}}
-
 
 # indicator.phcr
 indicator.phcr <- function(stk, itrg, args, tracking, ...){

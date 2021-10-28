@@ -4,7 +4,17 @@
 \alias{tac.is}
 \title{TAC implementation function}
 \usage{
-tac.is(stk, ctrl, args, delta_tac_max = NA, delta_tac_min = NA, tracking)
+tac.is(
+  stk,
+  ctrl,
+  args,
+  dtaclow = NA,
+  dtacupp = NA,
+  recyrs = 10,
+  fmin = 0,
+  initac = catch(stk[, ac(iy - 1)]),
+  tracking
+)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}
@@ -25,4 +35,7 @@ The control argument is a list of parameters:
 nsqy - number of years to average over to get Fbar for STF
 delta_tac_min - constraint on the TAC
 delta_tac_max - constraint on the TAC
+}
+\examples{
+data(ple4om)
 }

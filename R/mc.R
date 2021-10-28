@@ -31,8 +31,10 @@
 #'  plot(se~iters, itse, type='l')
 #'  }
 
+setGeneric("mcN", function(x, ...) standardGeneric("mcN"))
+
 setMethod("mcN", signature(x="FLQuant"),
-  function(x, s, E=5, z=1.96, start=100, by=1) {
+  function(x, E=5, z=1.96, start=100, by=1) {
 
     i <- dim(x)[6]
     if(i < start)
@@ -45,8 +47,8 @@ setMethod("mcN", signature(x="FLQuant"),
     }
 
     res <- unlist(lapply(its,
-      function(x) mciters(mean(iter(ssb, 1:x)),
-        s=var(iter(ssb, 1:x)) ^ 0.5)))
+      function(y) mciters(mean(iter(x, seq(1, y))),
+        s=var(iter(x, seq(1, y))) ^ 0.5)))
 
   return(data.frame(iters=its, se=res))
 })

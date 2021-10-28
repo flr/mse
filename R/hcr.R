@@ -7,58 +7,59 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-#' Evaluate the chosen HCR function
-#'
-#' Evaluate the chosen HCR function using the current stock perception and a control
-#' @param method Name of the chosen HCR function.
-#' @param stk The perceived stock.
-#' @param ay The current year. The management control (e.g. F or effort) will be set in ay+1.
-#' @param EFF Effort array (if effort management is being used).
-#' @param EFF0 Tracking array.
-#' @param control The control object for the chosen HCR function. A list of parameters.
-#h <- function(...){
-#	args <- list(...)
-#	method <- args$method
-#	args$method <- NULL
-#	# Check inputs
-#	if(!is(args$stk,"FLStock")) stop("stk argument must be an FLStock")
-#	# dispatch
-#	ctrl <- do.call(method, args)
-#	# check outputs
-#	if(!is(ctrl, "fwdControl")) stop("The HCR must return and object of class fwdControl")	
-#	# return
-#	ctrl  
-#}
 
 # ices.hcr {{{
 
 #' The typical HCR used by ICES
 #'
-#' The typical HCR used by ICES which sets a target F based on the SSB based on 4 parameters: blim, bsafe, fmin and ftrg.
+#' The typical HCR used by ICES which sets a target F based on the SSB based on 4 parameters: sblim, sbsafe, fmin and ftrg.
 #' F increases linearly between SSB = blim and SSB = bsafe, from F = fmin to F = ftrg.
 #' If:
-#' B < Blim, F = Fbycatch;
-#' B > trigger, F = Fmsy;
-#' B > Blim & B < trigger, F linear between Fbycatch and Fmsy;
-#' F = ftrg is the maximum F, F = fmin is the minimum F.
-#' F is set in year ay, based on SSB in year ay - ssb_lag.
-#' The control argument is a list of parameters used by the HCR.
+#' - B < Blim, F = Fbycatch;
+#' - B > trigger, F = Fmsy;
+#' - B > Blim & B < trigger, F linear between Fbycatch and Fmsy;
+#' - F = ftrg is the maximum F, F = fmin is the minimum F.
+#' F is set in year ay, based on SSB in year ay - data_lag
+#'
 #' @param stk The perceived FLStock.
-#' @param control A list with the elements fmin, ftrg, blim, bsafe and ssb_lag, all of which are numeric.
-#' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
-ices.hcr <- function(stk, fmin, ftrg, blim, bsafe, args, tracking){
+#' @param fmin Minimum fishing mortality.
+#' @param ftrg [TODO:description]
+#' @param sblim [TODO:description]
+#' @param sbsafe [TODO:description]
+#' @param args MSE arguments, class *list*.
+#' @param tracking Structure for tracking modules outputs.
+#'
+#' @return A *list* with elements *ctrl*, of class *fwdControl*, and *tracking*.
+#' @examples
+#' data(ple4om)
+#' # Test for year when SSB > bsafe
+#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+#'   args=list(ay=2018, data_lag=1, management_lag=1), tracking=FLQuant())
+#' # Test for year when SSB < bsafe
+#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+#'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
+
+ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0, args, tracking){
+
+  # args
 	ay <- args$ay
-	ssb_lag <- ifelse(is.null(args$ssb_lag), 1, args$ssb_lag)
-	# rule
-	ssb <- ssb(stk)[, ac(ay-ssb_lag)]
+	data_lag <- args$data_lag
+	man_lag <- args$management_lag
+
+  # GET ssb metric
+	ssb <- unitSums(ssb(stk)[, ac(ay - data_lag)])
+
+	# APPLY rule
+
 	fout <- FLQuant(fmin, dimnames=list(iter=dimnames(ssb)$iter))
-	fout[ssb >= bsafe] <- ftrg
-	inbetween <- (ssb < bsafe) & (ssb > blim)
-	gradient <- (ftrg - fmin) / (bsafe - blim)
-	fout[inbetween] <- (ssb[inbetween] - blim) * gradient + fmin
-	# create control file
-	ctrl <- getCtrl(c(fout), "f", ay+args$management_lag, dim(fout)[6])
-	# return
+	fout[ssb >= sbsafe] <- ftrg
+	inbetween <- (ssb < sbsafe) & (ssb > sblim)
+	gradient <- (ftrg - fmin) / (sbsafe - sblim)
+	fout[inbetween] <- (ssb[inbetween] - sblim) * gradient + fmin
+	
+  # CREATE control file
+  ctrl <- fwdControl(year=ay + man_lag, quant="fbar", value=c(fout))
+
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
 
@@ -70,22 +71,70 @@ ices.hcr <- function(stk, fmin, ftrg, blim, bsafe, args, tracking){
 #' The control argument is a list of parameters used by the HCR.
 #' @param stk The perceived FLStock.
 #' @param control A list with the element ftrg (numeric).
-fixedF.hcr <- function(stk, ftrg, args, tracking){
-	ay <- args$ay
-	# rule 
-	if(!is(ftrg, "FLQuant"))
-    ftrg <- FLQuant(ftrg, dimnames=list(iter=dimnames(stk@catch)$iter))
+#' @examples
+#' data(ple4om)
+#' fixedF.hcr(stock(om), ftrg=0.15, args=list(ay=2017, management_lag=1,
+#'   frq=1), tracking=FLQuant())
 
-	# create control file
-	ctrl <- getCtrl(c(ftrg), "f", ay+args$management_lag, dim(ftrg)[6])
-	
+fixedF.hcr <- function(stk, ftrg, args, tracking){
+
+  # args
+	ay <- args$ay
+  mlag <- args$management_lag
+  frq <- args$frq
+
+	# create control object
+  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="fbar", value=c(ftrg))
+
 	# return
 	list(ctrl=ctrl, tracking=tracking)
+
+} # }}}
+
+# fixedC.hcr {{{
+
+#' A fixed catch HCR
+#'
+#' No matter what get C = ctrg
+#' The control argument is a list of parameters used by the HCR.
+#' @param stk The perceived FLStock.
+#' @param control A list with the element ctrg (numeric).
+#' @examples
+#' data(ple4om)
+#' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1,
+#'   frq=1), tracking=FLQuant())
+
+fixedC.hcr <- function(stk, ctrg, args, tracking){
+
+  # args
+	ay <- args$ay
+  mlag <- args$management_lag
+  frq <- args$frq
+
+	# create control object
+  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="catch", value=c(ctrg))
+
+	# return
+	list(ctrl=ctrl, tracking=tracking)
+
 } # }}}
 
 # movingF.hcr {{{
 
+#' [TODO:description]
+#'
+#' @param stk [TODO:description]
+#' @param hcrpars [TODO:description]
+#' @param args [TODO:description]
+#' @param tracking [TODO:description]
+#'
+#' @return [TODO:description]
+#' @export
+#'
+#' @examples
+
 movingF.hcr <- function(stk, hcrpars, args, tracking){
+
 	ay <- args$ay
 	# rule 
 	if(!is(hcrpars, "FLQuant"))
@@ -98,88 +147,130 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
 
-#' A indicator based HCR
+# catchSSB.hcr {{{
+
+#' A HCR to set total catch based on SSB depletion level
+#'
+#' @param stk The perceived FLStock.
+#' @param dtarget=0.40 Depletion level from which catch is decreased.
+#' @param dlimit=0.10 Depletion level at which fishing is stopped.
+#' @param lambda=1 Multiplier for MSY level.
+#' @param MSY Assumed or estimated MSY.
+#' @param dtaclow=0.85 Maximum proportional decrease in allowable catch.
+#' @param dtacupp=1.15 Maximum proportional increase in allowable catch.
+#' @param args MSE arguments, class *list*.
+#' @param tracking Structure for tracking modules outputs.
+#'
+#' @return A *list* with elements *ctrl*, of class *fwdControl*, and *tracking*.
+#'
+#' @examples
+#' data(ple4om)
+#' catchSSB.hcr(stock(om), MSY=140000, tracking=FLQuant(),
+#' args=list(ay=2018, data_lag=1, management_lag=1, frq=1))
+#' # APPLY hcr over a range of dtarget values
+#' lapply(seq(0.30, 0.80, by=0.1), function(x) {
+#'   catchSSB.hcr(stock(om), MSY=140000, dtarget=x,
+#'   args=list(ay=2018, data_lag=1, management_lag=1, frq=1),
+#'   tracking=FLQuant())$ctrl } )
+
+catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
+  dtaclow=0.85, dtacupp=1.15, yrs=1, args, tracking) {
+  
+  # args
+  ay <- args$ay
+  data_lag <- args$data_lag
+  man_lag <- args$management_lag
+  frq <- args$frq
+
+  # SET tac limits if NA
+  if(is.na(dtaclow))
+    dtaclow <- 1e-8
+  if(is.na(dtacupp))
+    dtacupp <- 1e8
+
+  # COMPUTE depletion, across units
+  dep <- yearMeans(unitSums(window(stock(stk), start=ay - data_lag - yrs,
+    end=ay - data_lag))) / unitSums(stock(stk)[, 1])
+
+  # RULE
+  ca <- ifelse(dep <= dlimit, 1e-8,
+    ifelse(dep < dtarget, (lambda * MSY) / (dtarget - dlimit) * (dep - dlimit),
+    lambda * MSY))
+
+  # IF NA, set to previous TAC
+  if(any(is.na(ca)))
+    ca[is.na(ca)] <- tracking[[1]]['hcr', ac(ay - 1)][is.na(ca)]
+
+  # CONTROL
+  ctrl <- fwdControl(
+    # TAC for frq years
+    c(lapply(seq(ay + man_lag, ay + frq), function(x)
+      list(quant="catch", value=c(ca), year=x)),
+    # TAC change limits
+    lapply(seq(ay + man_lag, ay + frq), function(x)
+      list(quant="catch", min=rep(dtaclow, dim(ca)[6]), max=rep(dtacupp, dim(ca)[6]),
+        year=x, relYear=x-1)))
+  )
+
+	return(list(ctrl=ctrl, tracking=tracking))
+
+} # }}}
+
+# indicator.hcr {{{
+
+#' An indicator-based HCR
 #'
 #' Get indicator to target. The control argument is a list of parameters used by the HCR.
 #' @param stk The perceived FLStock.
 #' @param itrg The target for the indicator.
 #' @param args A list with generic arguments to be used by the function if needed.
 #' @param tracking The tracking matrix.
-indicator.hcr <- function (stk, hcrpars, args, tracking) 
-{
+indicator.hcr <- function (stk, hcrpars, args, tracking) {
     ay <- args$ay
     dy <- args$dy
   	#sqy <- args$sqy
   	mlag <- args$management_lag
 	if(!is(hcrpars, "FLQuant"))
     hcrpars <- FLQuant(hcrpars, dimnames=list(iter=dimnames(stk@catch)$iter))
-	mult <- stk@indicator[,ac(dy)]/hcrpars
+	mult <- stk@indicator[,ac(dy)] / hcrpars
 	#csq <- yearMeans(catch(stk)[,ac(dy)])
-    ctrl <- getCtrl(mult, NA, ay + mlag, dim(hcrpars)[6])
+    ctrl <- getCtrl(mult, "f", ay + mlag, dim(hcrpars)[6])
     list(ctrl = ctrl, tracking = tracking)
 }
+# }}}
 
-# Test:
-# library(FLCore)
-# data(ple4)
-# Test ICES HCR - single iter
-#ple4t <- ple4
-#control <- list(fmin=0.1, ftrg=1.0, blim=100000,bsafe=200000, ssb_lag=1)
-#ay <- 2008
-#stock.wt(ple4t) <- 1.0
-#stock.n(ple4t)[,ac(ay-control$ssb_lag)] <- 0.0
-#ssb <- seq(from=0, to = 300000, length=20)
-#fout <- rep(NA, length(ssb))
-#for (i in 1:length(ssb)){
-#    stock.n(ple4t)[10,ac(ay-control$ssb_lag)] <- ssb[i]
-#    #c(ssb(ple4t)[,ac(ay-control$ssb_lag)])
-#    fout[i] <- ices_hcr(ple4t, control, ay)
-#}
-#plot(ssb, fout)
+# cpue.hcr {{{
 
-# Test ICES HCR - multiple iters
-#niter <- 10
-#ple4p <- propagate(ple4, niter)
-#ay <- 2008
-#stock.wt(ple4p)[] <- 1.0
-#stock.n(ple4p)[,ac(ay-control$ssb_lag)] <- 0.0
-#stock.wt(ple4p) <- stock.wt(ple4p) * rlnorm(prod(dim(stock.wt(ple4p))), mean=0, sd=0.1)
-#control <- list(fmin=0.1, ftrg=1.0, blim=100000,bsafe=200000, ssb_lag=1)
-#ssb <- seq(from=0, to = 300000, length=20)
-#fout <- array(NA, dim=c(length(ssb), niter))
-#ssbout <- array(NA, dim=c(length(ssb), niter))
-#for (i in 1:length(ssb)){
-#    stock.n(ple4p)[10,ac(ay-control$ssb_lag)] <- ssb[i]
-#    fout[i,] <- ices_hcr(ple4p, control, ay)
-#    ssbout[i,] <- c(ssb(ple4p)[,ac(ay-control$ssb_lag)])
-#}
-#plot(ssbout[,1], fout[,1])
-#for (i in 2:niter){
-#    points(ssbout[,i], fout[,i])
-#}
+#' cpue.hcr
+#'
+#' @examples
+#' data(ple4om)
+#' cpue.hcr(stock(om), k1=0.1, k2=0.2, k3=0.1, k4=0.1, args=list(ay=1990),
+#'  tracking=FLQuants(FLQuant(c(0.5, 0.8), dimnames=list(metric=c("cpue.slope",
+#'  "cpue.mean"), year=1990))))
 
-# Test h()
-#library(FLash)
-#control <- list(fmin=0.1, ftrg=1.0, blim=100000,bsafe=200000, ssb_lag=1)
-#niter <- 10
-#ple4p <- propagate(ple4, niter)
-#ay <- 2000
-#stock.n(ple4p) <- stock.n(ple4p) * rlnorm(prod(dim(stock.n(ple4p))), mean=0, sd=0.1)
-#EFF <- FLQuant(NA, dimnames=list(EFF="all", year=dimnames(stock.n(ple4p))$year, iter=dimnames(stock.n(ple4p))$iter))
-#eff_dmns <- dimnames(EFF)
-#names(eff_dmns)[1] <- "metric"
-#eff_dmns[["metric"]] <- c("Fperc", "Fhcr", "Implementation", "IEM", "Hyper")
-#EFF0 <- FLQuant(NA, dimnames=eff_dmns)
-## from funs.R
-#getCtrl <- function(values, quantity, years, it){
-#	dnms <- list(iter=1:it, year=years, c("min", "val", "max"))
-#	arr0 <- array(NA, dimnames=dnms, dim=unlist(lapply(dnms, length)))
-#	arr0[,,"val"] <- unlist(values)
-#	arr0 <- aperm(arr0, c(2,3,1))
-#	ctrl <- fwdControl(data.frame(year=years, quantity=quantity, val=NA))
-#	ctrl@trgtArray <- arr0
-#	ctrl
-#}
-#test <- h(method = "ices_hcr", stk=ple4p, ay=ay, EFF0=EFF0, control=control)
+cpue.hcr <- function(stk, k1, k2, k3, k4, target=1,
+  dtaclow=0.85, dtacupp=1.15, args, tracking){
+  
+  # args
+  ay <- args$ay
 
+  # RECOVER slope & mean(cpue)
 
+  slope <- tracking[[1]]["cpue.slope", ac(ay)]
+  mcpue <- tracking[[1]]["cpue.mean", ac(ay)]
+
+  # CALCULATE new tac
+
+  ka <- ifelse(slope > 0, k1, k2)
+  kb <- ifelse(mcpue > target, k3, k4)
+
+  # TAC_y-1 ~ TAC_y * 1 + ka * m + kb * (mcpue - target)
+  tac <- catch(stk)[, ac(ay-1)] * (1 + ka * slope + kb * (mcpue - target))
+
+  ctrl <- fwdControl(list(quant="catch", value=tac, year=ay + 1),
+    # TAC limits
+    list(quant="catch", min=dtaclow, max=dtacupp, relYear=ay - 1, year=ay + 1))
+  
+	return(list(ctrl=ctrl, tracking=tracking))
+} # }}}

@@ -2,14 +2,24 @@
 % Please edit documentation in R/performance.R
 \name{performance}
 \alias{performance}
-\alias{performance,FLQuants-method}
+\alias{performance,FLStock-method}
 \alias{performance,FLStocks-method}
 \alias{performance,list-method}
-\title{Compute performance indicators}
+\alias{performance,FLom-method}
+\title{Compute performance statistics}
 \usage{
+\S4method{performance}{FLQuants}(
+  x,
+  statistics,
+  refpts = FLPar(),
+  years = setNames(list(dimnames(x[[1]])$year), nm = dims(x[[1]])$maxyear),
+  probs = c(0.1, 0.25, 0.5, 0.75, 0.9),
+  mp = NULL
+)
+
 \S4method{performance}{FLStock}(
   x,
-  indicators,
+  statistics,
   refpts = FLPar(),
   years = as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
   metrics = FLCore::metrics(x),
@@ -17,18 +27,9 @@
   mp = NULL
 )
 
-\S4method{performance}{FLQuants}(
-  x,
-  indicators,
-  refpts = FLPar(),
-  years = dims(x[[1]])$maxyear,
-  probs = c(0.1, 0.25, 0.5, 0.75, 0.9),
-  mp = NULL
-)
-
 \S4method{performance}{FLStocks}(
   x,
-  indicators,
+  statistics,
   refpts = FLPar(),
   years = dims(x[[1]])$maxyear,
   metrics = FLCore::metrics,
@@ -40,52 +41,90 @@
 
 \S4method{performance}{list}(
   x,
-  indicators,
+  statistics,
   refpts = FLPar(),
   years = dims(x[[1]])$maxyear,
   probs = NULL,
-  grid = missing,
+  grid = "missing",
   mp = NULL,
-  mc.cores = 1
+  mc.cores = 1,
+  ...
 )
+
+\S4method{performance}{FLom}(x, refpts = x@refpts, ...)
 }
 \arguments{
-\item{indicators}{Indicators to be computed, as formula, name and description, \code{list}}
+\item{statistics}{statistics to be computed, as formula, name and description, \code{list}}
 
 \item{refpts}{Reference points for calculations, \code{list}}
 
-\item{years}{Years on which indicators should be computed, defaults to last year of input FLQuants}
+\item{years}{Years on which statistics should be computed, defaults to last year of input FLQuants}
 
-\item{run}{Object holding the results of forward projections, as a named \code{FLQuants}}
+\item{run}{Object holding the results of forward projections, as a named
+\code{FLQuants}}
 }
 \value{
-data.frame Results of computing performance indicators
+data.table Results of computing performance statistics.
 }
 \description{
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
-odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
-libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
-Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id
-nunc euismod ante fringilla lobortis. Aliquam ullamcorper in diam non placerat.
+TODO
 }
 \details{
-Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa,
-vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in
-mi. Sed sodales mollis arcu, sit amet venenatis lorem fringilla vel. Vivamus vitae
-ipsum sem. Donec malesuada purus at libero bibendum accumsan. Donec ipsum sapien,
-feugiat blandit arcu in, dapibus dictum felis.
+Each statistics is an object of class list object, with three elements, the
+first two of them compulsory:
+\itemize{
+\item An unnamed element of class \emph{formula}, e.g. \code{yearMeans(SB/SB0)}.
+\item name: A short name to be output on tables and plots, of class character,
+e.g. "SB/SB\link{0}".
+\item desc: A longer description of the statistics, of class character, e.g. "Mean
+spawner biomass relative to unfished"
+}
+
+Each statistic \code{formula} is evaluated against the \emph{metrics} and \emph{refpts} used
+in the function call. Formulas can thus use (i) the names of the \code{FLQuants}
+object or of the object returned by the call to \code{metrics()}, (ii) of the
+\emph{params} in the \emph{refpts} object and, for all classes but \code{FLQuants}, (iii)
+functions that can be called on \emph{object}. See examples below for the
+necessary matching between \emph{metrics}, \emph{refpts} and the statistics formulas.
 }
 \examples{
 
-data(p4om)
-indicators <- list(
-  T1=list(~yearMeans(C[, -1]/C[, -dims(C)$year]), name="mean(C[t] / C[t-1])",
-    desc="Mean absolute proportional change in catch"),
-  T2=list(~yearVars(C), name="var(C)", desc="Variance in catch"),
-  T3=list(~yearVars(F), name="var(F)", desc="Variance in fishing mortality"))
+# LOAD example FLmse object
+data(ple4om)
+# GENERATE run from last 16 years of OM
 run <- window(stock(om), start=2000, end=2015)
-performance(run, indicators, refpts=FLPar(MSY=0),
-  metrics=list(C=catch, F=fbar), years=list(20:25, 20:30))
+# DEFINE statistics
+statistics <- list(
+  dCatch=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
+    name="mean(C[t] / C[t-1])",
+    desc="Mean absolute proportional change in catch"),
+  varCatch=list(~yearVars(C),
+    name="var(C)",
+    desc="Variance in catch"),
+  varF=list(~yearVars(F),
+    name="var(F)",
+    desc="Variance in fishing mortality"))
+# COMPUTE performance
+performance(run, statistics, refpts=FLPar(MSY=110000),
+  metrics=list(C=catch, F=fbar), years=list(2000:2015))
+# Minimum statistic, named list with formula and name
+performance(run, statistics=list(CMSY=list(~C/MSY, name="CMSY")),
+  refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
+  years=list(2000:2015))
+# return quantiles
+performance(run, statistics, refpts=FLPar(MSY=110000),
+  metrics=list(C=catch, F=fbar), years=list(2000:2015),
+  probs =  c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95))
+# DEFINE statistics without summaries
+statistics <- list(
+  CMSY=list(~C/MSY,
+    name="CMSY",
+    desc="Catch over MSY"))
+# COMPUTE performance
+perf <- performance(run, statistics, refpts=FLPar(MSY=110000),
+  metrics=list(C=catch), years=list(2000:2015))
+# COMPUTE summaries
+perf[, .(CMSY=mean(data))]
 }
 \seealso{
 \code{\link{FLQuants}}

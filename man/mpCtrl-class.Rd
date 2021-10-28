@@ -38,8 +38,12 @@
 \alias{tm<-,mpCtrl,function-method}
 \alias{show,mpCtrl-method}
 \alias{iters,mpCtrl-method}
-\alias{exists}
-\alias{exists,mpCtrl-method}
+\alias{method,mpCtrl-method}
+\alias{method<-,mpCtrl,function-method}
+\alias{method<-,mpCtrl-method}
+\alias{args<-,mpCtrl,function-method}
+\alias{args<-,mpCtrl-method}
+\alias{debug,mpCtrl,character-method}
 \title{S4 class \code{mpCtrl}}
 \usage{
 \S4method{initialize}{mpCtrl}(.Object, ...)
@@ -88,14 +92,13 @@ tm(object) <- value
 
 \S4method{iters}{mpCtrl}(object, iter)
 
-exists(
-  x,
-  where = -1,
-  envir = if (missing(frame)) as.environment(where) else sys.frame(frame),
-  frame,
-  mode = "any",
-  inherits = TRUE
-)
+\S4method{method}{mpCtrl}(object, element)
+
+\S4method{method}{mpCtrl,`function`}(object, element) <- value
+
+\S4method{args}{mpCtrl,`function`}(object, element) <- value
+
+\S4method{debug}{mpCtrl,character}(fun, text)
 }
 \arguments{
 \item{...}{additional argument list that might never be used}
@@ -103,17 +106,23 @@ exists(
 \item{object}{object of relevant class (see signature of method)}
 }
 \description{
-The \code{mpCtrl} class defines which moules will be runned and carries the specifications of those modules in \code{mseCtrl} elements.
+The \code{mpCtrl} class defines which modules will be run my a
+call to the \code{mp} function. It contains a series of objects of class \emph{mseCtrl}
+only for those modules required by the defined MP.
 }
 \section{Slots}{
 
 \describe{
-\item{est}{\code{mseCtrl} object with estimator of stock abundance specifications.}
-\item{phcr}{\code{mseCtrl} object with specifications about parameters needed for harvest control rule which must e computed from estimator results, e.g. Fmsy.}
-\item{hcr}{\code{mseCtrl} object with harvest control rule specifications.}
-\item{is}{\code{mseCtrl} object with management system specifications, e.g. translation of F into catch limits.}
-\item{tm}{\code{mseCtrl} object with technical measures specifications.}
-}
+\item{\code{est}}{Specification for the stock status estimator, class \emph{mseCtrl}.}
+
+\item{\code{phcr}}{Specification for the harvest control rule parametrization, class \emph{mseCtrl}.}
+
+\item{\code{hcr}}{Specification for the harvest control rule, class \emph{mseCtrl}.}
+
+\item{\code{isys}}{Specification for the implementation system, class \emph{mseCtrl}.}
+
+\item{\code{tm}}{Specification for technical measures, class \emph{mseCtrl}.}
+}}
 
 \section{Accessors}{
 
