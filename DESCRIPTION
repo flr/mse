@@ -28,6 +28,7 @@ Suggests:
   FLa4a,
   doParallel
 Collate:
+  'generics.R'
   'mseCtrl-class.R'
   'mpCtrl-class.R'
   'oem.R'
@@ -62,4 +63,4 @@ LazyLoad: Yes
 LazyData: No
 BugReports: https://github.com/iagomosqueira/mse/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
