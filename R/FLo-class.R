@@ -151,3 +151,13 @@ find.original.name <- function(fun) {
   return("NULL")
 }
 # }}}
+
+setMethod("debug", signature(fun="FLo"),
+  function(fun) {
+    debug(method(projection(fun)))
+  })
+
+setMethod("undebug", signature(fun="FLo"),
+  function(fun) {
+    undebug(method(projection(fun)))
+  })
