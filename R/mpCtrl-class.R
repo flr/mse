@@ -198,15 +198,11 @@ setReplaceMethod("args", signature(object="mpCtrl", value="function"),
 
 # debug & undebug  {{{
 
-setGeneric("debug", useAsDefault = base::debug)
-
 setMethod("debug", signature(fun="mpCtrl", text="character"),
   function(fun, text) {
     debug(fun[[text]]@method)
   }
 )
-
-setGeneric("undebug", useAsDefault = base::undebug)
 
 setMethod("undebug", signature(fun="mpCtrl", signature="character"),
   function(fun, signature) {
