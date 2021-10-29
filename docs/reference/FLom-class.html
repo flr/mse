@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -40,7 +44,6 @@
 odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
 libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
 Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -58,7 +61,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id"
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -72,7 +75,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id"
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -80,7 +83,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id"
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -95,7 +98,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id"
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/mse-manual.html">Technical Manual for the *mse* FLR/a4a package</a>
+      <a href="../articles/mse-manual.html">Technical Manual for the mse FLR/a4a package</a>
     </li>
   </ul>
 </li>
@@ -104,7 +107,12 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id"
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/iagomosqueira/mse/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -119,7 +127,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id"
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>A class for an operating model (OM)</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/FLom-class.R'><code>R/FLom-class.R</code></a>, <a href='https://github.com/iagomosqueira/mse/blob/master/R/FLmse-class.R'><code>R/FLmse-class.R</code></a></small>
     <div class="hidden name"><code>FLom-class.Rd</code></div>
     </div>
 
@@ -130,55 +138,41 @@ libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
 Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id</p>
     </div>
 
-    <pre class="usage"><span class='fu'>FLom</span>(<span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>FLom</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>FLom</span>(<span class='no'>...</span>)
+<span class='fu'>FLom</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for FLom</span>
-<span class='fu'>stock</span>(<span class='no'>object</span>)
+<span class='fu'>stock</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
 <span class='co'># S4 method for FLom,FLStock</span>
-<span class='fu'>stock</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>stock</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for FLom</span>
-<span class='fu'>sr</span>(<span class='no'>object</span>)
+<span class='fu'>sr</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
-<span class='fu'>sr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>sr</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for FLom,FLSR</span>
-<span class='fu'>sr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>sr</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for FLom</span>
-<span class='fu'>refpts</span>(<span class='no'>object</span>)
+<span class='fu'>show</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
-<span class='co'># S4 method for FLom,FLPar</span>
-<span class='fu'>refpts</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='co'># S4 method for FLom,FLom</span>
+<span class='fu'>combine</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>fleetBehaviour</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='co'># S4 method for FLmse,FLo</span>
+<span class='fu'><a href='FLmse-class.html'>om</a></span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
-<span class='co'># S4 method for FLom</span>
-<span class='fu'>fleetBehaviour</span>(<span class='no'>object</span>)
+<span class='co'># S4 method for FLmse,FLQuants</span>
+<span class='fu'><a href='FLmse-class.html'>tracking</a></span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
-<span class='fu'>fleetBehaviour</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='co'># S4 method for FLmse,mpCtrl</span>
+<span class='fu'><a href='FLmse-class.html'>control</a></span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
-<span class='fu'>projection</span>(<span class='no'>object</span>, <span class='no'>...</span>)
-
-<span class='co'># S4 method for FLom</span>
-<span class='fu'>projection</span>(<span class='no'>object</span>)
-
-<span class='fu'>projection</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for FLom</span>
-<span class='fu'>show</span>(<span class='no'>object</span>)
-
-<span class='co'># S4 method for FLmse,FLQuant</span>
-<span class='fu'><a href='FLmse-class.html'>tracking</a></span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for FLmse,FLQuant</span>
-<span class='fu'><a href='FLmse-class.html'>control</a></span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for FLmse,FLQuant</span>
-<span class='fu'><a href='FLmse-class.html'>oem</a></span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span></pre>
+<span class='co'># S4 method for FLmse,FLoem</span>
+<span class='fu'><a href='FLmse-class.html'>oem</a></span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -193,7 +187,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id<
     </tr>
     <tr>
       <th>value</th>
-      <td><p>the new object</p></td>
+      <td><p>Object to assign in slot</p></td>
     </tr>
     </table>
 
@@ -201,7 +195,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id<
 
     
 
-<dl class='dl-horizontal'>
+<dl>
 <dt><code>stock</code></dt><dd><p>The population and catch history, <code>FLStock</code>.</p></dd>
 
 <dt><code>sr</code></dt><dd><p>The stock-recruitment relationship, <code>FLSR</code>.</p></dd>
@@ -216,7 +210,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id<
     
 
 
-<dl class='dl-horizontal'>
+<dl>
 <dt>stock and sr dimensions</dt><dd><p>Dimensions 2:6 of the <code>stock</code> and <code>sr</code> slots must match.</p></dd>
 <dt>rec age</dt><dd><p>Stock and stock recruitment residuals must use the recruitment age.</p></dd>
 
@@ -244,7 +238,7 @@ requirements of the class validity function.</p>
     
 
 <p>Methods exist for various calculations based on values stored in the class:</p>
-<dl class='dl-horizontal'>
+<dl>
 <dt>METHOD</dt><dd><p>Neque porro quisquam est qui dolorem ipsum.</p></dd>
 
 </dl>
@@ -252,26 +246,38 @@ requirements of the class validity function.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>FLComp</p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>The FLR Team</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-</div></pre>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span>
+<span class='va'>comb</span> <span class='op'>&lt;-</span> <span class='fu'>combine</span><span class='op'>(</span><span class='fu'>iter</span><span class='op'>(</span><span class='va'>om</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>, <span class='fu'>iter</span><span class='op'>(</span><span class='va'>om</span>, <span class='fl'>11</span><span class='op'>:</span><span class='fl'>25</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span><span class='op'>(</span><span class='va'>om</span>, <span class='va'>comb</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  [1] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “logLik”: Attributes: &lt; Length mismatch: comparison on first 1 components &gt; &gt; &gt;"     
+#&gt;  [2] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “logLik”: Numeric: lengths (25, 10) differ &gt; &gt;"                                      
+#&gt;  [3] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"    
+#&gt;  [4] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                             
+#&gt;  [5] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;" 
+#&gt;  [6] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                          
+#&gt;  [7] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “harvest.spwn”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"
+#&gt;  [8] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “harvest.spwn”: Numeric: lengths (740, 18500) differ &gt; &gt;"                         
+#&gt;  [9] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;" 
+#&gt; [10] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                          
+#&gt; [11] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"           
+#&gt; [12] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m”: Numeric: lengths (740, 18500) differ &gt; &gt;"                                    
+#&gt; [13] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m.spwn”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"      
+#&gt; [14] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m.spwn”: Numeric: lengths (740, 18500) differ &gt; &gt;"                               
+#&gt; [15] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “mat”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"         
+#&gt; [16] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “mat”: Numeric: lengths (740, 18500) differ &gt; &gt;"                                  
+#&gt; [17] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"    
+#&gt; [18] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                             </div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#slots">Slots</a></li>
-      <li><a href="#validity">Validity</a></li>
-      <li><a href="#accessors">Accessors</a></li>
-      <li><a href="#constructor">Constructor</a></li>
-      <li><a href="#methods">Methods</a></li>
-      <li><a href="#see-also">See also</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
-    <h2>Author</h2>
-    <p>The FLR Team</p>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -282,7 +288,7 @@ requirements of the class validity function.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

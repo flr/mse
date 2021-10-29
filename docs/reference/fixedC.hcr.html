@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S4 class FLmse — FLmse-class • mse</title>
+<title>A fixed catch HCR — fixedC.hcr • mse</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="S4 class FLmse — FLmse-class" />
-<meta property="og:description" content="The FLmse class stores information relative to the MSE's management procedure'." />
+<meta property="og:title" content="A fixed catch HCR — fixedC.hcr" />
+<meta property="og:description" content="No matter what get C = ctrg
+The control argument is a list of parameters used by the HCR." />
 
 
 
@@ -123,103 +124,51 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>S4 class <code>FLmse</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/FLmse-class.R'><code>R/FLmse-class.R</code></a></small>
-    <div class="hidden name"><code>FLmse-class.Rd</code></div>
+    <h1>A fixed catch HCR</h1>
+    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/hcr.R'><code>R/hcr.R</code></a></small>
+    <div class="hidden name"><code>fixedC.hcr.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>FLmse</code> class stores information relative to the MSE's management procedure'.</p>
+    <p>No matter what get C = ctrg
+The control argument is a list of parameters used by the HCR.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>FLmse</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
-
-<span class='fu'>FLmse</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
-
-<span class='fu'>om</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>om</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
-
-<span class='fu'>om</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>tracking</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>tracking</span><span class='op'>(</span><span class='va'>object</span>, biol <span class='op'>=</span> <span class='st'>"missing"</span><span class='op'>)</span>
-
-<span class='fu'>tracking</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>control</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>control</span><span class='op'>(</span><span class='va'>object</span>, i <span class='op'>=</span> <span class='st'>"missing"</span><span class='op'>)</span>
-
-<span class='fu'>control</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>oem</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>oem</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
-
-<span class='fu'>oem</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span><span class='op'>(</span><span class='va'>name</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse,list</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span></pre>
+    <pre class="usage"><span class='fu'>fixedC.hcr</span><span class='op'>(</span><span class='va'>stk</span>, <span class='va'>ctrg</span>, <span class='va'>args</span>, <span class='va'>tracking</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>...</th>
-      <td><p>additional argument list that might never be used</p></td>
+      <th>stk</th>
+      <td><p>The perceived FLStock.</p></td>
     </tr>
     <tr>
-      <th>object</th>
-      <td><p>object of relevant class (see signature of method)</p></td>
-    </tr>
-    <tr>
-      <th>value</th>
-      <td><p>the new object</p></td>
+      <th>control</th>
+      <td><p>A list with the element ctrg (numeric).</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
-
-    
-
-<dl>
-<dt>om</dt><dd><p><code>FLom</code> with the operating model.</p></dd>
-<dt>tracking</dt><dd><p><code>FLQuant</code> with record of decisions made during the mp cycle.</p></dd>
-<dt>args</dt><dd><p><code>list</code> with assorted arguments required to run the MSE cycle.</p></dd>
-
-</dl>
-
-    <h2 class="hasAnchor" id="accessors"><a class="anchor" href="#accessors"></a>Accessors</h2>
-
-    
-
-<p>All slots in the class have accessor and replacement methods defined that
-allow retrieving and substituting individual slots.</p>
-<p>The values passed for replacement need to be of the class of that slot.
-A numeric vector can also be used when replacing FLQuant slots, and the
-vector will be used to substitute the values in the slot, but not its other
-attributes.</p>
-    <h2 class="hasAnchor" id="constructor"><a class="anchor" href="#constructor"></a>Constructor</h2>
-
-    
-
-<p>A construction method exists for this class that can take named arguments for
-any of its slots. All slots are then created to match the requirements of the
-class validity. If an unnamed <code>FLQuant</code> object is provided, this is used
-for sizing, but not for populating any slot.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span>
+<span class='fu'>fixedC.hcr</span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, ctrg<span class='op'>=</span><span class='fl'>50000</span>, args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ay<span class='op'>=</span><span class='fl'>2017</span>, management_lag<span class='op'>=</span><span class='fl'>1</span>,
+  frq<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>, tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; $ctrl
+#&gt; An object of class "fwdControl"
+#&gt;  (step) year quant min     value max
+#&gt;       1 2018 catch  NA 50000.000  NA
+#&gt; 
+#&gt; $tracking
+#&gt; An object of class "FLQuant"
+#&gt; , , unit = unique, season = all, area = unique
+#&gt; 
+#&gt;      year
+#&gt; quant 1 
+#&gt;   all NA
+#&gt; 
+#&gt; units:  NA 
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

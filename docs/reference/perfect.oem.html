@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S4 class FLmse — FLmse-class • mse</title>
+<title>A perfect observation of catch and abundances-at-age. — perfect.oem • mse</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,12 @@
 
 
 
-<meta property="og:title" content="S4 class FLmse — FLmse-class" />
-<meta property="og:description" content="The FLmse class stores information relative to the MSE's management procedure'." />
+<meta property="og:title" content="A perfect observation of catch and abundances-at-age. — perfect.oem" />
+<meta property="og:description" content="This observation error model function generates a set of perfect observations
+on catches, biology and abundance. Direct observations are made of the stock,
+while a single age-structured index of abundance, in numbers, is created with
+a fixed catchability of 0.01. deviances on either stk$catch.n or
+idx$index, if given, are applied." />
 
 
 
@@ -123,102 +127,59 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>S4 class <code>FLmse</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/FLmse-class.R'><code>R/FLmse-class.R</code></a></small>
-    <div class="hidden name"><code>FLmse-class.Rd</code></div>
+    <h1>A perfect observation of catch and abundances-at-age.</h1>
+    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/oem.R'><code>R/oem.R</code></a></small>
+    <div class="hidden name"><code>perfect.oem.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>FLmse</code> class stores information relative to the MSE's management procedure'.</p>
+    <p>This observation error model function generates a set of perfect observations
+on catches, biology and abundance. Direct observations are made of the stock,
+while a single age-structured index of abundance, in numbers, is created with
+a fixed catchability of 0.01. <em>deviances</em> on either <em>stk$catch.n</em> or
+<em>idx$index</em>, if given, are applied.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>FLmse</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
-
-<span class='fu'>FLmse</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
-
-<span class='fu'>om</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>om</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
-
-<span class='fu'>om</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>tracking</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>tracking</span><span class='op'>(</span><span class='va'>object</span>, biol <span class='op'>=</span> <span class='st'>"missing"</span><span class='op'>)</span>
-
-<span class='fu'>tracking</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>control</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>control</span><span class='op'>(</span><span class='va'>object</span>, i <span class='op'>=</span> <span class='st'>"missing"</span><span class='op'>)</span>
-
-<span class='fu'>control</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>oem</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>oem</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
-
-<span class='fu'>oem</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span><span class='op'>(</span><span class='va'>name</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse,list</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span></pre>
+    <pre class="usage"><span class='fu'>perfect.oem</span><span class='op'>(</span><span class='va'>om</span>, <span class='va'>deviances</span>, <span class='va'>observations</span>, <span class='va'>args</span>, <span class='va'>tracking</span>, biomass <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>...</th>
-      <td><p>additional argument list that might never be used</p></td>
+      <th>om</th>
+      <td><p>An operating model, class <em>FLom</em> or <em>FLombf</em>.</p></td>
     </tr>
     <tr>
-      <th>object</th>
-      <td><p>object of relevant class (see signature of method)</p></td>
+      <th>deviances</th>
+      <td><p>A named list of observation deviances, class <em>list</em>.</p></td>
     </tr>
     <tr>
-      <th>value</th>
-      <td><p>the new object</p></td>
+      <th>observations</th>
+      <td><p>A list of past observations, extended to the end of <em>om</em>, class <em>list</em>.</p></td>
+    </tr>
+    <tr>
+      <th>args</th>
+      <td><p>The mp dimensions arguments, as generated by <code>mp</code>, class <em>list</em>.</p></td>
+    </tr>
+    <tr>
+      <th>tracking</th>
+      <td><p>Object to track module decisions and outputs, class <em>FLQuant</em>.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
+    <p>A named <em>list</em> with elements <em>stk</em> (<em>FLStock</em>), <em>idx</em> (<em>FLIndices</em>), <em>deviances</em>, <em>observations</em> and <em>tracking</em>.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-<dl>
-<dt>om</dt><dd><p><code>FLom</code> with the operating model.</p></dd>
-<dt>tracking</dt><dd><p><code>FLQuant</code> with record of decisions made during the mp cycle.</p></dd>
-<dt>args</dt><dd><p><code>list</code> with assorted arguments required to run the MSE cycle.</p></dd>
-
-</dl>
-
-    <h2 class="hasAnchor" id="accessors"><a class="anchor" href="#accessors"></a>Accessors</h2>
-
-    
-
-<p>All slots in the class have accessor and replacement methods defined that
-allow retrieving and substituting individual slots.</p>
-<p>The values passed for replacement need to be of the class of that slot.
-A numeric vector can also be used when replacing FLQuant slots, and the
-vector will be used to substitute the values in the slot, but not its other
-attributes.</p>
-    <h2 class="hasAnchor" id="constructor"><a class="anchor" href="#constructor"></a>Constructor</h2>
-
-    
-
-<p>A construction method exists for this class that can take named arguments for
-any of its slots. All slots are then created to match the requirements of the
-class validity. If an unnamed <code>FLQuant</code> object is provided, this is used
-for sizing, but not for populating any slot.</p>
+    <p>This <em>oem</em> function generates a full observation time series every time step,
+and does not append them to existing objects in <em>observations</em>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
+    <pre class="examples"><div class='input'><span class='co'># On FLom</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span>
+<span class='va'>obs</span> <span class='op'>&lt;-</span> <span class='fu'>perfect.oem</span><span class='op'>(</span><span class='va'>om</span>, deviances<span class='op'>=</span><span class='cn'>NULL</span>, observations<span class='op'>=</span><span class='cn'>NULL</span>,
+  args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>y0<span class='op'>=</span><span class='fl'>1957</span>, dy<span class='op'>=</span><span class='fl'>2017</span><span class='op'>)</span>, tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

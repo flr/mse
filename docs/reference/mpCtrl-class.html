@@ -6,27 +6,31 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S4 class <code>mpCtrl</code> — mpCtrl-class • mse</title>
+<title>S4 class mpCtrl — mpCtrl-class • mse</title>
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -35,9 +39,10 @@
 
 
 
-<meta property="og:title" content="S4 class <code>mpCtrl</code> — mpCtrl-class" />
-<meta property="og:description" content="The mpCtrl class defines which moules will be runned and carries the specifications of those modules in mseCtrl elements." />
-<meta name="twitter:card" content="summary" />
+<meta property="og:title" content="S4 class mpCtrl — mpCtrl-class" />
+<meta property="og:description" content="The mpCtrl class defines which modules will be run my a
+call to the mp function. It contains a series of objects of class mseCtrl
+only for those modules required by the defined MP." />
 
 
 
@@ -55,7 +60,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +74,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -77,7 +82,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -92,7 +97,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/mse-manual.html">Technical Manual for the *mse* FLR/a4a package</a>
+      <a href="../articles/mse-manual.html">Technical Manual for the mse FLR/a4a package</a>
     </li>
   </ul>
 </li>
@@ -101,7 +106,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/iagomosqueira/mse/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -116,81 +126,86 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>S4 class <code>mpCtrl</code></h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/mpCtrl-class.R'><code>R/mpCtrl-class.R</code></a></small>
     <div class="hidden name"><code>mpCtrl-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>mpCtrl</code> class defines which moules will be runned and carries the specifications of those modules in <code>mseCtrl</code> elements.</p>
+    <p>The <code>mpCtrl</code> class defines which modules will be run my a
+call to the <code>mp</code> function. It contains a series of objects of class <em>mseCtrl</em>
+only for those modules required by the defined MP.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for mpCtrl</span>
-<span class='fu'>initialize</span>(<span class='no'>.Object</span>, <span class='no'>...</span>)
+<span class='fu'>initialize</span><span class='op'>(</span><span class='va'>.Object</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>est</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>est</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for mpCtrl</span>
-<span class='fu'>est</span>(<span class='no'>object</span>)
+<span class='fu'>est</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
-<span class='fu'>est</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>est</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for mpCtrl,`function`</span>
-<span class='fu'>est</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>est</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
-<span class='fu'>phcr</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>phcr</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for mpCtrl</span>
-<span class='fu'>phcr</span>(<span class='no'>object</span>)
+<span class='fu'>phcr</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
-<span class='fu'>phcr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>phcr</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for mpCtrl,`function`</span>
-<span class='fu'>phcr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>phcr</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
-<span class='fu'>hcr</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>hcr</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for mpCtrl</span>
-<span class='fu'>hcr</span>(<span class='no'>object</span>)
+<span class='fu'>hcr</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
-<span class='fu'>hcr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>hcr</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for mpCtrl,`function`</span>
-<span class='fu'>hcr</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>hcr</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
-<span class='fu'>isys</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>isys</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for mpCtrl</span>
-<span class='fu'>isys</span>(<span class='no'>object</span>)
+<span class='fu'>isys</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
-<span class='fu'>isys</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>isys</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for mpCtrl,`function`</span>
-<span class='fu'>isys</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>isys</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
-<span class='fu'>tm</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>tm</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for mpCtrl</span>
-<span class='fu'>tm</span>(<span class='no'>object</span>)
+<span class='fu'>tm</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
-<span class='fu'>tm</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>tm</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for mpCtrl,`function`</span>
-<span class='fu'>tm</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>tm</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for mpCtrl</span>
-<span class='fu'>show</span>(<span class='no'>object</span>)
+<span class='fu'>show</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
 <span class='co'># S4 method for mpCtrl</span>
-<span class='fu'>iters</span>(<span class='no'>object</span>, <span class='no'>iter</span>)
+<span class='fu'>iters</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>iter</span><span class='op'>)</span>
 
-<span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span>(
-  <span class='no'>x</span>,
-  <span class='kw'>where</span> <span class='kw'>=</span> -<span class='fl'>1</span>,
-  <span class='kw'>envir</span> <span class='kw'>=</span> <span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/missing.html'>missing</a></span>(<span class='no'>frame</span>)) <span class='fu'><a href='https://rdrr.io/r/base/as.environment.html'>as.environment</a></span>(<span class='no'>where</span>) <span class='kw'>else</span> <span class='fu'><a href='https://rdrr.io/r/base/sys.parent.html'>sys.frame</a></span>(<span class='no'>frame</span>),
-  <span class='no'>frame</span>,
-  <span class='kw'>mode</span> <span class='kw'>=</span> <span class='st'>"any"</span>,
-  <span class='kw'>inherits</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</pre>
+<span class='co'># S4 method for mpCtrl</span>
+<span class='fu'><a href='mseCtrl-class.html'>method</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>element</span><span class='op'>)</span>
+
+<span class='co'># S4 method for mpCtrl,`function`</span>
+<span class='fu'><a href='mseCtrl-class.html'>method</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>element</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='co'># S4 method for mpCtrl,`function`</span>
+<span class='fu'><a href='mseCtrl-class.html'>args</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>element</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='co'># S4 method for mpCtrl,character</span>
+<span class='fu'><a href='https://rdrr.io/r/base/debug.html'>debug</a></span><span class='op'>(</span><span class='va'>fun</span>, <span class='va'>text</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -209,33 +224,42 @@
 
     
 
-<dl class='dl-horizontal'>
-<dt>est</dt><dd><p><code>mseCtrl</code> object with estimator of stock abundance specifications.</p></dd>
-<dt>phcr</dt><dd><p><code>mseCtrl</code> object with specifications about parameters needed for harvest control rule which must e computed from estimator results, e.g. Fmsy.</p></dd>
-<dt>hcr</dt><dd><p><code>mseCtrl</code> object with harvest control rule specifications.</p></dd>
-<dt>is</dt><dd><p><code>mseCtrl</code> object with management system specifications, e.g. translation of F into catch limits.</p></dd>
-<dt>tm</dt><dd><p><code>mseCtrl</code> object with technical measures specifications.</p></dd>
+<dl>
+<dt><code>est</code></dt><dd><p>Specification for the stock status estimator, class <em>mseCtrl</em>.</p></dd>
+
+<dt><code>phcr</code></dt><dd><p>Specification for the harvest control rule parametrization, class <em>mseCtrl</em>.</p></dd>
+
+<dt><code>hcr</code></dt><dd><p>Specification for the harvest control rule, class <em>mseCtrl</em>.</p></dd>
+
+<dt><code>isys</code></dt><dd><p>Specification for the implementation system, class <em>mseCtrl</em>.</p></dd>
+
+<dt><code>tm</code></dt><dd><p>Specification for technical measures, class <em>mseCtrl</em>.</p></dd>
 
 </dl>
+    <h2 class="hasAnchor" id="accessors"><a class="anchor" href="#accessors"></a>Accessors</h2>
 
-<p>AccessorsAll slots in the class have accessor and replacement methods defined that
-allow retrieving and substituting individual slots.The values passed for replacement need to be of the class of that slot.
+    
+
+<p>All slots in the class have accessor and replacement methods defined that
+allow retrieving and substituting individual slots.</p>
+<p>The values passed for replacement need to be of the class of that slot.
 A numeric vector can also be used when replacing FLQuant slots, and the
 vector will be used to substitute the values in the slot, but not its other
 attributes.</p>
-<p>ConstructorA construction method exists for this class that can take named arguments for
+    <h2 class="hasAnchor" id="constructor"><a class="anchor" href="#constructor"></a>Constructor</h2>
+
+    
+
+<p>A construction method exists for this class that can take named arguments for
 any of its slots. All slots are then created to match the requirements of the
 class validity. If an unnamed <code>FLQuant</code> object is provided, this is used
 for sizing, but not for populating any slot.</p>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#slots">Slots</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -246,7 +270,7 @@ for sizing, but not for populating any slot.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

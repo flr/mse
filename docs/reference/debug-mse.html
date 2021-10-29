@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S4 class FLmse — FLmse-class • mse</title>
+<title>Debugging mse modules — debug-mse • mse</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="S4 class FLmse — FLmse-class" />
-<meta property="og:description" content="The FLmse class stores information relative to the MSE's management procedure'." />
+<meta property="og:title" content="Debugging mse modules — debug-mse" />
+<meta property="og:description" content="Set and unset the debugging flag of a function inside the method slot of
+a mseCtrl object." />
 
 
 
@@ -123,103 +124,78 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>S4 class <code>FLmse</code></h1>
-    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/FLmse-class.R'><code>R/FLmse-class.R</code></a></small>
-    <div class="hidden name"><code>FLmse-class.Rd</code></div>
+    <h1>Debugging mse modules</h1>
+    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/generics.R'><code>R/generics.R</code></a>, <a href='https://github.com/iagomosqueira/mse/blob/master/R/mseCtrl-class.R'><code>R/mseCtrl-class.R</code></a>, <a href='https://github.com/iagomosqueira/mse/blob/master/R/mpCtrl-class.R'><code>R/mpCtrl-class.R</code></a>, and 1 more</small>
+    <div class="hidden name"><code>debug-mse.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>FLmse</code> class stores information relative to the MSE's management procedure'.</p>
+    <p>Set and unset the debugging flag of a function inside the <em>method</em> slot of
+a mseCtrl object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>FLmse</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'><a href='https://rdrr.io/r/base/debug.html'>debug</a></span><span class='op'>(</span><span class='va'>fun</span>, text <span class='op'>=</span> <span class='st'>""</span>, condition <span class='op'>=</span> <span class='cn'>NULL</span>, signature <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>FLmse</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
+<span class='co'># S4 method for mseCtrl,missing</span>
+<span class='fu'><a href='https://rdrr.io/r/base/debug.html'>debug</a></span><span class='op'>(</span><span class='va'>fun</span><span class='op'>)</span>
 
-<span class='fu'>om</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='co'># S4 method for mseCtrl,missing</span>
+<span class='fu'><a href='https://rdrr.io/r/base/debug.html'>undebug</a></span><span class='op'>(</span><span class='va'>fun</span><span class='op'>)</span>
 
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>om</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
+<span class='co'># S4 method for mpCtrl,character</span>
+<span class='fu'><a href='https://rdrr.io/r/base/debug.html'>undebug</a></span><span class='op'>(</span><span class='va'>fun</span>, signature <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>om</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+<span class='co'># S4 method for mpCtrl,missing</span>
+<span class='fu'><a href='https://rdrr.io/r/base/debug.html'>undebug</a></span><span class='op'>(</span><span class='va'>fun</span><span class='op'>)</span>
 
-<span class='fu'>tracking</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='co'># S4 method for FLo,ANY</span>
+<span class='fu'><a href='https://rdrr.io/r/base/debug.html'>debug</a></span><span class='op'>(</span><span class='va'>fun</span><span class='op'>)</span>
 
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>tracking</span><span class='op'>(</span><span class='va'>object</span>, biol <span class='op'>=</span> <span class='st'>"missing"</span><span class='op'>)</span>
-
-<span class='fu'>tracking</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>control</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>control</span><span class='op'>(</span><span class='va'>object</span>, i <span class='op'>=</span> <span class='st'>"missing"</span><span class='op'>)</span>
-
-<span class='fu'>control</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>oem</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'>oem</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
-
-<span class='fu'>oem</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='co'># S4 method for FLmse</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span><span class='op'>(</span><span class='va'>name</span><span class='op'>)</span>
-
-<span class='co'># S4 method for FLmse,list</span>
-<span class='fu'><a href='mseCtrl-class.html'>args</a></span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span></pre>
+<span class='co'># S4 method for FLo,ANY</span>
+<span class='fu'><a href='https://rdrr.io/r/base/debug.html'>undebug</a></span><span class='op'>(</span><span class='va'>fun</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>...</th>
-      <td><p>additional argument list that might never be used</p></td>
+      <th>fun</th>
+      <td><p>Module or control object to debug.</p></td>
     </tr>
     <tr>
-      <th>object</th>
-      <td><p>object of relevant class (see signature of method)</p></td>
+      <th>text</th>
+      <td><p>Name of module in mpCtrl.</p></td>
     </tr>
     <tr>
-      <th>value</th>
-      <td><p>the new object</p></td>
+      <th>condition</th>
+      <td><p>Unused.</p></td>
+    </tr>
+    <tr>
+      <th>signature</th>
+      <td><p>Name of module in mpCtrl.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
+    <p>Both functions invisibly return NULL</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-<dl>
-<dt>om</dt><dd><p><code>FLom</code> with the operating model.</p></dd>
-<dt>tracking</dt><dd><p><code>FLQuant</code> with record of decisions made during the mp cycle.</p></dd>
-<dt>args</dt><dd><p><code>list</code> with assorted arguments required to run the MSE cycle.</p></dd>
+    <p>Modules in the mse control object contain the function to be called in the
+<em>method</em> slot. To debug and check the behaviour of an individual function,
+the <em>debug</em> method will start a browser session next time it is called.
+Debugging functions requires the parallel flag to be set to FALSE, or that
+no parallel backend is loaded.</p>
+<p>Calling <em>undebug</em> on an mpCtrl without specifying a module will check for
+the debugging status of each of them, and undebug if TRUE.</p>
+<p>For objects of classes <em>FLom</em> and <em>FLombf</em>, <em>debug</em> and <em>undebug</em> will set
+and unset the debugging flag on the function stored in the <em>projection</em> slot.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-</dl>
+    <div class='dont-index'><p><code><a href='https://rdrr.io/r/base/debug.html'>debug</a></code></p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
-    <h2 class="hasAnchor" id="accessors"><a class="anchor" href="#accessors"></a>Accessors</h2>
+    <p>Iago Mosqueira (WMR)</p>
 
-    
-
-<p>All slots in the class have accessor and replacement methods defined that
-allow retrieving and substituting individual slots.</p>
-<p>The values passed for replacement need to be of the class of that slot.
-A numeric vector can also be used when replacing FLQuant slots, and the
-vector will be used to substitute the values in the slot, but not its other
-attributes.</p>
-    <h2 class="hasAnchor" id="constructor"><a class="anchor" href="#constructor"></a>Constructor</h2>
-
-    
-
-<p>A construction method exists for this class that can take named arguments for
-any of its slots. All slots are then created to match the requirements of the
-class validity. If an unnamed <code>FLQuant</code> object is provided, this is used
-for sizing, but not for populating any slot.</p>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

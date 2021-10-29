@@ -6,27 +6,31 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>S4 class <code>FLoem</code> — FLoem-class • mse</title>
+<title>Specification for the observation error model (OEM). — FLoem-class • mse</title>
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -35,9 +39,12 @@
 
 
 
-<meta property="og:title" content="S4 class <code>FLoem</code> — FLoem-class" />
-<meta property="og:description" content="The FLoem class stores the information relative to the observation error model of the MSE." />
-<meta name="twitter:card" content="summary" />
+<meta property="og:title" content="Specification for the observation error model (OEM). — FLoem-class" />
+<meta property="og:description" content="The FLoem class stores the method, arguments and
+observations that define the way observations are collected from an operating
+model at each time step in the management procedure. This class extends
+mseCtrl through the addition of two lists used to gather past and new
+observations, and deviances to use on each step in the observation process." />
 
 
 
@@ -55,7 +62,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +76,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
       </span>
     </div>
 
@@ -77,7 +84,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -92,7 +99,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/mse-manual.html">Technical Manual for the *mse* FLR/a4a package</a>
+      <a href="../articles/mse-manual.html">Technical Manual for the mse FLR/a4a package</a>
     </li>
   </ul>
 </li>
@@ -101,7 +108,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/iagomosqueira/mse/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -115,53 +127,54 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>S4 class <code>FLoem</code></h1>
-    
+    <h1>Specification for the observation error model (OEM).</h1>
+    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/FLoem-class.R'><code>R/FLoem-class.R</code></a></small>
     <div class="hidden name"><code>FLoem-class.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>FLoem</code> class stores the information relative to the observation error model of the MSE.</p>
+    <p>The <code>FLoem</code> class stores the method, arguments and
+observations that define the way observations are collected from an operating
+model at each time step in the management procedure. This class extends
+<em>mseCtrl</em> through the addition of two lists used to gather past and new
+observations, and deviances to use on each step in the observation process.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>FLoem</span>(<span class='no'>...</span>)
+    <pre class="usage"><span class='fu'>FLoem</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>FLoem</span>(<span class='no'>...</span>)
+<span class='fu'>FLoem</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>observations</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>observations</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S4 method for FLoem</span>
-<span class='fu'>observations</span>(<span class='no'>object</span>)
+<span class='fu'>observations</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>observations</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>observations</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>i</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='co'># S4 method for FLoem,missing,list</span>
+<span class='fu'>observations</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='co'># S4 method for FLoem,ANY,ANY</span>
+<span class='fu'>observations</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>i</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
+
+<span class='fu'>deviances</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
+
+<span class='co'># S4 method for FLoem</span>
+<span class='fu'>deviances</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
+
+<span class='fu'>deviances</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for FLoem,list</span>
-<span class='fu'>observations</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='fu'>deviances</span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'>deviances</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
 
 <span class='co'># S4 method for FLoem</span>
-<span class='fu'>deviances</span>(<span class='no'>object</span>)
-
-<span class='fu'>deviances</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for FLoem,list</span>
-<span class='fu'>deviances</span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
+<span class='fu'>show</span><span class='op'>(</span><span class='va'>object</span><span class='op'>)</span>
 
 <span class='co'># S4 method for FLoem</span>
-<span class='fu'>show</span>(<span class='no'>object</span>)
-
-<span class='co'># S4 method for FLoem</span>
-<span class='fu'>iters</span>(<span class='no'>object</span>, <span class='no'>iter</span>)
+<span class='fu'>iter</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>iter</span><span class='op'>)</span>
 
 <span class='co'># S4 method for FLoem,FLoem</span>
-<span class='fu'>combine</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='no'>...</span>)
-
-<span class='co'># S4 method for FLom,mseCtrl</span>
-<span class='fu'><a href='FLom-class.html'>fleetBehaviour</a></span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span>
-
-<span class='co'># S4 method for FLom,mseCtrl</span>
-<span class='fu'><a href='FLom-class.html'>projection</a></span>(<span class='no'>object</span>) <span class='kw'>&lt;-</span> <span class='no'>value</span></pre>
+<span class='fu'>combine</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>y</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -184,13 +197,16 @@
 
     
 
-<dl class='dl-horizontal'>
-<dt>catch.dev</dt><dd><p><code>FLQuant</code>  with catch-at-age deviances</p></dd>
-<dt>index.qdev</dt><dd><p><code>FLQuants</code> with catchability deviances for abundance indices</p></dd>
-<dt>ctrl</dt><dd><p><code>mseCtrl</code> with control parameter for the oem</p></dd>
+<dl>
+<dt><code>method</code></dt><dd><p>The function to be run in the module call, class <em>function</em>.</p></dd>
+
+<dt><code>args</code></dt><dd><p>Arguments to be passed to the method, of class <em>list</em>.</p></dd>
+
+<dt><code>observations</code></dt><dd><p>Past observations, class <em>list</em>.</p></dd>
+
+<dt><code>deviances</code></dt><dd><p>Observation deviances, class <em>list</em>.</p></dd>
 
 </dl>
-
     <h2 class="hasAnchor" id="accessors"><a class="anchor" href="#accessors"></a>Accessors</h2>
 
     
@@ -210,19 +226,11 @@ any of its slots. All slots are then created to match the requirements of the
 class validity. If an unnamed <code>FLQuant</code> object is provided, this is used
 for sizing, but not for populating any slot.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>cod</span>)</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#slots">Slots</a></li>
-      <li><a href="#accessors">Accessors</a></li>
-      <li><a href="#constructor">Constructor</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -233,7 +241,7 @@ for sizing, but not for populating any slot.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

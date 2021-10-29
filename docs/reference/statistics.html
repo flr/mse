@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>A method to project the operating model (OM) — fwd.om • mse</title>
+<title>Example set of performance statistics — statistics • mse</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,10 @@
 
 
 
-<meta property="og:title" content="A method to project the operating model (OM) — fwd.om" />
-<meta property="og:description" content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
-odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
-libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
-Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id" />
+<meta property="og:title" content="Example set of performance statistics — statistics" />
+<meta property="og:description" content="A set of performance statistics is provided, coded in the format that
+performance()requires. The statistics included in this list are as
+follows:" />
 
 
 
@@ -126,44 +125,50 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id"
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>A method to project the operating model (OM)</h1>
-    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/FLom-class.R'><code>R/FLom-class.R</code></a></small>
-    <div class="hidden name"><code>fwd.om.Rd</code></div>
+    <h1>Example set of performance statistics</h1>
+    <small class="dont-index">Source: <a href='https://github.com/iagomosqueira/mse/blob/master/R/data.R'><code>R/data.R</code></a></small>
+    <div class="hidden name"><code>statistics.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
-odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
-libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
-Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id</p>
+    <p>A set of performance statistics is provided, coded in the format that
+<code><a href='performance.html'>performance()</a></code>requires. The statistics included in this list are as
+follows:</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fwd.om</span><span class='op'>(</span><span class='va'>om</span>, <span class='va'>ctrl</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>ctrl</th>
-      <td><p>the fwdControl object with objectives and constraints</p></td>
-    </tr>
-    <tr>
-      <th>object</th>
-      <td><p>the OM as a FLStock</p></td>
-    </tr>
-    <tr>
-      <th>sr</th>
-      <td><p>a FLSR with the stock-recruitment model</p></td>
-    </tr>
-    <tr>
-      <th>sr.residuals</th>
-      <td><p>a FLQuant with S/R residuals</p></td>
-    </tr>
-    <tr>
-      <th>sr.residuals.mult</th>
-      <td><p>logical about residuals being multiplicative</p></td>
-    </tr>
-    </table>
+
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>An object of class list.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    
+<ul>
+<li><p>SB0: Mean spawner biomass relative to unfished.</p></li>
+<li><p>SBMSY: Mean spawnwer biomass relative to SBMSY.</p></li>
+<li><p>Ftarget: Mean fishing mortality relative to target.</p></li>
+<li><p>FMSY: Mean fishing mortality relative to FMSY.</p></li>
+<li><p>green: Probability of being in Kobe green quadrant.</p></li>
+<li><p>red: Probability of being in Kobe red quadrant.</p></li>
+<li><p>PSBMSY: Probability of SB greater or equal to SBMSY.</p></li>
+<li><p>PBlim: Probability that spawner biomass is above Blim.</p></li>
+<li><p>risk1: ICES Risk 1, mean probability that spawner biomass is below Blim.</p></li>
+<li><p>risk2: ICES Risk 2, probability that spawner biomass is above Blim once.</p></li>
+<li><p>risk3: ICES Risk 3, max probability that spawner biomass is above Blim.</p></li>
+<li><p>C: Mean catch over years.</p></li>
+<li><p>VarC: Catch variability.</p></li>
+<li><p>PC0: Probability of fishery shutdown.</p></li>
+</ul>
+
+<p>Each indicator is itself a list object, with three elements, the first two
+of them compulsory:</p><ul>
+<li><p>An unnamed element of class <em>formula</em>, e.g. <code>yearMeans(SB/SB0)</code>.</p></li>
+<li><p>name: A short name to be output on tables and plots, of class character,
+e.g. "SB/SB0".</p></li>
+<li><p>desc: A longer description of the indicator, of class character, e.g. "Mean
+spawner biomass relative to unfished"</p></li>
+</ul>
 
 
   </div>
