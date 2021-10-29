@@ -1,6 +1,6 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.1.1
+Version: 2.2.1
 Date: 2021-10-28
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut"),
   email = "iago.mosqueira@wur.nl"), 
@@ -10,13 +10,13 @@ Description: A set of functions and methods to simplify the development and
   running of Management Strategy Evaluation (MSE) analyses using the FLR 
   packages and classes, and the a4a methods and algorithms. 
 Depends:
-  R(>= 3.5),
+  R(>= 4.0),
   methods,
-  FLCore(>= 2.6.11),
-  ggplotFL,
+  FLCore(>= 2.6.18),
+  ggplotFL(>= 2.6.10),
   data.table,
-  FLasher,
-  FLBRP
+  FLasher(>= 0.6.7),
+  FLBRP(>= 2.5.8)
 Imports:
   foreach,
   progressr

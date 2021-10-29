@@ -1,5 +1,5 @@
 # mse
-- Version: 2.1.1
+- Version: 2.2.1
 - Date: 2021-10-28
 - Authors: Iago Mosqueira, WUR. Ernesto Jardim, EC JRC.
 - Maintainer: Ernesto Jardim, EC JRC.
