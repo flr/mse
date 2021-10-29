@@ -17,12 +17,10 @@ calculate the number of Monte Carlo (MC) simulations required to obtain
 results with a given precision level.
 }
 \examples{
-\dontrun{
  data(ple4) 
  ssb <- rlnorm(2000, log(ssb(ple4)), 0.5)
  itse <- mcN(ssb) 
  plot(se~iters, itse, type='l')
- }
 }
 \references{
 Bukaci, E. Korini, Th., Periku, E., Allkja, S., Sheperi, P. 2016. Number of iterations needed in Monte Carlo Simulation using reliability analysis for tunnel supports.  Int. J. of Eng. Res. and Apps., 6 (6-3): 60-64. <www.ijera.com/papers/Vol6_issue6/Part\%20-\%203/J0606036064.pdf>

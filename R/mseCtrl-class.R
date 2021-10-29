@@ -31,8 +31,7 @@
 #'   args=list(alpha=0.5))
 #' ctl
 
-mseCtrl <-
-  setClass("mseCtrl",
+mseCtrl <- setClass("mseCtrl",
     slots = c(method = "function",
     args   = "list"))
 
@@ -123,8 +122,19 @@ setGeneric("exists")
 setMethod("exists", "mseCtrl", function(x) !is.null(body(x@method)))
 # }}}
 
-# debug {{{
+# debug & undebug {{{
+
+#' @rdname debug-mse
+
 setMethod("debug", signature(fun="mseCtrl", text="missing"),
+  function(fun) {
+    debug(fun@method)
+  }
+)
+
+#' @rdname debug-mse
+
+setMethod("undebug", signature(fun="mseCtrl", signature="missing"),
   function(fun) {
     debug(fun@method)
   }

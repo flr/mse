@@ -152,12 +152,21 @@ find.original.name <- function(fun) {
 }
 # }}}
 
+# debug {{{
+
+#' @rdname debug-mse
+#' @details For objects of classes *FLom* and *FLombf*, *debug* and *undebug* will set
+#' and unset the debugging flag on the function stored in the *projection* slot.
+
 setMethod("debug", signature(fun="FLo"),
   function(fun) {
     debug(method(projection(fun)))
   })
 
+#' @rdname debug-mse
+
 setMethod("undebug", signature(fun="FLo"),
   function(fun) {
     undebug(method(projection(fun)))
   })
+# }}}

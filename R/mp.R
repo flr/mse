@@ -9,15 +9,15 @@
 
 # mp {{{
 
-#' mp executes a run of a MP
+#' mp executes a single run of a Management Procedure
 #'
-#' @param om The operating model (OM), an object of class *FLom*.
-#' @param oem The observation error model (OEM), an object orf class *FLoem*.
+#' @param om The operating model (OM), an object of class *FLom* or *FLombf*.
+#' @param oem The observation error model (OEM), an object of class *FLoem*.
 #' @param iem The implementation error model (IEM), an object of class *FLiem*.
 #' @param ctrl A control structure for the MP run, an object of class *mpCtrl*.
-#' @param args MSE arguments, *list*.
-#' @param scenario Name of the scenario tested in this ru, *character*.
-#' @param tracking Extra elements to add to the standard tracking *FLQuant*.
+#' @param args MSE arguments, *list*. Only 'iy', the starting year, is required.
+#' @param scenario Name of the scenario tested in this run, *character*.
+#' @param tracking Extra elements to add to the standard tracking *FLQuant* in its first dimensions, *character*.
 #' @param verbose Should output be verbose or not, *logical*.
 #'
 #' @return An object of class *FLmse*.
@@ -25,7 +25,7 @@
 #' @examples
 #' # [TODO:example]
 
-mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
+mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   tracking="missing", verbose=TRUE, parallel=TRUE){
 
   dis <- dims(om)
@@ -80,10 +80,12 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="test",
     season=dmns$season,
     iter=1:args$it)))
 
-  if(is(om, "FLombf"))
+  if(is(om, "FLombf")) {
+    tracking <- rep(tracking, length(biols(om)))
     names(tracking) <- names(biols(om))
+  }
 
-  # GET historical from OM DEBUG different fron original
+  # GET historical from OM DEBUG different from original
   # hyrs <- ac(c(iy - args$management_lag + 1, iy))
   # track(tracking, "F.om", hyrs) <- window(catch(om), start=hyrs[1], end=hyrs[2])
 	

@@ -24,14 +24,8 @@ utils::globalVariables(c("i", "run"))
 #' @param refpts The reference points needed to compute the statistics, *FLPar*
 #' @param ... Any other arguments to be passed on to *mp*
 #' @return A list or aggregatecd FLR object, depending on the output of *mp*
-#' @examples 
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
 #' @seealso 
-#'  \code{\link[mse]{mseBasic}},\code{\link[mse]{performance}}
+#'  \code{\link[mse]{mp}},\code{\link[mse]{performance}}
 
 tune <- function(mp, grid, statistics, refpts, ...) {
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/mp.R
 \name{mp}
 \alias{mp}
-\title{mp executes a run of a MP}
+\title{mp executes a single run of a Management Procedure}
 \usage{
 mp(
   om,
@@ -10,26 +10,26 @@ mp(
   iem = NULL,
   ctrl,
   args,
-  scenario = "test",
+  scenario = "NA",
   tracking = "missing",
   verbose = TRUE,
   parallel = TRUE
 )
 }
 \arguments{
-\item{om}{The operating model (OM), an object of class \emph{FLom}.}
+\item{om}{The operating model (OM), an object of class \emph{FLom} or \emph{FLombf}.}
 
-\item{oem}{The observation error model (OEM), an object orf class \emph{FLoem}.}
+\item{oem}{The observation error model (OEM), an object of class \emph{FLoem}.}
 
 \item{iem}{The implementation error model (IEM), an object of class \emph{FLiem}.}
 
 \item{ctrl}{A control structure for the MP run, an object of class \emph{mpCtrl}.}
 
-\item{args}{MSE arguments, \emph{list}.}
+\item{args}{MSE arguments, \emph{list}. Only 'iy', the starting year, is required.}
 
-\item{scenario}{Name of the scenario tested in this ru, \emph{character}.}
+\item{scenario}{Name of the scenario tested in this run, \emph{character}.}
 
-\item{tracking}{Extra elements to add to the standard tracking \emph{FLQuant}.}
+\item{tracking}{Extra elements to add to the standard tracking \emph{FLQuant} in its first dimensions, \emph{character}.}
 
 \item{verbose}{Should output be verbose or not, \emph{logical}.}
 }
@@ -37,7 +37,7 @@ mp(
 An object of class \emph{FLmse}.
 }
 \description{
-mp executes a run of a MP
+mp executes a single run of a Management Procedure
 }
 \examples{
 # [TODO:example]

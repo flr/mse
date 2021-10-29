@@ -41,6 +41,7 @@
 #' list(M=list(0.2, 0.4, lo=seq(0.2, 0.4, length=10)))
 #' # or both
 #' scenarios  <- list(steepness=c(0.7, 0.8), M=list(0.2, 0.4, lo=seq(0.2, 0.4, length=10)))
+NULL
 
 # expandGrid {{{
 

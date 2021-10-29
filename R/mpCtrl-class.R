@@ -198,11 +198,18 @@ setReplaceMethod("args", signature(object="mpCtrl", value="function"),
 
 # debug & undebug  {{{
 
+#' @rdname debug-mse
+#' Objects of calss mpCtrl contain one or more modules (mseCtrl). The module to
+#' debug is specified as a character argument matching its name, e.g.
+#' *debug(mpCtrl, "est")*.
+
 setMethod("debug", signature(fun="mpCtrl", text="character"),
   function(fun, text) {
     debug(fun[[text]]@method)
   }
 )
+
+#' @rdname debug-mse
 
 setMethod("undebug", signature(fun="mpCtrl", signature="character"),
   function(fun, signature) {
@@ -210,8 +217,12 @@ setMethod("undebug", signature(fun="mpCtrl", signature="character"),
   }
 )
 
+#' @rdname debug-mse
+#' @details Calling *undebug* on an mpCtrl without specifying a module will check for
+#' the debugging status of each of them, and undebug if TRUE.
+
 setMethod("undebug", signature(fun="mpCtrl", signature="missing"),
-  function(fun, signature) {
+  function(fun) {
     for(i in names(fun)) {
       if(isdebugged(fun[[i]]@method))
         undebug(fun[[i]]@method)

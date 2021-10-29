@@ -28,13 +28,6 @@ give the best performance over the chosen statistics, a.k.a. \emph{tuning}
 \details{
 DETAILS
 }
-\examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
-}
 \seealso{
-\code{\link[mse]{mseBasic}},\code{\link[mse]{performance}}
+\code{\link[mse]{mp}},\code{\link[mse]{performance}}
 }

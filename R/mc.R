@@ -20,16 +20,13 @@
 #' @param z Value of Z for a given confidence level for a normally distributed random variable, default is 1.96 for a 95\% CI, *numeric*.
 #' @param E The required percentage error of the mean, *numeric*.
 #' @param s
-#' @param z
 #' @param start
 #' @param by
 #' @examples
-#' \dontrun{
 #'  data(ple4) 
 #'  ssb <- rlnorm(2000, log(ssb(ple4)), 0.5)
 #'  itse <- mcN(ssb) 
 #'  plot(se~iters, itse, type='l')
-#'  }
 
 setGeneric("mcN", function(x, ...) standardGeneric("mcN"))
 
