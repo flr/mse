@@ -146,3 +146,26 @@ indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"),
 	# return
 	list(ctrl = ctrl, tracking = tracking)
 } # }}}
+
+# seasonal.is {{{
+
+seasonal.is <- function(stk, ctrl, args, ratio=rep(1/args$ns, args$ns),
+  tracking, ...){
+
+  nseas <- args$ns
+
+  res <- fwdControl(
+    # LAPPLY over ctrl rows
+    Reduce(c, lapply(seq(dim(iters(ctrl))[1]), function(i)
+      # LAPPLY over seasons
+      lapply(seq(nseas), function(s)
+        c(as.list(target(ctrl)[i, -3]),
+          list(season=s, value=iters(ctrl)[i, 'value',] * ratio[s])
+        )
+      )
+    ))
+  )
+
+  return(list(ctrl=res, tracking=tracking))
+}
+# }}}
