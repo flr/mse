@@ -63,6 +63,10 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   # vector of years to be projected
 	vy <- args$vy <- ac(seq(iy, fy - management_lag, by=frq))
 
+  # number of seasons & units
+  ns <- args$ns <- dims(om)$season
+  nu <- args$nu <- dims(om)$unit
+
 	# --- INIT tracking
   
   metric <- c("F.om", "B.om", "SB.om", "C.om", "C.obs",
