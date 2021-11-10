@@ -45,6 +45,13 @@ perfect.oem <- function(om, deviances, observations, args, tracking,
   # GET perfect stock
 	stk <- window(stock(om), start=y0, end=dy, extend=FALSE)
 
+  # TODO SIMPLIFY as with observations$stk
+  dis <- dim(observations$stk)
+  if(dis[3] == 1)
+    stk <- nounit(stk)
+  if(dis[4] == 1)
+    stk <- noseason(stk)
+
   # SET perfect FLIndex per stock
   if(biomass) {
     abu <- catch(stk) / fbar(stk)
@@ -92,6 +99,13 @@ sampling.oem <- function(om, deviances, observations, args, tracking, ...) {
 
   # GET perfect stock
 	stk <- window(stock(om), start=y0, end=dy, extend=FALSE)
+
+  # TODO SIMPLIFY as with observations$stk
+  dis <- dim(observations$stk)
+  if(dis[3] == 1)
+    stk <- nounit(stk)
+  if(dis[4] == 1)
+    stk <- noseason(stk)
 
   # --- STK
 
