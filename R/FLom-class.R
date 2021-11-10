@@ -471,3 +471,14 @@ setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
     metrics(object, list(SB=ssb, C=catch, F=fbar))
 }) # }}}
+
+# propagate {{{
+setMethod("propagate", signature(object="FLom"),
+	function(object, iter, fill.iter=TRUE) {
+
+    stock(object) <- propagate(stock(object), iter=iter, fill.iter=fill.iter)
+    sr(object) <- propagate(sr(object), iter=iter, fill.iter=fill.iter)
+
+    return(object)
+  }
+) # }}}
