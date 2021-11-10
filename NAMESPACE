@@ -50,7 +50,9 @@ export(
   "perfect.oem",
   "perfect.sa",
   "sampling.oem",
+  "seasonal.is",
   "tac.is",
+  "trend.hcr",
   "tunebisect",
   "tunegrid")
 
