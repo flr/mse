@@ -174,7 +174,9 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 #'   tracking=FLQuant())$ctrl } )
 
 catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
-  dtaclow=0.85, dtacupp=1.15, yrs=1, args, tracking) {
+  dtaclow=0.85, dtacupp=1.15, yrs=1, metric="ssb", args, tracking) {
+
+  # TODO
   
   # args
   ay <- args$ay
@@ -189,8 +191,10 @@ catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
     dtacupp <- 1e8
 
   # COMPUTE depletion, across units
-  dep <- yearMeans(unitSums(window(stock(stk), start=ay - data_lag - yrs,
-    end=ay - data_lag))) / unitSums(stock(stk)[, 1])
+  browser()
+  met <- do.call(metric, list(stk))
+  dep <- yearMeans(unitSums(window(met, start=ay - data_lag - yrs,
+    end=ay - data_lag))) / unitSums(met[, 1])
 
   # RULE
   ca <- ifelse(dep <= dlimit, 1e-8,
