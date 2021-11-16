@@ -103,10 +103,10 @@ setMethod("show", signature(object = "mseCtrl"),
   function(object)
   {
     cat("Method:\n")
-    print(object @ method)
+    print(object@method)
 
     cat("Arguments:\n")
-    print(object @ args)
+    print(object@args)
  }) # }}}
 
 # exists {{{

@@ -31,5 +31,3 @@ indicator.phcr <- function(stk, itrg, args, tracking, ...){
 	if(is(itrg, 'FLPar')) hcrpars <- itrg else hcrpars <- FLPar(itrg=itrg) 
 	list(hcrpars=hcrpars, tracking=tracking)	
 }
-
-

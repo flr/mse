@@ -21,13 +21,13 @@ graph mp {
   oemin [label="om (FLomBF)"];
   oemargs [label="oem (FLoem)"];
   
-  estin [label="stock (FLStocks), indices (FLIndices)"];
+  estin [label="stk (FLStocks), idx (FLIndices)"];
   estargs [label="method (function)"];
   
-  phcrin [label="stock (FLStocks)"];
+  phcrin [label="stk (FLStocks)"];
   phcrargs [label="method (function)"];
   
-  hcrin [label="metrics (FLQuants)"];
+  hcrin [label="stk (FLStocks), hcrpars (FLPar)"];
   hcrargs [label="method (function)"];
   
   isin [label="control (fwdControl)"];

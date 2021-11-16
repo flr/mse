@@ -287,10 +287,10 @@ cpue.hcr <- function(stk, k1, k2, k3, k4, target=1,
 #' @param nyears Number of years used in regression of log(stock).
 #' @examples
 #' data(ple4om)
-#'  trend.hcr(stock(om), args=list(ay=2003, data_lag=1), tracking=FLQuant(),
-#'    k1=1.5, k2=3, gamma=1, nyears=5, metric=stock)
+#'  trend.hcr(stock(om), args=list(ay=2003, data_lag=1, management_lag=1, frq=1,
+#'  it=1), tracking=FLQuant(), k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
 
-trend.hcr <- function(stk, args, tracking, k1, k2, gamma, nyears,
+trend.hcr <- function(stk, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
   metric=stock, ...) {
 
   # args
@@ -299,7 +299,8 @@ trend.hcr <- function(stk, args, tracking, k1, k2, gamma, nyears,
   mlag <- args$management_lag
   dy <- ac(ay - dlag)
   frq <- args$frq
- 
+  its <- args$it
+
   # BIOMASS
   biom <- do.call(metric, list(stk))[, ac(seq(ay - dlag - (nyears - 1) ,
     length=nyears))]
@@ -312,7 +313,7 @@ trend.hcr <- function(stk, args, tracking, k1, k2, gamma, nyears,
   rnas <- nas[nas == 0, (iter)]
 
   # CALCULATE slot if not in nas
-  slope <- rep(NA, args$it)
+  slope <- rep(NA, its)
   slope[lnas] <- dat[iter %in% rnas, .(slope=coef(lm(log(data) ~ year))[2]),
     by=iter][, (slope)]
 

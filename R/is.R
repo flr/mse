@@ -160,12 +160,12 @@ seasonal.is <- function(stk, ctrl, args, ratio=rep(1/args$ns, args$ns),
       # LAPPLY over seasons
       lapply(seq(nseas), function(s)
         c(as.list(target(ctrl)[i, -3]),
-          list(season=s, value=iters(ctrl)[i, 'value',] * ratio[s])
-        )
+          list(season=s, value=iters(ctrl)[i, 'value',] * ratio[s]))
       )
     ))
   )
 
   return(list(ctrl=res, tracking=tracking))
 }
+
 # }}}

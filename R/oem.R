@@ -35,7 +35,7 @@
 #' obs <- perfect.oem(om, deviances=NULL, observations=NULL,
 #'   args=list(y0=1957, dy=2017), tracking=FLQuant())
 
-perfect.oem <- function(om, deviances, observations, args, tracking,
+perfect.oem <- function(stk, deviances, observations, args, tracking,
   biomass=FALSE, ...) {
 
   # DIMENSIONS
@@ -43,14 +43,17 @@ perfect.oem <- function(om, deviances, observations, args, tracking,
   dy <- ac(args$dy)
 
   # GET perfect stock
-	stk <- window(stock(om), start=y0, end=dy, extend=FALSE)
+	stk <- window(stk, start=y0, end=dy, extend=FALSE)
 
-  # TODO SIMPLIFY as with observations$stk
+  # SIMPLIFY as with observations$stk
   dis <- dim(observations$stk)
-  if(dis[3] == 1)
-    stk <- nounit(stk)
-  if(dis[4] == 1)
-    stk <- noseason(stk)
+
+  if(!is.null(dis)) {
+    if(dis[3] == 1)
+      stk <- nounit(stk)
+    if(dis[4] == 1)
+      stk <- noseason(stk)
+  }
 
   # SET perfect FLIndex per stock
   if(biomass) {
@@ -81,10 +84,10 @@ perfect.oem <- function(om, deviances, observations, args, tracking,
 #' oem@deviances$idx <- lapply(oem@observations$idx, function(x) index(x) %=% 0.1)
 #' oem@deviances$stk <- FLQuants(catch.n=catch.n(stock(om)) %=% 0.1)
 #' oem@observations$idx[[1]] <- propagate(oem@observations$idx[[1]], 25)
-#' sampling.oem(om, deviances=deviances(oem), observations=observations(oem),
+#' sampling.oem(stock(om), deviances=deviances(oem), observations=observations(oem),
 #'   args=list(y0=2000, dy=2016, ay=2017, frq=1), tracking=FLQuant())
 
-sampling.oem <- function(om, deviances, observations, args, tracking, ...) {
+sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
 
   # DIMENSIONS
   y0 <- ac(args$y0)
@@ -98,7 +101,7 @@ sampling.oem <- function(om, deviances, observations, args, tracking, ...) {
   ay <- ac(args$ay)
 
   # GET perfect stock
-	stk <- window(stock(om), start=y0, end=dy, extend=FALSE)
+	stk <- window(stk, start=y0, end=dy, extend=FALSE)
 
   # TODO SIMPLIFY as with observations$stk
   dis <- dim(observations$stk)
@@ -179,10 +182,10 @@ sampling.oem <- function(om, deviances, observations, args, tracking, ...) {
 } # }}}
 
 # default.oem {{{
-default.oem <- function(om) {
+default.oem <- function(stk) {
   
   # observations match OM
-  obs <- list(idx=FLIndices(A=as(stock(om), 'FLIndex')), stk=stock(om))
+  obs <- list(idx=FLIndices(A=as(stk, 'FLIndex')), stk=stk)
 
   # deviances are NULL
   devs <- list(idx=FLQuants(index.q=index.q(obs$idx$A) %=% 1),
