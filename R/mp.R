@@ -472,7 +472,7 @@ setMethod("goFish", signature(om="FLombf"),
   for(i in vy) {
     
     if(verbose) cat(i, " > ")
-
+    
     # time (start)   
     track(tracking, "time", i) <- as.numeric(Sys.time())
 
