@@ -250,9 +250,8 @@ setMethod("goFish", signature(om="FLom"),
 		observations(oem) <- o.out$observations
 		tracking <- o.out$tracking
 
-    track(tracking, "C.obs", seq(ay, ay+frq-1)) <- unitSums(window(catch(stk),
+    track(tracking, "C.obs", seq(ay, ay+frq-1)) <- unitSums(window(catch(stk0),
       start=dy, end=dy + frq - 1))
-
 
 		# --- est: Estimator of stock statistics
 
@@ -607,8 +606,7 @@ setMethod("goFish", signature(om="FLombf"),
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
     }
 
-    # DEBUG
-    # track(tracking, "hcr", seq(ay, ay+frq-1)) <- ctrl
+    track(tracking, "hcr", seq(ay, ay+frq-1)) <- ctrl
 
 		#----------------------------------------------------------
 		# Implementation system
