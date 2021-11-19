@@ -8,7 +8,7 @@ computeFp05(
   stock,
   sr,
   SBlim,
-  range = c(0.01, 1),
+  range = c(0.01, 0.75),
   nyears = 3,
   sigmaR = 0.5,
   rho = 0.43,
@@ -22,7 +22,7 @@ Calculates the Fbar value giving a probability of ssb being Blim of 5\%
 \examples{
 data(ple4)
 sr <- predictModel(model=bevholt, params=FLPar(a=1.4e6, b=1.5e5))
-fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.20,0.50))
+fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.10,0.40))
 # RUN projection for Fp.05 value
 proj <- fwd(propagate(stf(ple4, nyears=100), 300), sr=sr,
   fbar=FLQuant(fp05, dimnames=list(year=2018:2117)),
