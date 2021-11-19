@@ -21,7 +21,9 @@ importFrom("stats",
   "rf")
 
 export(
+  "bisect",
   "catchSSB.hcr",
+  "computeFp05",
   "cpue.hcr",
   "default.oem",
   "effort.is",
