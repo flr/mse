@@ -306,7 +306,7 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
     obmid <- mean(pmid$data, na.rm=TRUE) - prob
 
     if(verbose)
-    cat(" - prob:", mean(pmid$data, na.rm=TRUE), " - diff: ", obmid, "\n")
+      cat(" - prob:", mean(pmid$data, na.rm=TRUE), " - diff: ", obmid, "\n")
 
     # CHECK and RETURN cmid result
     if(isTRUE(all.equal(obmid, 0, tolerance=tol))) {
@@ -323,7 +323,7 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
         return(rmid)
       }
     } else {
-      
+
       # SET min as new mid
       cmin <- cmid
       obmin <- obmid
@@ -342,9 +342,19 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
 
 # computeFp05 {{{
 
+#' Calculates the Fbar value giving a probability of ssb being Blim of 5%
+#'
 #' @examples
 #' data(ple4)
-#' fp05 <- computeFp05(ple4, sr, SBlim=150000, its=10)
+#' sr <- predictModel(model=bevholt, params=FLPar(a=1.4e6, b=1.5e5))
+#' fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.20,0.50))
+#' # RUN projection for Fp.05 value
+#' proj <- fwd(propagate(stf(ple4, nyears=100), 300), sr=sr,
+#'   fbar=FLQuant(fp05, dimnames=list(year=2018:2117)),
+#'   deviances=ar1rlnorm(rho=0.43, years=2018:2117, iters=300, meanlog=0,
+#'   sdlog=0.5))
+#' plot(ssb(proj), prob=c(0.01, 0.25, 0.50, 0.75, 0.99)) +
+#'   geom_hline(yintercept=150000)
 
 computeFp05 <- function(stock, sr, SBlim, range=c(0.01, 1), nyears=3,
   sigmaR=0.5, rho=0.43, its=500, verbose=TRUE) {
@@ -360,7 +370,7 @@ computeFp05 <- function(stock, sr, SBlim, range=c(0.01, 1), nyears=3,
   stock <- stf(stock, end=years[100], wts.nyears=nyears)
   stock <- propagate(stock, its)
 
-  statistic <- list(FP05=list(~yearMeans((SB/SBlim) > 1), name="P.05",
+  statistic <- list(FP05=list(~yearMeans((SB/SBlim) < 1), name="P.05",
     desc="ICES P.05"))
 
   res <- bisect(stock, sr=sr, refpts=FLPar(SBlim=SBlim), deviances=devs,
