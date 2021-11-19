@@ -13,6 +13,7 @@ catchSSB.hcr(
   dtaclow = 0.85,
   dtacupp = 1.15,
   yrs = 1,
+  metric = "ssb",
   args,
   tracking
 )

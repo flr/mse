@@ -1,6 +1,6 @@
 # mse
-- Version: 2.2.1
-- Date: 2021-10-28
+- Version: 2.2.1.9001
+- Date: 2021-11-19
 - Authors: Iago Mosqueira, WUR. Ernesto Jardim, EC JRC.
 - Maintainer: Ernesto Jardim, EC JRC.
 - Repository: <https://github.com/flr/mse/>
