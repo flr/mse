@@ -226,7 +226,7 @@ tunegrid <- function(om, oem="missing", control, metric, statistic, grid, args,
 #' # GENERATE SRR deviances
 #' devs <- ar1rlnorm(rho=0.4, 2019:2118, iters=100, meanlog=0, sdlog=0.5)
 #' # DEFINE Fp05 statistic
-#' statistic <- list(FP05=list(~yearMeans((SB/SBlim) > 1), name="P.05",
+#' statistic <- list(FP05=list(~yearMeans((SB/SBlim) < 1), name="P.05",
 #'   desc="ICES P.05"))
 #' # CALL bisect over 100 years
 #' fp05fwd <- bisect(stock, sr=srr, deviances=devs, metrics=list(SB=ssb), 
@@ -342,13 +342,22 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
 
 # computeFp05 {{{
 
-#' Calculates the Fbar value giving a probability of ssb being Blim of 5%
+#' Calculates the Fbar value giving a maximum probability of ssb being Blim of 5%
 #'
+#' @param stock An FLStock over which the calculation is carried out.
+#' @param sr The stock-recruits relationship tpo use in fwd.
+#' @param SBlim
+#' @param range
+#' @param nyears
+#' @param sigmaR
+#' @param rho
+#' @param its Number of iterations
+#' @param verbose Should progress be shown, TRUE.
 #' @examples
 #' data(ple4)
 #' sr <- predictModel(model=bevholt, params=FLPar(a=1.4e6, b=1.5e5))
 #' fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.10,0.40))
-#' # RUN projection for Fp.05 value
+#' # RUN projection for obtained Fp.05 value
 #' proj <- fwd(propagate(stf(ple4, nyears=100), 300), sr=sr,
 #'   fbar=FLQuant(fp05, dimnames=list(year=2018:2117)),
 #'   deviances=ar1rlnorm(rho=0.43, years=2018:2117, iters=300, meanlog=0,
@@ -370,13 +379,15 @@ computeFp05 <- function(stock, sr, SBlim, range=c(0.01, 0.75), nyears=3,
   stock <- stf(stock, end=years[100], wts.nyears=nyears)
   stock <- propagate(stock, its)
 
-  statistic <- list(FP05=list(~yearMeans((SB/SBlim) < 1), name="P.05",
-    desc="ICES P.05"))
+  statistic <- list(FP05=list(~apply(iterMeans((SB/SBlim) < 1), c(1, 3:6), max),
+    name="P.05", desc="ICES P.05"))
 
   res <- bisect(stock, sr=sr, refpts=FLPar(SBlim=SBlim), deviances=devs,
     metrics=list(SB=ssb), statistic=statistic, years=years, pyears=pyears, 
     tune=list(fbar=range), prob=0.05, tol=0.01, verbose=verbose)
-  
-  return(c(Fp05=mean(fbar(res)[,100])))
+
+  fp05 <- mean(fbar(res)[,100])
+
+  return(c(Fp05=fp05))
 }
 # }}}
