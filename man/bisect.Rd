@@ -32,7 +32,7 @@ srr <- predictModel(model=rec~a*ssb*exp(-b*ssb), params=FLPar(a=5.20, b=1.65e-6)
 # GENERATE SRR deviances
 devs <- ar1rlnorm(rho=0.4, 2019:2118, iters=100, meanlog=0, sdlog=0.5)
 # DEFINE Fp05 statistic
-statistic <- list(FP05=list(~yearMeans((SB/SBlim) > 1), name="P.05",
+statistic <- list(FP05=list(~yearMeans((SB/SBlim) < 1), name="P.05",
   desc="ICES P.05"))
 # CALL bisect over 100 years
 fp05fwd <- bisect(stock, sr=srr, deviances=devs, metrics=list(SB=ssb), 

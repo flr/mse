@@ -29,7 +29,7 @@ mp(
 
 \item{scenario}{Name of the scenario tested in this run, \emph{character}.}
 
-\item{tracking}{Extra elements to add to the standard tracking \emph{FLQuant} in its first dimensions, \emph{character}.}
+\item{tracking}{Extra elements (rows) to add to the standard tracking \emph{FLQuant} in its first dimensions, \emph{character}.}
 
 \item{verbose}{Should output be verbose or not, \emph{logical}.}
 }
@@ -37,8 +37,15 @@ mp(
 An object of class \emph{FLmse}.
 }
 \description{
-mp executes a single run of a Management Procedure
+An individual management procedure (MP) is run for a number of years,
+on an operating model, observation error model, control and arguments.
 }
 \examples{
-# [TODO:example]
+data(ple4om)
+control <- mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=catchSSB.hcr,
+    args=list(MSY=140000))))
+tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
+plot(om, tes)
 }
