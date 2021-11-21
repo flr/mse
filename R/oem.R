@@ -104,11 +104,16 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
 	stk <- window(stk, start=y0, end=dy, extend=FALSE)
 
   # TODO SIMPLIFY as with observations$stk
-  dis <- dim(observations$stk)
-  if(dis[3] == 1)
-    stk <- nounit(stk)
-  if(dis[4] == 1)
-    stk <- noseason(stk)
+  dio <- dim(observations$stk)
+  dis <- dim(stk)
+
+  if(sum(dis[c(3,4)]) > 2) {
+
+    if(dio[3] == 1)
+      stk <- nounit(stk)
+    if(dio[4] == 1)
+      stk <- noseason(stk)
+  }
 
   # --- STK
 
@@ -151,19 +156,16 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
     # APPLY survey() with deviances$idx as index.q
 
     idx[upi] <- Map(function(x, y) {
-      
+     
       # CREATE survey obs
       res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
         index.q=y[, dyrs])
 
-      # FLATTEN units, should not be surveyed separately
-      res <- unitSums(res)
-    
       # SET 0s to min / 2
-      res[res == 0] <- min(res[res > 0] / 2)
+      index(res)[index(res) == 0] <- min(index(res)[index(res) > 0] / 2)
 
       # ASSIGN in dyrs    
-      index(x)[, dyrs] <- res
+      index(x)[, dyrs] <- index(res)
 
       return(window(x, end=dy))
 

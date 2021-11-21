@@ -191,7 +191,6 @@ catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
     dtacupp <- 1e8
 
   # COMPUTE depletion, across units
-  browser()
   met <- do.call(metric, list(stk))
   dep <- yearMeans(unitSums(window(met, start=ay - data_lag - yrs,
     end=ay - data_lag))) / unitSums(met[, 1])
