@@ -601,9 +601,11 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
 setMethod("stock", signature(object="FLombf"),
   function(object) {
 
-    # DEBUG SLOW!
-    res <- FLStocks(lapply(biols(object), as.FLStock,
-      fisheries=fisheries(object), full=TRUE))
+    res <- FLStocks(lapply(names(biols(object)), function(x)
+      as.FLStock(biols(object)[[x]], fisheries=fisheries(object),
+      catch=x, full=TRUE)))
+    # DEBUG
+    names(res) <- names(biols(object))
 
       return(res)
   }

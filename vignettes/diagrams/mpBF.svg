@@ -28,8 +28,8 @@
 <!-- estin -->
 <g id="node12" class="node">
 <title>estin</title>
-<polygon fill="none" stroke="black" points="839,-1284 375,-1284 375,-1248 839,-1248 839,-1284"/>
-<text text-anchor="middle" x="607" y="-1259.8" font-family="Times,serif" font-size="24.00">stock (FLStocks), indices (FLIndices)</text>
+<polygon fill="none" stroke="black" points="800.5,-1284 413.5,-1284 413.5,-1248 800.5,-1248 800.5,-1284"/>
+<text text-anchor="middle" x="607" y="-1259.8" font-family="Times,serif" font-size="24.00">stk (FLStocks), idx (FLIndices)</text>
 </g>
 <!-- oem&#45;&#45;estin -->
 <g id="edge12" class="edge">
@@ -55,8 +55,8 @@
 <!-- phcrin -->
 <g id="node14" class="node">
 <title>phcrin</title>
-<polygon fill="none" stroke="black" points="716,-1128 498,-1128 498,-1092 716,-1092 716,-1128"/>
-<text text-anchor="middle" x="607" y="-1103.8" font-family="Times,serif" font-size="24.00">stock (FLStocks)</text>
+<polygon fill="none" stroke="black" points="702.5,-1128 511.5,-1128 511.5,-1092 702.5,-1092 702.5,-1128"/>
+<text text-anchor="middle" x="607" y="-1103.8" font-family="Times,serif" font-size="24.00">stk (FLStocks)</text>
 </g>
 <!-- est&#45;&#45;phcrin -->
 <g id="edge14" class="edge">
@@ -136,8 +136,8 @@
 <!-- hcrin -->
 <g id="node16" class="node">
 <title>hcrin</title>
-<polygon fill="none" stroke="black" points="733,-972 481,-972 481,-936 733,-936 733,-972"/>
-<text text-anchor="middle" x="607" y="-947.8" font-family="Times,serif" font-size="24.00">metrics (FLQuants)</text>
+<polygon fill="none" stroke="black" points="805.5,-972 408.5,-972 408.5,-936 805.5,-936 805.5,-972"/>
+<text text-anchor="middle" x="607" y="-947.8" font-family="Times,serif" font-size="24.00">stk (FLStocks), hcrpars (FLPar)</text>
 </g>
 <!-- phcr&#45;&#45;hcrin -->
 <g id="edge16" class="edge">

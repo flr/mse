@@ -28,7 +28,7 @@
 #'   tracking=FLQuants(FLQuant(dimnames=list(metric="conv.est", year=2018))))
 
 perfect.sa <- function(stk, idx, args, tracking, ...) {
-  
+ 
   stk <- window(stk, end=args$dy)
   
   track(tracking, "conv.est", ac(args$ay)) <- 1

@@ -194,6 +194,8 @@ setReplaceMethod("args", signature("FLmse", "list"), function(object, value){
 
 setMethod("stock", "FLmse", function(object) stock(om(object)))
 
+setMethod("biols", "FLmse", function(object) biol(om(object)))
+
 setMethod("sr", "FLmse", function(object) sr(om(object)))
 
 setMethod("refpts", "FLmse", function(object) refpts(om(object)))
