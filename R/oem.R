@@ -32,7 +32,7 @@
 #' @examples
 #' # On FLom
 #' data(ple4om)
-#' obs <- perfect.oem(om, deviances=NULL, observations=NULL,
+#' obs <- perfect.oem(stock(om), deviances=NULL, observations=NULL,
 #'   args=list(y0=1957, dy=2017), tracking=FLQuant())
 
 perfect.oem <- function(stk, deviances, observations, args, tracking,
