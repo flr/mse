@@ -466,6 +466,10 @@ setMethod("goFish", signature(om="FLombf"),
   # COPY ctrl
 	ctrl0 <- ctrl
 
+  # ENSURE deviances(oem) has the right length
+  if(length(deviances(oem)) == 0)
+    deviances(oem) <- rep(list(NULL), length(biols(om)))
+
 	# go fish
 
   for(i in vy) {
@@ -486,7 +490,7 @@ setMethod("goFish", signature(om="FLombf"),
     track(tracking, "B.om", ay) <- window(tsb(om), start=dy, end=dy)
     track(tracking, "SB.om", ay) <- window(ssb(om), start=dy, end=dy)
     # DEBUG
-    # track(tracking, "C.om", ay) <- unitSums(window(catch(om), start=dy, end=dy))
+    # track(tracking, "C.om", ay) <- window(catch(om), start=dy, end=dy)
     
     # --- OEM: Observation Error Model
  
@@ -497,13 +501,15 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
 
+    # CALL by biol
     o.out <- Map(function(stk, dev, obs, tra) {
 
       do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
-
-      }, stk=stock(om), dev=lapply(stock(om), catch.n),
-    obs=observations(oem), tra=tracking)
+      # EXTRACT stock(s) from om
+      }, stk=stock(om),
+      # GET observations and deviances from oem
+      obs=observations(oem), dev=deviances(oem), tra=tracking)
 
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
