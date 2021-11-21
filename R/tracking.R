@@ -6,11 +6,7 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
-# track<- {{{
-
-# track<-
-setGeneric("track<-", function(object, ..., value)
-  standardGeneric("track<-"))
+# track<- FLQuants, fwdControl{{{
 
 #' @rdname tracking
 #' @examples
@@ -41,6 +37,10 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
   }
 )
 
+# }}}
+
+# track<- FLQuants, FLQuant {{{
+
 #' @rdname tracking
 #' @examples
 #' tracking <- FLQuants(
@@ -61,6 +61,9 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
     return(object)
   }
 )
+# }}}
+
+# track<- FLQuants, numeric{{{
 
 setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
   function(object, step, year=dimnames(value)$year, ..., value) {
@@ -82,6 +85,9 @@ setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
     return(object)
   }
 )
+# }}}
+
+# track<- FLQuants, FLQuants{{{
 
 #' @rdname tracking
 #' @examples

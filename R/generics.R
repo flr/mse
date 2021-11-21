@@ -42,3 +42,9 @@ setGeneric("undebug", useAsDefault = base::undebug)
 # debuggingState(on = NULL)
 
 # }}}
+
+# track<- {{{
+setGeneric("track<-", function(object, ..., value)
+  standardGeneric("track<-"))
+# }}}
+
