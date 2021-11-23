@@ -40,7 +40,8 @@
 
 
 <meta property="og:title" content="mp executes a single run of a Management Procedure — mp" />
-<meta property="og:description" content="mp executes a single run of a Management Procedure" />
+<meta property="og:description" content="An individual management procedure (MP) is run for a number of years,
+on an operating model, observation error model, control and arguments." />
 
 
 
@@ -72,7 +73,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9001</span>
       </span>
     </div>
 
@@ -129,7 +130,8 @@
     </div>
 
     <div class="ref-description">
-    <p>mp executes a single run of a Management Procedure</p>
+    <p>An individual management procedure (MP) is run for a number of years,
+on an operating model, observation error model, control and arguments.</p>
     </div>
 
     <pre class="usage"><span class='fu'>mp</span><span class='op'>(</span>
@@ -173,7 +175,7 @@
     </tr>
     <tr>
       <th>tracking</th>
-      <td><p>Extra elements to add to the standard tracking <em>FLQuant</em> in its first dimensions, <em>character</em>.</p></td>
+      <td><p>Extra elements (rows) to add to the standard tracking <em>FLQuant</em> in its first dimensions, <em>character</em>.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -186,8 +188,17 @@
     <p>An object of class <em>FLmse</em>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># [TODO:example]</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>control</span> <span class='op'>&lt;-</span> <span class='fu'><a href='mpCtrl-class.html'>mpCtrl</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span></span>
+<span class='r-in'>  est <span class='op'>=</span> <span class='fu'><a href='mseCtrl-class.html'>mseCtrl</a></span><span class='op'>(</span>method<span class='op'>=</span><span class='va'>perfect.sa</span><span class='op'>)</span>,</span>
+<span class='r-in'>  hcr <span class='op'>=</span> <span class='fu'><a href='mseCtrl-class.html'>mseCtrl</a></span><span class='op'>(</span>method<span class='op'>=</span><span class='va'>catchSSB.hcr</span>,</span>
+<span class='r-in'>    args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>MSY<span class='op'>=</span><span class='fl'>140000</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>tes</span> <span class='op'>&lt;-</span> <span class='fu'>mp</span><span class='op'>(</span><span class='va'>om</span>, oem<span class='op'>=</span><span class='va'>oem</span>, ctrl<span class='op'>=</span><span class='va'>control</span>, args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>iy<span class='op'>=</span><span class='fl'>2017</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2017  &gt; </span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in x@.Data[i, j, k, l, m, n] &lt;- value:</span> number of items to replace is not a multiple of replacement length</span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>om</span>, <span class='va'>tes</span><span class='op'>)</span></span>
+<span class='r-err co'><span class='r-pr'>#&gt;</span> <span class='error'>Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'y' in selecting a method for function 'plot': object 'tes' not found</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

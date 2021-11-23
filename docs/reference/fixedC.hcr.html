@@ -73,7 +73,7 @@ The control argument is a list of parameters used by the HCR." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9001</span>
       </span>
     </div>
 
@@ -151,24 +151,25 @@ The control argument is a list of parameters used by the HCR.</p>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span>
-<span class='fu'>fixedC.hcr</span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, ctrg<span class='op'>=</span><span class='fl'>50000</span>, args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ay<span class='op'>=</span><span class='fl'>2017</span>, management_lag<span class='op'>=</span><span class='fl'>1</span>,
-  frq<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>, tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $ctrl
-#&gt; An object of class "fwdControl"
-#&gt;  (step) year quant min     value max
-#&gt;       1 2018 catch  NA 50000.000  NA
-#&gt; 
-#&gt; $tracking
-#&gt; An object of class "FLQuant"
-#&gt; , , unit = unique, season = all, area = unique
-#&gt; 
-#&gt;      year
-#&gt; quant 1 
-#&gt;   all NA
-#&gt; 
-#&gt; units:  NA 
-#&gt; </div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>fixedC.hcr</span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, ctrg<span class='op'>=</span><span class='fl'>50000</span>, args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ay<span class='op'>=</span><span class='fl'>2017</span>, management_lag<span class='op'>=</span><span class='fl'>1</span>,</span>
+<span class='r-in'>  frq<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>, tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ctrl</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "fwdControl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  (step) year quant min     value max</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       1 2018 catch  NA 50000.000  NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $tracking</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "FLQuant"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> , , unit = unique, season = all, area = unique</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      year</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> quant 1 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   all NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> units:  NA </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

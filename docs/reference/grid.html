@@ -77,7 +77,7 @@ selection of MPs." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9001</span>
       </span>
     </div>
 
@@ -185,72 +185,81 @@ below for guidance.</p>
     <p>Iago Mosqueira, EC JRC</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Lists of scenarios can contains vectors ...</span>
-<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>steepness<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.6</span>, <span class='fl'>0.7</span>, <span class='fl'>0.8</span><span class='op'>)</span>, M<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.3</span>, <span class='fl'>0.4</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $steepness
-#&gt; [1] 0.6 0.7 0.8
-#&gt; 
-#&gt; $M
-#&gt; [1] 0.2 0.3 0.4
-#&gt; </div><div class='input'><span class='co'># lists ...</span>
-<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>M<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.4</span>, lo<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.4</span>, length<span class='op'>=</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $M
-#&gt; $M[[1]]
-#&gt; [1] 0.2
-#&gt; 
-#&gt; $M[[2]]
-#&gt; [1] 0.4
-#&gt; 
-#&gt; $M$lo
-#&gt;  [1] 0.2000000 0.2222222 0.2444444 0.2666667 0.2888889 0.3111111 0.3333333
-#&gt;  [8] 0.3555556 0.3777778 0.4000000
-#&gt; 
-#&gt; </div><div class='input'><span class='co'># or both</span>
-<span class='va'>scenarios</span>  <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>steepness<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.7</span>, <span class='fl'>0.8</span><span class='op'>)</span>, M<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.4</span>, lo<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.4</span>, length<span class='op'>=</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-<span class='co'># Create full grid as index table</span>
-<span class='fu'>expandGrid</span><span class='op'>(</span><span class='va'>scenarios</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   steepness M
-#&gt; 1         1 1
-#&gt; 2         2 1
-#&gt; 3         1 2
-#&gt; 4         2 2
-#&gt; 5         1 3
-#&gt; 6         2 3</div><div class='input'><span class='co'># Drop certain combinations</span>
-<span class='fu'>expandGrid</span><span class='op'>(</span><span class='va'>scenarios</span>, <span class='va'>M</span> <span class='op'>==</span> <span class='fl'>0.2</span> <span class='op'>&amp;</span> <span class='va'>steepness</span> <span class='op'>==</span> <span class='fl'>0.7</span>, <span class='va'>M</span> <span class='op'>==</span> <span class='st'>"lo"</span> <span class='op'>&amp;</span> <span class='va'>steepness</span> <span class='op'>==</span> <span class='fl'>0.8</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   steepness M
-#&gt; 1         2 1
-#&gt; 2         1 2
-#&gt; 3         2 2
-#&gt; 4         1 3</div><div class='input'><span class='co'># Output as names</span>
-<span class='fu'>expandGrid</span><span class='op'>(</span><span class='va'>scenarios</span>, <span class='va'>M</span> <span class='op'>==</span> <span class='fl'>0.2</span> <span class='op'>&amp;</span> <span class='va'>steepness</span> <span class='op'>==</span> <span class='fl'>0.7</span>, names<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   steepness   M
-#&gt; 1       0.8 0.2
-#&gt; 2       0.7 0.4
-#&gt; 3       0.8 0.4
-#&gt; 4       0.7  lo
-#&gt; 5       0.8  lo</div><div class='input'><span class='co'># Create list of variable combinations</span>
-<span class='va'>runs</span> <span class='op'>&lt;-</span> <span class='fu'>gridList</span><span class='op'>(</span><span class='va'>scenarios</span><span class='op'>)</span>
-<span class='va'>runs</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; $steepness
-#&gt; [1] 0.7
-#&gt; 
-#&gt; $M
-#&gt; $M[[1]]
-#&gt; [1] 0.2
-#&gt; 
-#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>runs</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 6</div><div class='input'><span class='co'># Create list but dropping certain combinations</span>
-<span class='va'>runs</span> <span class='op'>&lt;-</span> <span class='fu'>gridList</span><span class='op'>(</span><span class='va'>scenarios</span>, <span class='va'>M</span> <span class='op'>==</span> <span class='fl'>0.2</span> <span class='op'>&amp;</span> <span class='va'>steepness</span> <span class='op'>==</span> <span class='fl'>0.7</span><span class='op'>)</span>
-<span class='va'>runs</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span>
-</div><div class='output co'>#&gt; $steepness
-#&gt; [1] 0.7
-#&gt; 
-#&gt; $M
-#&gt; $M[[1]]
-#&gt; [1] 0.2
-#&gt; 
-#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>runs</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 5</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># Lists of scenarios can contains vectors ...</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>steepness<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.6</span>, <span class='fl'>0.7</span>, <span class='fl'>0.8</span><span class='op'>)</span>, M<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.3</span>, <span class='fl'>0.4</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $steepness</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.6 0.7 0.8</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $M</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.2 0.3 0.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='co'># lists ...</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>M<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.4</span>, lo<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.4</span>, length<span class='op'>=</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $M</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $M[[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $M[[2]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $M$lo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] 0.2000000 0.2222222 0.2444444 0.2666667 0.2888889 0.3111111 0.3333333</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [8] 0.3555556 0.3777778 0.4000000</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='co'># or both</span></span>
+<span class='r-in'><span class='va'>scenarios</span>  <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>steepness<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.7</span>, <span class='fl'>0.8</span><span class='op'>)</span>, M<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.4</span>, lo<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.2</span>, <span class='fl'>0.4</span>, length<span class='op'>=</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># Create full grid as index table</span></span>
+<span class='r-in'><span class='fu'>expandGrid</span><span class='op'>(</span><span class='va'>scenarios</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   steepness M</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1         1 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2         2 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3         1 2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4         2 2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5         1 3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 6         2 3</span>
+<span class='r-in'><span class='co'># Drop certain combinations</span></span>
+<span class='r-in'><span class='fu'>expandGrid</span><span class='op'>(</span><span class='va'>scenarios</span>, <span class='va'>M</span> <span class='op'>==</span> <span class='fl'>0.2</span> <span class='op'>&amp;</span> <span class='va'>steepness</span> <span class='op'>==</span> <span class='fl'>0.7</span>, <span class='va'>M</span> <span class='op'>==</span> <span class='st'>"lo"</span> <span class='op'>&amp;</span> <span class='va'>steepness</span> <span class='op'>==</span> <span class='fl'>0.8</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   steepness M</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1         2 1</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2         1 2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3         2 2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4         1 3</span>
+<span class='r-in'><span class='co'># Output as names</span></span>
+<span class='r-in'><span class='fu'>expandGrid</span><span class='op'>(</span><span class='va'>scenarios</span>, <span class='va'>M</span> <span class='op'>==</span> <span class='fl'>0.2</span> <span class='op'>&amp;</span> <span class='va'>steepness</span> <span class='op'>==</span> <span class='fl'>0.7</span>, names<span class='op'>=</span><span class='cn'>TRUE</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   steepness   M</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1       0.8 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2       0.7 0.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 3       0.8 0.4</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 4       0.7  lo</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 5       0.8  lo</span>
+<span class='r-in'><span class='co'># Create list of variable combinations</span></span>
+<span class='r-in'><span class='va'>runs</span> <span class='op'>&lt;-</span> <span class='fu'>gridList</span><span class='op'>(</span><span class='va'>scenarios</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>runs</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $steepness</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.7</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $M</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $M[[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>runs</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 6</span>
+<span class='r-in'><span class='co'># Create list but dropping certain combinations</span></span>
+<span class='r-in'><span class='va'>runs</span> <span class='op'>&lt;-</span> <span class='fu'>gridList</span><span class='op'>(</span><span class='va'>scenarios</span>, <span class='va'>M</span> <span class='op'>==</span> <span class='fl'>0.2</span> <span class='op'>&amp;</span> <span class='va'>steepness</span> <span class='op'>==</span> <span class='fl'>0.7</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>runs</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $steepness</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.7</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $M</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $M[[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0.2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>runs</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 5</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

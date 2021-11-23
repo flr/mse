@@ -76,7 +76,7 @@ idx$index, if given, are applied." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9001</span>
       </span>
     </div>
 
@@ -140,15 +140,11 @@ a fixed catchability of 0.01. <em>deviances</em> on either <em>stk$catch.n</em> 
 <em>idx$index</em>, if given, are applied.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>perfect.oem</span><span class='op'>(</span><span class='va'>om</span>, <span class='va'>deviances</span>, <span class='va'>observations</span>, <span class='va'>args</span>, <span class='va'>tracking</span>, biomass <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>perfect.oem</span><span class='op'>(</span><span class='va'>stk</span>, <span class='va'>deviances</span>, <span class='va'>observations</span>, <span class='va'>args</span>, <span class='va'>tracking</span>, biomass <span class='op'>=</span> <span class='cn'>FALSE</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>om</th>
-      <td><p>An operating model, class <em>FLom</em> or <em>FLombf</em>.</p></td>
-    </tr>
     <tr>
       <th>deviances</th>
       <td><p>A named list of observation deviances, class <em>list</em>.</p></td>
@@ -165,6 +161,10 @@ a fixed catchability of 0.01. <em>deviances</em> on either <em>stk$catch.n</em> 
       <th>tracking</th>
       <td><p>Object to track module decisions and outputs, class <em>FLQuant</em>.</p></td>
     </tr>
+    <tr>
+      <th>om</th>
+      <td><p>An operating model, class <em>FLom</em> or <em>FLombf</em>.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -176,11 +176,11 @@ a fixed catchability of 0.01. <em>deviances</em> on either <em>stk$catch.n</em> 
 and does not append them to existing objects in <em>observations</em>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># On FLom</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span>
-<span class='va'>obs</span> <span class='op'>&lt;-</span> <span class='fu'>perfect.oem</span><span class='op'>(</span><span class='va'>om</span>, deviances<span class='op'>=</span><span class='cn'>NULL</span>, observations<span class='op'>=</span><span class='cn'>NULL</span>,
-  args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>y0<span class='op'>=</span><span class='fl'>1957</span>, dy<span class='op'>=</span><span class='fl'>2017</span><span class='op'>)</span>, tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># On FLom</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>obs</span> <span class='op'>&lt;-</span> <span class='fu'>perfect.oem</span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, deviances<span class='op'>=</span><span class='cn'>NULL</span>, observations<span class='op'>=</span><span class='cn'>NULL</span>,</span>
+<span class='r-in'>  args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>y0<span class='op'>=</span><span class='fl'>1957</span>, dy<span class='op'>=</span><span class='fl'>2017</span><span class='op'>)</span>, tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

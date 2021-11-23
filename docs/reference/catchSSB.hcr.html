@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9001</span>
       </span>
     </div>
 
@@ -141,6 +141,7 @@
   dtaclow <span class='op'>=</span> <span class='fl'>0.85</span>,
   dtacupp <span class='op'>=</span> <span class='fl'>1.15</span>,
   yrs <span class='op'>=</span> <span class='fl'>1</span>,
+  metric <span class='op'>=</span> <span class='st'>"ssb"</span>,
   <span class='va'>args</span>,
   <span class='va'>tracking</span>
 <span class='op'>)</span></pre>
@@ -191,79 +192,81 @@
     <p>A <em>list</em> with elements <em>ctrl</em>, of class <em>fwdControl</em>, and <em>tracking</em>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span>
-<span class='fu'>catchSSB.hcr</span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, MSY<span class='op'>=</span><span class='fl'>140000</span>, tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span>,
-args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ay<span class='op'>=</span><span class='fl'>2018</span>, data_lag<span class='op'>=</span><span class='fl'>1</span>, management_lag<span class='op'>=</span><span class='fl'>1</span>, frq<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; $ctrl
-#&gt; An object of class "fwdControl"
-#&gt;  (step) year quant relYear   min      value   max
-#&gt;       1 2019 catch      NA    NA 140000.000    NA
-#&gt;       2 2019 catch    2018 0.850         NA 1.150
-#&gt;    iters:  25 
-#&gt; 
-#&gt; 
-#&gt; $tracking
-#&gt; An object of class "FLQuant"
-#&gt; , , unit = unique, season = all, area = unique
-#&gt; 
-#&gt;      year
-#&gt; quant 1 
-#&gt;   all NA
-#&gt; 
-#&gt; units:  NA 
-#&gt; </div><div class='input'><span class='co'># APPLY hcr over a range of dtarget values</span>
-<span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.30</span>, <span class='fl'>0.80</span>, by<span class='op'>=</span><span class='fl'>0.1</span><span class='op'>)</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='fu'>catchSSB.hcr</span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, MSY<span class='op'>=</span><span class='fl'>140000</span>, dtarget<span class='op'>=</span><span class='va'>x</span>,
-  args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ay<span class='op'>=</span><span class='fl'>2018</span>, data_lag<span class='op'>=</span><span class='fl'>1</span>, management_lag<span class='op'>=</span><span class='fl'>1</span>, frq<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>,
-  tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>$</span><span class='va'>ctrl</span> <span class='op'>}</span> <span class='op'>)</span>
-</div><div class='output co'>#&gt; [[1]]
-#&gt; An object of class "fwdControl"
-#&gt;  (step) year quant relYear   min      value   max
-#&gt;       1 2019 catch      NA    NA 140000.000    NA
-#&gt;       2 2019 catch    2018 0.850         NA 1.150
-#&gt;    iters:  25 
-#&gt; 
-#&gt; 
-#&gt; [[2]]
-#&gt; An object of class "fwdControl"
-#&gt;  (step) year quant relYear   min      value   max
-#&gt;       1 2019 catch      NA    NA 140000.000    NA
-#&gt;       2 2019 catch    2018 0.850         NA 1.150
-#&gt;    iters:  25 
-#&gt; 
-#&gt; 
-#&gt; [[3]]
-#&gt; An object of class "fwdControl"
-#&gt;  (step) year quant relYear   min      value   max
-#&gt;       1 2019 catch      NA    NA 140000.000    NA
-#&gt;       2 2019 catch    2018 0.850         NA 1.150
-#&gt;    iters:  25 
-#&gt; 
-#&gt; 
-#&gt; [[4]]
-#&gt; An object of class "fwdControl"
-#&gt;  (step) year quant relYear   min      value   max
-#&gt;       1 2019 catch      NA    NA 140000.000    NA
-#&gt;       2 2019 catch    2018 0.850         NA 1.150
-#&gt;    iters:  25 
-#&gt; 
-#&gt; 
-#&gt; [[5]]
-#&gt; An object of class "fwdControl"
-#&gt;  (step) year quant relYear   min      value   max
-#&gt;       1 2019 catch      NA    NA 140000.000    NA
-#&gt;       2 2019 catch    2018 0.850         NA 1.150
-#&gt;    iters:  25 
-#&gt; 
-#&gt; 
-#&gt; [[6]]
-#&gt; An object of class "fwdControl"
-#&gt;  (step) year quant relYear   min      value   max
-#&gt;       1 2019 catch      NA    NA 140000.000    NA
-#&gt;       2 2019 catch    2018 0.850         NA 1.150
-#&gt;    iters:  25 
-#&gt; 
-#&gt; </div></pre>
+    <pre class="examples"><span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>catchSSB.hcr</span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, MSY<span class='op'>=</span><span class='fl'>140000</span>, tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span>,</span>
+<span class='r-in'>args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ay<span class='op'>=</span><span class='fl'>2018</span>, data_lag<span class='op'>=</span><span class='fl'>1</span>, management_lag<span class='op'>=</span><span class='fl'>1</span>, frq<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $ctrl</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "fwdControl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  (step) year quant relYear   min      value   max</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       1 2019 catch      NA    NA 140000.000    NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       2 2019 catch    2018 0.850         NA 1.150</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    iters:  50 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> $tracking</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "FLQuant"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> , , unit = unique, season = all, area = unique</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      year</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> quant 1 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   all NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> units:  NA </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'><span class='co'># APPLY hcr over a range of dtarget values</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.30</span>, <span class='fl'>0.80</span>, by<span class='op'>=</span><span class='fl'>0.1</span><span class='op'>)</span>, <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='fu'>catchSSB.hcr</span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, MSY<span class='op'>=</span><span class='fl'>140000</span>, dtarget<span class='op'>=</span><span class='va'>x</span>,</span>
+<span class='r-in'>  args<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ay<span class='op'>=</span><span class='fl'>2018</span>, data_lag<span class='op'>=</span><span class='fl'>1</span>, management_lag<span class='op'>=</span><span class='fl'>1</span>, frq<span class='op'>=</span><span class='fl'>1</span><span class='op'>)</span>,</span>
+<span class='r-in'>  tracking<span class='op'>=</span><span class='fu'>FLQuant</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span><span class='op'>$</span><span class='va'>ctrl</span> <span class='op'>}</span> <span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "fwdControl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  (step) year quant relYear   min      value   max</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       1 2019 catch      NA    NA 140000.000    NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       2 2019 catch    2018 0.850         NA 1.150</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    iters:  50 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[2]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "fwdControl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  (step) year quant relYear   min      value   max</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       1 2019 catch      NA    NA 140000.000    NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       2 2019 catch    2018 0.850         NA 1.150</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    iters:  50 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[3]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "fwdControl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  (step) year quant relYear   min      value   max</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       1 2019 catch      NA    NA 140000.000    NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       2 2019 catch    2018 0.850         NA 1.150</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    iters:  50 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[4]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "fwdControl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  (step) year quant relYear   min      value   max</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       1 2019 catch      NA    NA 140000.000    NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       2 2019 catch    2018 0.850         NA 1.150</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    iters:  50 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[5]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "fwdControl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  (step) year quant relYear   min             value   max</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       1 2019 catch      NA    NA 140000.000(0.000)    NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       2 2019 catch    2018 0.850                NA 1.150</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    iters:  50 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[6]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> An object of class "fwdControl"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  (step) year quant relYear   min             value   max</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       1 2019 catch      NA    NA 140000.000(0.000)    NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       2 2019 catch    2018 0.850                NA 1.150</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    iters:  50 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9001</span>
       </span>
     </div>
 
@@ -232,154 +232,93 @@ necessary matching between <em>metrics</em>, <em>refpts</em> and the statistics 
     <p>Iago Mosqueira, EC JRC</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'># LOAD example FLmse object</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span>
-<span class='co'># GENERATE run from last 16 years of OM</span>
-<span class='va'>run</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/window.html'>window</a></span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, start<span class='op'>=</span><span class='fl'>2000</span>, end<span class='op'>=</span><span class='fl'>2015</span><span class='op'>)</span>
-<span class='co'># DEFINE statistics</span>
-<span class='va'>statistics</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
-  dCatch<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='fu'>yearMeans</span><span class='op'>(</span><span class='va'>C</span><span class='op'>[</span>, <span class='op'>-</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>/</span><span class='va'>C</span><span class='op'>[</span>, <span class='op'>-</span><span class='fu'>dims</span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span><span class='op'>$</span><span class='va'>year</span><span class='op'>]</span><span class='op'>)</span>,
-    name<span class='op'>=</span><span class='st'>"mean(C[t] / C[t-1])"</span>,
-    desc<span class='op'>=</span><span class='st'>"Mean absolute proportional change in catch"</span><span class='op'>)</span>,
-  varCatch<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='fu'>yearVars</span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span>,
-    name<span class='op'>=</span><span class='st'>"var(C)"</span>,
-    desc<span class='op'>=</span><span class='st'>"Variance in catch"</span><span class='op'>)</span>,
-  varF<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='fu'>yearVars</span><span class='op'>(</span><span class='cn'>F</span><span class='op'>)</span>,
-    name<span class='op'>=</span><span class='st'>"var(F)"</span>,
-    desc<span class='op'>=</span><span class='st'>"Variance in fishing mortality"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='co'># COMPUTE performance</span>
-<span class='fu'>performance</span><span class='op'>(</span><span class='va'>run</span>, <span class='va'>statistics</span>, refpts<span class='op'>=</span><span class='fu'>FLPar</span><span class='op'>(</span>MSY<span class='op'>=</span><span class='fl'>110000</span><span class='op'>)</span>,
-  metrics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>C<span class='op'>=</span><span class='va'>catch</span>, F<span class='op'>=</span><span class='va'>fbar</span><span class='op'>)</span>, years<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>2000</span><span class='op'>:</span><span class='fl'>2015</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;     statistic year         data iter                name
-#&gt;  1:    dCatch 2015 9.994373e-01    1 mean(C[t] / C[t-1])
-#&gt;  2:    dCatch 2015 9.994373e-01    2 mean(C[t] / C[t-1])
-#&gt;  3:    dCatch 2015 9.984355e-01    3 mean(C[t] / C[t-1])
-#&gt;  4:    dCatch 2015 9.986469e-01    4 mean(C[t] / C[t-1])
-#&gt;  5:    dCatch 2015 9.994853e-01    5 mean(C[t] / C[t-1])
-#&gt;  6:    dCatch 2015 9.989960e-01    6 mean(C[t] / C[t-1])
-#&gt;  7:    dCatch 2015 9.986956e-01    7 mean(C[t] / C[t-1])
-#&gt;  8:    dCatch 2015 9.985410e-01    8 mean(C[t] / C[t-1])
-#&gt;  9:    dCatch 2015 9.988764e-01    9 mean(C[t] / C[t-1])
-#&gt; 10:    dCatch 2015 9.984006e-01   10 mean(C[t] / C[t-1])
-#&gt; 11:    dCatch 2015 9.972845e-01   11 mean(C[t] / C[t-1])
-#&gt; 12:    dCatch 2015 9.980538e-01   12 mean(C[t] / C[t-1])
-#&gt; 13:    dCatch 2015 9.987969e-01   13 mean(C[t] / C[t-1])
-#&gt; 14:    dCatch 2015 9.992097e-01   14 mean(C[t] / C[t-1])
-#&gt; 15:    dCatch 2015 9.997025e-01   15 mean(C[t] / C[t-1])
-#&gt; 16:    dCatch 2015 1.000126e+00   16 mean(C[t] / C[t-1])
-#&gt; 17:    dCatch 2015 1.000371e+00   17 mean(C[t] / C[t-1])
-#&gt; 18:    dCatch 2015 1.000372e+00   18 mean(C[t] / C[t-1])
-#&gt; 19:    dCatch 2015 1.000083e+00   19 mean(C[t] / C[t-1])
-#&gt; 20:    dCatch 2015 9.996324e-01   20 mean(C[t] / C[t-1])
-#&gt; 21:    dCatch 2015 9.991367e-01   21 mean(C[t] / C[t-1])
-#&gt; 22:    dCatch 2015 9.997361e-01   22 mean(C[t] / C[t-1])
-#&gt; 23:    dCatch 2015 1.000617e+00   23 mean(C[t] / C[t-1])
-#&gt; 24:    dCatch 2015 9.991421e-01   24 mean(C[t] / C[t-1])
-#&gt; 25:    dCatch 2015 9.996747e-01   25 mean(C[t] / C[t-1])
-#&gt; 26:  varCatch 2015 2.291724e+08    1              var(C)
-#&gt; 27:  varCatch 2015 2.291724e+08    2              var(C)
-#&gt; 28:  varCatch 2015 2.225521e+08    3              var(C)
-#&gt; 29:  varCatch 2015 2.346856e+08    4              var(C)
-#&gt; 30:  varCatch 2015 2.349722e+08    5              var(C)
-#&gt; 31:  varCatch 2015 2.355825e+08    6              var(C)
-#&gt; 32:  varCatch 2015 2.266701e+08    7              var(C)
-#&gt; 33:  varCatch 2015 2.109882e+08    8              var(C)
-#&gt; 34:  varCatch 2015 2.268825e+08    9              var(C)
-#&gt; 35:  varCatch 2015 2.213593e+08   10              var(C)
-#&gt; 36:  varCatch 2015 2.118339e+08   11              var(C)
-#&gt; 37:  varCatch 2015 2.146798e+08   12              var(C)
-#&gt; 38:  varCatch 2015 2.151345e+08   13              var(C)
-#&gt; 39:  varCatch 2015 2.303325e+08   14              var(C)
-#&gt; 40:  varCatch 2015 2.232798e+08   15              var(C)
-#&gt; 41:  varCatch 2015 2.273611e+08   16              var(C)
-#&gt; 42:  varCatch 2015 2.182051e+08   17              var(C)
-#&gt; 43:  varCatch 2015 2.207349e+08   18              var(C)
-#&gt; 44:  varCatch 2015 2.330167e+08   19              var(C)
-#&gt; 45:  varCatch 2015 2.382070e+08   20              var(C)
-#&gt; 46:  varCatch 2015 2.320905e+08   21              var(C)
-#&gt; 47:  varCatch 2015 2.347540e+08   22              var(C)
-#&gt; 48:  varCatch 2015 2.334668e+08   23              var(C)
-#&gt; 49:  varCatch 2015 2.240261e+08   24              var(C)
-#&gt; 50:  varCatch 2015 2.299363e+08   25              var(C)
-#&gt; 51:      varF 2015 2.180638e-02    1              var(F)
-#&gt; 52:      varF 2015 2.180638e-02    2              var(F)
-#&gt; 53:      varF 2015 2.109697e-02    3              var(F)
-#&gt; 54:      varF 2015 2.216665e-02    4              var(F)
-#&gt; 55:      varF 2015 2.023697e-02    5              var(F)
-#&gt; 56:      varF 2015 1.989139e-02    6              var(F)
-#&gt; 57:      varF 2015 2.085215e-02    7              var(F)
-#&gt; 58:      varF 2015 1.919674e-02    8              var(F)
-#&gt; 59:      varF 2015 1.836105e-02    9              var(F)
-#&gt; 60:      varF 2015 1.963375e-02   10              var(F)
-#&gt; 61:      varF 2015 2.004514e-02   11              var(F)
-#&gt; 62:      varF 2015 2.018918e-02   12              var(F)
-#&gt; 63:      varF 2015 2.014899e-02   13              var(F)
-#&gt; 64:      varF 2015 1.940458e-02   14              var(F)
-#&gt; 65:      varF 2015 1.900968e-02   15              var(F)
-#&gt; 66:      varF 2015 2.096307e-02   16              var(F)
-#&gt; 67:      varF 2015 2.130031e-02   17              var(F)
-#&gt; 68:      varF 2015 2.142248e-02   18              var(F)
-#&gt; 69:      varF 2015 2.166655e-02   19              var(F)
-#&gt; 70:      varF 2015 2.143131e-02   20              var(F)
-#&gt; 71:      varF 2015 2.082809e-02   21              var(F)
-#&gt; 72:      varF 2015 2.129481e-02   22              var(F)
-#&gt; 73:      varF 2015 1.948213e-02   23              var(F)
-#&gt; 74:      varF 2015 2.126185e-02   24              var(F)
-#&gt; 75:      varF 2015 2.097983e-02   25              var(F)
-#&gt;     statistic year         data iter                name</div><div class='input'><span class='co'># Minimum statistic, named list with formula and name</span>
-<span class='fu'>performance</span><span class='op'>(</span><span class='va'>run</span>, statistics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>CMSY<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='va'>C</span><span class='op'>/</span><span class='va'>MSY</span>, name<span class='op'>=</span><span class='st'>"CMSY"</span><span class='op'>)</span><span class='op'>)</span>,
-  refpts<span class='op'>=</span><span class='fu'>FLPar</span><span class='op'>(</span>MSY<span class='op'>=</span><span class='fl'>110000</span><span class='op'>)</span>, metrics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>C<span class='op'>=</span><span class='va'>catch</span>, F<span class='op'>=</span><span class='va'>fbar</span><span class='op'>)</span>,
-  years<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>2000</span><span class='op'>:</span><span class='fl'>2015</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;      statistic year     data iter name
-#&gt;   1:      CMSY 2015 1.339249    1 CMSY
-#&gt;   2:      CMSY 2015 1.150833    1 CMSY
-#&gt;   3:      CMSY 2015 1.297908    1 CMSY
-#&gt;   4:      CMSY 2015 1.412723    1 CMSY
-#&gt;   5:      CMSY 2015 1.273223    1 CMSY
-#&gt;  ---                                  
-#&gt; 396:      CMSY 2015 1.086449   25 CMSY
-#&gt; 397:      CMSY 2015 1.216778   25 CMSY
-#&gt; 398:      CMSY 2015 1.289115   25 CMSY
-#&gt; 399:      CMSY 2015 1.261346   25 CMSY
-#&gt; 400:      CMSY 2015 1.250653   25 CMSY</div><div class='input'><span class='co'># return quantiles</span>
-<span class='fu'>performance</span><span class='op'>(</span><span class='va'>run</span>, <span class='va'>statistics</span>, refpts<span class='op'>=</span><span class='fu'>FLPar</span><span class='op'>(</span>MSY<span class='op'>=</span><span class='fl'>110000</span><span class='op'>)</span>,
-  metrics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>C<span class='op'>=</span><span class='va'>catch</span>, F<span class='op'>=</span><span class='va'>fbar</span><span class='op'>)</span>, years<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>2000</span><span class='op'>:</span><span class='fl'>2015</span><span class='op'>)</span>,
-  probs <span class='op'>=</span>  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.05</span>, <span class='fl'>0.1</span>, <span class='fl'>0.25</span>, <span class='fl'>0.5</span>, <span class='fl'>0.75</span>, <span class='fl'>0.9</span>, <span class='fl'>0.95</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;     statistic year                name         data prob
-#&gt;  1:    dCatch 2015 mean(C[t] / C[t-1]) 9.981231e-01 0.05
-#&gt;  2:    dCatch 2015 mean(C[t] / C[t-1]) 9.984146e-01 0.10
-#&gt;  3:    dCatch 2015 mean(C[t] / C[t-1]) 9.986956e-01 0.25
-#&gt;  4:    dCatch 2015 mean(C[t] / C[t-1]) 9.992097e-01 0.50
-#&gt;  5:    dCatch 2015 mean(C[t] / C[t-1]) 9.997025e-01 0.75
-#&gt;  6:    dCatch 2015 mean(C[t] / C[t-1]) 1.000273e+00 0.90
-#&gt;  7:    dCatch 2015 mean(C[t] / C[t-1]) 1.000372e+00 0.95
-#&gt;  8:  varCatch 2015              var(C) 2.124031e+08 0.05
-#&gt;  9:  varCatch 2015              var(C) 2.148617e+08 0.10
-#&gt; 10:  varCatch 2015              var(C) 2.213593e+08 0.25
-#&gt; 11:  varCatch 2015              var(C) 2.273611e+08 0.50
-#&gt; 12:  varCatch 2015              var(C) 2.330167e+08 0.75
-#&gt; 13:  varCatch 2015              var(C) 2.348849e+08 0.90
-#&gt; 14:  varCatch 2015              var(C) 2.354604e+08 0.95
-#&gt; 15:      varF 2015              var(F) 1.904710e-02 0.05
-#&gt; 16:      varF 2015              var(F) 1.927988e-02 0.10
-#&gt; 17:      varF 2015              var(F) 1.989139e-02 0.25
-#&gt; 18:      varF 2015              var(F) 2.085215e-02 0.50
-#&gt; 19:      varF 2015              var(F) 2.130031e-02 0.75
-#&gt; 20:      varF 2015              var(F) 2.175045e-02 0.90
-#&gt; 21:      varF 2015              var(F) 2.180638e-02 0.95
-#&gt;     statistic year                name         data prob</div><div class='input'><span class='co'># DEFINE statistics without summaries</span>
-<span class='va'>statistics</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>
-  CMSY<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='va'>C</span><span class='op'>/</span><span class='va'>MSY</span>,
-    name<span class='op'>=</span><span class='st'>"CMSY"</span>,
-    desc<span class='op'>=</span><span class='st'>"Catch over MSY"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='co'># COMPUTE performance</span>
-<span class='va'>perf</span> <span class='op'>&lt;-</span> <span class='fu'>performance</span><span class='op'>(</span><span class='va'>run</span>, <span class='va'>statistics</span>, refpts<span class='op'>=</span><span class='fu'>FLPar</span><span class='op'>(</span>MSY<span class='op'>=</span><span class='fl'>110000</span><span class='op'>)</span>,
-  metrics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>C<span class='op'>=</span><span class='va'>catch</span><span class='op'>)</span>, years<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>2000</span><span class='op'>:</span><span class='fl'>2015</span><span class='op'>)</span><span class='op'>)</span>
-<span class='co'># COMPUTE summaries</span>
-<span class='va'>perf</span><span class='op'>[</span>, <span class='fu'>.</span><span class='op'>(</span>CMSY<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span>
-</div><div class='output co'>#&gt;        CMSY
-#&gt; 1: 1.170685</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='co'># LOAD example FLmse object</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># GENERATE run from last 16 years of OM</span></span>
+<span class='r-in'><span class='va'>run</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/window.html'>window</a></span><span class='op'>(</span><span class='fu'>stock</span><span class='op'>(</span><span class='va'>om</span><span class='op'>)</span>, start<span class='op'>=</span><span class='fl'>2000</span>, end<span class='op'>=</span><span class='fl'>2015</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># DEFINE statistics</span></span>
+<span class='r-in'><span class='va'>statistics</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span></span>
+<span class='r-in'>  dCatch<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='fu'>yearMeans</span><span class='op'>(</span><span class='va'>C</span><span class='op'>[</span>, <span class='op'>-</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>/</span><span class='va'>C</span><span class='op'>[</span>, <span class='op'>-</span><span class='fu'>dims</span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span><span class='op'>$</span><span class='va'>year</span><span class='op'>]</span><span class='op'>)</span>,</span>
+<span class='r-in'>    name<span class='op'>=</span><span class='st'>"mean(C[t] / C[t-1])"</span>,</span>
+<span class='r-in'>    desc<span class='op'>=</span><span class='st'>"Mean absolute proportional change in catch"</span><span class='op'>)</span>,</span>
+<span class='r-in'>  varCatch<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='fu'>yearVars</span><span class='op'>(</span><span class='va'>C</span><span class='op'>)</span>,</span>
+<span class='r-in'>    name<span class='op'>=</span><span class='st'>"var(C)"</span>,</span>
+<span class='r-in'>    desc<span class='op'>=</span><span class='st'>"Variance in catch"</span><span class='op'>)</span>,</span>
+<span class='r-in'>  varF<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='fu'>yearVars</span><span class='op'>(</span><span class='cn'>F</span><span class='op'>)</span>,</span>
+<span class='r-in'>    name<span class='op'>=</span><span class='st'>"var(F)"</span>,</span>
+<span class='r-in'>    desc<span class='op'>=</span><span class='st'>"Variance in fishing mortality"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># COMPUTE performance</span></span>
+<span class='r-in'><span class='fu'>performance</span><span class='op'>(</span><span class='va'>run</span>, <span class='va'>statistics</span>, refpts<span class='op'>=</span><span class='fu'>FLPar</span><span class='op'>(</span>MSY<span class='op'>=</span><span class='fl'>110000</span><span class='op'>)</span>,</span>
+<span class='r-in'>  metrics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>C<span class='op'>=</span><span class='va'>catch</span>, F<span class='op'>=</span><span class='va'>fbar</span><span class='op'>)</span>, years<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>2000</span><span class='op'>:</span><span class='fl'>2015</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      statistic year        data iter                name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   1:    dCatch 2015 0.999437326    1 mean(C[t] / C[t-1])</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   2:    dCatch 2015 0.999437326    2 mean(C[t] / C[t-1])</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   3:    dCatch 2015 0.998435474    3 mean(C[t] / C[t-1])</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   4:    dCatch 2015 0.998646896    4 mean(C[t] / C[t-1])</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   5:    dCatch 2015 0.999485280    5 mean(C[t] / C[t-1])</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ---                                                    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 146:      varF 2015 0.006859315   46              var(F)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 147:      varF 2015 0.006830682   47              var(F)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 148:      varF 2015 0.007249405   48              var(F)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 149:      varF 2015 0.007191610   49              var(F)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 150:      varF 2015 0.006961201   50              var(F)</span>
+<span class='r-in'><span class='co'># Minimum statistic, named list with formula and name</span></span>
+<span class='r-in'><span class='fu'>performance</span><span class='op'>(</span><span class='va'>run</span>, statistics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>CMSY<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='va'>C</span><span class='op'>/</span><span class='va'>MSY</span>, name<span class='op'>=</span><span class='st'>"CMSY"</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>  refpts<span class='op'>=</span><span class='fu'>FLPar</span><span class='op'>(</span>MSY<span class='op'>=</span><span class='fl'>110000</span><span class='op'>)</span>, metrics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>C<span class='op'>=</span><span class='va'>catch</span>, F<span class='op'>=</span><span class='va'>fbar</span><span class='op'>)</span>,</span>
+<span class='r-in'>  years<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>2000</span><span class='op'>:</span><span class='fl'>2015</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      statistic year     data iter name</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   1:      CMSY 2015 1.339249    1 CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   2:      CMSY 2015 1.150833    1 CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   3:      CMSY 2015 1.297908    1 CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   4:      CMSY 2015 1.412723    1 CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   5:      CMSY 2015 1.273223    1 CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  ---                                  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 796:      CMSY 2015 1.088270   50 CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 797:      CMSY 2015 1.218733   50 CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 798:      CMSY 2015 1.297366   50 CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 799:      CMSY 2015 1.279709   50 CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 800:      CMSY 2015 1.268845   50 CMSY</span>
+<span class='r-in'><span class='co'># return quantiles</span></span>
+<span class='r-in'><span class='fu'>performance</span><span class='op'>(</span><span class='va'>run</span>, <span class='va'>statistics</span>, refpts<span class='op'>=</span><span class='fu'>FLPar</span><span class='op'>(</span>MSY<span class='op'>=</span><span class='fl'>110000</span><span class='op'>)</span>,</span>
+<span class='r-in'>  metrics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>C<span class='op'>=</span><span class='va'>catch</span>, F<span class='op'>=</span><span class='va'>fbar</span><span class='op'>)</span>, years<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>2000</span><span class='op'>:</span><span class='fl'>2015</span><span class='op'>)</span>,</span>
+<span class='r-in'>  probs <span class='op'>=</span>  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.05</span>, <span class='fl'>0.1</span>, <span class='fl'>0.25</span>, <span class='fl'>0.5</span>, <span class='fl'>0.75</span>, <span class='fl'>0.9</span>, <span class='fl'>0.95</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     statistic year                name         data prob</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  1:    dCatch 2015 mean(C[t] / C[t-1]) 9.979495e-01 0.05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  2:    dCatch 2015 mean(C[t] / C[t-1]) 9.983906e-01 0.10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  3:    dCatch 2015 mean(C[t] / C[t-1]) 9.989492e-01 0.25</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  4:    dCatch 2015 mean(C[t] / C[t-1]) 9.995589e-01 0.50</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  5:    dCatch 2015 mean(C[t] / C[t-1]) 1.000115e+00 0.75</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  6:    dCatch 2015 mean(C[t] / C[t-1]) 1.000527e+00 0.90</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  7:    dCatch 2015 mean(C[t] / C[t-1]) 1.000619e+00 0.95</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  8:  varCatch 2015              var(C) 2.117540e+08 0.05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  9:  varCatch 2015              var(C) 2.144311e+08 0.10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 10:  varCatch 2015              var(C) 2.232715e+08 0.25</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 11:  varCatch 2015              var(C) 2.312115e+08 0.50</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 12:  varCatch 2015              var(C) 2.362207e+08 0.75</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 13:  varCatch 2015              var(C) 2.404835e+08 0.90</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 14:  varCatch 2015              var(C) 2.459298e+08 0.95</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 15:      varF 2015              var(F) 6.965308e-03 0.05</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 16:      varF 2015              var(F) 7.224341e-03 0.10</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 17:      varF 2015              var(F) 8.390434e-03 0.25</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 18:      varF 2015              var(F) 9.319742e-03 0.50</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 19:      varF 2015              var(F) 1.015070e-02 0.75</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 20:      varF 2015              var(F) 1.091947e-02 0.90</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 21:      varF 2015              var(F) 1.113246e-02 0.95</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     statistic year                name         data prob</span>
+<span class='r-in'><span class='co'># DEFINE statistics without summaries</span></span>
+<span class='r-in'><span class='va'>statistics</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span></span>
+<span class='r-in'>  CMSY<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='op'>~</span><span class='va'>C</span><span class='op'>/</span><span class='va'>MSY</span>,</span>
+<span class='r-in'>    name<span class='op'>=</span><span class='st'>"CMSY"</span>,</span>
+<span class='r-in'>    desc<span class='op'>=</span><span class='st'>"Catch over MSY"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># COMPUTE performance</span></span>
+<span class='r-in'><span class='va'>perf</span> <span class='op'>&lt;-</span> <span class='fu'>performance</span><span class='op'>(</span><span class='va'>run</span>, <span class='va'>statistics</span>, refpts<span class='op'>=</span><span class='fu'>FLPar</span><span class='op'>(</span>MSY<span class='op'>=</span><span class='fl'>110000</span><span class='op'>)</span>,</span>
+<span class='r-in'>  metrics<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>C<span class='op'>=</span><span class='va'>catch</span><span class='op'>)</span>, years<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>2000</span><span class='op'>:</span><span class='fl'>2015</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='co'># COMPUTE summaries</span></span>
+<span class='r-in'><span class='va'>perf</span><span class='op'>[</span>, <span class='fu'>.</span><span class='op'>(</span>CMSY<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span><span class='op'>)</span><span class='op'>]</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        CMSY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 1: 1.171798</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

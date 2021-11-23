@@ -75,7 +75,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id"
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9001</span>
       </span>
     </div>
 
@@ -251,28 +251,59 @@ requirements of the class validity function.</p>
     <p>The FLR Team</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span>
-<span class='va'>comb</span> <span class='op'>&lt;-</span> <span class='fu'>combine</span><span class='op'>(</span><span class='fu'>iter</span><span class='op'>(</span><span class='va'>om</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>, <span class='fu'>iter</span><span class='op'>(</span><span class='va'>om</span>, <span class='fl'>11</span><span class='op'>:</span><span class='fl'>25</span><span class='op'>)</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span><span class='op'>(</span><span class='va'>om</span>, <span class='va'>comb</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;  [1] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “logLik”: Attributes: &lt; Length mismatch: comparison on first 1 components &gt; &gt; &gt;"     
-#&gt;  [2] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “logLik”: Numeric: lengths (25, 10) differ &gt; &gt;"                                      
-#&gt;  [3] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"    
-#&gt;  [4] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                             
-#&gt;  [5] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;" 
-#&gt;  [6] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                          
-#&gt;  [7] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “harvest.spwn”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"
-#&gt;  [8] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “harvest.spwn”: Numeric: lengths (740, 18500) differ &gt; &gt;"                         
-#&gt;  [9] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;" 
-#&gt; [10] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                          
-#&gt; [11] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"           
-#&gt; [12] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m”: Numeric: lengths (740, 18500) differ &gt; &gt;"                                    
-#&gt; [13] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m.spwn”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"      
-#&gt; [14] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m.spwn”: Numeric: lengths (740, 18500) differ &gt; &gt;"                               
-#&gt; [15] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “mat”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"         
-#&gt; [16] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “mat”: Numeric: lengths (740, 18500) differ &gt; &gt;"                                  
-#&gt; [17] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"    
-#&gt; [18] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                             </div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>ple4om</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>comb</span> <span class='op'>&lt;-</span> <span class='fu'>combine</span><span class='op'>(</span><span class='fu'>iter</span><span class='op'>(</span><span class='va'>om</span>, <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span>, <span class='fu'>iter</span><span class='op'>(</span><span class='va'>om</span>, <span class='fl'>11</span><span class='op'>:</span><span class='fl'>25</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/all.equal.html'>all.equal</a></span><span class='op'>(</span><span class='va'>om</span>, <span class='va'>comb</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [1] "Attributes: &lt; Component “refpts”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt;"                                        </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [2] "Attributes: &lt; Component “refpts”: Numeric: lengths (100, 50) differ &gt;"                                                                     </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [3] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “fitted”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"        </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [4] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “fitted”: Numeric: lengths (3000, 1500) differ &gt; &gt;"                                  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [5] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “logLik”: Attributes: &lt; Length mismatch: comparison on first 1 components &gt; &gt; &gt;"     </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [6] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “logLik”: Numeric: lengths (50, 10) differ &gt; &gt;"                                      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [7] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “params”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"        </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [8] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “params”: Numeric: lengths (100, 50) differ &gt; &gt;"                                     </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>  [9] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “rec”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [10] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “rec”: Numeric: lengths (3000, 1500) differ &gt; &gt;"                                     </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [11] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “residuals”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"     </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [12] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “residuals”: Numeric: lengths (700, 350) differ &gt; &gt;"                                 </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [13] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “ssb”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [14] "Attributes: &lt; Component “sr”: Attributes: &lt; Component “ssb”: Numeric: lengths (3000, 1500) differ &gt; &gt;"                                     </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [15] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [16] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch”: Numeric: lengths (3700, 1850) differ &gt; &gt;"                                </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [17] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch.n”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [18] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch.n”: Numeric: lengths (37000, 18500) differ &gt; &gt;"                            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [19] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [20] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “catch.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                             </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [21] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"   </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [22] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards”: Numeric: lengths (3700, 1850) differ &gt; &gt;"                             </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [23] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards.n”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;" </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [24] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards.n”: Numeric: lengths (37000, 18500) differ &gt; &gt;"                         </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [25] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;" </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [26] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “discards.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [27] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “harvest”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [28] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “harvest”: Numeric: lengths (37000, 18500) differ &gt; &gt;"                            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [29] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “harvest.spwn”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [30] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “harvest.spwn”: Numeric: lengths (740, 18500) differ &gt; &gt;"                         </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [31] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"   </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [32] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings”: Numeric: lengths (3700, 1850) differ &gt; &gt;"                             </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [33] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings.n”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;" </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [34] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings.n”: Numeric: lengths (37000, 18500) differ &gt; &gt;"                         </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [35] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;" </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [36] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “landings.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                          </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [37] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"           </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [38] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m”: Numeric: lengths (740, 18500) differ &gt; &gt;"                                    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [39] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m.spwn”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [40] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “m.spwn”: Numeric: lengths (740, 18500) differ &gt; &gt;"                               </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [41] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “mat”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"         </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [42] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “mat”: Numeric: lengths (740, 18500) differ &gt; &gt;"                                  </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [43] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"      </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [44] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock”: Numeric: lengths (3700, 1850) differ &gt; &gt;"                                </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [45] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock.n”: Attributes: &lt; Component “dim”: Mean relative difference: 0.5 &gt; &gt; &gt;"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [46] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock.n”: Numeric: lengths (37000, 18500) differ &gt; &gt;"                            </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [47] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock.wt”: Attributes: &lt; Component “dim”: Mean relative difference: 24 &gt; &gt; &gt;"    </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [48] "Attributes: &lt; Component “stock”: Attributes: &lt; Component “stock.wt”: Numeric: lengths (740, 18500) differ &gt; &gt;"                             </span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
