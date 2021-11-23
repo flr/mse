@@ -259,7 +259,7 @@ setMethod("goFish", signature(om="FLom"),
 		observations(oem) <- o.out$observations
 		tracking <- o.out$tracking
 
-    track(tracking, "C.obs", seq(ay, ay+frq-1)) <- unitSums(window(catch(stk),
+    track(tracking, "C.obs", seq(ay, ay+frq-1)) <- unitSums(window(catch(stk0),
       start=dy, end=dy + frq - 1))
 
 
@@ -477,6 +477,8 @@ setMethod("goFish", signature(om="FLombf"),
 	ctrl0 <- ctrl
 
 	# go fish
+  if(length(deviances(oem)) == 0)
+    deviances(oem) <- rep(list(NULL), length(biols(om)))
 
   for(i in vy) {
     
@@ -512,8 +514,9 @@ setMethod("goFish", signature(om="FLombf"),
       do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
 
-      }, stk=stock(om), dev=lapply(stock(om), catch.n),
-    obs=observations(oem), tra=tracking)
+      }, stk=stock(om),
+      # GET observations and deviances from oem
+      obs=observations(oem), dev=deviances(oem), tra=tracking)
 
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
@@ -616,8 +619,7 @@ setMethod("goFish", signature(om="FLombf"),
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
     }
 
-    # DEBUG
-    # track(tracking, "hcr", seq(ay, ay+frq-1)) <- ctrl
+    track(tracking, "hcr", seq(ay, ay+frq-1)) <- ctrl
 
 		#----------------------------------------------------------
 		# Implementation system

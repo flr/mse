@@ -36,11 +36,6 @@
 setGeneric("debug", useAsDefault = base::debug)
 setGeneric("undebug", useAsDefault = base::undebug)
 
-# TODO
-# debugonce(fun, text = "", condition = NULL, signature = NULL)
-# isdebugged(fun, signature = NULL)
-# debuggingState(on = NULL)
-
 # }}}
 
 # track<- {{{

@@ -6,7 +6,6 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
-
 # merge {{{
 
 setGeneric("merge", useAsDefault = base::merge)
