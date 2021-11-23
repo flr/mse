@@ -1,6 +1,7 @@
 Makefile
 docs
 appveyor.yml
+.github
 .travis.yml
 ^.*\.Rproj$
 ^\.Rproj\.user$
