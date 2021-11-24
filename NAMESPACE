@@ -32,7 +32,6 @@ export(
   "fixedF.hcr",
   "FLiem",
   "fwd.om",
-  "getCtrl",
   "goFish",
   "gridList",
   "hyperstability.fb",

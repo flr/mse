@@ -250,7 +250,7 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
     statistics=statistic, refpts=refpts, probs=NULL, years=pyears)
 
   obmin <- mean(pmin$data, na.rm=TRUE) - prob
-  
+
   if(verbose)
     cat(" - prob:", mean(pmin$data, na.rm=TRUE), " - diff: ", obmin, "\n")
   
@@ -342,7 +342,7 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
 
 # computeFp05 {{{
 
-#' Calculates the Fbar value giving a maximum probability of ssb being Blim of 5%
+#' Calculates the Fbar value giving a maximum probability of ssb being below Blim of 5%
 #'
 #' @param stock An FLStock over which the calculation is carried out.
 #' @param sr The stock-recruits relationship tpo use in fwd.
@@ -356,7 +356,8 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
 #' @examples
 #' data(ple4)
 #' sr <- predictModel(model=bevholt, params=FLPar(a=1.4e6, b=1.5e5))
-#' fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.10, 0.40))
+#' set.seed(865)
+#' fp05 <- computeFp05(ple4, sr, SBlim=150000, its=100, range=c(0.10, 0.40))
 #' # RUN projection for obtained Fp.05 value
 #' proj <- fwd(propagate(stf(ple4, nyears=100), 300), sr=sr,
 #'   fbar=FLQuant(fp05, dimnames=list(year=2018:2117)),

@@ -18,7 +18,7 @@
 #' @param oem The observation error model (OEM), an object of class *FLoem*.
 #' @param iem The implementation error model (IEM), an object of class *FLiem*.
 #' @param ctrl A control structure for the MP run, an object of class *mpCtrl*.
-#' @param args MSE arguments, *list*. Only 'iy', the starting year, is required.
+#' @param args MSE arguments, *list*. Only 'iy', the intermediate (starting) year, is required.
 #' @param scenario Name of the scenario tested in this run, *character*.
 #' @param tracking Extra elements (rows) to add to the standard tracking *FLQuant* in its first dimensions, *character*.
 #' @param verbose Should output be verbose or not, *logical*.
@@ -26,13 +26,15 @@
 #' @return An object of class *FLmse*.
 #'
 #' @examples
+#' # dataset contains both OM (FLom) and OEM (FLoem)
 #' data(ple4om)
+#' # choose sa and hcr
 #' control <- mpCtrl(list(
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=catchSSB.hcr,
 #'     args=list(MSY=140000))))
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
-#' plot(om, tes)
+#' plot(om, TEST=tes)
 
 mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   tracking="missing", verbose=TRUE, parallel=TRUE){

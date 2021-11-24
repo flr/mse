@@ -1,6 +1,6 @@
 # mse <img src="man/figures/mse.png" align="right" width="120" />
 
-[![R-CMD-check](https://github.com/flr/FLasher/workflows/R-CMD-check/badge.svg)](https://github.com/flr/FLasher/actions)
+[![R-CMD-check](https://github.com/flr/mse/workflows/R-CMD-check/badge.svg)](https://github.com/flr/mse/actions)
 [![License](https://eddelbuettel.github.io/badges/GPL2+.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 
 ## Overview
