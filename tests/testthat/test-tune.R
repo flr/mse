@@ -112,16 +112,3 @@ all.equal(res[[1]][[1]], res[[2]][[1]])
 
 res[[1]][[1]]@control$hcr@args
 res[[2]][[1]]@control$hcr@args
-
-res <-
-  foreach(op = ops) %:% 
-    mp(om, oem=oem, args=mpargs, ctrl=op, parallel=TRUE)
-
-
-x <-
-    foreach(b = bvec, .combine = 'cbind') %:%
-        foreach(a = avec, .combine = 'c') %do% {
-            sim(a, b)
-        }
-x
-
