@@ -25,7 +25,7 @@ mp(
 
 \item{ctrl}{A control structure for the MP run, an object of class \emph{mpCtrl}.}
 
-\item{args}{MSE arguments, \emph{list}. Only 'iy', the starting year, is required.}
+\item{args}{MSE arguments, \emph{list}. Only 'iy', the intermediate (starting) year, is required.}
 
 \item{scenario}{Name of the scenario tested in this run, \emph{character}.}
 
@@ -41,11 +41,13 @@ An individual management procedure (MP) is run for a number of years,
 on an operating model, observation error model, control and arguments.
 }
 \examples{
+# dataset contains both OM (FLom) and OEM (FLoem)
 data(ple4om)
+# choose sa and hcr
 control <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=catchSSB.hcr,
     args=list(MSY=140000))))
 tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
-plot(om, tes)
+plot(om, TEST=tes)
 }
