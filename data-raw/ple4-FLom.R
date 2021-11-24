@@ -87,7 +87,7 @@ om <- FLom(stock=slim(stk), sr=srbh, refpts=foo(refpts(brp), mets),
 
 set.seed(3621)
 
-oem <- FLoem(method=perfect.oem,
+oem <- FLoem(method=sampling.oem,
   observations=list(stk=stock(om), idx=lapply(idx, propagate, it)),
   deviances=list(
     stk=FLQuants(catch.n=rlnorm(it, catch.n(stock(om)) %=% 0, 0.1)),
