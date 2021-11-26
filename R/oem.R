@@ -104,7 +104,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
   # GET perfect stock
 	stk <- window(stk, start=y0, end=dy, extend=FALSE)
 
-  # TODO SIMPLIFY as with observations$stk
+  # SIMPLIFY to match observations$stk
   dio <- dim(observations$stk)
   dis <- dim(stk)
 
