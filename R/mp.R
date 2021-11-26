@@ -34,6 +34,8 @@
 #'   hcr = mseCtrl(method=catchSSB.hcr,
 #'     args=list(MSY=140000))))
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
+#' # 'perfect.oem' is used if none is given
+#' tes <- mp(om, ctrl=control, args=list(iy=2017))
 #' plot(om, TEST=tes)
 
 mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",

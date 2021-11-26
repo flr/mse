@@ -45,13 +45,14 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
   # GET perfect stock
 	stk <- window(stk, start=y0, end=dy, extend=FALSE)
 
-  # SIMPLIFY as with observations$stk
-  dis <- dim(observations$stk)
+  # SIMPLIFY to match observations$stk
+  dio <- dim(observations$stk)
+  dis <- dim(stk)
 
   if(!is.null(dis)) {
-    if(dis[3] == 1)
+    if(dio[3] > dis[3])
       stk <- nounit(stk)
-    if(dis[4] == 1)
+    if(dio[4] > dis[4])
       stk <- noseason(stk)
   }
 
@@ -184,17 +185,19 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
 } # }}}
 
 # default.oem {{{
-default.oem <- function(stk) {
+default.oem <- function(om) {
+ 
+  stk <- stock(om)
   
   # observations match OM
-  obs <- list(idx=FLIndices(A=as(stk, 'FLIndex')), stk=stk)
+  obs <- list(stk=stk, idx=FLIndices(A=as(stk, 'FLIndex')))
 
   # deviances are NULL
-  devs <- list(idx=FLQuants(index.q=index.q(obs$idx$A) %=% 1),
+  devs <- list(idx=FLQuants(A=index.q(obs$idx$A) %=% 1),
     stk=FLQuants(catch.n=catch.n(obs$stk) %=% 1))
 
   # method is perfect.oem
 
-  return(FLoem(method=perfect.oem, observations=obs, deviances=devs))
+  return(FLoem(method=perfect.oem, observations=obs))
 }
 # }}}
