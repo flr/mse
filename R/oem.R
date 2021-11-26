@@ -44,12 +44,12 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
 
   # GET perfect stock
 	stk <- window(stk, start=y0, end=dy, extend=FALSE)
-
+  
   # SIMPLIFY to match observations$stk
   dio <- dim(observations$stk)
   dis <- dim(stk)
 
-  if(!is.null(dis)) {
+  if(!is.null(dio)) {
     if(dio[3] > dis[3])
       stk <- nounit(stk)
     if(dio[4] > dis[4])
