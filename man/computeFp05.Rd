@@ -2,7 +2,7 @@
 % Please edit documentation in R/tune.R
 \name{computeFp05}
 \alias{computeFp05}
-\title{Calculates the Fbar value giving a maximum probability of ssb being Blim of 5\%}
+\title{Calculates the Fbar value giving a maximum probability of ssb being below Blim of 5\%}
 \usage{
 computeFp05(
   stock,
@@ -19,20 +19,19 @@ computeFp05(
 \arguments{
 \item{stock}{An FLStock over which the calculation is carried out.}
 
-\item{sr}{The stock-recruits relationship tpo use in fwd.}
+\item{sr}{The stock-recruits relationship to use in fwd.}
 
 \item{its}{Number of iterations}
 
 \item{verbose}{Should progress be shown, TRUE.}
 }
 \description{
-Calculates the Fbar value giving a maximum probability of ssb being Blim of 5\%
+Calculates the Fbar value giving a maximum probability of ssb being below Blim of 5\%
 }
 \examples{
 data(ple4)
 sr <- predictModel(model=bevholt, params=FLPar(a=1.4e6, b=1.5e5))
-set.seed(865)
-fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.10, 0.40))
+fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.30, 0.60))
 # RUN projection for obtained Fp.05 value
 proj <- fwd(propagate(stf(ple4, nyears=100), 300), sr=sr,
   fbar=FLQuant(fp05, dimnames=list(year=2018:2117)),

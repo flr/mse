@@ -356,8 +356,7 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
 #' @examples
 #' data(ple4)
 #' sr <- predictModel(model=bevholt, params=FLPar(a=1.4e6, b=1.5e5))
-#' set.seed(865)
-#' fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.10, 0.40))
+#' fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.30, 0.60))
 #' # RUN projection for obtained Fp.05 value
 #' proj <- fwd(propagate(stf(ple4, nyears=100), 300), sr=sr,
 #'   fbar=FLQuant(fp05, dimnames=list(year=2018:2117)),
@@ -386,6 +385,9 @@ computeFp05 <- function(stock, sr, SBlim, range=c(0.01, 0.75), nyears=3,
   res <- bisect(stock, sr=sr, refpts=FLPar(SBlim=SBlim), deviances=devs,
     metrics=list(SB=ssb), statistic=statistic, years=years, pyears=pyears, 
     tune=list(fbar=range), prob=0.05, tol=0.01, verbose=verbose)
+
+  if(is(res, "list"))
+    stop("FP.05 cannot be found within the range provided.")
 
   fp05 <- mean(fbar(res)[,100])
 
