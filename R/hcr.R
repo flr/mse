@@ -63,6 +63,76 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0, args, tracking){
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
 
+# hockeystick.hcr {{{
+
+#' @param stk
+#' @param lim Value of metric at which output is set to 'min'.
+#' @param trigger Value of metric below which output is linearly reduced towards 'min'.
+#' @param target Output value when metric is greater or equal to 'trigger'.
+#' @param min Minimum output value, applied if metric is below 'min'
+#' @param metric Quantity computed from 'stk', defaults to ssb. Function or character.
+#' @param output Quantity employed if forecast, defaults to 'fbar', character.
+#' @param dlow
+#' @param dupp
+#' @param args
+#' @param tracking
+#' @examples
+#' data(ple4)
+#' args <- list(ay=2015, data_lag=1, management_lag=1, frq=1)
+#' # Set as fbar ~ ssb
+#' hockeystick.hcr(ple4, lim=3e5, trigger=4e5, target=0.25, min=0,
+#'   metric="ssb", output="fbar", args=args, tracking=FLQuant())
+#' # Use for catch ~ depletion, with metric as own function
+#' hockeystick.hcr(ple4, lim=0.10, trigger=0.40, target=140000, min=0,
+#'   metric=function(x) ssb(x) %/% ssb(x)[,1],
+#'   output="catch", dlow=0.85, dupp=1.15, args=args, tracking=FLQuant())
+
+hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
+  output="fbar", dlow=NA, dupp=NA, args, tracking) {
+
+  # EXTRACT args
+  ay <- args$ay
+  data_lag <- args$data_lag
+  man_lag <- args$management_lag
+  frq <- args$frq
+
+  # SET limits if NA
+  if(is.na(dlow))
+    dlow <- 1e-8
+  if(is.na(dupp))
+    dupp <- 1e8
+
+  # COMPUTE metric across units
+  met <- do.call(metric, list(stk))
+  met <- unitSums(window(met, start=ay - data_lag, end=ay - data_lag))
+
+  # RULE
+    # BELOW lim
+  out <- ifelse(met <= lim, min,
+    # BETWEEN lim and trigger
+    ifelse(met < trigger, target / (target - min) * (met - lim),
+    # ABOVE trigger
+    target))
+
+  # IF NA, set to previous value
+  if(any(is.na(out)))
+    out[is.na(out)] <- tracking[[1]]['hcr', ac(ay - 1)][is.na(out)]
+
+  # CONTROL
+  ctrl <- fwdControl(
+    # TARGET for frq years
+    c(lapply(seq(ay + man_lag, ay + frq), function(x)
+      list(quant=output, value=c(out), year=x)),
+    # CHANGE limits
+    lapply(seq(ay + man_lag, ay + frq), function(x)
+      list(quant=output, min=rep(dlow, dim(out)[6]), max=rep(dupp, dim(out)[6]),
+        year=x, relYear=x - 1)))
+  )
+
+	list(ctrl=ctrl, tracking=tracking)
+}
+# }}}
+
 # fixedF.hcr {{{
 
 #' A fixed target f

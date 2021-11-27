@@ -151,33 +151,32 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
   # CHOOSE indices to be updated (maxyear >= dy)
   upi <- unlist(lapply(idx, function(x) unname(range(x, "maxyear")) > args$dy))
 
-  # lapply(idx[upi], index.q)
-  if(!is.null(deviances$idx)) {
-
-    # APPLY survey() with deviances$idx as index.q
-
-    idx[upi] <- Map(function(x, y) {
-      
-      # CREATE survey obs
-      res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
-        index.q=y[, dyrs])
-
-      # SET 0s to min / 2
-      index(res)[index(res) == 0] <- min(index(res)[index(res) > 0] / 2)
-    
-      # SET 0s to min / 2
-      index(x)[, dyrs] <- index(res)
-
-      return(window(x, end=dy))
-
-    }, x=idx[upi], y=deviances$idx[upi])
-
-    for(i in seq(idx[upi]))
-      observations$idx[upi][[i]][, dyrs] <- idx[upi][[i]][, dyrs]
-
-  } else {
-    idx <- observations$idx
+  if(is.null(deviances$idx)) {
+    deviances$idx <- lapply(observations$idx, function(x) index.q(x) %=% 1)
   }
+
+  # lapply(idx[upi], index.q)
+
+  # APPLY survey() with deviances$idx as index.q
+
+  idx[upi] <- Map(function(x, y) {
+      
+    # CREATE survey obs
+    res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
+      index.q=y[, dyrs])
+
+    # SET 0s to min / 2
+    index(res)[index(res) == 0] <- min(index(res)[index(res) > 0] / 2)
+    
+    # SET 0s to min / 2
+    index(x)[, dyrs] <- index(res)
+
+    return(window(x, end=dy))
+
+  }, x=idx[upi], y=deviances$idx[upi])
+
+  for(i in seq(idx[upi]))
+    observations$idx[upi][[i]][, dyrs] <- idx[upi][[i]][, dyrs]
 
   # return
   list(stk=stk, idx=idx, observations=observations, tracking=tracking)
