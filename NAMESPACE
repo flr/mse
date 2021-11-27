@@ -34,6 +34,7 @@ export(
   "fwd.om",
   "goFish",
   "gridList",
+  "hockeystick.hcr",
   "hyperstability.fb",
   "ices.hcr",
   "indicator.hcr",
