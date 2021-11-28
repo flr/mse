@@ -6,9 +6,7 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
-# merge {{{
-
-setGeneric("merge", useAsDefault = base::merge)
+# merge (FLQuant, data.table) {{{
 
 setMethod("merge", signature(x="FLQuant", y="data.table"),
   function(x, y, by="iter", ...) {
@@ -22,6 +20,7 @@ setMethod("merge", signature(x="FLQuant", y="data.table"),
 
 # }}}
 
+# .combinegoFish {{{
 .combinegoFish <- function(...) {
   
   res <- list(...)
@@ -33,7 +32,5 @@ setMethod("merge", signature(x="FLQuant", y="data.table"),
     oem = Reduce("combine", lapply(res, '[[', 3))
 		)
   )
-} 
-
-
-
+}
+# }}}

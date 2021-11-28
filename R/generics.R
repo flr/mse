@@ -43,3 +43,6 @@ setGeneric("track<-", function(object, ..., value)
   standardGeneric("track<-"))
 # }}}
 
+# merge {{{
+setGeneric("merge", useAsDefault = base::merge)
+#}}}

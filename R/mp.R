@@ -101,7 +101,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
     tracking <- FLQuants(setNames(rep(list(tracking), length(names(biols(om)))),
       names(biols(om))))
   } else if (is(om, "FLom")){
-    tracking <- FLQuants(tracking)
+    tracking <- FLQuants(A=tracking)
   }
 
   # GET historical from OM DEBUG different from original
@@ -135,15 +135,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
     # LOOP and combine
 		lst0 <- foreach(j=its, 
- 		  .combine=function(...) {
-        res <- list(...)
-        id <- lapply(res, function(x) is(x[[1]], 'FLo'))
- 				list(
-           om = Reduce("combine", lapply(res, '[[', 1)),
-           tracking = Reduce("combine", lapply(res, '[[', 2)),
-           oem = Reduce("combine", lapply(res, '[[', 3))
- 				)
- 			}, 
+ 		  .combine=.combinegoFish,
 			.packages="mse", 
 			.multicombine=TRUE, 
 			.errorhandling = "remove", 
@@ -319,9 +311,8 @@ setMethod("goFish", signature(om="FLom"),
 			tracking <- out$tracking
 		}
 
-		# TODO REVIEW & TEST
     if(exists("hcrpars")){
-      track(tracking, "metric.phcr", seq(ay, ay+frq-1)) <- hcrpars[1,1,,drop=TRUE]
+      track(tracking, "phcr", seq(ay, ay+frq-1)) <- c(hcrpars[1,])
 		 }
 
 		# --- hcr: Harvest Control Rule
@@ -333,6 +324,7 @@ setMethod("goFish", signature(om="FLom"),
 			ctrl.hcr$stk <- stk0
 			ctrl.hcr$args <- args #ay <- ay
 			ctrl.hcr$tracking <- tracking
+      # TODO REVIEW interface
 			if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
 			ctrl.hcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flfval))
       ctrl.hcr$step <- "hcr"
@@ -450,7 +442,7 @@ setMethod("goFish", signature(om="FLom"),
     om <- do.call("mpDispatch", ctrl.om)$om
 
     # time (end)   
-    track(tracking, "fwd", seq(ay, ay+frq-1)) <- ctrl
+    track(tracking, "fwd", seq(ay, ay + frq - 1)) <- ctrl
     track(tracking, "time", ay) <- as.numeric(Sys.time()) - tracking[[1]]["time", i]
 
 		gc()
