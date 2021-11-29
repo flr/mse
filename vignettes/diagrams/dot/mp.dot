@@ -31,12 +31,16 @@ graph mp {
   hcrargs [label="method (function)"];
   
   isin [label="control (fwdControl)"];
+  isargs [label="method (function)"];
   
   tmin [label="control (fwdControl)"];
+  tmargs [label="method (function)"];
   
   iemin [label="control (fwdControl)"];
+  iemargs [label="iem (FLiem)"];
   
   fbin [label="control (fwdControl)"];
+  fbargs [label="method (function)"];
   
   omin [label="stock (FLStock), control (fwdControl)"];
   omout [label="om (FLmse)"];
@@ -51,6 +55,14 @@ graph mp {
     {rank=same; phcr; phcrargs;}
   hcr -- hcrargs;
     {rank=same; hcr; hcrargs;}
+  is -- isargs;
+    {rank=same; is; isargs;}
+  tm -- tmargs;
+    {rank=same; tm; tmargs;}
+  iem -- iemargs;
+    {rank=same; iem; iemargs;}
+  fb -- fbargs;
+    {rank=same; fb; fbargs;}
   omargs2 -- om -- omargs;
     {rank=same; om; omargs; omargs2;}
   
