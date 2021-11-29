@@ -75,10 +75,13 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
   # vector of years to be projected
 	vy <- args$vy <- ac(seq(iy, fy - management_lag, by=frq))
-
+  
   # number of seasons & units
   ns <- args$ns <- dims(om)$season
   nu <- args$nu <- dims(om)$unit
+
+
+  # --- TODO CHECK control: c('est', 'hcr') %in% names(control)
 
 	# --- INIT tracking
   
@@ -92,7 +95,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   # SETUP tracking FLQs
   tracking <- FLQuant(NA, dimnames=list(
     metric=c(metric, steps[steps %in% names(ctrl)], "time", "fwd"),
-    year=ac(seq(iy, fy - management_lag + 1)),
+    year=ac(seq(iy - data_lag - frq + 1, fy + management_lag)),
     unit=dmns$unit,
     season=dmns$season,
     iter=1:args$it))
@@ -182,7 +185,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
   # GET objects back from loop
 	om <- lst0$om
-	tracking <- lst0$tracking
+	tracking <- window(lst0$tracking, start=iy, end=fy)
 	oem <- lst0$oem
 
 	if(verbose) cat("\n")
@@ -207,9 +210,11 @@ setMethod("goFish", signature(om="FLom"),
 	y0 <- args$y0     # initial data year
 	fy <- args$fy     # final year
 	iy <- args$iy     # initial year of projection (also intermediate)
-	nsqy <- args$nsqy # number of years to compute status quo metrics
 	vy <- args$vy     # vector of years to be projected
-	data_lag <- args$data_lag  # years between assessment and last data
+  nsqy <- args$nsqy # years for status quo calculations
+  # TODO RENAME to dlag and mlag
+	dlag <- args$data_lag  # years between assessment and last data
+  mlag <- args$management_lag # years between assessment and management
   frq <- args$frq   # frequency
 
   # COPY ctrl
@@ -224,17 +229,22 @@ setMethod("goFish", signature(om="FLom"),
     # time (start)   
     track(tracking, "time", i) <- as.numeric(Sys.time())
 
+    # args
     ay <- args$ay <- an(i)
-		dy <- args$dy <- ay - data_lag
+		dy <- args$dy <- ay - dlag
+    dys <- seq(ay - dlag - frq + 1, ay - dlag)
+    dy0 <- dys[1]
+    dyf <- dys[frq]
+    mys <- seq(ay + mlag, ay + mlag + frq - 1)
     
     # years for status quo computations 
-		sqy <- args$sqy <- ac(seq(ay - nsqy - data_lag + 1, dy))
+		sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
     
     # TRACK om
-    track(tracking, "F.om", ay) <- unitMeans(window(fbar(om), start=dy, end=dy))
-    track(tracking, "B.om", ay) <- unitSums(window(tsb(om), start=dy, end=dy))
-    track(tracking, "SB.om", ay) <- unitSums(window(ssb(om), start=dy, end=dy))
-    track(tracking, "C.om", ay) <- unitSums(window(catch(om), start=dy, end=dy))
+    track(tracking, "F.om", dys) <- unitMeans(window(fbar(om), start=dy0, end=dyf))
+    track(tracking, "B.om", dys) <- unitSums(window(tsb(om), start=dy0, end=dyf))
+    track(tracking, "SB.om", dys) <- unitSums(window(ssb(om), start=dy0, end=dyf))
+    track(tracking, "C.om", dys) <- unitSums(window(catch(om), start=dy0, end=dy))
     
     # --- OEM: Observation Error Model
     
@@ -254,10 +264,9 @@ setMethod("goFish", signature(om="FLom"),
 		idx0 <- o.out$idx
 		observations(oem) <- o.out$observations
 		tracking <- o.out$tracking
-
-    track(tracking, "C.obs", seq(ay, ay+frq-1)) <- unitSums(window(catch(stk0),
-      start=dy, end=dy + frq - 1))
-
+    
+    track(tracking, "C.obs", dys) <- unitSums(window(catch(stk0),
+      start=dy0, end=dyf))
 
 		# --- est: Estimator of stock statistics
 
@@ -283,14 +292,14 @@ setMethod("goFish", signature(om="FLom"),
 			tracking <- out.assess$tracking
 		}
 
-    track(tracking, "F.est", seq(ay, ay+frq-1)) <- unitMeans(window(fbar(stk0),
-      start=dy, end=dy + frq - 1))
-    track(tracking, "B.est", seq(ay, ay+frq-1)) <- unitSums(window(stock(stk0),
-      start=dy, end=dy + frq - 1))
-    track(tracking, "SB.est", seq(ay, ay+frq-1)) <- unitSums(window(ssb(stk0),
-      start=dy, end=dy + frq - 1))
-    track(tracking, "C.est", seq(ay, ay+frq-1)) <- unitSums(window(catch(stk0),
-      start=dy, end=dy + frq - 1))
+    track(tracking, "F.est", dys) <- unitMeans(window(fbar(stk0),
+      start=dy0, end=dyf))
+    track(tracking, "B.est", dys) <- unitSums(window(stock(stk0),
+      start=dy0, end=dyf))
+    track(tracking, "SB.est", dys) <- unitSums(window(ssb(stk0),
+      start=dy0, end=dyf))
+    track(tracking, "C.est", dys) <- unitSums(window(catch(stk0),
+      start=dy0, end=dyf))
 
 		# --- phcr: HCR parameterization
 		
@@ -312,7 +321,8 @@ setMethod("goFish", signature(om="FLom"),
 		}
 
     if(exists("hcrpars")){
-      track(tracking, "phcr", seq(ay, ay+frq-1)) <- c(hcrpars[1,])
+      # TODO
+      track(tracking, "phcr", dys) <- c(hcrpars[1,])
 		 }
 
 		# --- hcr: Harvest Control Rule
@@ -334,10 +344,12 @@ setMethod("goFish", signature(om="FLom"),
 
 			tracking <- out$tracking
 		} else {
-			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
+      # DEFAULTS to F = mean(Fbar) over nsqy years
+      ctrl <- as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]), year=mys)),
+        "fwdControl")
     }
 
-    track(tracking, "hcr", seq(ay, ay+frq-1)) <- ctrl
+    track(tracking, "hcr", mys) <- ctrl
 
 		#----------------------------------------------------------
 		# Implementation system
@@ -358,7 +370,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl <- out$ctrl
 			tracking <- out$tracking
 
-      track(tracking, "isys", seq(ay, ay+frq-1)) <- ctrl
+      track(tracking, "isys", mys) <- ctrl
 		}		
 
 		#----------------------------------------------------------
@@ -379,7 +391,7 @@ setMethod("goFish", signature(om="FLom"),
       attr(ctrl, "snew") <- out$flq
 			tracking <- out$tracking
 
-      track(tracking, "tm", seq(ay, ay+frq-1)) <- ctrl
+      track(tracking, "tm", mys) <- ctrl
 		}
 
 		#==========================================================
@@ -401,7 +413,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl <- out$ctrl
 			tracking <- out$tracking
       
-      track(tracking, "iem", seq(ay, ay+frq-1)) <- ctrl
+      track(tracking, "iem", mys) <- ctrl
 		}
 
 		#==========================================================
@@ -424,7 +436,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl <- out$ctrl
 			tracking <- out$tracking
       
-      track(tracking, "fb", seq(ay, ay+frq-1)) <- ctrl
+      track(tracking, "fb", mys) <- ctrl
 		}
 
 		#----------------------------------------------------------
@@ -442,15 +454,22 @@ setMethod("goFish", signature(om="FLom"),
     om <- do.call("mpDispatch", ctrl.om)$om
 
     # time (end)   
-    track(tracking, "fwd", seq(ay, ay + frq - 1)) <- ctrl
-    track(tracking, "time", ay) <- as.numeric(Sys.time()) - tracking[[1]]["time", i]
+    track(tracking, "fwd", mys) <- ctrl
+    track(tracking, "time", ay) <- as.numeric(Sys.time()) -
+      tracking[[1]]["time", i]
 
 		gc()
 	}
-  
-  # RETURN
-	list(om=window(om, start=iy, end=fy), tracking=tracking, oem=oem, args=args)
 
+  # TRACK om in final mys
+  track(tracking, "F.om", mys) <- unitMeans(fbar(om))[, ac(mys)]
+  track(tracking, "B.om", mys) <- unitSums(tsb(om))[, ac(mys)]
+  track(tracking, "SB.om", mys) <- unitSums(ssb(om))[, ac(mys)]
+  track(tracking, "C.om", mys) <- unitSums(catch(om))[, ac(mys)]
+  
+    # RETURN
+	list(om=window(om, start=iy, end=fy), tracking=window(tracking, end=fy),
+    oem=oem, args=args)
   } 
 )
 # }}}
@@ -732,7 +751,8 @@ setMethod("goFish", signature(om="FLombf"),
 	}
   
   # RETURN
-	list(om=window(om, start=iy, end=fy), tracking=tracking, oem=oem, args=args)
+	list(om=window(om, start=iy, end=fy), tracking=window(tracking, end=fy),
+    oem=oem, args=args)
 
   }
 )# }}}

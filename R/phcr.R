@@ -31,3 +31,16 @@ indicator.phcr <- function(stk, itrg, args, tracking, ...){
 	if(is(itrg, 'FLPar')) hcrpars <- itrg else hcrpars <- FLPar(itrg=itrg) 
 	list(hcrpars=hcrpars, tracking=tracking)	
 }
+
+# brp.phcr
+
+brp.phcr <- function(stk, model, params, args, tracking) {
+
+  brp <- brp(FLBRP(stk, sr=list(model=model, params=params)))
+
+  rps <- refpts(brp)
+
+  hcrpars <- FLPar(sbsafe=c(rps["msy", "ssb", ]))
+
+  return(list(hcrpars=hcrpars, tracking=tracking))
+}

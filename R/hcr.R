@@ -82,10 +82,12 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0, args, tracking){
 #' # Set as fbar ~ ssb
 #' hockeystick.hcr(ple4, lim=3e5, trigger=4e5, target=0.25, min=0,
 #'   metric="ssb", output="fbar", args=args, tracking=FLQuant())
-#' # Use for catch ~ depletion, with metric as own function
+#' # Use for catch ~ depletion, with metric as a new function
 #' hockeystick.hcr(ple4, lim=0.10, trigger=0.40, target=140000, min=0,
 #'   metric=function(x) ssb(x) %/% ssb(x)[,1],
 #'   output="catch", dlow=0.85, dupp=1.15, args=args, tracking=FLQuant())
+
+# TODO USE refpts in metric
 
 hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   output="fbar", dlow=NA, dupp=NA, args, tracking) {
@@ -103,8 +105,7 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
     dupp <- 1e8
 
   # COMPUTE metric across units
-  met <- do.call(metric, list(stk))
-  met <- unitSums(window(met, start=ay - data_lag, end=ay - data_lag))
+  met <- window(do.call(metric, list(stk)), start=ay - data_lag, end=ay - data_lag)
 
   # RULE
     # BELOW lim
