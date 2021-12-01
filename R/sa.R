@@ -42,13 +42,13 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
 # cpue.ind
 
 # mean length of the catch - length based estimator
-mlc.est <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
+mlc.ind <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
   
   args0 <- list(...)
   tracking <- args0$tracking
 
   # 
-	vbObj <- a4aGr(
+	vbObj <- FLa4a:::a4aGr(
 	  grMod=~linf*(1 - exp(-k * (t - t0))),      
 	  grInvMod=~t0 - 1/k * log(1 - len / linf),      
 	  params=FLPar(linf=vbPars["linf"], k=vbPars["k"], t0=vbPars["t0"],
@@ -57,10 +57,8 @@ mlc.est <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
   flq <- flc <- catch.n(stk)
 	flq[] <- predict(vbObj, t=range(stk)["min"]:range(stk)["max"] + 0.5)
 	flq <- quantSums(flc * flq) / quantSums(flc)
-	
-  attr(stk, "indicator") <- flq
   
-  tracking["indicator.est", ac(args$ay)] <- flq[,ac(args$dy)]
+  ind <- FLQuants(mlc=flq)
   
-  list(stk = stk, tracking = tracking)
+  list(stk = stk, ind = ind, tracking = tracking)
 }

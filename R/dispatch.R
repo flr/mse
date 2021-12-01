@@ -27,6 +27,9 @@ flfval <- list(object="ctrl", test= "!is(object, \"fwdControl\")",
 flqval <- list(object="flq", test= "!is(object, \"FLQuant\")",
   msg="\"flq must be of class FLQuant\"")
 
+flqsval <- list(object="ind", test= "!is(object, \"FLQuants\")",
+  msg="\"ind must be of class FLQuants\"")
+
 floval <- list(object="om", test="!is(object, \"FLo\")",
   msg="\"om must be of class FLo\"")
 
@@ -51,8 +54,11 @@ mpDispatch <- function(ioval, ..., step){
 		eval(parse(text=str))
 	}
 	
-  # DISPATCH
-	out <- do.call(method, args)
+  # DISPATCH, only args in formals if no '...'.
+	if("..." %in% names(formals(method)))
+	  out <- do.call(method, args)
+  else
+    out <- do.call(method, args[names(args) %in% names(formals(method))])
 	
   # CHECK output objects
 	for(i in ioval$ov){

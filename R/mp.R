@@ -212,7 +212,6 @@ setMethod("goFish", signature(om="FLom"),
 	iy <- args$iy     # initial year of projection (also intermediate)
 	vy <- args$vy     # vector of years to be projected
   nsqy <- args$nsqy # years for status quo calculations
-  # TODO RENAME to dlag and mlag
 	dlag <- args$data_lag  # years between assessment and last data
   mlag <- args$management_lag # years between assessment and management
   frq <- args$frq   # frequency
@@ -283,6 +282,13 @@ setMethod("goFish", signature(om="FLom"),
       out.assess <- do.call("mpDispatch", ctrl.est)
       
       stk0 <- out.assess$stk
+
+      # EXTRACT ind(icators) if returned
+      if(!is.null(out.assess$ind)) {
+        ind <- out.assess$ind
+      } else {
+        ind <- FLQuants()
+      }
       
       # PASS args generated at est to ctrl
       if (!is.null(out.assess$args)) {
@@ -308,6 +314,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl.phcr <- args(ctrl0$phcr)
 		  ctrl.phcr$method <- method(ctrl0$phcr) 
 			ctrl.phcr$stk <- stk0
+      ctrl.phcr$ind <- ind
 			ctrl.phcr$args <- args
 			ctrl.phcr$tracking <- tracking
 			if(exists("hcrpars")) ctrl.phcr$hcrpars <- hcrpars
@@ -334,9 +341,11 @@ setMethod("goFish", signature(om="FLom"),
 			ctrl.hcr$stk <- stk0
 			ctrl.hcr$args <- args #ay <- ay
 			ctrl.hcr$tracking <- tracking
+      ctrl.hcr$ind <- ind
+
       # TODO REVIEW interface
 			if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
-			ctrl.hcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flfval))
+			ctrl.hcr$ioval <- list(iv=list(t1=flsval, t2=flqsval), ov=list(t1=flfval))
       ctrl.hcr$step <- "hcr"
 
 			out <- do.call("mpDispatch", ctrl.hcr)

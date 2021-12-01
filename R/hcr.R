@@ -134,6 +134,126 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 }
 # }}}
 
+# trend.hcr {{{
+
+#' @param k1 Gain parameter
+#' @param k2 Gain parameter
+#' @param gamma Asymmetry parameter
+#' @param nyears Number of years used in regression of log(stock).
+#' @examples
+#' data(ple4om)
+#'  trend.hcr(stock(om), args=list(ay=2003, data_lag=1, management_lag=1, frq=1,
+#'  it=1), tracking=FLQuant(), k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
+
+trend.hcr <- function(stk, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
+  metric=stock) {
+
+  # args
+  ay <- args$ay
+  dlag <- args$data_lag
+  mlag <- args$management_lag
+  dy <- ac(ay - dlag)
+  frq <- args$frq
+  its <- args$it
+
+  # BIOMASS
+  biom <- do.call(metric, list(stk))[, ac(seq(ay - dlag - (nyears - 1) ,
+    length=nyears))]
+
+  dat <- data.table(as.data.frame(biom))
+  
+  # FIND iters with NAs
+  nas <- dat[, .(nas=sum(is.na(data))), by=iter]
+  lnas <- nas$nas == 0
+  rnas <- nas[nas == 0, (iter)]
+
+  # CALCULATE slot if not in nas
+  slope <- rep(NA, its)
+  slope[lnas] <- dat[iter %in% rnas, .(slope=coef(lm(log(data) ~ year))[2]),
+    by=iter][, (slope)]
+
+  # TAC TODO GET TAC from tracking['hcr',]
+  tac <- catch(stk)[, dy]
+
+  id <- slope < 0
+
+  # slope < 0
+  tac[,,,,, id & lnas] <- catch(stk)[, dy,,,, id & lnas] *
+    (1 - k1 * abs(slope[id & lnas]) ^ gamma) 
+
+  # slope >= 0
+  tac[,,,,, !id & lnas] <- catch(stk)[, dy,,,, !id & lnas] *
+    (1 + k2 * slope[!id & lnas]) 
+
+  # CONTROL
+  ctrl <- fwdControl(
+    # TAC for frq years
+    lapply(seq(ay + mlag, ay + frq), function(x)
+    list(quant="catch", value=c(tac), year=x))
+  )
+
+  return(list(ctrl=ctrl, tracking=tracking))
+}
+
+# }}}
+
+# target.hcr {{{
+
+#' @param stk
+#' @param lim Lower limit for value of metric.
+#' @param target Desired value for metric.
+#' @param metric Quantity computed from 'stk', defaults to ssb. Function or character.
+#' @param output Quantity employed in forecast (fwd's 'quant'), defaults to 'fbar', character.
+#' @param args
+#' @param tracking
+#' @examples
+#' data(ple4)
+#' args <- list(ay=2015, data_lag=1, management_lag=1, frq=1)
+#' # Set as fbar ~ ssb
+#' hockeystick.hcr(ple4, lim=3e5, trigger=4e5, target=0.25, min=0,
+#'   metric="ssb", output="fbar", args=args, tracking=FLQuant())
+#' # Use for catch ~ depletion, with metric as a new function
+#' hockeystick.hcr(ple4, lim=0.10, trigger=0.40, target=140000, min=0,
+#'   metric=function(x) ssb(x) %/% ssb(x)[,1],
+#'   output="catch", dlow=0.85, dupp=1.15, args=args, tracking=FLQuant())
+
+target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar", nyears=3,
+  args, tracking) {
+
+  # EXTRACT args
+  ay <- args$ay
+  data_lag <- args$data_lag
+  man_lag <- args$management_lag
+  frq <- args$frq
+
+  # COMPUTE metric multiplier
+
+  met <- yearMeans(window(ind[[metric]], start=ay - data_lag - nyears + 1,
+    end=ay - data_lag))
+
+  # RULE
+    # BELOW lim, E_[y+1] = E_y / 2 * (I_recent / I_lim) ^ 2 * r
+  out <- ifelse(met < lim, 1 / 2 * (met / lim) ^ 2 * r,
+    # ABOVE lim, E_[y+1] = E_y * ((1 + (I_recent - I_lim) / (I_tar - I_lim)) / 2) ^ r
+    ((1 + (met - lim) / (target - lim)) / 2) ^ r
+    )
+
+  # IF NA, set to previous value
+  # if(any(is.na(out)))
+  #   out[is.na(out)] <- tracking[[1]]['hcr', ac(ay - 1)][is.na(out)]
+
+  # CONTROL
+  ctrl <- fwdControl(
+    # TARGET for frq years
+    lapply(seq(ay + man_lag, ay + frq), function(x)
+      list(quant=output, value=c(out), year=x, relYear=x-1)))
+
+	list(ctrl=ctrl, tracking=tracking)
+}
+# }}}
+
+# ---
+
 # fixedF.hcr {{{
 
 #' A fixed target f
@@ -349,65 +469,3 @@ cpue.hcr <- function(stk, k1, k2, k3, k4, target=1,
 	return(list(ctrl=ctrl, tracking=tracking))
 } # }}}
 
-# trend.hcr {{{
-
-#' @param k1 Gain parameter
-#' @param k2 Gain parameter
-#' @param gamma Asymmetry parameter
-#' @param nyears Number of years used in regression of log(stock).
-#' @examples
-#' data(ple4om)
-#'  trend.hcr(stock(om), args=list(ay=2003, data_lag=1, management_lag=1, frq=1,
-#'  it=1), tracking=FLQuant(), k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
-
-trend.hcr <- function(stk, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
-  metric=stock, ...) {
-
-  # args
-  ay <- args$ay
-  dlag <- args$data_lag
-  mlag <- args$management_lag
-  dy <- ac(ay - dlag)
-  frq <- args$frq
-  its <- args$it
-
-  # BIOMASS
-  biom <- do.call(metric, list(stk))[, ac(seq(ay - dlag - (nyears - 1) ,
-    length=nyears))]
-
-  dat <- data.table(as.data.frame(biom))
-  
-  # FIND iters with NAs
-  nas <- dat[, .(nas=sum(is.na(data))), by=iter]
-  lnas <- nas$nas == 0
-  rnas <- nas[nas == 0, (iter)]
-
-  # CALCULATE slot if not in nas
-  slope <- rep(NA, its)
-  slope[lnas] <- dat[iter %in% rnas, .(slope=coef(lm(log(data) ~ year))[2]),
-    by=iter][, (slope)]
-
-  # TAC TODO GET TAC from tracking['hcr',]
-  tac <- catch(stk)[, dy]
-
-  id <- slope < 0
-
-  # slope < 0
-  tac[,,,,, id & lnas] <- catch(stk)[, dy,,,, id & lnas] *
-    (1 - k1 * abs(slope[id & lnas]) ^ gamma) 
-
-  # slope >= 0
-  tac[,,,,, !id & lnas] <- catch(stk)[, dy,,,, !id & lnas] *
-    (1 + k2 * slope[!id & lnas]) 
-
-  # CONTROL
-  ctrl <- fwdControl(
-    # TAC for frq years
-    lapply(seq(ay + mlag, ay + frq), function(x)
-    list(quant="catch", value=c(tac), year=x))
-  )
-
-  return(list(ctrl=ctrl, tracking=tracking))
-}
-
-# }}}
