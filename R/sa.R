@@ -61,6 +61,11 @@ mlc.ind <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
 
 # cpue.ind {{{
 
+#' @examples
+#' data(ple4om)
+#' cpue.ind(stock(om), observations(oem)$idx, args=list(ay=2000, data_lag=1),
+#'   tracking=FLQuant())
+
 cpue.ind <- function(stk, idx, nyears=5, ayears=3, args, tracking) {
 
   # ARGS
