@@ -6,6 +6,7 @@
 \usage{
 cpue.hcr(
   stk,
+  ind,
   k1,
   k2,
   k3,
@@ -22,7 +23,7 @@ cpue.hcr
 }
 \examples{
 data(ple4om)
-cpue.hcr(stock(om), k1=0.1, k2=0.2, k3=0.1, k4=0.1, args=list(ay=1990),
+cpue.hcr(FLQuants(stock(om)), k1=0.1, k2=0.2, k3=0.1, k4=0.1, args=list(ay=1990),
  tracking=FLQuants(FLQuant(c(0.5, 0.8), dimnames=list(metric=c("cpue.slope",
  "cpue.mean"), year=1990))))
 }

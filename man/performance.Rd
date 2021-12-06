@@ -125,6 +125,8 @@ perf <- performance(run, statistics, refpts=FLPar(MSY=110000),
   metrics=list(C=catch), years=list(2000:2015))
 # COMPUTE summaries
 perf[, .(CMSY=mean(data))]
+perf <- performance(FLStocks(A=run, B=run), statistics, refpts=FLPar(MSY=110000),
+   metrics=list(C=catch), years=list(2000:2015))
 }
 \seealso{
 \code{\link{FLQuants}}
