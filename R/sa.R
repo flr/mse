@@ -1,7 +1,7 @@
-# sa.R - DESC
-# /sa.R
+# sa.R - Status and trend estimators and indicators.
+# mse/R/sa.R
 
-# Copyright European Union, 2018
+# Copyright European Union, 2018-2021
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
@@ -37,17 +37,12 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
 }
 # }}}
 
-# mlc.ind
-
-# cpue.ind
-
-# mean length of the catch - length based estimator
+# mlc.ind {{{
 mlc.ind <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
   
   args0 <- list(...)
   tracking <- args0$tracking
 
-  # 
 	vbObj <- FLa4a:::a4aGr(
 	  grMod=~linf*(1 - exp(-k * (t - t0))),      
 	  grInvMod=~t0 - 1/k * log(1 - len / linf),      
@@ -62,3 +57,61 @@ mlc.ind <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
   
   list(stk = stk, ind = ind, tracking = tracking)
 }
+# }}}
+
+# cpue.ind {{{
+
+cpue.ind <- function(stk, idx, nyears=5, ayears=3, args, tracking) {
+
+  # ARGS
+  ay <- args$ay
+  dlag <- args$data_lag
+  
+  # INDEX slot
+  ind <- index(idx[[1]])[1:2,]
+
+  # SUBSET last nyears from ay - mlag
+  ind <- quantSums(ind[, ac(seq(ay - dlag - (nyears - 1) , length=nyears))] *
+    stock.wt(stk)[1:2, ac(seq(ay - dlag - (nyears - 1) , length=nyears))])
+
+  # SLOPE by iter
+  dat <- data.table(as.data.frame(ind))
+  slope <- dat[, .(slope=coef(lm(log(data)~year))[2]), by=iter]
+
+  # WEIGHTED average index of last ayears
+  mind <- yearSums(tail(ind, ayears) * 
+   c(0.50 * seq(1, ayears - 1) / sum(seq(1, ayears - 1)), 0.50))
+  # LABEL as from last data year
+  dimnames(mind) <- list(year=ay - dlag)
+
+  # OUTPUT
+  slop <- FLQuant(slope$slope, dimnames=dimnames(mind), units="")
+  ind <- FLQuants(mean=mind, slope=slop)
+
+  list(stk=stk, ind=ind, tracking=tracking)
+} # }}}
+
+# len.ind {{{
+len.ind <- function (stk, idx, args, tracking, indicator="mlc", params,
+  nyears=3, cv=0.1, lmax=1.25, bin=1, n=500, ...) {
+
+  # EXTRACT args
+  ay <- args$ay
+  data_lag <- args$data_lag
+  args0 <- list(...)
+  
+  # COMPUTE inverse ALK (cv, lmax, bin)
+  ialk <- invALK(params, age=seq(dims(stk)$min, dims(stk)$max),
+    cv=cv, lmax=lmax, bin=bin)
+
+  # GENERATE length samples from catch.n (n)
+  samps <- lenSamples(window(catch.n(stk), start=ay - data_lag - nyears + 1,
+    end=ay - data_lag), ialk, n=n)
+
+  # CALL indicator
+  ind <- lapply(indicator, do.call, args=c(list(samps), args0))
+  names(ind) <- indicator
+  
+  list(stk = stk, ind = FLQuants(ind), tracking = tracking)
+}
+# }}}

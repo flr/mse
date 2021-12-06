@@ -217,8 +217,8 @@ trend.hcr <- function(stk, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
 #'   metric=function(x) ssb(x) %/% ssb(x)[,1],
 #'   output="catch", dlow=0.85, dupp=1.15, args=args, tracking=FLQuant())
 
-target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar", nyears=3,
-  args, tracking) {
+target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar",
+  nyears=3, args, tracking) {
 
   # EXTRACT args
   ay <- args$ay
@@ -251,6 +251,46 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar", nyear
 	list(ctrl=ctrl, tracking=tracking)
 }
 # }}}
+
+
+# cpue.hcr {{{
+
+#' cpue.hcr
+#'
+#' @examples
+#' data(ple4om)
+#' cpue.hcr(FLQuants(stock(om)), k1=0.1, k2=0.2, k3=0.1, k4=0.1, args=list(ay=1990),
+#'  tracking=FLQuants(FLQuant(c(0.5, 0.8), dimnames=list(metric=c("cpue.slope",
+#'  "cpue.mean"), year=1990))))
+
+cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
+  dtaclow=0.85, dtacupp=1.15, args, tracking){
+  
+  # args
+  ay <- args$ay
+
+  # RECOVER slope & mean(cpue)
+  slope <- ind$slope
+  mcpue <- ind$mean
+
+  # CALCULATE new tac
+  ka <- ifelse(slope > 0, k1, k2)
+  kb <- ifelse(mcpue > target, k3, k4)
+
+  # TAC_y-1 ~ TAC_y * 1 + ka * m + kb * (mcpue - target)
+  # TODO TAC: catch(om) / catch(stk) / TAC(y-1)
+  tac <- catch(stk)[, ac(ay-1)] * (1 + ka * slope + kb * (mcpue - target))
+
+  ctrl <- fwdControl(list(quant="catch", value=tac, year=ay + 1),
+    # TAC limits
+    list(quant="catch", min=dtaclow, max=dtacupp, relYear=ay - 1, year=ay + 1))
+  
+	return(list(ctrl=ctrl, tracking=tracking))
+} # }}}
+
+
+# mix.hcr: COMBINE 2 hcr modules
+#   mlc.hcr + cpue.hcr
 
 # ---
 
@@ -433,39 +473,4 @@ indicator.hcr <- function (stk, hcrpars, args, tracking) {
 }
 # }}}
 
-# cpue.hcr {{{
-
-#' cpue.hcr
-#'
-#' @examples
-#' data(ple4om)
-#' cpue.hcr(stock(om), k1=0.1, k2=0.2, k3=0.1, k4=0.1, args=list(ay=1990),
-#'  tracking=FLQuants(FLQuant(c(0.5, 0.8), dimnames=list(metric=c("cpue.slope",
-#'  "cpue.mean"), year=1990))))
-
-cpue.hcr <- function(stk, k1, k2, k3, k4, target=1,
-  dtaclow=0.85, dtacupp=1.15, args, tracking){
-  
-  # args
-  ay <- args$ay
-
-  # RECOVER slope & mean(cpue)
-
-  slope <- tracking[[1]]["cpue.slope", ac(ay)]
-  mcpue <- tracking[[1]]["cpue.mean", ac(ay)]
-
-  # CALCULATE new tac
-
-  ka <- ifelse(slope > 0, k1, k2)
-  kb <- ifelse(mcpue > target, k3, k4)
-
-  # TAC_y-1 ~ TAC_y * 1 + ka * m + kb * (mcpue - target)
-  tac <- catch(stk)[, ac(ay-1)] * (1 + ka * slope + kb * (mcpue - target))
-
-  ctrl <- fwdControl(list(quant="catch", value=tac, year=ay + 1),
-    # TAC limits
-    list(quant="catch", min=dtaclow, max=dtacupp, relYear=ay - 1, year=ay + 1))
-  
-	return(list(ctrl=ctrl, tracking=tracking))
-} # }}}
 

@@ -40,7 +40,7 @@ export(
   "indicator.hcr",
   "indicator.phcr",
   "indicator.is",
-  "mlc.est",
+  "mlc.ind",
   "movingF.hcr",
   "movingF.phcr",
   "mp",

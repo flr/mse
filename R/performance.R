@@ -160,7 +160,6 @@ setMethod("performance", signature(x="FLQuants"),
     # mp if not NULL
     if(!is.null(mp))
       res[, mp:=mp]
-    res[, mp:=factor(mp)]
 	  
     return(res[])
   }
@@ -212,7 +211,6 @@ setMethod("performance", signature(x="FLStocks"),
     
     # IF grid, ADD columns
     if(!missing(grid)) {
-
         if(is(grid, "list"))
           dgrid <- data.table(expand.grid(grid))
         if(!"run" %in% colnames(dgrid))
@@ -237,7 +235,6 @@ setMethod("performance", signature(x="list"),
     }
 
     # ELSE assume list of FLQuants
-
     if(!all(unlist(lapply(x, is, 'FLQuants'))))
       stop("input list must contain objects of class FLQuants")
 
@@ -250,7 +247,7 @@ setMethod("performance", signature(x="list"),
         statistics, refpts, years, probs=probs, mp=mp), idcol='run')
     }
     
-    # mp=run if not NULL
+    # mp=run if NULL
     if(is.null(mp))
       res[, mp:=run]
     res[, mp:=factor(mp)]
