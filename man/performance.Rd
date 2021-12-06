@@ -108,7 +108,7 @@ statistics <- list(
 performance(run, statistics, refpts=FLPar(MSY=110000),
   metrics=list(C=catch, F=fbar), years=list(2000:2015))
 # Minimum statistic, named list with formula and name
-performance(run, statistics=list(CMSY=list(~C/MSY, name="CMSY")),
+performance(run, statistics=list(CMSY=list(~yearMeans(C/MSY), name="CMSY")),
   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
   years=list(2000:2015))
 # return quantiles
@@ -117,7 +117,7 @@ performance(run, statistics, refpts=FLPar(MSY=110000),
   probs =  c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95))
 # DEFINE statistics without summaries
 statistics <- list(
-  CMSY=list(~C/MSY,
+  CMSY=list(~yearMeans(C/MSY),
     name="CMSY",
     desc="Catch over MSY"))
 # COMPUTE performance
@@ -125,7 +125,7 @@ perf <- performance(run, statistics, refpts=FLPar(MSY=110000),
   metrics=list(C=catch), years=list(2000:2015))
 # COMPUTE summaries
 perf[, .(CMSY=mean(data))]
-perf <- performance(FLStocks(A=run, B=run), statistics, refpts=FLPar(MSY=110000),
+perf <- performance(FLStocks(B=run, A=run), statistics, refpts=FLPar(MSY=110000),
    metrics=list(C=catch), years=list(2000:2015))
 }
 \seealso{
