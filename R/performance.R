@@ -187,7 +187,7 @@ setMethod("performance", signature(x="FLStock"),
 
 #' @rdname performance
 #' @examples
-#' perf <- performance(FLStocks(A=run, B=run), statistics, refpts=FLPar(MSY=110000),
+#' perf <- performance(FLStocks(B=run, A=run), statistics, refpts=FLPar(MSY=110000),
 #'    metrics=list(C=catch), years=list(2000:2015))
 
 setMethod("performance", signature(x="FLStocks"),
@@ -207,7 +207,7 @@ setMethod("performance", signature(x="FLStocks"),
     # mp=run if NULL
     if(is.null(mp))
       res[, mp:=run]
-    res[, mp:=factor(mp)]
+    res[, mp:=factor(mp, levels=unique(mp))]
     
     # IF grid, ADD columns
     if(!missing(grid)) {
@@ -250,7 +250,7 @@ setMethod("performance", signature(x="list"),
     # mp=run if NULL
     if(is.null(mp))
       res[, mp:=run]
-    res[, mp:=factor(mp)]
+    res[, mp:=factor(mp), levels=unique(mp))]
     
     # IF grid, ADD columns
     if(!missing(grid)) {
