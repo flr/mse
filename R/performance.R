@@ -160,6 +160,7 @@ setMethod("performance", signature(x="FLQuants"),
     # mp if not NULL
     if(!is.null(mp))
       res[, mp:=mp]
+    res[, mp:=factor(mp)]
 	  
     return(res[])
   }
