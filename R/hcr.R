@@ -87,7 +87,7 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0, args, tracking){
 #'   metric=function(x) ssb(x) %/% ssb(x)[,1],
 #'   output="catch", dlow=0.85, dupp=1.15, args=args, tracking=FLQuant())
 
-# TODO USE refpts in metric
+# TODO USE hcrpars / refpts in metric
 
 hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   output="fbar", dlow=NA, dupp=NA, args, tracking) {
@@ -104,17 +104,19 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   if(is.na(dupp))
     dupp <- 1e8
 
-  # COMPUTE metric across units
-  met <- window(do.call(metric, list(stk)), start=ay - data_lag, end=ay - data_lag)
+  # COMPUTE metric
+  met <- window(do.call(metric, list(stk)), start=ay - data_lag,
+    end=ay - data_lag)
 
   # RULE
     # BELOW lim
   out <- ifelse(met <= lim, min,
     # BETWEEN lim and trigger
-    ifelse(met < trigger, target / (target - min) * (met - lim),
+    ifelse(met < trigger,
+      pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  min),
     # ABOVE trigger
     target))
-
+    
   # IF NA, set to previous value
   if(any(is.na(out)))
     out[is.na(out)] <- tracking[[1]]['hcr', ac(ay - 1)][is.na(out)]
@@ -132,6 +134,72 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 
 	list(ctrl=ctrl, tracking=tracking)
 }
+
+
+#' @examples
+#' args <- list(lim=1e5, trigger=4e5, target=0.25, min=0,
+#'   metric="ssb", output="fbar")
+#' # Plot hockeystick.hcr for given arguments
+#' plot_hockeystick.hcr(args)
+#' # Add metric and output from FLStock
+#' plot_hockeystick.hcr(args, ple4)
+
+plot_hockeystick.hcr <- function(args, obs="missing") {
+
+  # EXTRACT args from mpCtrl
+  if(is(args, "mpCtrl"))
+    args <- args$args
+
+  # SET args
+  spread(args)
+  xlim <- trigger * 1.50
+  ylim <- target * 1.50
+
+  # GET observations
+  if(!missing(obs)) {
+    obs <- model.frame(metrics(obs, list(met=get(metric), out=get(output))))
+    xlim <- max(obs$met)
+    ylim <- max(obs$out)
+  }
+ 
+  # SET met values
+  met <- seq(0, xlim, length=200)
+
+  # BELOW lim
+  out <- ifelse(met <= lim, min,
+    # BETWEEN lim and trigger
+    ifelse(met < trigger,
+      pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  min),
+    # ABOVE trigger
+    target))
+ 
+  # DATA
+  dat <- data.frame(met=met, out=out)
+  
+  p <- ggplot(dat, aes(x=met, y=out)) +
+    coord_cartesian(ylim = c(0, ylim), clip="off") +
+    xlab(toupper(metric)) + ylab(toupper(output)) +
+    # TARGET
+    geom_segment(aes(x=0, xend=trigger * 1.25, y=target, yend=target), linetype=2) +
+    annotate("text", x=0, y=target + ylim / 30, label="target", hjust="left") +
+    # MIN
+    annotate("text", x=0, y=min + ylim / 30, label="min", hjust="left") +
+    # TRIGGER
+    geom_segment(aes(x=trigger, xend=trigger, y=0, yend=target), linetype=2) +
+    annotate("text", x=trigger, y=-ylim / 40, label="trigger", vjust="bottom") +
+    # LIMIT
+    geom_segment(aes(x=lim, xend=lim, y=0, yend=min), linetype=2) +
+    annotate("text", x=lim, y=-ylim / 40, label="limit", vjust="bottom") +
+    # HCR line
+    geom_line()
+
+  if(!missing(obs)) {
+    p <- p + geom_point(data=obs)
+  }
+
+  return(p)
+}
+
 # }}}
 
 # trend.hcr {{{
@@ -251,7 +319,6 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar",
 	list(ctrl=ctrl, tracking=tracking)
 }
 # }}}
-
 
 # cpue.hcr {{{
 

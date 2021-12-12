@@ -51,6 +51,7 @@ export(
   "noise.iem",
   "perfect.oem",
   "perfect.sa",
+  "plot_hockeystick.hcr",
   "sampling.oem",
   "seasonal.is",
   "tac.is",
