@@ -114,6 +114,31 @@ setReplaceMethod("observations", signature(object="FLoem", i="missing", value="l
 
 #' @rdname FLoem-class
 
+setReplaceMethod("observations", signature(object="FLoem", i="ANY", value="FLStock"),
+  function(object, i, value){
+	object@observations$stk <- value
+	object
+})
+
+setReplaceMethod("observations", signature(object="FLoem", i="ANY", value="FLStocks"),
+  function(object, i, value){
+	object@observations$stk <- value
+	object
+})
+
+setReplaceMethod("observations", signature(object="FLoem", i="ANY", value="FLIndex"),
+  function(object, i, value){
+	object@observations$idx <- FLIndices(value)
+	object
+})
+
+setReplaceMethod("observations", signature(object="FLoem", i="ANY", value="FLIndices"),
+  function(object, i, value){
+	object@observations$idx <- value
+	object
+})
+
+
 setReplaceMethod("observations", signature(object="FLoem", i="ANY", value="ANY"),
   function(object, i, value){
 	object@observations[[i]] <- value
@@ -212,3 +237,21 @@ setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
 	}
 })
 # }}}
+
+# fwdWindow {{{
+
+setMethod("window", signature(x="FLoem"),
+  function(x, ...) {
+
+    # observations
+    observations(x) <- rapply(observations(x), window,
+      classes=c("FLStock", "FLIndex", "FLIndexBiomass"),
+      how="replace", ...)
+
+    # deviances
+    deviances(x) <- rapply(deviances(x), window, classes=c("FLQuant"),
+      how="replace",  ...)
+
+    return(x)
+  }
+) # }}}
