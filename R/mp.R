@@ -533,14 +533,13 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
 
+    # APPLY oem over each biol
     o.out <- Map(function(stk, dev, obs, tra) {
 
       do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
 
-      }, stk=stock(om),
-      # GET observations and deviances from oem
-      obs=observations(oem), dev=deviances(oem), tra=tracking)
+      }, stk=stock(om), obs=observations(oem), dev=deviances(oem), tra=tracking)
 
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
@@ -614,17 +613,18 @@ setMethod("goFish", signature(om="FLombf"),
 		 }
 
 		# --- hcr: Harvest Control Rule
-
-		if (!is.null(ctrl0$hcr)){
+		
+    if (!is.null(ctrl0$hcr)){
      
       ctrl.hcr <- args(ctrl0$hcr) 
 			ctrl.hcr$method <- method(ctrl0$hcr)
       
       # SELECT stock for hcr
       if(!is.null(args$stock))
-        stk0 <- stk0[[args$stock]]
-			
-      ctrl.hcr$stk <- stk0
+        ctrl.hcr$stk <- stk0[[args$stock]]
+      else
+        ctrl.hcr$stk <- stk0
+
 			ctrl.hcr$args <- args
 			ctrl.hcr$tracking <- tracking
 			if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
@@ -653,15 +653,26 @@ setMethod("goFish", signature(om="FLombf"),
 			ctrl.is <- args(ctrl0$isys)
 			ctrl.is$method <- method(ctrl0$isys)
 			ctrl.is$ctrl <- ctrl
-			ctrl.is$stk <- stk0
+
+      # SELECT stock for hcr
+      if(!is.null(args$stock))
+        ctrl.is$stk <- stk0[[args$stock]]
+      else
+        ctrl.is$stk <- stk0
+
 			ctrl.is$args <- args #ay <- ay
 			ctrl.is$tracking <- tracking
-			ctrl.is$ioval <- list(iv=list(t1=flssval, t2=flfval), ov=list(t1=flfval))
+			ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval), ov=list(t1=flfval))
       ctrl.is$step <- "isys"
 
 			out <- do.call("mpDispatch", ctrl.is)
 			
       ctrl <- out$ctrl
+
+      # DEBUG ASSIGN biol
+      if(all(is.na(ctrl$biol)))
+        ctrl$biol <- args$stock
+
 			tracking <- out$tracking
 
       track(tracking, "isys", seq(ay, ay+frq-1)) <- ctrl
