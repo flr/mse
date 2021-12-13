@@ -39,7 +39,8 @@
 #' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
 #'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
 
-ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0, args, tracking){
+ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
+  minfbar=range(stk, "minfbar"), maxfbar=range(stk, "maxfbar"), args, tracking){
 
   # args
 	ay <- args$ay
@@ -58,7 +59,8 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0, args, tracking){
 	fout[inbetween] <- (ssb[inbetween] - sblim) * gradient + fmin
 	
   # CREATE control file
-  ctrl <- fwdControl(year=ay + man_lag, quant="fbar", value=c(fout))
+  ctrl <- fwdControl(year=ay + man_lag, quant="fbar", value=c(fout),
+    minAge=minfbar, maxAge=maxfbar)
 
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
