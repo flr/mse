@@ -4,7 +4,17 @@
 \alias{ices.hcr}
 \title{The typical HCR used by ICES}
 \usage{
-ices.hcr(stk, ftrg, sblim, sbsafe, fmin = 0, args, tracking)
+ices.hcr(
+  stk,
+  ftrg,
+  sblim,
+  sbsafe,
+  fmin = 0,
+  minfbar = range(stk, "minfbar"),
+  maxfbar = range(stk, "maxfbar"),
+  args,
+  tracking
+)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}

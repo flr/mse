@@ -63,21 +63,17 @@ mlc.ind <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
 
 #' @examples
 #' data(ple4om)
-#' cpue.ind(stock(om), observations(oem)$idx, args=list(ay=2000, data_lag=1),
-#'   tracking=FLQuant())
+#' cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om))),
+#'   args=list(ay=2000, data_lag=1), tracking=FLQuant())
 
-cpue.ind <- function(stk, idx, nyears=5, ayears=3, args, tracking) {
-
+cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
+  
   # ARGS
   ay <- args$ay
   dlag <- args$data_lag
   
-  # INDEX slot
-  ind <- index(idx[[1]])[1:2,]
-
   # SUBSET last nyears from ay - mlag
-  ind <- quantSums(ind[, ac(seq(ay - dlag - (nyears - 1) , length=nyears))] *
-    stock.wt(stk)[1:2, ac(seq(ay - dlag - (nyears - 1) , length=nyears))])
+  ind <- index(idx[[index]])[1, ac(seq(ay - dlag - (nyears - 1) , length=nyears))]
 
   # SLOPE by iter
   dat <- data.table(as.data.frame(ind))

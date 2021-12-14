@@ -497,6 +497,9 @@ setMethod("goFish", signature(om="FLombf"),
 	data_lag <- args$data_lag  # years between assessment and last data
   frq <- args$frq   # frequency
 
+  # TODO LOOP every module over stock
+  stks <- args$stock <- if(is.null(args$stock)) seq(length(biols(om))) else args$stock
+
   # COPY ctrl
 	ctrl0 <- ctrl
 
@@ -541,8 +544,11 @@ setMethod("goFish", signature(om="FLombf"),
 
       }, stk=stock(om), obs=observations(oem), dev=deviances(oem), tra=tracking)
 
+    # EXTRACT oem observations
+
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
+
 		observations(oem) <- lapply(o.out, "[[", "observations")
 
 		# tracking <- FLQuants(o.out[[1]]$tracking[[1]], o.out[[2]]$tracking[[2]])
@@ -551,21 +557,19 @@ setMethod("goFish", signature(om="FLombf"),
     # track(tracking, "C.obs", seq(ay, ay+frq-1)) <- unitSums(window(catch(om),
     #  start=dy, end=dy + frq - 1))
 
-
 		# --- est: Estimator of stock statistics
 
     if (!is.null(ctrl0$est)) {
       ctrl.est <- args(ctrl0$est)
 			ctrl.est$method <- method(ctrl0$est)
 			ctrl.est$args <- args
-			ctrl.est$tracking <- tracking
 
 			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
       ctrl.est$step <- "est"
-  
-      out.assess <- Map(function(x, y)
-        do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y))),
-        x=stk0, y=idx0)
+browser()  
+      out.assess <- Map(function(x, y, z)
+        do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z))),
+        x=stk0, y=idx0, z=tracking)
 
       stk0 <- FLStocks(lapply(out.assess, "[[", "stk"))
       
@@ -574,7 +578,7 @@ setMethod("goFish", signature(om="FLombf"),
         args(ctrl0$est)[names(out.assess$args)] <-
           out.assess$args
       }
-			# tracking <- out.assess$tracking
+      tracking <- FLQuants(lapply(out.assess, "[[", "tracking"))
 		}
 
     # TRACK est

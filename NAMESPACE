@@ -25,6 +25,7 @@ export(
   "catchSSB.hcr",
   "computeFp05",
   "cpue.hcr",
+  "cpue.ind",
   "default.oem",
   "effort.is",
   "expandGrid",

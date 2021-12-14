@@ -124,3 +124,20 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
 )
 
 # }}}
+
+# track<- FLQuants, numeric{{{
+
+setReplaceMethod("track", signature(object="FLQuant", value="numeric"),
+  function(object, step, year=dimnames(value)$year, ..., value) {
+
+    # CHECK step exists
+    if(!step %in% dimnames(object)[[1]])
+      stop(paste("tracking does not contain the required step:", step))
+
+    object[step, ac(year)] <- c(value)
+
+    return(object)
+  }
+)
+# }}}
+
