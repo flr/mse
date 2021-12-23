@@ -224,17 +224,24 @@ tunegrid <- function(om, oem="missing", control, metric, statistic, grid, args,
 #' stock <- propagate(stf(ple4, end=2118), 100)
 #' srr <- predictModel(model=rec~a*ssb*exp(-b*ssb), params=FLPar(a=5.20, b=1.65e-6))
 #' # GENERATE SRR deviances
-#' devs <- ar1rlnorm(rho=0.4, 2019:2118, iters=100, meanlog=0, sdlog=0.5)
+#' devs <- ar1rlnorm(rho=0.4, 2018:2118, iters=100, meanlog=0, sdlog=0.5)
 #' # DEFINE Fp05 statistic
 #' statistic <- list(FP05=list(~yearMeans((SB/SBlim) < 1), name="P.05",
 #'   desc="ICES P.05"))
-#' # CALL bisect over 100 years
+#' # CALL bisect over 100 years, Fp.05 calculated over last 50.
 #' fp05fwd <- bisect(stock, sr=srr, deviances=devs, metrics=list(SB=ssb), 
 #' refpts=FLPar(SBlim=150000), statistic=statistic, years=2018:2118,
 #' pyears=2069:2118, tune=list(fbar=c(0.1, 1)), prob=0.05)
 
 bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
   statistic, years, pyears=years, tune, prob, tol=0.01, maxit=15, verbose=TRUE) {
+
+  # CHOOSE method
+
+  if(names(tune)[1] %in% c("f", "fbar"))
+    foo <- ffwd
+  else
+    foo <- fwd
 
   # --- RUN at min
 
@@ -243,8 +250,7 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
   # PRINT at top
   if(verbose)
     cat(paste0("[1] ", names(tune), ": ", unlist(tune)[1]))
-
-  rmin <- fwd(stock, sr=sr, control=cmin, deviances=deviances)
+  rmin <- foo(stock, sr=sr, control=cmin, deviances=deviances)
   
   pmin <- performance(rmin, metrics=metrics, 
     statistics=statistic, refpts=refpts, probs=NULL, years=pyears)
@@ -266,7 +272,7 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
   if(verbose)
     cat(paste0("[2] ", names(tune), ": ", unlist(tune)[2]))
 
-  rmax <- fwd(stock, sr=sr, control=cmax, deviances=deviances)
+  rmax <- foo(stock, sr=sr, control=cmax, deviances=deviances)
   
   pmax <- performance(rmax, metrics=metrics, 
     statistics=statistic, refpts=refpts, probs=NULL, years=pyears)
@@ -299,7 +305,7 @@ bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
     if(verbose)
       cat(paste0("[", count + 3, "] ", names(tune), ": ", cmid$value[1]))
 
-    rmid <- fwd(stock, sr=sr, control=cmid, deviances=deviances)
+    rmid <- foo(stock, sr=sr, control=cmid, deviances=deviances)
 
     pmid <- performance(rmid, metrics=metrics, 
       statistics=statistic, refpts=refpts, probs=NULL, years=pyears)
