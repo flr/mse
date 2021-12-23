@@ -86,62 +86,44 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
 #' oem@deviances$stk <- FLQuants(catch.n=catch.n(stock(om)) %=% 0.1)
 #' oem@observations$idx[[1]] <- propagate(oem@observations$idx[[1]], 25)
 #' sampling.oem(stock(om), deviances=deviances(oem), observations=observations(oem),
-#'   args=list(y0=2000, dy=2016, ay=2017, frq=1), tracking=FLQuant())
+#'   args=list(y0=2000, dy=2016, frq=1), tracking=FLQuant())
 
 sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
-
+ 
   # DIMENSIONS
   y0 <- ac(args$y0)
   dy <- ac(args$dy)
-  yrs <- ac(seq(args$y0, args$dy))
-
-  # Data years
   dyrs <- ac(seq(args$dy - args$frq + 1, args$dy))
 
-  # Assessment year
-  ay <- ac(args$ay)
+  # DROP units from observation
+  stk <- nounit(stk)
 
-  # GET perfect stock
+  # SUBSET year range
 	stk <- window(stk, start=y0, end=dy, extend=FALSE)
 
   # SIMPLIFY to match observations$stk
   dio <- dim(observations$stk)
-  dis <- dim(stk)
 
-  if(sum(dis[c(3,4)]) > 2) {
-
-    if(dio[3] == 1)
-    stk <- nounit(stk)
-    if(dio[4] == 1)
+  if(dio[4] == 1)
     stk <- noseason(stk)
-  }
 
   # --- STK
 
   if(!is.null(deviances$stk)) {
 
-    # APPLY deviances to corresponding slot
-    devs <- lapply(setNames(nm=names(deviances$stk)), function(x) {
-      do.call(x, list(object=stk))[, dyrs] * deviances$stk[[x]][, dyrs] + 1
-    })
-
-    # ASSIGN devs to observations$stk slots in dyrs
-    for(i in names(devs)) {
-      slot(observations$stk, i)[, dyrs] <- devs[[i]]
+    # APPLY deviances and ASSIGN to stk slots in dyrs
+    for(i in names(deviances$stk)) {
+      slot(stk, i)[, dyrs] <-
+      do.call(i, list(object=stk))[, dyrs] * deviances$stk[[i]][, dyrs] + 0.001
     }
 
     # COMPUTE depending on inputs
-    landings(observations$stk)[, dyrs] <- computeLandings(observations$stk[, dyrs])
-    discards(observations$stk)[, dyrs] <- computeDiscards(observations$stk[, dyrs])
+    landings(stk)[, dyrs] <- computeLandings(stk[, dyrs])
+    discards(stk)[, dyrs] <- computeDiscards(stk[, dyrs])
+    catch(stk)[, dyrs] <- computeCatch(stk[, dyrs])
 
-    catch(observations$stk)[, dyrs] <- computeCatch(observations$stk[, dyrs])
-
-    # SHORTCUT 
-    stock.n(observations$stk)[, dyrs] <- stock.n(stk)[, dyrs]
-    harvest(observations$stk)[, dyrs] <- harvest(stk)[, dyrs]
-
-    # SET output stock
-    stk <- observations$stk[, yrs]
+    # STORE for shortcut 
+    observations$stk[, dyrs] <- stk[, dyrs]
   }
 
   # --- IDX
@@ -155,12 +137,10 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
     deviances$idx <- lapply(observations$idx, function(x) index.q(x) %=% 1)
   }
 
-  # lapply(idx[upi], index.q)
-
   # APPLY survey() with deviances$idx as index.q
 
   idx[upi] <- Map(function(x, y) {
-      
+    
     # CREATE survey obs
     res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
       index.q=y[, dyrs])
