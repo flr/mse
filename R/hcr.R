@@ -215,36 +215,41 @@ plot_hockeystick.hcr <- function(args, obs="missing") {
 #'  trend.hcr(stock(om), args=list(ay=2003, data_lag=1, management_lag=1, frq=1,
 #'  it=1), tracking=FLQuant(), k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
 
-trend.hcr <- function(stk, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
+trend.hcr <- function(stk, ind, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
   metric=stock) {
 
   # args
-  ay <- args$ay
-  dlag <- args$data_lag
-  mlag <- args$management_lag
-  dy <- ac(ay - dlag)
-  frq <- args$frq
-  its <- args$it
+  spread(args)
+  dy <- ac(ay - data_lag)
 
-  # BIOMASS
-  biom <- do.call(metric, list(stk))[, ac(seq(ay - dlag - (nyears - 1) ,
-    length=nyears))]
+  # SELECT metric
+  if(is(metric, "function")) {
+    met <- do.call(metric, list(stk))
+  } else if (is(metric, "character")) {
+    if(metric %in% names(ind))
+      met <- ind[[metric]]
+    else
+      met <- do.call(metric, list(stk))
+  }
 
-  dat <- data.table(as.data.frame(biom))
+  # CREATE data.table
+  dat <- data.table(as.data.frame(met[, ac(seq(ay - data_lag - (nyears - 1),
+    length=nyears))]))
   
   # FIND iters with NAs
   nas <- dat[, .(nas=sum(is.na(data))), by=iter]
   lnas <- nas$nas == 0
   rnas <- nas[nas == 0, (iter)]
 
-  # CALCULATE slot if not in nas
-  slope <- rep(NA, its)
+  # CALCULATE slope if not in nas
+  slope <- rep(NA, it)
   slope[lnas] <- dat[iter %in% rnas, .(slope=coef(lm(log(data) ~ year))[2]),
     by=iter][, (slope)]
 
   # TAC TODO GET TAC from tracking['hcr',]
   tac <- catch(stk)[, dy]
 
+  # FIND iters with negative slope
   id <- slope < 0
 
   # slope < 0
@@ -258,7 +263,7 @@ trend.hcr <- function(stk, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
   # CONTROL
   ctrl <- fwdControl(
     # TAC for frq years
-    lapply(seq(ay + mlag, ay + frq), function(x)
+    lapply(seq(ay + management_lag, ay + frq), function(x)
     list(quant="catch", value=c(tac), year=x))
   )
 
