@@ -1,5 +1,5 @@
 # utilities.R - DESC
-# /utilities.R
+# mse/R/utilities.R
 
 # Copyright Iago MOSQUEIRA (WMR), 2021
 # Author: Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
@@ -34,3 +34,30 @@ setMethod("merge", signature(x="FLQuant", y="data.table"),
   )
 }
 # }}}
+
+# find.original.name {{{
+
+find.original.name <- function(fun) {
+
+  # 'NULL' function
+  if(is.null(formals(fun)))
+     if(is.null(do.call(fun, args=list())))
+       return("NULL")
+  
+  ns <- environment(fun)
+  objects <- ls(envir = ns)
+  
+  if(isNamespace(ns))
+    name <- getNamespaceName(ns)
+  else
+    name <- environmentName(ns)
+
+  for (i in objects) {
+    if (identical(fun, get(i, envir = environment(fun)))) {
+        return(paste(name, i, sep="::"))                   
+    }
+  }
+  return("NULL")
+}
+# }}}
+
