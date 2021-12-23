@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-# map.tm {{{
+# mpa.tm {{{
 
 mpa.tm <- function(stk, args, sel.objective, tracking){             
 	sqy <- args$sqy
@@ -17,5 +17,3 @@ mpa.tm <- function(stk, args, sel.objective, tracking){
 	snew <- snew * mean(sold[v])/mean(snew[v])
 	list(flq=snew, tracking=tracking)
 } # }}}
-
-

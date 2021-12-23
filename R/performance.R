@@ -10,7 +10,7 @@ globalVariables("statistic")
 
 setGeneric("performance", function(x, ...) standardGeneric("performance"))
 
-# performance {{{
+# performance(FLQuants) {{{
 
 #' Compute performance statistics
 #'
@@ -89,7 +89,7 @@ setMethod("performance", signature(x="FLQuants"),
   function(x, statistics, refpts=FLPar(),
     years=setNames(list(dimnames(x[[1]])$year), nm=dims(x[[1]])$maxyear),
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
-
+    
     # CHECK x /refpts names cover all required by statistics
     stats.names <- unique(unlist(lapply(statistics,
       function(x) all.vars(x[[1]][[2]]))))
@@ -165,6 +165,10 @@ setMethod("performance", signature(x="FLQuants"),
   }
 )
 
+# }}}
+
+# performance(FLStock) {{{
+
 #' @rdname performance
 
 setMethod("performance", signature(x="FLStock"),
@@ -184,6 +188,9 @@ setMethod("performance", signature(x="FLStock"),
       statistics=statistics, years=years, probs=probs, mp=mp))
   }
 )
+# }}}
+
+# performance(FLStocks) {{{
 
 #' @rdname performance
 #' @examples
@@ -219,7 +226,10 @@ setMethod("performance", signature(x="FLStocks"),
       }
     return(res[])
   }
-) 
+)
+# }}}
+
+# performance(list) FLmse / FLQuants {{{
 
 #' @rdname performance
 
@@ -264,7 +274,9 @@ setMethod("performance", signature(x="list"),
     return(res[])
   }
 ) 
+# }}}
 
+# performance(FLom) {{{
 #' @rdname performance
 
 setMethod("performance", signature(x="FLom"),
@@ -274,6 +286,9 @@ setMethod("performance", signature(x="FLom"),
     
   }
 )
+# }}}
+
+# performance(FLombf) {{{
 
 setMethod("performance", signature(x="FLombf"),
   function(x, statistics, refpts=x@refpts, metrics,
@@ -295,6 +310,10 @@ setMethod("performance", signature(x="FLombf"),
     return(res[])
   }
 )
+
+# }}}
+
+# performance(FLmse) {{{
 
 setMethod("performance", signature(x="FLmse"),
   function(x, ...) {

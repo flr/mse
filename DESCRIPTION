@@ -1,6 +1,6 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.2.1.9007
+Version: 2.2.1.9008
 Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut"),
   email = "iago.mosqueira@wur.nl"), 
   person("Ernesto", "Jardim", email = "ernesto.jardim@msc.org",
@@ -44,6 +44,7 @@ Collate:
   'is.R'
   'mp.R'
   'phcr.R'
+  'ind.R'
   'sa.R'
   'tm.R'
   'grid.R'

@@ -81,7 +81,15 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   nu <- args$nu <- dims(om)$unit
 
 
-  # --- TODO CHECK control: c('est', 'hcr') %in% names(control)
+  # --- RUN checks on inputs
+
+#TODO CHECK control: c('est', 'hcr') %in% names(control)
+
+# TODO CHECK iy is correct
+# TODO dims stk, idx
+# TODO check deviances years
+# TODO check iters om vs. ctrl
+# TODO stk(om) and units: merge
 
 	# --- INIT tracking
   

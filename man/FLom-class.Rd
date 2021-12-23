@@ -10,7 +10,6 @@
 \alias{sr,FLom-method}
 \alias{sr<-}
 \alias{sr<-,FLom,FLSR-method}
-\alias{show,FLom-method}
 \alias{combine,FLom,FLom-method}
 \alias{om<-,FLmse,FLo-method}
 \alias{tracking<-,FLmse,FLQuants-method}
@@ -31,8 +30,6 @@ FLom(...)
 sr(object) <- value
 
 \S4method{sr}{FLom,FLSR}(object) <- value
-
-\S4method{show}{FLom}(object)
 
 \S4method{combine}{FLom,FLom}(x, y, ...)
 
