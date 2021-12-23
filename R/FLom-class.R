@@ -132,11 +132,23 @@ setReplaceMethod("sr", signature("FLom", "FLSR"), function(object, value){
 
 # }}}
 
-# catch, landings, discards {{{
+# accessors to stock slots {{{
 
 setMethod("catch", signature(object="FLom"),
   function(object) {
     return(catch(stock(object)))
+  }
+)
+
+setMethod("catch.n", signature(object="FLom"),
+  function(object) {
+    return(catch.n(stock(object)))
+  }
+)
+
+setMethod("catch.wt", signature(object="FLom"),
+  function(object) {
+    return(catch.wt(stock(object)))
   }
 )
 
@@ -146,9 +158,75 @@ setMethod("landings", signature(object="FLom"),
   }
 )
 
+setMethod("landings.n", signature(object="FLom"),
+  function(object) {
+    return(landings.n(stock(object)))
+  }
+)
+
+setMethod("landings.wt", signature(object="FLom"),
+  function(object) {
+    return(landings.wt(stock(object)))
+  }
+)
+
 setMethod("discards", signature(object="FLom"),
   function(object) {
     return(discards(stock(object)))
+  }
+)
+
+setMethod("discards.n", signature(object="FLom"),
+  function(object) {
+    return(discards.n(stock(object)))
+  }
+)
+
+setMethod("discards.wt", signature(object="FLom"),
+  function(object) {
+    return(discards.wt(stock(object)))
+  }
+)
+
+setMethod("m", signature(object="FLom"),
+  function(object) {
+    return(m(stock(object)))
+  }
+)
+
+setMethod("m.spwn", signature(object="FLom"),
+  function(object) {
+    return(m.spwn(stock(object)))
+  }
+)
+
+setMethod("mat", signature(object="FLom"),
+  function(object) {
+    return(mat(stock(object)))
+  }
+)
+
+setMethod("harvest", signature(object="FLom"),
+  function(object) {
+    return(harvest(stock(object)))
+  }
+)
+
+setMethod("harvest.spwn", signature(object="FLom"),
+  function(object) {
+    return(harvest.spwn(stock(object)))
+  }
+)
+
+setMethod("stock.n", signature(object="FLom"),
+  function(object) {
+    return(stock.n(stock(object)))
+  }
+)
+
+setMethod("stock.wt", signature(object="FLom"),
+  function(object) {
+    return(mat(stock.wt(object)))
   }
 )
 # }}}
@@ -168,16 +246,6 @@ setMethod("tsb", signature(object="FLom"),
     return(tsb(stock(object)))
   }
 )
-# }}}
-
-# harvest {{{
-
-setMethod("harvest", signature(object="FLom", catch="missing"),
-  function(object) {
-    return(harvest(stock(object)))
-  }
-) 
-
 # }}}
 
 # fbar {{{
@@ -200,91 +268,70 @@ setMethod("rec", signature(object="FLom"),
 
 # }}}
 
-# show, summary {{{
+# summary {{{
 
-#' @rdname FLom-class
-setMethod("show", signature(object = "FLom"),
-  function(object)
-  {
-  cat('An object of class "FLom"\n')
-
-	cat("\n--- stock:\n")
-  summary(object@stock)
-
-	cat("\n--- sr:\n")
-  summary(object@sr)
-
-	cat("\n--- refpts:\n")
-  show(object@refpts)
-
-	cat("\n--- fleetBehaviour:\n")
-  show(object@fleetBehaviour)
-
-	cat("\n--- projection:\n")
-  show(object@projection)
-
- })
- 
 setMethod("summary", signature(object="FLom"),
   function(object) {
 
-    cat("An object of class \"", class(object), "\"\n\n", sep="")
-
-    # stock
-    cat("-- stock\n")
-    stock <- stock(object)
-		dms <- dims(stock)
+		cat("An object of class \"", class(object), "\"\n\n", sep="")
     
-		cat("Name:", name(stock), "\n")
-    cat("Quant:", dms$quant, "\n")
-		cat("Dims: ", dms$quant, "\tyear\tunit\tseason\tarea\titer\n")
-		cat("", unname(unlist(dms[c(dms$quant, "year", "unit", "season",
-    "area", "iter")])), "\n", sep="\t")
-    cat("Range: ", paste(sub('plusgroup', 'pgroup', names(stock@range)),
-      collapse="\t"), "\n")
-		cat("", stock@range, "\n", sep="\t")
+    # name
+		cat("name:", object@name, "\n")
+    
+    # stock: dims, ages, years ...
+    dms <- dims(stock(object))
+    dm <- dim(stock(object))
+		cat("stock:\n")
+		cat("  dims: ", dms$quant, "\tyear\tunit\tseason\tarea\titer\n", sep="")
+    cat("  ", dm, "\n", sep="\t")
+    cat("  ages: ", dms$min, " - ", dms$max,
+      ifelse(is.na(dms$plusgroup), "", "+"), "\n", sep="")
+    cat("  years: ", dms$minyear, " - ", dms$maxyear, "\n", sep="")
+
+    # ... & metrics
+    metrics <- c("rec", "ssb", "catch", "fbar")
+
+    for(i in metrics) {
+      met <- try(iterMedians(do.call(i, list(object))), silent=TRUE)
+      if(is(met, "FLQuant"))
+        cat(" ", paste0(i, ":"),
+          paste(format(range(met), trim=TRUE, digits=2), collapse=' - '),
+          paste0(" (", units(met), ")"),
+          "\n")
+      else
+        cat(" ", paste0(i, ": NA - NA (NA)\n"))
+    }
 
     # sr
-    cat("-- sr\n")
-    sr <- sr(object)
-   
-    cat("Model: \t")
-    print(model(sr), showEnv=FALSE)
-    # params
-    print(params(sr), reduced=TRUE)
+    cat("sr: \n")
     
-    cat("\n")
+    cat("  model:  ")
+    nm <- SRModelName(model(sr(object)))
+    if(!is.null(nm)) {
+      cat(nm, "\n")
+    } else {
+      print(model(sr(object)), showEnv=FALSE)
+    }
+    
+    cat("  params: \n")
+    cat("  ", dimnames(params(sr(object)))$param, "\n", sep="\t")
+    cat("  ", apply(params(sr(object)), 1, median), "\n", sep="\t")
 
     # refpts
-    cat("-- refpts\n")
-    refpts <- refpts(object)
-
-    rows <- as.logical(c(apply(refpts, c(1,2),
-      function(x) sum(is.na(x)) < length(x))))
-    cols <- as.logical(c(apply(refpts, c(2,1),
-      function(x) sum(is.na(x)) < length(x))))
-
-    print(refpts[rows, cols,])
-
-    cat("\n")
-
-    # fleetBehaviour
-    cat("-- fleetBehaviour\n")
-    behaviour <- fleetBehaviour(object)
-    
-    cat("Method: ", find.original.name(method(behaviour)), "\n")
-    cat("Args: ", names(unlist(args(behaviour))), "\n", sep="\t")
-    cat("", unlist(args(behaviour)), "\n", sep="\t")
+    cat("  refpts: \n")
+    cat("  ", dimnames(refpts(object))$param, "\n", sep="\t")
+    cat("  ", apply(refpts(object), 1, median), "\n", sep="\t")
 
     # projection
-    cat("-- projection\n")
-    projection <- projection(object)
+    cat("projection: \n")
+    cat("  method: ")
+    cat(find.original.name(method(projection(object))), "\n")
 
-    cat("Method: ", find.original.name(method(projection)), "\n")
-    cat("Args: ", names(unlist(args(projection))), "\n", sep="\t")
-    cat("", unlist(args(projection)), "\n", sep="\t")
+    # fleetBehaviour
+
   }
-) # }}}
+)
+# }}}
 
 # plot {{{
 
@@ -386,37 +433,6 @@ setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl
 
 # }}}
 
-# fwd.om {{{
-
-#' A method to project the operating model (OM)
-#'
-#' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
-#' odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
-#' libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
-#' Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id 
-#'
-#' @name fwd.om
-#' @rdname fwd.om
-#' @aliases fwd.om
-#' @param object the OM as a FLStock
-#' @param ctrl the fwdControl object with objectives and constraints
-#' @param sr a FLSR with the stock-recruitment model
-#' @param sr.residuals a FLQuant with S/R residuals
-#' @param sr.residuals.mult logical about residuals being multiplicative
- 
-fwd.om <- function(om, ctrl, ...){
-	
-  args <- list(...)
-
-	args$object <- om
-	args$control <- ctrl
-	
-  om <- do.call("fwd", args)
-
-	list(om=om)
-}
-# }}}
-
 # iter {{{
 
 setMethod("iter", signature(obj="FLo"),
@@ -469,7 +485,7 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 # metrics {{{
 setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
-    FLQuants(metrics(object, list(SB=ssb, C=catch, F=fbar)))
+    FLQuants(metrics(object, list(SB=ssb, C=catch, F=fbar, B=stock, VB=vb)))
 }) # }}}
 
 # propagate {{{

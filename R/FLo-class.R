@@ -1,5 +1,5 @@
 # FLo-class.R - DESC
-# /FLo-class.R
+# mse/R/FLo-class.R
 
 # Copyright Iago MOSQUEIRA (WMR), 2020
 # Author: Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
@@ -85,38 +85,12 @@ setReplaceMethod("projection", signature("FLo", "mseCtrl"), function(object, val
 
 # }}}
 
-# summary {{{
-
-setMethod("summary", signature(object="FLo"),
+# show {{{
+setMethod('show', signature('FLo'),
   function(object) {
-
-    # refpts
-    cat("-- refpts\n")
-    
-    for(i in names(refpts(object))) {
-      cat(i, ":\n", sep="")
-      print(refpts(object)[[i]], reduced=TRUE)
-    }
-    cat("\n")
-
-    # fleetBehaviour
-    cat("-- fleetBehaviour\n")
-    behaviour <- fleetBehaviour(object)
-    
-    cat("Method: ", find.original.name(method(behaviour)), "\n")
-    cat("Args: ", names(unlist(args(behaviour))), "\n", sep="\t")
-    cat("", unlist(args(behaviour)), "\n", sep="\t")
-
-    # projection
-    cat("-- projection\n")
-    projection <- projection(object)
-
-    cat("Method: ", find.original.name(method(projection)), "\n")
-    cat("Args: ", names(unlist(args(projection))), "\n", sep="\t")
-    cat("", unlist(args(projection)), "\n", sep="\t")
+    summary(object)
   }
-)
-# }}}
+) # }}}
 
 # metrics {{{
 setMethod("metrics", signature(object="FLo", metrics="list"),
@@ -125,32 +99,6 @@ setMethod("metrics", signature(object="FLo", metrics="list"),
       do.call(x, list(object))))
   }
 ) # }}}
-
-# find.original.name {{{
-
-find.original.name <- function(fun) {
-
-  # 'NULL' function
-  if(is.null(formals(fun)))
-     if(is.null(do.call(fun, args=list())))
-       return("NULL")
-  
-  ns <- environment(fun)
-  objects <- ls(envir = ns)
-  
-  if(isNamespace(ns))
-    name <- getNamespaceName(ns)
-  else
-    name <- environmentName(ns)
-
-  for (i in objects) {
-    if (identical(fun, get(i, envir = environment(fun)))) {
-        return(paste(name, i, sep="::"))                   
-    }
-  }
-  return("NULL")
-}
-# }}}
 
 # debug {{{
 
@@ -169,4 +117,35 @@ setMethod("undebug", signature(fun="FLo"),
   function(fun) {
     undebug(method(projection(fun)))
   })
+# }}}
+
+# fwd.om {{{
+
+#' A method to project the operating model (OM)
+#'
+#' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
+#' odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
+#' libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
+#' Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id 
+#'
+#' @name fwd.om
+#' @rdname fwd.om
+#' @aliases fwd.om
+#' @param object the OM as a FLStock
+#' @param ctrl the fwdControl object with objectives and constraints
+#' @param sr a FLSR with the stock-recruitment model
+#' @param sr.residuals a FLQuant with S/R residuals
+#' @param sr.residuals.mult logical about residuals being multiplicative
+ 
+fwd.om <- function(om, ctrl, ...){
+	
+  args <- list(...)
+
+	args$object <- om
+	args$control <- ctrl
+	
+  om <- do.call("fwd", args)
+
+	list(om=om)
+}
 # }}}
