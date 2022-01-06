@@ -36,7 +36,8 @@ mcmc <- mcsave * it
 fit <- sca(stk, idx, fit="MCMC",
   mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
 
-stk <- slim(stk + fit)
+# stk <- slim(stk + fit)
+stk <- stk + fit
 
 # Make SRRs
 
@@ -80,7 +81,7 @@ idx[["BTS"]] <- window(idx[["BTS"]], end=fy)
 fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
 
 # OM object
-om <- FLom(stock=slim(stk), sr=srbh, refpts=foo(refpts(brp), mets),
+om <- FLom(stock=stk, sr=srbh, refpts=foo(refpts(brp), mets),
   projection=mseCtrl(method=fwd.om))
 
 # OEM
