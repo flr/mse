@@ -84,7 +84,7 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
 #' data(ple4om)
 #' oem@deviances$idx <- lapply(oem@observations$idx, function(x) index(x) %=% 0.1)
 #' oem@deviances$stk <- FLQuants(catch.n=catch.n(stock(om)) %=% 0.1)
-#' oem@observations$idx[[1]] <- propagate(oem@observations$idx[[1]], 25)
+#' oem@observations$idx[[1]] <- propagate(oem@observations$idx[[1]], 50)
 #' sampling.oem(stock(om), deviances=deviances(oem), observations=observations(oem),
 #'   args=list(y0=2000, dy=2016, frq=1), tracking=FLQuant())
 
@@ -103,8 +103,9 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
 
   # SIMPLIFY to match observations$stk
   dio <- dim(observations$stk)
+  dis <- dim(stk)
 
-  if(dio[4] == 1)
+  if(dio[4] == 1 & dis[4] > 1)
     stk <- noseason(stk)
 
   # --- STK
@@ -137,14 +138,14 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
     deviances$idx <- lapply(observations$idx, function(x) index.q(x) %=% 1)
   }
 
-  # APPLY survey() with deviances$idx as index.q
+  # APPLY survey() with deviances$idx on top of index.q
 
   idx[upi] <- Map(function(x, y) {
     
     # CREATE survey obs
     res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
-      index.q=y[, dyrs])
-
+      index.q=index.q(x)[, dyrs] * y[, dyrs])
+browser()
     # SET 0s to min / 2
     index(res)[index(res) == 0] <- min(index(res)[index(res) > 0] / 2)
     

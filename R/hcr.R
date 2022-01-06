@@ -137,6 +137,9 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 	list(ctrl=ctrl, tracking=tracking)
 }
 
+# }}}
+
+# plot_hockeystick.hcr {{{
 
 #' @examples
 #' args <- list(lim=1e5, trigger=4e5, target=0.25, min=0,
@@ -144,9 +147,14 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 #' # Plot hockeystick.hcr for given arguments
 #' plot_hockeystick.hcr(args)
 #' # Add metric and output from FLStock
-#' plot_hockeystick.hcr(args, ple4)
+#' plot_hockeystick.hcr(args, obs=ple4)
+#' # Superpose Kobe colours
+#' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE)
+#' # Set actual x (e.g. biomass) target.
+#' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE, xtarget=args$trigger * 0.80)
 
-plot_hockeystick.hcr <- function(args, obs="missing") {
+plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
+  xtarget=args$trigger, alpha=0.3) {
 
   # EXTRACT args from mpCtrl
   if(is(args, "mpCtrl"))
@@ -160,8 +168,8 @@ plot_hockeystick.hcr <- function(args, obs="missing") {
   # GET observations
   if(!missing(obs)) {
     obs <- model.frame(metrics(obs, list(met=get(metric), out=get(output))))
-    xlim <- max(obs$met)
-    ylim <- max(obs$out)
+    xlim <- max(obs$met) * 1.05
+    ylim <- max(obs$out) * 1.05
   }
  
   # SET met values
@@ -197,6 +205,23 @@ plot_hockeystick.hcr <- function(args, obs="missing") {
 
   if(!missing(obs)) {
     p <- p + geom_point(data=obs)
+  }
+
+  if(kobe) {
+  p <- p +
+    # YELLOW
+    geom_polygon(data=data.frame(x=c(args$lim, xtarget, xtarget, args$lim),
+      y=c(args$min, args$min, args$target, args$min)),
+      aes(x=x, y=y), fill="yellow", alpha=alpha) +
+    # GREEN
+    geom_polygon(data=data.frame(x=c(xtarget, xlim, xlim, xtarget),
+      y=c(0, 0, rep(args$target, 2))),
+      aes(x=x, y=y), fill="green", alpha=alpha) +
+    # RED
+    geom_polygon(data=data.frame(
+      x=c(0, args$lim, xtarget, xlim, xlim, 0, 0),
+      y=c(args$min, args$min, args$target, args$target, ylim, ylim, args$min)),
+      aes(x=x, y=y), fill="red", alpha=alpha)
   }
 
   return(p)

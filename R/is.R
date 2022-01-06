@@ -169,3 +169,5 @@ seasonal.is <- function(stk, ctrl, args, ratio=rep(1/args$ns, args$ns),
 }
 
 # }}}
+
+# allocate.is

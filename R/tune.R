@@ -400,7 +400,3 @@ computeFp05 <- function(stock, sr, SBlim, range=c(0.01, 0.75), nyears=3,
   return(c(Fp05=fp05))
 }
 # }}}
-
-# BRING stk down to Blim
-
-# RUN for FMSY to set range
