@@ -145,7 +145,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
     # CREATE survey obs
     res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
       index.q=index.q(x)[, dyrs] * y[, dyrs])
-browser()
+
     # SET 0s to min / 2
     index(res)[index(res) == 0] <- min(index(res)[index(res) > 0] / 2)
     

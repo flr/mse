@@ -24,7 +24,7 @@ iy <- 2017 # initial year of projection (also intermediate)
 fy <- 2030 # final year
 y0 <- range(stk)["minyear"] # initial data year
 dy <- range(stk)["maxyear"] # final data year
-ny <- fy - iy + 1 # number of years to project from intial year
+ny <- fy - iy + 1 # number of years to project from initial year
 nsqy <- 3 # number of years to compute status quo metrics
 vy <- ac(iy:fy) # vector of years to be projected
 
@@ -36,8 +36,9 @@ mcmc <- mcsave * it
 fit <- sca(stk, idx, fit="MCMC",
   mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
 
-# stk <- slim(stk + fit)
-stk <- stk + fit
+stk <- slim(stk + fit)
+# stk <- stk + fit
+
 
 # Make SRRs
 
@@ -94,6 +95,14 @@ oem <- FLoem(method=sampling.oem,
     stk=FLQuants(catch.n=rlnorm(it, catch.n(stock(om)) %=% 0, 0.1)),
     idx=lapply(idx, function(x) rlnorm(it, index(x) %=% 0, 0.3))
   ))
+
+
+sel.pattern(observations(oem)$idx[[1]]) <- window(catch.sel(stk), start=1996)
+
+computeQ(observations(oem)$idx, window(stk, start=1996, end=2017), index(fit))
+
+
+
 
 # SAVE
 
