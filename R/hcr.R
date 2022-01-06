@@ -142,7 +142,6 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 # plot_hockeystick.hcr {{{
 
 #' @examples
-#' data(ple4)
 #' args <- list(lim=1e5, trigger=4e5, target=0.25, min=0,
 #'   metric="ssb", output="fbar")
 #' # Plot hockeystick.hcr for given arguments
@@ -150,7 +149,8 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 #' # Add metric and output from FLStock
 #' plot_hockeystick.hcr(args, obs=ple4)
 #' # Superpose Kobe colours
-#' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE)
+#' plot_hockeystick.hcr(args, kobe=TRUE)
+#' data(ple4)
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE,
 #'   labels=c(limit="Blim", trigger="Btrigger", target="Ftarget"))
 #' # Set actual x (e.g. biomass) target.
@@ -165,6 +165,11 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 #'   geom_label(data=model.frame(metrics(ple4[, ac(seq(1957,2017, by=10))],
 #'   list(met=ssb, out=fbar))), aes(label=year),
 #'   fill=c("white", rep("gray", 5), "orange"))
+#' # Example on relative terms where trigger < xtarget
+#' args <- list(lim=0., trigger=0.9, target=1, min=0,
+#'   metric="ssb", output="fbar")  
+#' plot_hockeystick.hcr(args, kobe=TRUE, xtarget=1) +
+#' geom_vline(xintercept=1)
 
 plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
   xtarget=args$trigger, alpha=0.3,
@@ -226,20 +231,29 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 
   if(kobe) {
   
-  # PREDICT for xtarget
-  ytarget <- ifelse(xtarget < trigger,
-    pmax(c(target * ((xtarget - trigger) / (trigger - lim) + 1)),  min),
-    target)
+  # YELLOW inflection point
+  if(xtarget <= trigger) {
+    yinf <- ifelse(xtarget < trigger,
+      pmax(c(target * ((xtarget - trigger) / (trigger - lim) + 1)),  min),
+      target)
+    yell <- geom_polygon(data=data.frame(x=c(args$lim, xtarget, xtarget, args$lim),
+      y=c(args$min, args$min, yinf, args$min)),
+      aes(x=x, y=y), fill="yellow", alpha=alpha)
+  } else {
+    yinf <- target
 
-  p <- p +
+    yell <- geom_polygon(data=data.frame(
+      x=c(args$lim, xtarget, xtarget, trigger, args$lim),
+      y=c(args$min, args$min, yinf, yinf, args$min)),
+      aes(x=x, y=y), fill="yellow", alpha=alpha)
+  }
+  
     # YELLOW
-    geom_polygon(data=data.frame(x=c(args$lim, xtarget, xtarget, args$lim),
-      y=c(args$min, args$min, ytarget, args$min)),
-      aes(x=x, y=y), fill="yellow", alpha=alpha) +
+    p <- p + yell +
     # GREEN
     geom_polygon(data=data.frame(
       x=c(xtarget, xlim, xlim, args$trigger, xtarget, xtarget),
-      y=c(0, 0, rep(args$target, 2), ytarget, ytarget)),
+      y=c(0, 0, rep(args$target, 2), yinf, yinf)),
       aes(x=x, y=y), fill="green", alpha=alpha) +
     # RED
     geom_polygon(data=data.frame(
