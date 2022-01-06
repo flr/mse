@@ -1,4 +1,4 @@
-# hcr.R - DESC
+# cr.R - DESC
 # mse/R/hcr.R
 
 # Copyright European Union, 2018
@@ -151,11 +151,24 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 #' plot_hockeystick.hcr(args, obs=ple4)
 #' # Superpose Kobe colours
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE)
+#' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE,
+#'   labels=c(limit="Blim", trigger="Btrigger", target="Ftarget"))
 #' # Set actual x (e.g. biomass) target.
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE, xtarget=args$trigger * 0.80)
+#' #' Add line and label for Btarget
+#' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE, xtarget=args$trigger * 0.80) +
+#' geom_vline(xintercept=args$trigger * 0.80) +
+#' geom_label(x=args$trigger * 0.80, y=0.7, label="SBtarget")
+#' # ADD a time line and decade labels
+#' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE) +
+#'   geom_line(data=model.frame(metrics(ple4, list(met=ssb, out=fbar)))) +
+#'   geom_label(data=model.frame(metrics(ple4[, ac(seq(1957,2017, by=10))],
+#'   list(met=ssb, out=fbar))), aes(label=year),
+#'   fill=c("white", rep("gray", 5), "orange"))
 
 plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
-  xtarget=args$trigger, alpha=0.3) {
+  xtarget=args$trigger, alpha=0.3,
+  labels=c(limit="limit", trigger="trigger", min="min", target="target")) {
 
   # EXTRACT args from mpCtrl
   if(is(args, "mpCtrl"))
@@ -184,6 +197,8 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
     # ABOVE trigger
     target))
 
+  # LABELS as list
+  labels <- as.list(labels)
  
   # DATA
   dat <- data.frame(met=met, out=out)
@@ -193,15 +208,15 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
     xlab(toupper(metric)) + ylab(toupper(output)) +
     # TARGET
     geom_segment(aes(x=0, xend=trigger * 1.25, y=target, yend=target), linetype=2) +
-    annotate("text", x=0, y=target + ylim / 30, label="target", hjust="left") +
+    annotate("text", x=0, y=target + ylim / 30, label=labels$target, hjust="left") +
     # MIN
-    annotate("text", x=0, y=min + ylim / 30, label="min", hjust="left") +
+    annotate("text", x=0, y=min + ylim / 30, label=labels$min, hjust="left") +
     # TRIGGER
     geom_segment(aes(x=trigger, xend=trigger, y=0, yend=target), linetype=2) +
-    annotate("text", x=trigger, y=-ylim / 40, label="trigger", vjust="bottom") +
+    annotate("text", x=trigger, y=-ylim / 40, label=labels$trigger, vjust="bottom") +
     # LIMIT
     geom_segment(aes(x=lim, xend=lim, y=0, yend=min), linetype=2) +
-    annotate("text", x=lim, y=-ylim / 40, label="limit", vjust="bottom") +
+    annotate("text", x=lim, y=-ylim / 40, label=labels$limit, vjust="bottom") +
     # HCR line
     geom_line()
 
@@ -231,6 +246,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
       x=c(0, args$lim, args$trigger, xlim, xlim, 0, 0),
       y=c(args$min, args$min, args$target, args$target, ylim, ylim, args$min)),
       aes(x=x, y=y), fill="red", alpha=alpha)
+
   }
 
   return(p)
