@@ -142,6 +142,7 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 # plot_hockeystick.hcr {{{
 
 #' @examples
+#' data(ple4)
 #' args <- list(lim=1e5, trigger=4e5, target=0.25, min=0,
 #'   metric="ssb", output="fbar")
 #' # Plot hockeystick.hcr for given arguments
@@ -182,6 +183,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
       pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  min),
     # ABOVE trigger
     target))
+
  
   # DATA
   dat <- data.frame(met=met, out=out)
@@ -208,18 +210,25 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
   }
 
   if(kobe) {
+  
+  # PREDICT for xtarget
+  ytarget <- ifelse(xtarget < trigger,
+    pmax(c(target * ((xtarget - trigger) / (trigger - lim) + 1)),  min),
+    target)
+
   p <- p +
     # YELLOW
     geom_polygon(data=data.frame(x=c(args$lim, xtarget, xtarget, args$lim),
-      y=c(args$min, args$min, args$target, args$min)),
+      y=c(args$min, args$min, ytarget, args$min)),
       aes(x=x, y=y), fill="yellow", alpha=alpha) +
     # GREEN
-    geom_polygon(data=data.frame(x=c(xtarget, xlim, xlim, xtarget),
-      y=c(0, 0, rep(args$target, 2))),
+    geom_polygon(data=data.frame(
+      x=c(xtarget, xlim, xlim, args$trigger, xtarget, xtarget),
+      y=c(0, 0, rep(args$target, 2), ytarget, ytarget)),
       aes(x=x, y=y), fill="green", alpha=alpha) +
     # RED
     geom_polygon(data=data.frame(
-      x=c(0, args$lim, xtarget, xlim, xlim, 0, 0),
+      x=c(0, args$lim, args$trigger, xlim, xlim, 0, 0),
       y=c(args$min, args$min, args$target, args$target, ylim, ylim, args$min)),
       aes(x=x, y=y), fill="red", alpha=alpha)
   }
