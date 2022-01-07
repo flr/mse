@@ -426,50 +426,6 @@ setMethod("summary", signature(object="FLombf"),
   }
 ) # }}}
 
-# summary {{{
-
-setMethod("summary", signature(object="FLombf"),
-  function(object) {
-
-		cat("An object of class \"", class(object), "\"\n\n", sep="")
-    
-    # name
-		cat("Name:", object@name, "\n")
-    
-    # stock
-    dms <- dims(stock(object))
-    dm <- dim(stock(object))
-		cat("stock:\n")
-		cat("  dims: ", dms$quant, "\tyear\tunit\tseason\tarea\titer\n")
-    cat("  ", dm, "\n", sep="\t")
-
-    # sr
-    cat("sr: \n")
-    
-    cat("  model: \t")
-    nm <- SRModelName(model(sr(object)))
-    if(!is.null(nm)) {
-      cat(nm, "\n")
-    } else {
-      print(model(sr(object)), showEnv=FALSE)
-    }
-    
-    cat("  params: \n")
-    cat("  ", dimnames(params(sr(object)))$param, "\n", sep="\t")
-    cat("  ", apply(params(sr(object)), 1, median), "\n", sep="\t")
-
-    # refpts
-    cat("  refpts: \n")
-    cat("  ", dimnames(refpts(object))$param, "\n", sep="\t")
-    cat("  ", apply(refpts(object), 1, median), "\n", sep="\t")
-
-    # projection
-    # fleetBehaviour
-
-  }
-)
-# }}}
-
 # window {{{
 setMethod("window", signature(x="FLombf"),
   function(x, ...) {
