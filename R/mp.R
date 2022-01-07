@@ -574,7 +574,7 @@ setMethod("goFish", signature(om="FLombf"),
 
 			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
       ctrl.est$step <- "est"
-browser()  
+      
       out.assess <- Map(function(x, y, z)
         do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z))),
         x=stk0, y=idx0, z=tracking)

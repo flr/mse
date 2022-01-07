@@ -151,13 +151,14 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 #' # Superpose Kobe colours
 #' plot_hockeystick.hcr(args, kobe=TRUE)
 #' data(ple4)
+#' # Change labels
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE,
 #'   labels=c(limit="Blim", trigger="Btrigger", target="Ftarget"))
 #' # Set actual x (e.g. biomass) target.
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE, xtarget=args$trigger * 0.80)
 #' #' Add line and label for Btarget
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE, xtarget=args$trigger * 0.80) +
-#' geom_vline(xintercept=args$trigger * 0.80) +
+#' geom_vline(xintercept=args$trigger * 0.80, linetype=3) +
 #' geom_label(x=args$trigger * 0.80, y=0.7, label="SBtarget")
 #' # ADD a time line and decade labels
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE) +
