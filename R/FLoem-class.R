@@ -255,3 +255,22 @@ setMethod("window", signature(x="FLoem"),
     return(x)
   }
 ) # }}}
+
+# propagate {{{
+setMethod("propagate", signature(object="FLoem"),
+	function(object, iter, fill.iter=TRUE) {
+
+    # observations
+    if(!is.null(observations(object)) & length(observations(object)) > 0) {
+      observations(object) <- rapply(observations(object), propagate,
+        how='replace', iter=iter, fill.iter=fill.iter)
+    }
+
+    # deviances
+    if(!is.null(deviances(object)) & length(deviances(object)) > 0) {
+      deviances(object) <- rapply(deviances(object), propagate,
+        how='replace', iter=iter, fill.iter=fill.iter)
+    }
+    return(object)
+  }
+) # }}}
