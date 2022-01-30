@@ -56,6 +56,10 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
   # fy, defaults to maxyear
   fy <- args$fy <- if(is.null(args$fy)) dis$maxyear else args$fy
+
+  # CHECK fy > iy
+  if(fy <= iy)
+    stop("Final year (fy) must be greater than intermediate year (iy).")
   
   # nsq, defaults to 3
   nsqy <- args$nsqy <- if(is.null(args$nsqy)) 3 else args$nsqy
@@ -75,7 +79,12 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
   # vector of years to be projected
 	vy <- args$vy <- ac(seq(iy, fy - management_lag, by=frq))
-  
+
+  # CHECK proj years do not extend beyond fy
+  if(an(vy[length(vy)]) + frq > fy) {
+    args$vy <- vy <- vy[-length(vy)]
+  }
+
   # number of seasons & units
   ns <- args$ns <- dims(om)$season
   nu <- args$nu <- dims(om)$unit
@@ -139,19 +148,24 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 	# PREPARE for parallel if needed
   cores <- getDoParWorkers()
 
-	if(isTRUE(parallel) & cores > 1) {
+  if(is.numeric(parallel)) {
+    cores <- parallel
+    parallel <- TRUE
+  }
+
+	if(isTRUE(parallel) & cores > 0) {
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
 
     # LOOP and combine
 		lst0 <- foreach(j=its, 
- 		  .combine=.combinegoFish,
+		  .combine=.combinegoFish,
 			.packages="mse", 
 			.multicombine=TRUE, 
 			.errorhandling = "remove", 
 			.inorder=TRUE) %dopar% {
-
+      
 				call0 <- list(
           om = iter(om, j),
 					oem = iter(oem, j),
@@ -190,9 +204,13 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 		}
 
   # TODO CHECK outputs
-
+  
   # GET objects back from loop
 	om <- lst0$om
+
+  if(is.null(om))
+    stop("goFish returned no results")
+
 	tracking <- window(lst0$tracking, start=iy, end=fy)
 	oem <- lst0$oem
 
@@ -227,12 +245,12 @@ setMethod("goFish", signature(om="FLom"),
   # COPY ctrl
 	ctrl0 <- ctrl
 
-	# go fish
+	# go fish!
 
   for(i in vy) {
-    
-    if(verbose) cat(i, " > ")
 
+    if(verbose) cat(i, " > ")
+    
     # time (start)   
     track(tracking, "time", i) <- as.numeric(Sys.time())
 
@@ -477,7 +495,7 @@ setMethod("goFish", signature(om="FLom"),
 
 		gc()
 	}
-
+  
   # TRACK om in final mys
   track(tracking, "F.om", mys) <- unitMeans(fbar(om))[, ac(mys)]
   track(tracking, "B.om", mys) <- unitSums(tsb(om))[, ac(mys)]
@@ -546,7 +564,7 @@ setMethod("goFish", signature(om="FLombf"),
 
     # APPLY oem over each biol
     o.out <- Map(function(stk, dev, obs, tra) {
-
+      
       do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
 
@@ -647,8 +665,8 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
 
       # DEBUG ASSIGN biol
-      if(all(is.na(ctrl$biol)))
-        ctrl$biol <- args$stock
+      #if(all(is.na(ctrl$biol)))
+      #  ctrl$biol <- args$stock
 
 			tracking <- out$tracking
 		} else {
@@ -682,8 +700,8 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
 
       # DEBUG ASSIGN biol
-      if(all(is.na(ctrl$biol)))
-        ctrl$biol <- args$stock
+      #if(all(is.na(ctrl$biol)))
+      #  ctrl$biol <- args$stock
 
 			tracking <- out$tracking
 
