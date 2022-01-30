@@ -295,10 +295,15 @@ setMethod("performance", signature(x="FLombf"),
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     probs=NULL, mp=NULL) {
     
+    # CALL for metrics by biol
     mets <- metrics(x, metrics)
 
-    mets <- lapply(setNames(nm=names(mets[[1]])),
+    # SET list with biols' metrics
+    mets <- lapply(setNames(nm=names(biols(x))),
       function(i) FLQuants(lapply(X=mets, FUN="[[", i)))
+
+    # DEBUG
+    # mets <- list(SKJ=mets)
 
     res <- mapply(function(xx, rr) {
       performance(x=xx, statistics=statistics, refpts=rr, years=years,
