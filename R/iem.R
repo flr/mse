@@ -25,9 +25,12 @@ noise.iem <- function(ctrl, fun="rlnorm", mean=0, sd=0.1, multiplicative=TRUE, a
 	lst
 } # }}}
 
+# partial.iem {{{
 
 partial.iem <- function(ctrl, args, tracking, response=c("catch", "effort"),
-  nocomp=c('GL', 'LI', 'LL', 'Other')) {
+  nocomp=NULL) {
+  
+  # TODO MATCH names
 
   idx <- ctrl$fishery %in% nocomp
 
@@ -43,6 +46,9 @@ partial.iem <- function(ctrl, args, tracking, response=c("catch", "effort"),
   ctrl@target[idx, "relCatch"] <- ctrl@target[idx, "catch"]
 
   # TODO ADD effort limit
+  if(response[1] == "catch") {
+    a <- 1
+  }
 
   # OPTION 2. nocomp fisheries keep effort as last year
   
@@ -53,4 +59,4 @@ partial.iem <- function(ctrl, args, tracking, response=c("catch", "effort"),
   }
 
   res <- list(ctrl=ctrl, tracking=tracking)
-}
+} # }}}
