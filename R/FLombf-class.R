@@ -231,23 +231,27 @@ setMethod("sr", signature(object="FLombf"),
 )
 # }}}
 
+# biol metrics
+
+# fishery metrics
+
 # catch, landings, discards {{{
 
 setMethod("catch", signature(object="FLombf"),
-  function(object) {
-    return(catch(fisheries(object)))
+  function(object, by="catch") {
+    return(catch(fisheries(object), by=by))
   }
 )
 
 setMethod("landings", signature(object="FLombf"),
-  function(object) {
-    return(landings(fisheries(object)))
+  function(object, by="catch") {
+    return(landings(fisheries(object), by=by))
   }
 )
 
 setMethod("discards", signature(object="FLombf"),
-  function(object) {
-    return(discards(fisheries(object)))
+  function(object, by="catch") {
+    return(discards(fisheries(object), by=by))
   }
 )
 # }}}
@@ -260,11 +264,6 @@ setMethod("ssb", signature(object="FLombf"),
     res <- FLQuants(mapply(ssb, biols(object),
       f=harvest(object), SIMPLIFY=FALSE))
 
-    if(!is.null(biol))
-      if(length(biol) == 1)
-        return(res[[biol]])
-      else
-        return(res[biol])
     return(res)
   }
 )
@@ -275,16 +274,19 @@ setMethod("tsb", signature(object="FLombf"),
     res <- FLQuants(mapply(tsb, biols(object),
       f=harvest(object), SIMPLIFY=FALSE))
     
-    if(!is.null(biol))
-      if(length(biol) == 1)
-        return(res[[biol]])
-      else
-        return(res[biol])
     return(res)
   }
 )
 
+setMethod("tb", signature(object="FLombf"),
+  function(object, biol=NULL) {
 
+    res <- FLQuants(mapply(tb, biols(object),
+      f=harvest(object), SIMPLIFY=FALSE))
+    
+    return(res)
+  }
+)
 # }}}
 
 # harvest {{{
@@ -483,9 +485,18 @@ setMethod("fwd", signature(object="FLombf", fishery="missing", control="fwdContr
     # ADD object FCB if missing
     if(all(is.na(FCB(control))))
       FCB(control) <- FCB(object)
+    
+    # deviances
+    deviances <- lapply(biols(object), function(x) {
+      if(!is.null(x@rec$residuals))
+        x@rec$residuals
+      else
+        n(x)[1,] %=% 0
+    })
 
     # CALL fwd(FLBiols, FLFisheries)
-    res <- fwd(object@biols, object@fisheries, control=control, ...)
+    res <- fwd(object@biols, object@fisheries, control=control,
+      deviances=deviances, ...)
     
     # EXTRACT results
     object@biols <- res$biols
@@ -499,19 +510,19 @@ setMethod("fwd", signature(object="FLombf", fishery="missing", control="fwdContr
 setMethod("plot", signature(x="FLombf", y="missing"),
   function(x, metrics=list(SBMSY=ssb ~ SBmsy, FMSY=fbar ~ Fmsy)) {
 
-    # 1. SB/SBMSY + F/FMSY
-    ssbs <- ubind(ssb(x))
+    # 1. TODO SB/SBMSY + F/FMSY
+    ssbs <- lapply(ssb(x), unitSums)
     p1 <- plot(ssbs) + ylim(c(0,NA)) +
-      ylab(paste0("SSB (", units(ssbs) , ")"))
+      ylab(paste0("SSB (", units(ssbs[[1]]) , ")"))
 
     # 2. catch by fleet
-    cas <- ubind(catch(fisheries(x)))
+    cas <- lapply(catch(fisheries(x)), unitSums)
     p2 <- plot(cas) + ylim(c(0, NA)) +
-      ylab(paste0("Catch (", units(cas), ")")) +
+      ylab(paste0("Catch (", units(cas[[1]]), ")")) +
       theme(legend.position="bottom")
 
-    # TODO COMBINE p1 + p2
-    return(p1)
+    # COMBINE p1 + p2
+    return(p1 + p2)
 
  }) # }}}
 
@@ -594,7 +605,7 @@ setMethod("[", signature(x="FLombf"),
 # metrics {{{
 setMethod("metrics", signature(object="FLombf", metrics="missing"),
   function(object) {
-    metrics(object, list(SB=ssb, C=catch, F=fbar))
+    is(metrics(object, list(SB=ssb, C=catch, F=fbar)))
 }) # }}}
 
 # stock {{{
@@ -611,3 +622,20 @@ setMethod("stock", signature(object="FLombf"),
   }
 )
 # }}}
+
+# propagate {{{
+setMethod("propagate", signature(object="FLombf"),
+	function(object, iter, fill.iter=TRUE) {
+
+    biols(object) <- lapply(biols(object), propagate, iter=iter,
+      fill.iter=fill.iter)
+
+    fisheries(object) <- lapply(fisheries(object), propagate, iter=iter,
+      fill.iter=fill.iter)
+    
+    refpts(object) <- FLPars(lapply(object@refpts, propagate, iter=iter,
+      fill.iter=fill.iter))
+    
+    return(object)
+  }
+) # }}}
