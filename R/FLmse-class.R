@@ -210,10 +210,11 @@ setMethod("plot", signature(x="FLmse", y="missing"),
   }
 ) 
 
-setMethod("plot", signature(x="FLom", y="FLmse"),
+setMethod("plot", signature(x="FLo", y="FLmse"),
   function(x, y, ..., window=TRUE) {
 
     args <- list(...)
+
     fms <- unlist(lapply(args, is, "FLmse"))
 
     stocks <- lapply(c(list(x, om(y)), args[fms]), stock)
