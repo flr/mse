@@ -1,4 +1,4 @@
-# cr.R - DESC
+# hcr.R - DESC
 # mse/R/hcr.R
 
 # Copyright European Union, 2018
@@ -118,20 +118,24 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
       pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  min),
     # ABOVE trigger
     target))
-    
+
+  # LIMITS over previous output
+  pre <- unitSums(seasonSums(window(do.call(output, list(stk)),
+    start=ay - data_lag, end=ay - data_lag)))
+  
   # IF NA, set to previous value
   if(any(is.na(out)))
-    out[is.na(out)] <- tracking[[1]]['hcr', ac(ay - 1)][is.na(out)]
+    out[is.na(out)] <- pre[is.na(out)]
+
+  # APPLY limits
+  out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
+  out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
 
   # CONTROL
   ctrl <- fwdControl(
     # TARGET for frq years
     c(lapply(seq(ay + man_lag, ay + frq), function(x)
-      list(quant=output, value=c(out), year=x)),
-    # CHANGE limits
-    lapply(seq(ay + man_lag, ay + frq), function(x)
-      list(quant=output, min=rep(dlow, dim(out)[6]), max=rep(dupp, dim(out)[6]),
-        year=x, relYear=x - 1)))
+      list(quant=output, value=c(out), year=x)))
   )
 
 	list(ctrl=ctrl, tracking=tracking)
@@ -174,17 +178,25 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
 
 plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
   xtarget=args$trigger, alpha=0.3,
-  labels=c(limit="limit", trigger="trigger", min="min", target="target")) {
-
+  labels=c(lim="limit", trigger="trigger", min="min", target="target")) {
+  
   # EXTRACT args from mpCtrl
-  if(is(args, "mpCtrl"))
-    args <- args$args
+  if(is(args, "mseCtrl"))
+    args <- args(args)
+
+  # ASSIGN min if missing
+  if(!"min" %in% names(args))
+    args$min <- 0
+  if(!"metric" %in% names(args))
+    metric <- "ssb"
+  if(!"output" %in% names(args))
+    output <- "fbar"
 
   # SET args
   spread(args)
   xlim <- trigger * 1.50
   ylim <- target * 1.50
-
+  
   # GET observations
   if(!missing(obs)) {
     obs <- model.frame(metrics(obs, list(met=get(metric), out=get(output))))
@@ -211,7 +223,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
   
   p <- ggplot(dat, aes(x=met, y=out)) +
     coord_cartesian(ylim = c(0, ylim), clip="off") +
-    xlab(toupper(metric)) + ylab(toupper(output)) +
+    # DROP xlab(toupper(metric)) + ylab(toupper(output)) +
     # TARGET
     geom_segment(aes(x=0, xend=trigger * 1.25, y=target, yend=target), linetype=2) +
     annotate("text", x=0, y=target + ylim / 30, label=labels$target, hjust="left") +
@@ -311,18 +323,18 @@ trend.hcr <- function(stk, ind, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
   slope[lnas] <- dat[iter %in% rnas, .(slope=coef(lm(log(data) ~ year))[2]),
     by=iter][, (slope)]
 
-  # TAC TODO GET TAC from tracking['hcr',]
-  tac <- catch(stk)[, dy]
+  # TAC TODO GET TAC from tracking['hcr',] ?
+  tac <- seasonSums(unitSums(catch(stk)[, dy]))
 
   # FIND iters with negative slope
   id <- slope < 0
 
   # slope < 0
-  tac[,,,,, id & lnas] <- catch(stk)[, dy,,,, id & lnas] *
+  tac[,,,,, id & lnas] <- tac[, dy,,,, id & lnas] *
     (1 - k1 * abs(slope[id & lnas]) ^ gamma) 
 
   # slope >= 0
-  tac[,,,,, !id & lnas] <- catch(stk)[, dy,,,, !id & lnas] *
+  tac[,,,,, !id & lnas] <- tac[, dy,,,, !id & lnas] *
     (1 + k2 * slope[!id & lnas]) 
 
   # CONTROL
