@@ -147,7 +147,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
       index.q=index.q(x)[, dyrs] * y[, dyrs])
 
     # SET 0s to min / 2
-    index(res)[index(res) == 0] <- min(index(res)[index(res) > 0] / 2)
+    index(res)[index(res) == 0] <- c(min(index(res)[index(res) > 0] / 2))
     
     # SET 0s to min / 2
     index(x)[, dyrs] <- index(res)
