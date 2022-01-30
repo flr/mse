@@ -56,7 +56,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
   rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
     verbose=FALSE, ...)
-  
+ 
   pmin <- performance(rmin, metrics=metrics, 
     statistic=statistic, refpts=refpts(om), probs=NULL, years=years)
   obmin <- mean(pmin$data, na.rm=TRUE) - prob

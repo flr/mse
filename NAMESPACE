@@ -4,6 +4,7 @@ import("ggplotFL")
 import("FLCore")
 import("foreach")
 import("progressr")
+import("patchwork")
 import("FLasher")
 
 importFrom("FLBRP",

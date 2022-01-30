@@ -141,6 +141,7 @@ setMethod("show", signature(object = "mpCtrl"),
     print(names(object))
  }) # }}}
 
+# DEBUG WHY iters?
 # iters {{{
 
 #' @rdname mpCtrl-class

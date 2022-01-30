@@ -119,10 +119,6 @@ setReplaceMethod("stock", signature("FLom", "FLStock"), function(object, value){
 setMethod("sr", "FLom", function(object) object@sr)
 
 #' @rdname FLom-class
-
-setGeneric("sr<-", function(object, value) standardGeneric("sr<-"))
-
-#' @rdname FLom-class
 #' @param value Object to assign in slot
 
 setReplaceMethod("sr", signature("FLom", "FLSR"), function(object, value){
@@ -435,7 +431,7 @@ setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl
 
 # iter {{{
 
-setMethod("iter", signature(obj="FLo"),
+setMethod("iter", signature(obj="FLom"),
   function(obj, iter) {
 
     # stock
