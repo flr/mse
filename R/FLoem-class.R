@@ -199,7 +199,11 @@ setMethod("iter", signature(obj = "FLoem"),
       function(x) lapply(x, FLCore::iter, iter))
 
     # OBSERVATIONS
-	  observations(obj) <- lapply(observations(obj), FLCore::iter, iter)
+    if(any(c("stk", "idx") %in% names(observations(obj))))
+  	  observations(obj) <- lapply(observations(obj), FLCore::iter, iter)
+	  else
+      observations(obj) <- lapply(setNames(nm=names(observations(obj))), function(i)
+           lapply(observations(obj)[[i]], "iter", iter))
 
     return(obj)
 })
@@ -210,32 +214,59 @@ setMethod("iter", signature(obj = "FLoem"),
 
 #' @rdname FLoem-class
 
-setMethod("combine", signature(x = "FLoem", y = "FLoem"), function(x, y, ...){
-  
-  args <- c(list(x, y), list(...))
+setMethod("combine", signature(x="FLoem", y="FLoem"),
+  function(x, y, ..., check=FALSE) {
 
-	if(length(args) > 2) {
-		return(combine(combine(x, y), ...))
-	} else {
-		obj <- x
-		
-    dev <- deviances(obj)
-		obs <- observations(obj)
+    args <- c(list(x=x, y=y), list(...))
     
-#    if(length(dev) > 0)
-#		  for(i in seq(length(dev)))
-#        dev[[i]] <- combine(deviances(x)[[i]], deviances(y)[[i]])
-		
-    if(length(obs) > 0)
-      for(i in seq(length(obs)))
-        obs [[i]] <- combine(observations(x)[[i]], observations(y)[[i]])
+    # OBSERVATIONS
+    obs <- lapply(args, slot, "observations")
+    
+    # DEVIANCES
+    devs <- lapply(args, slot, "deviances")
 
-		deviances(obj) <- dev
-		observations(obj) <- obs
+    # IF no observations
+    if(length(obs) < 1)
+      return(x)
 
-		return(obj)
-	}
-})
+    # NAMES to check or build on
+    nms <- names(obs[[1]])
+
+    # FLom: DOES obs[[1]] contain stk | idx? 
+    if(any(c("stk", "idx") %in% nms)) {
+
+        # FIND elements in observations
+        elems <- setNames(nm=names(obs[[1]]))
+        
+        # COMBINE across elements
+        obs <- lapply(elems, function(e)
+          Reduce(combine, lapply(obs, "[[", e)))
+
+    # FLombf
+    } else {
+
+      obs <- lapply(setNames(nm=nms), function(s) {
+
+        # EXTRACT biol observations
+        bios <- lapply(obs, "[[", s)
+
+        # FIND elements in observations
+        elems <- setNames(nm=names(bios[[1]]))
+        
+        # COMBINE across elements
+        lapply(elems, function(e)
+          Reduce(combine, lapply(bios, "[[", e)))
+      })
+    }
+
+    # DEVIANCES
+
+    # ASSIGN to x
+    observations(x) <- obs
+
+    return(x)
+  }
+)
 # }}}
 
 # fwdWindow {{{
@@ -274,3 +305,6 @@ setMethod("propagate", signature(object="FLoem"),
     return(object)
   }
 ) # }}}
+
+
+
