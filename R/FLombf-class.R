@@ -306,7 +306,7 @@ setMethod("harvest", signature(object="FLombf", catch="missing"),
 
 setMethod("partialF", signature(object="FLombf", fisheries="missing"),
   function(object, biol=seq(biols(object))) {
-
+    
     res <- partialF(biols(object), fisheries=fisheries(object),
       biol=biol, fcb=FCB(object))
 
@@ -491,7 +491,7 @@ setMethod("fwd", signature(object="FLombf", fishery="missing", control="fwdContr
       if(!is.null(x@rec$residuals))
         x@rec$residuals
       else
-        n(x)[1,] %=% 0
+        n(x)[1,] %=% 1
     })
 
     # CALL fwd(FLBiols, FLFisheries)
@@ -639,3 +639,49 @@ setMethod("propagate", signature(object="FLombf"),
     return(object)
   }
 ) # }}}
+
+# iter {{{
+setMethod("iter", signature(obj="FLombf"),
+  function(obj, iter) {
+
+    # biols
+    biols(obj) <- lapply(biols(obj), 'iter', iter)
+
+    # fisheries
+    fisheries(obj) <- lapply(fisheries(obj), 'iter', iter)
+
+    # refpts
+    obj@refpts <- FLPars(lapply(obj@refpts, 'iter', iter))
+
+    return(obj)
+  }
+) 
+# }}}
+
+# combine {{{
+
+setMethod("combine", signature(x = "FLombf", y = "FLombf"), function(x, y, ...){
+	
+  args <- c(list(x, y), list(...))
+
+	if(length(args) > 2) {
+
+		return(combine(combine(x, y), ...))
+	
+  } else {
+
+    # biols
+    biols(x) <- Map(combine, x=biols(x), y=biols(y))
+
+    # fisheries
+    fisheries(x) <- Map(function(i, j) {
+      combine(i, j)
+    }, i=fisheries(x), j=fisheries(y))
+
+    # refpts
+    slot(x, 'refpts') <- do.call(combine, lapply(args, slot, 'refpts'))
+
+    return(x)
+	}
+})
+# }}}
