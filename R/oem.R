@@ -80,33 +80,52 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
 
 # sampling.oem {{{
 
+#' Samples from an operating model to obtain catch, biology and abundance data
+#'
+#' This observation error model (OEM) function mimics the most common data
+#' collection regime, in which catch-at-age and biology is sampled from the
+#' population, and one or more indices of abundance are derived from surveys
+#' or CPUE data.
+#'
+#' The FLStock object passed to *sampling.oem* by the *mp* function is simplified
+#' to match the dimensions of that present in the *observations* slot.
+#'
+#' @param stk An FLStock object as obtained by the call to *stock(om)*.
+#' @param deviances A named list of deviances, see Details.
+#' @param observations A named list of observations, see Details.
+#' @param args Options and arguments passed on by *mp()*.
+#' @param tracking The tracking object.
+#' @return A named list with elements *stk*, *idx*, *observations* and *tracking*.
+#' @author Iago Mosqueira (WUR) & Ernesto Jardim (MSC).
+#' @seealso \link{mp}
+#' @keywords function
 #' @examples
 #' data(ple4om)
-#' oem@deviances$idx <- lapply(oem@observations$idx, function(x) index(x) %=% 0.1)
-#' oem@deviances$stk <- FLQuants(catch.n=catch.n(stock(om)) %=% 0.1)
-#' oem@observations$idx[[1]] <- propagate(oem@observations$idx[[1]], 50)
+#' # Generate samples from year 2000:2016
 #' sampling.oem(stock(om), deviances=deviances(oem), observations=observations(oem),
 #'   args=list(y0=2000, dy=2016, frq=1), tracking=FLQuant())
 
-sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
- 
+sampling.oem <- function(stk, deviances, observations, args, tracking) {
+
   # DIMENSIONS
   y0 <- ac(args$y0)
   dy <- ac(args$dy)
   dyrs <- ac(seq(args$dy - args$frq + 1, args$dy))
 
-  # DROP units from observation
-  stk <- nounit(stk)
+  # CHECK inputs
+  if(!all(names(deviances) == c("stk", "idx")))
+    stop("deviances(oem) must have elements 'stk' and 'idx'.")
 
+  if(!all(names(observations) == c("stk", "idx")))
+    stop("observations(oem) must have elements 'stk' and 'idx'.")
+
+  # SIMPLIFY to match dimensions of observations$stk
+  simp <- (dim(observations$stk)[c(3,4,5)] == 1) + (dim(stk)[c(3,4,5)] == 1) < 2
+  if(any(simp))
+    stk <- simplify(stk, c("unit", "season", "area")[simp], harvest=FALSE)
+  
   # SUBSET year range
 	stk <- window(stk, start=y0, end=dy, extend=FALSE)
-
-  # SIMPLIFY to match observations$stk
-  dio <- dim(observations$stk)
-  dis <- dim(stk)
-
-  if(dio[4] == 1 & dis[4] > 1)
-    stk <- noseason(stk)
 
   # --- STK
 
@@ -118,7 +137,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking, ...) {
       do.call(i, list(object=stk))[, dyrs] * deviances$stk[[i]][, dyrs] + 0.001
     }
 
-    # COMPUTE depending on inputs
+    # COMPUTE aggregated slots
     landings(stk)[, dyrs] <- computeLandings(stk[, dyrs])
     discards(stk)[, dyrs] <- computeDiscards(stk[, dyrs])
     catch(stk)[, dyrs] <- computeCatch(stk[, dyrs])
