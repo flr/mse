@@ -100,6 +100,10 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   man_lag <- args$management_lag
   frq <- args$frq
 
+  # HANDLE metric and output as functions
+  metric <- as.character(substitute(metric))
+  output <- as.character(substitute(output))
+
   # SET limits if NA
   if(is.na(dlow))
     dlow <- 1e-8
@@ -132,6 +136,12 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
 
   # CONTROL
+  ctrl <- fwdControl(
+    # TARGET for frq years
+    c(lapply(seq(ay + man_lag, ay + frq), function(x)
+      list(quant=output, value=c(out), year=x)))
+  )
+
   ctrl <- fwdControl(
     # TARGET for frq years
     c(lapply(seq(ay + man_lag, ay + frq), function(x)
