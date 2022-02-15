@@ -125,7 +125,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
 
 # }}}
 
-# track<- FLQuants, numeric{{{
+# track<- FLQuant, numeric{{{
 
 setReplaceMethod("track", signature(object="FLQuant", value="numeric"),
   function(object, step, year=dimnames(value)$year, ..., value) {

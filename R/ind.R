@@ -62,6 +62,7 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
 } # }}}
 
 # len.ind {{{
+
 len.ind <- function (stk, idx, args, tracking, indicator="mlc", params,
   nyears=3, cv=0.1, lmax=1.25, bin=1, n=500, ...) {
 

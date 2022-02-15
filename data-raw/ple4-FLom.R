@@ -37,8 +37,6 @@ fit <- sca(stk, idx, fit="MCMC",
   mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
 
 stk <- slim(stk + fit)
-# stk <- stk + fit
-
 
 # Make SRRs
 
@@ -46,10 +44,21 @@ stk <- slim(stk + fit)
 rv1 <- sqrt(mean(c(iterVars(log(rec(stk)))), na.rm=TRUE))
 
 # average autocor lag1
-ac1 <- mean(apply(window(rec(stk), end=2008)@.Data,6,function(x) c(acf(c(x), plot=FALSE, lag.max=1)$acf[2])))
+ac1 <- mean(apply(window(rec(stk), end=2008)@.Data, 6, function(x)
+  c(acf(c(x), plot=FALSE, lag.max=1)$acf[2])))
 
 # BevHolt
-srbh <- fmle(as.FLSR(stk, model="bevholt"), method="L-BFGS-B", lower=c(1e-6, 1e-6), upper=c(max(rec(stk)) * 3, Inf))
+library(FLSRTMB)
+
+srbh <- as.FLSR(stk, model="bevholtSV")
+res <- lapply(1:50, function(x) srrTMB(iter(srbh, x), spr=yearMeans(spr0y(stk))))
+
+srbh <- srrTMB(srbh, spr=yearMeans(spr0y(stk)))
+
+params(srbh) <- propagate(params(srbh), 50)
+
+for(i in 1:50)
+  params(srbh)[,i] <- params(res[[i]])
 
 # Deviances
 devbh <- ar1rlnorm(rho=ac1, years=dy:fy, iters=it, margSD=rv1*2)
@@ -99,15 +108,6 @@ oem <- FLoem(method=sampling.oem,
 
 sel.pattern(observations(oem)$idx[[1]]) <- window(catch.sel(stk), start=1996)
 
-computeQ(observations(oem)$idx, window(stk, start=1996, end=2017), index(fit))
-
-
-
-
 # SAVE
 
 save(om, oem, file="../data/ple4om.RData", compress="xz")
-
-# TESTS
-
-

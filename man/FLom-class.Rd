@@ -8,7 +8,6 @@
 \alias{stock,FLom-method}
 \alias{stock<-,FLom,FLStock-method}
 \alias{sr,FLom-method}
-\alias{sr<-}
 \alias{sr<-,FLom,FLSR-method}
 \alias{combine,FLom,FLom-method}
 \alias{om<-,FLmse,FLo-method}
@@ -26,8 +25,6 @@ FLom(...)
 \S4method{stock}{FLom,FLStock}(object) <- value
 
 \S4method{sr}{FLom}(object)
-
-sr(object) <- value
 
 \S4method{sr}{FLom,FLSR}(object) <- value
 

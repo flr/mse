@@ -49,7 +49,7 @@ deviances(object) <- value
 
 \S4method{iter}{FLoem}(obj, iter)
 
-\S4method{combine}{FLoem,FLoem}(x, y, ...)
+\S4method{combine}{FLoem,FLoem}(x, y, ..., check = FALSE)
 }
 \arguments{
 \item{...}{additional argument list that might never be used}
