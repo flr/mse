@@ -38,6 +38,7 @@ Collate:
   'FLombf-class.R'
   'FLiem-class.R'
   'FLmse-class.R'
+  'FLmses-class.R'
   'dispatch.R'
   'fb.R'
   'hcr.R'
