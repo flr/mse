@@ -113,7 +113,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   tracking <- FLQuant(NA, dimnames=list(
     metric=c(metric, steps[steps %in% names(ctrl)], "time", "fwd"),
     year=ac(seq(iy - data_lag - frq + 1, fy + management_lag)),
-    unit=dmns$unit,
+    unit="unique",
     season=dmns$season,
     iter=1:args$it))
 
@@ -373,8 +373,10 @@ setMethod("goFish", signature(om="FLom"),
 			if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
 			ctrl.hcr$ioval <- list(iv=list(t1=flsval, t2=flqsval), ov=list(t1=flfval))
       ctrl.hcr$step <- "hcr"
-
-			out <- do.call("mpDispatch", ctrl.hcr)
+      
+			# out <- try(do.call("mpDispatch", ctrl.hcr))
+      out <- tryCatch(do.call("mpDispatch", ctrl.hcr),
+        error = function(e) stop(paste0("HCR: ", i)))
       ctrl <- out$ctrl
 
 			tracking <- out$tracking
@@ -486,7 +488,10 @@ setMethod("goFish", signature(om="FLom"),
 		ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
     ctrl.om$step <- "om"
     
-    om <- do.call("mpDispatch", ctrl.om)$om
+    # om <- do.call("mpDispatch", ctrl.om)$om
+    out <- tryCatch(do.call("mpDispatch", ctrl.om),
+        error = function(e) stop(paste0("OM: ", i)))
+    om <- out$om
 
     # time (end)   
     track(tracking, "fwd", mys) <- ctrl
