@@ -153,7 +153,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
   # CHOOSE indices to be updated (maxyear >= dy)
   upi <- unlist(lapply(idx, function(x) unname(range(x, "maxyear")) > args$dy))
 
-  if(is.null(deviances$idx)) {
+  if(is.null(deviances$idx) | length(deviances$idx) == 0) {
     deviances$idx <- lapply(observations$idx, function(x) index.q(x) %=% 1)
   }
 
