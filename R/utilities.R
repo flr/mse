@@ -61,3 +61,8 @@ find.original.name <- function(fun) {
 }
 # }}}
 
+# onAttach {{{
+.onAttach <- function(lib,pkg) {
+  registerDoSEQ()
+}
+# }}}
