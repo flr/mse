@@ -501,11 +501,12 @@ setMethod("goFish", signature(om="FLom"),
 		gc()
 	}
   
-  # TRACK om in final mys
-  track(tracking, "F.om", mys) <- unitMeans(fbar(om))[, ac(mys)]
-  track(tracking, "B.om", mys) <- unitSums(tsb(om))[, ac(mys)]
-  track(tracking, "SB.om", mys) <- unitSums(ssb(om))[, ac(mys)]
-  track(tracking, "C.om", mys) <- unitSums(catch(om))[, ac(mys)]
+  # TRACK om in final years
+  fys <- seq(dyf, ay + mlag + frq - 1)
+  track(tracking, "F.om", fys) <- unitMeans(fbar(om))[, ac(fys)]
+  track(tracking, "B.om", fys) <- unitSums(tsb(om))[, ac(fys)]
+  track(tracking, "SB.om", fys) <- unitSums(ssb(om))[, ac(fys)]
+  track(tracking, "C.om", fys) <- unitSums(catch(om))[, ac(fys)]
   
     # RETURN
 	list(om=window(om, start=iy, end=fy), tracking=window(tracking, end=fy),
