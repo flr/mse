@@ -153,7 +153,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
     parallel <- TRUE
   }
 
-  p <- progressor(along=vy)
+  # p <- progressor(along=vy)
 
 	if(isTRUE(parallel) & cores > 0) {
 
@@ -177,8 +177,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 					iem=iem,  # TODO needs it selection
 					ctrl= iters(ctrl, j),
 					args=c(args[!names(args) %in% "it"], it=length(j)),
-					verbose=verbose,
-          p=p)
+					verbose=verbose)
 				
         out <- do.call(goFish, call0)
         
@@ -199,8 +198,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 				iem=iem,
 				ctrl=ctrl,
 				args=args,
-				verbose=verbose,
-        p=p)
+				verbose=verbose)
 			
       out <- do.call(goFish, call0)
 
@@ -234,7 +232,7 @@ setGeneric("goFish", function(om, ...) standardGeneric("goFish"))
 # goFish FLom {{{
 
 setMethod("goFish", signature(om="FLom"),
-  function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose, p) {
+  function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) {
   
   it <- args$it     # number of iterations
 	y0 <- args$y0     # initial data year
@@ -254,8 +252,8 @@ setMethod("goFish", signature(om="FLom"),
   for(i in vy) {
 
     if(verbose) {
-      # message(i, " > ")
-      p(sprintf("ay: %s", i), amount = 0)
+      message(i, " > ")
+      # p(sprintf("ay: %s", i), amount = 0)
     }
 
     # time (start)   
@@ -507,7 +505,7 @@ setMethod("goFish", signature(om="FLom"),
 
 		gc()
     
-    p()
+    # p()
 	}
   
   # TRACK om in final years

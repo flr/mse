@@ -51,7 +51,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
   # PRINT at top
   if(verbose)
-    print(paste0("[1] ", names(tune), ": ",
+    cat(paste0("[1] ", names(tune), ": ",
       unlist(cmin$hcr@args[names(tune)])))
 
   rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
@@ -63,8 +63,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   
   # PRINT result
   if(verbose)
-    print(paste0("[1] diff: ", format(obmin, digits=2), "; ", names(tune), ": ",
-      unlist(cmin$hcr@args[names(tune)])))
+    cat(paste0(" - [1] diff: ", format(obmin, digits=2), "\n"))
 
   # CHECK cmin result
   if(isTRUE(all.equal(obmin, 0, tolerance=tol)))
@@ -77,8 +76,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
   # PRINT at top
   if(verbose)
-    print(paste0("[2] ", names(tune), ": ",
-      unlist(cmax$hcr@args[names(tune)])))
+    cat(paste0("[2] ", names(tune), ": ", unlist(cmax$hcr@args[names(tune)])))
 
   rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
     verbose=FALSE, ...)
@@ -89,7 +87,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   
   # PRINT result
   if(verbose)
-    print(paste0("[2] diff: ", format(obmax, digits=2)))
+    cat(paste0(" - [2] diff: ", format(obmax, digits=2), "\n"))
   
   # CHECK cmax result
   if(isTRUE(all.equal(obmax, 0, tolerance=tol)))
@@ -113,8 +111,8 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
     # PRINT at top
     if(verbose)
-      print(paste0("[", count + 2, "] ", names(tune), ": ",
-        unlist(cmid$hcr@args[names(tune)])))
+      cat(paste0("[", count + 2, "] ", names(tune), ": ",
+        format(unlist(cmid$hcr@args[names(tune)]), digits=3)))
 
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
       verbose=FALSE, ...)
@@ -124,8 +122,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
     # PRINT result
     if(verbose)
-      print(paste0("[", count + 2, "] diff: ", format(obmid, digits=2), "; ",
-        names(tune), ": ", unlist(cmid$hcr@args[names(tune)])))
+      cat(paste0(" - [", count + 2, "] diff: ", format(obmid, digits=2), "\n"))
   
     # CHECK and RETURN cmid result
     if(isTRUE(all.equal(obmid, 0, tolerance=tol))) {
