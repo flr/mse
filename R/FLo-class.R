@@ -133,9 +133,7 @@ setMethod("undebug", signature(fun="FLo"),
 #' @aliases fwd.om
 #' @param object the OM as a FLStock
 #' @param ctrl the fwdControl object with objectives and constraints
-#' @param sr a FLSR with the stock-recruitment model
-#' @param sr.residuals a FLQuant with S/R residuals
-#' @param sr.residuals.mult logical about residuals being multiplicative
+#' @param ... 
  
 fwd.om <- function(om, ctrl, ...){
 	
@@ -143,7 +141,7 @@ fwd.om <- function(om, ctrl, ...){
 
 	args$object <- om
 	args$control <- ctrl
-	
+
   om <- do.call("fwd", args)
 
 	list(om=om)
