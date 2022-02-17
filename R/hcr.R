@@ -334,7 +334,9 @@ trend.hcr <- function(stk, ind, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
     by=iter][, (slope)]
 
   # TAC TODO GET TAC from tracking['hcr',] ?
-  tac <- seasonSums(unitSums(catch(stk)[, dy]))
+  tac <- tracking[[1]]['hcr', dy]
+  if(all(is.na(tac)))
+    tac <- seasonSums(unitSums(catch(stk)[, dy]))
 
   # FIND iters with negative slope
   id <- slope < 0
