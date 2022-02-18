@@ -310,9 +310,12 @@ setMethod("goFish", signature(om="FLom"),
 			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
       ctrl.est$step <- "est"
       
-      # out.assess <- do.call("mpDispatch", ctrl.est)
+      # DISPATCH
       out.assess <- tryCatch(do.call("mpDispatch", ctrl.est),
-        error = function(e) break())
+        error = function(e){
+          track(tracking, "conv.est", ac(args$ay)) <- -1
+          return(list(stk=stk0, tracking=tracking))
+        })
       
       stk0 <- out.assess$stk
 
@@ -381,12 +384,16 @@ setMethod("goFish", signature(om="FLom"),
 			ctrl.hcr$ioval <- list(iv=list(t1=flsval, t2=flqsval), ov=list(t1=flfval))
       ctrl.hcr$step <- "hcr"
       
-			# out <- try(do.call("mpDispatch", ctrl.hcr))
-      out <- tryCatch(do.call("mpDispatch", ctrl.hcr),
-        error = function(e) break())
-      ctrl <- out$ctrl
-
-			tracking <- out$tracking
+      out.hcr <- tryCatch(do.call("mpDispatch", ctrl.hcr),
+        error = function(e){
+          track(tracking, "hcr", ac(args$ay)) <- -1
+          return(list(ctrl=as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]),
+            year=mys)), "fwdControl"),
+            tracking=tracking))
+        })
+    
+      ctrl <- out.hcr$ctrl
+			tracking <- out.hcr$tracking
 		} else {
       # DEFAULTS to F = mean(Fbar) over nsqy years
       ctrl <- as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]), year=mys)),

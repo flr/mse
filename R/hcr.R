@@ -473,7 +473,7 @@ cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
 #'   frq=1), tracking=FLQuant())
 
 fixedF.hcr <- function(stk, ftrg, args, tracking){
-
+stop()
   # args
 	ay <- args$ay
   mlag <- args$management_lag
