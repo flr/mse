@@ -310,7 +310,9 @@ setMethod("goFish", signature(om="FLom"),
 			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
       ctrl.est$step <- "est"
       
-      out.assess <- do.call("mpDispatch", ctrl.est)
+      # out.assess <- do.call("mpDispatch", ctrl.est)
+      out.assess <- tryCatch(do.call("mpDispatch", ctrl.est),
+        error = function(e) break())
       
       stk0 <- out.assess$stk
 
@@ -381,7 +383,7 @@ setMethod("goFish", signature(om="FLom"),
       
 			# out <- try(do.call("mpDispatch", ctrl.hcr))
       out <- tryCatch(do.call("mpDispatch", ctrl.hcr),
-        error = function(e) stop(paste0("HCR: ", i)))
+        error = function(e) break())
       ctrl <- out$ctrl
 
 			tracking <- out$tracking
@@ -495,7 +497,7 @@ setMethod("goFish", signature(om="FLom"),
     
     # om <- do.call("mpDispatch", ctrl.om)$om
     out <- tryCatch(do.call("mpDispatch", ctrl.om),
-        error = function(e) stop(paste0("OM: ", i)))
+        error = function(e) break())
     om <- out$om
 
     # time (end)   
