@@ -252,7 +252,7 @@ setMethod("goFish", signature(om="FLom"),
   for(i in vy) {
 
     if(verbose) {
-      message(i, " > ")
+      cat(i, " > ")
       # p(sprintf("ay: %s", i), amount = 0)
     }
 

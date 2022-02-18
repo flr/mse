@@ -52,10 +52,10 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   # PRINT at top
   if(verbose)
     cat(paste0("[1] ", names(tune), ": ",
-      unlist(cmin$hcr@args[names(tune)])))
+      unlist(cmin$hcr@args[names(tune)])), "\n")
 
   rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
-    verbose=FALSE, ...)
+    verbose=verbose, ...)
  
   pmin <- performance(rmin, metrics=metrics, 
     statistic=statistic, refpts=refpts(om), probs=NULL, years=years)
@@ -63,7 +63,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   
   # PRINT result
   if(verbose)
-    cat(paste0(" - [1] diff: ", format(obmin, digits=2), "\n"))
+    cat(paste0("[1] diff: ", format(obmin, digits=2), "\n"))
 
   # CHECK cmin result
   if(isTRUE(all.equal(obmin, 0, tolerance=tol)))
@@ -76,10 +76,11 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
   # PRINT at top
   if(verbose)
-    cat(paste0("[2] ", names(tune), ": ", unlist(cmax$hcr@args[names(tune)])))
+    cat(paste0("[2] ", names(tune), ": ",
+      unlist(cmax$hcr@args[names(tune)])), "\n")
 
   rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
-    verbose=FALSE, ...)
+    verbose=verbose, ...)
   
   pmax <- performance(rmax, metrics=metrics,
     statistic=statistic, refpts=refpts(om), probs=NULL, years=years)
@@ -87,7 +88,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   
   # PRINT result
   if(verbose)
-    cat(paste0(" - [2] diff: ", format(obmax, digits=2), "\n"))
+    cat(paste0("[2] diff: ", format(obmax, digits=2), "\n"))
   
   # CHECK cmax result
   if(isTRUE(all.equal(obmax, 0, tolerance=tol)))
@@ -112,17 +113,17 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     # PRINT at top
     if(verbose)
       cat(paste0("[", count + 2, "] ", names(tune), ": ",
-        format(unlist(cmid$hcr@args[names(tune)]), digits=3)))
+        format(unlist(cmid$hcr@args[names(tune)]), digits=3)), "\n")
 
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
-      verbose=FALSE, ...)
+      verbose=verbose, ...)
     pmid <- performance(rmid, metrics=metrics, 
       statistics=statistic, refpts=refpts(om), probs=NULL, years=years)
     obmid <- mean(pmid$data, na.rm=TRUE) - prob
 
     # PRINT result
     if(verbose)
-      cat(paste0(" - [", count + 2, "] diff: ", format(obmid, digits=2), "\n"))
+      cat(paste0("[", count + 2, "] diff: ", format(obmid, digits=2), "\n"))
   
     # CHECK and RETURN cmid result
     if(isTRUE(all.equal(obmid, 0, tolerance=tol))) {
