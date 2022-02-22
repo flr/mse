@@ -48,8 +48,6 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=10,
   # SET recruitment
 
 	# Set geomean sr relationship
-  # gmnrec <- exp(yearMeans(log(window(rec(stk), end=-(recyrs)))))
-  # TODO recyrs
   gmnrec <- exp(yearMeans(log(rec(stk)[, rev(dimnames(stk)$year)[2:recyrs+1]])))
   srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
   

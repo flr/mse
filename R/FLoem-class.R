@@ -305,6 +305,3 @@ setMethod("propagate", signature(object="FLoem"),
     return(object)
   }
 ) # }}}
-
-
-
