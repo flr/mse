@@ -89,21 +89,18 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #'   metric=function(x) ssb(x) %/% ssb(x)[,1],
 #'   output="catch", dlow=0.85, dupp=1.15, args=args, tracking=FLQuant())
 
-# TODO USE hcrpars / refpts in metric
-
 hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   output="fbar", dlow=NA, dupp=NA, args, tracking) {
-
+  
   # EXTRACT args
   ay <- args$ay
   data_lag <- args$data_lag
   man_lag <- args$management_lag
   frq <- args$frq
 
-  # HANDLE metric and output as functions
-  metric <- as.character(substitute(metric))
-  output <- as.character(substitute(output))
-
+  # HANDLE output as character
+  # output <- as.character(substitute(output))
+  
   # SET limits if NA
   if(is.na(dlow))
     dlow <- 1e-8
@@ -113,7 +110,7 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   # COMPUTE metric
   met <- window(do.call(metric, list(stk)), start=ay - data_lag,
     end=ay - data_lag)
-
+  
   # RULE
     # BELOW lim
   out <- ifelse(met <= lim, min,
@@ -128,20 +125,17 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
     start=ay - data_lag, end=ay - data_lag)))
   
   # IF NA, set to previous value
-  if(any(is.na(out)))
+  if(any(is.na(out))) {
     out[is.na(out)] <- pre[is.na(out)]
+    out[is.na(out)] <- 1
+    pre[is.na(pre)] <- 1
+  }
 
   # APPLY limits
   out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
   out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
 
   # CONTROL
-  ctrl <- fwdControl(
-    # TARGET for frq years
-    c(lapply(seq(ay + man_lag, ay + frq), function(x)
-      list(quant=output, value=c(out), year=x)))
-  )
-
   ctrl <- fwdControl(
     # TARGET for frq years
     c(lapply(seq(ay + man_lag, ay + frq), function(x)
@@ -453,12 +447,6 @@ cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
 	return(list(ctrl=ctrl, tracking=tracking))
 } # }}}
 
-
-# mix.hcr: COMBINE 2 hcr modules
-#   mlc.hcr + cpue.hcr
-
-# ---
-
 # fixedF.hcr {{{
 
 #' A fixed target f
@@ -514,6 +502,8 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
 	list(ctrl=ctrl, tracking=tracking)
 
 } # }}}
+
+# ---
 
 # movingF.hcr {{{
 

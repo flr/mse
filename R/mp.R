@@ -92,26 +92,26 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
   # --- RUN checks on inputs
 
-#TODO CHECK control: c('est', 'hcr') %in% names(control)
+  #TODO CHECK control: c('est', 'hcr') %in% names(control)
 
-# TODO CHECK iy is correct
-# TODO dims stk, idx
-# TODO check deviances years
-# TODO check iters om vs. ctrl
-# TODO stk(om) and units: merge
+  # TODO CHECK iy is correct
+  # TODO dims stk, idx
+  # TODO check deviances years
+  # TODO check iters om vs. ctrl
+  # TODO stk(om) and units: merge
 
 	# --- INIT tracking
   
   metric <- c("F.om", "B.om", "SB.om", "C.om", "C.obs",
     "F.est", "B.est", "SB.est", "C.est", "conv.est", "iem")
-  steps <- c("phcr", "hcr", "isys", "tm", "fb")
+  steps <- c("phcr", "hcr", "isys", "tm")
 
 	if (!missing(tracking))
     metric <- c(metric, tracking)
 
   # SETUP tracking FLQs
   tracking <- FLQuant(NA, dimnames=list(
-    metric=c(metric, steps[steps %in% names(ctrl)], "time", "fwd"),
+    metric=c(metric, steps[steps %in% names(ctrl)], "time", "fwd", "fb"),
     year=ac(seq(iy - data_lag - frq + 1, fy + management_lag)),
     unit="unique",
     season=dmns$season,
@@ -135,6 +135,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   projection <- projection(om)
 
   # SET fleetBehaviour to NULL if not given
+  # TODO CHECK fb in control, assign to om
   if (exists(fleetBehaviour(om)))
     fb <- fleetBehaviour(om)
   else 
@@ -326,7 +327,7 @@ setMethod("goFish", signature(om="FLom"),
         ind <- FLQuants()
       }
       
-      # PASS args generated at est to ctrl
+      # PASS args generated at est to ctrl for future runs
       if (!is.null(out.assess$args)) {
         args(ctrl0$est)[names(out.assess$args)] <-
           out.assess$args
@@ -473,8 +474,8 @@ setMethod("goFish", signature(om="FLom"),
 		#==========================================================
 		#cat("fb\n")
 		if (!is.null(fb)){
-
-			ctrl.fb <- args(fb)
+			
+      ctrl.fb <- args(fb)
 			ctrl.fb$method <- method(fb)
 			ctrl.fb$ctrl <- ctrl
 			ctrl.fb$args <- args
@@ -588,7 +589,6 @@ setMethod("goFish", signature(om="FLombf"),
 
     # APPLY oem over each biol
     o.out <- Map(function(stk, dev, obs, tra) {
-      
       do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
 

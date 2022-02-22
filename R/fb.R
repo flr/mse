@@ -67,9 +67,9 @@ setMethod("merge", signature(x="fwdControl", y="fwdControl"),
 # }}}
  
   ctrl <- merge(ctrl,
-    fwdControl(year=ctrl$year, quant="effort", max=max, fishery=1))
+    fwdControl(lapply(ctrl$year, function(x) list(year=x, relYear=x - 1,
+      quant="effort", max=rep(max, args$it), fishery=1, relFishery=1)))
+  )
 
   return(list(ctrl=ctrl, tracking=tracking))
 }
-
-
