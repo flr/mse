@@ -256,8 +256,8 @@ setMethod("goFish", signature(om="FLom"),
       # p(sprintf("ay: %s", i), amount = 0)
     }
 
-    # time (start)   
-    track(tracking, "time", i) <- as.numeric(Sys.time())
+    # time (start)
+    stim <- Sys.time()
 
     # args
     ay <- args$ay <- an(i)
@@ -507,10 +507,12 @@ setMethod("goFish", signature(om="FLom"),
         error = function(e) break())
     om <- out$om
 
-    # time (end)   
+    # final control
     track(tracking, "fwd", mys) <- ctrl
-    track(tracking, "time", ay) <- as.numeric(Sys.time()) -
-      tracking[[1]]["time", i]
+    
+    # time (in minutes)   
+    track(tracking, "time", ay) <- as.numeric(difftime(Sys.time(), stim,
+      units = "mins"))
 
 		gc()
     
@@ -778,10 +780,10 @@ setMethod("goFish", signature(om="FLombf"),
 		# fleet dynamics/behaviour
 		#==========================================================
 		#cat("fb\n")
-		if (!is.null(fb)){
+		if (!is.null(ctrl0$fb)){
 
-			ctrl.fb <- args(fb)
-			ctrl.fb$method <- method(fb)
+			ctrl.fb <- args(ctrl0$fb)
+			ctrl.fb$method <- method(ctrl0$fb)
 			ctrl.fb$ctrl <- ctrl
 			ctrl.fb$args <- args
 			ctrl.fb$tracking <- tracking
