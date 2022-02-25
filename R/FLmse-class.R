@@ -316,6 +316,11 @@ setMethod("rec", "FLmse", function(object) rec(om(object)))
 
 # }}}
 
-# om accessors {{{
+# tracking metrics {{{
 
+setMethod("time", signature(x="FLmse"),
+  function(x) {
+    return(c(yearSums(iterSums(tracking(x)["time",]))))
+  }
+)
 # }}}

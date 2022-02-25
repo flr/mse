@@ -207,7 +207,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 		}
 
   # TODO CHECK outputs
-  
+
   # GET objects back from loop
 	om <- lst0$om
 
@@ -511,9 +511,9 @@ setMethod("goFish", signature(om="FLom"),
     # final control
     track(tracking, "fwd", mys) <- ctrl
     
-    # time (in minutes)   
+    # time (in minutes, per iter)   
     track(tracking, "time", ay) <- as.numeric(difftime(Sys.time(), stim,
-      units = "mins"))
+      units = "mins")) / args$it
 
 		gc()
     
