@@ -7,7 +7,7 @@
 # Distributed under the terms of the EUPL-1.2
 
 
-# CLASS {{{
+# FLmses CLASS {{{
 setClass("FLmses",
   representation("FLlst", performance="data.table"))
 
