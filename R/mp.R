@@ -575,8 +575,7 @@ setMethod("goFish", signature(om="FLombf"),
     track(tracking, "F.om", ay) <- window(fbar(om), start=dy, end=dy)
     track(tracking, "B.om", ay) <- window(tsb(om), start=dy, end=dy)
     track(tracking, "SB.om", ay) <- window(ssb(om), start=dy, end=dy)
-    # DEBUG
-    # track(tracking, "C.om", ay) <- unitSums(window(catch(om), start=dy, end=dy))
+    track(tracking, "C.om", ay) <- unitSums(window(catch(om), start=dy, end=dy))
     
     # --- OEM: Observation Error Model
  
@@ -587,12 +586,13 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
 
+    stk <- stock(om)
+
     # APPLY oem over each biol
     o.out <- Map(function(stk, dev, obs, tra) {
       do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
-
-      }, stk=stock(om), obs=observations(oem), dev=deviances(oem), tra=tracking)
+      }, stk=stk, obs=observations(oem), dev=deviances(oem), tra=tracking)
 
     # EXTRACT oem observations
 
@@ -689,8 +689,8 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
 
       # DEBUG ASSIGN biol
-      #if(all(is.na(ctrl$biol)))
-      #  ctrl$biol <- args$stock
+      if(all(is.na(ctrl$biol)))
+        ctrl$biol <- args$stock
 
 			tracking <- out$tracking
 		} else {
@@ -724,8 +724,8 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
 
       # DEBUG ASSIGN biol
-      #if(all(is.na(ctrl$biol)))
-      #  ctrl$biol <- args$stock
+      if(all(is.na(ctrl$biol)))
+        ctrl$biol <- args$stock
 
 			tracking <- out$tracking
 
@@ -795,16 +795,13 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
 			tracking <- out$tracking
       
-      track(tracking, "fb", seq(ay, ay+frq-1)) <- ctrl
+      track(tracking, "fb", seq(ay, ay + frq - 1)) <- ctrl
 		}
 
 		#----------------------------------------------------------
 		# stock dynamics and OM projections
 		#----------------------------------------------------------
 
-    # DEBUG WHY this?
-    #if(!is.null(attr(ctrl, "snew"))) harvest(stk.om)[, ac(ay+1)] <- 
-    #  attr(ctrl, "snew")
 		ctrl.om <- args(projection)
     ctrl.om$ctrl <- ctrl
 		ctrl.om$om <- om

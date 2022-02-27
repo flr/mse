@@ -17,7 +17,7 @@
 
 setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
   function(object, step, year=value$year, iter=seq(dim(object[[1]])[6]), ..., value) {
-    
+
     # SINGLE stock
     if(length(unique(value$biol)) == 1) {
       object[[1]][step, ac(year),,,, iter] <- value@iters[1, 'value',]
@@ -25,11 +25,11 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
     # MULTIPLE stocks
     } else {
 
+      # FIND biols in control with value
       ids <- unique(value$biol)
 
-      for(i in ids) {
-        object[[i]][step, ac(year),,,,, iter] <- value@iters[(value$biol == i)[1],
-          'value', ]
+      for(i in ids[!is.na(ids)]) {
+        object[[i]][step, ac(year),,,, iter] <- value@iters[value$biol == i & !is.na(value$value), 'value', ]
       }
     }
 
