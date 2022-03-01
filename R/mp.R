@@ -148,6 +148,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
 	# PREPARE for parallel if needed
   cores <- getDoParWorkers()
+  cores <- 10
 
   if(is.numeric(parallel)) {
     cores <- parallel
