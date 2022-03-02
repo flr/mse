@@ -147,8 +147,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 	}
 
 	# PREPARE for parallel if needed
-  cores <- getDoParWorkers()
-  cores <- 10
+  cores <- availableCores()
 
   if(is.numeric(parallel)) {
     cores <- parallel
@@ -157,7 +156,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
   # p <- progressor(along=vy)
 
-	if(isTRUE(parallel) | cores > 0) {
+	if(isTRUE(parallel) & cores > 0) {
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
