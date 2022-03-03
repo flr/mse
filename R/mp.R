@@ -135,7 +135,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   projection <- projection(om)
 
   # SET fleetBehaviour to NULL if not given
-  # TODO CHECK fb in control, assign to om
+  # TODO CHECK and WARN if fb in control
   if (exists(fleetBehaviour(om)))
     fb <- fleetBehaviour(om)
   else 
@@ -145,9 +145,9 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 	if(is.null(oem)){
     oem <- default.oem(om)
 	}
-
-	# PREPARE for parallel if needed
-  cores <- availableCores()
+	
+  # PREPARE for parallel if needed
+  cores <- getDoParWorkers()
 
   if(is.numeric(parallel)) {
     cores <- parallel
@@ -156,7 +156,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
   # p <- progressor(along=vy)
 
-	if(isTRUE(parallel) & cores > 0) {
+	if(isTRUE(parallel) & cores > 1) {
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
@@ -184,7 +184,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
         
         # CHECK output
         if(!all(names(out) == c("om", "tracking", "oem", "args")))
-          stop("Output of individual cores is not correct")
+          stop("Output of individual core is not correct")
 				
         list(om=out$om, tracking=out$tracking, oem=out$oem)
 			}
