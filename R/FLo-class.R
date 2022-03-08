@@ -142,6 +142,7 @@ fwd.om <- function(om, ctrl, ...){
 	args$object <- om
 	args$control <- ctrl
 
+  # TODO ADD tryCatch
   om <- do.call("fwd", args)
 
 	list(om=om)
