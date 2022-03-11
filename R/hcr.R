@@ -287,6 +287,9 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 
 # trend.hcr {{{
 
+# T_{y+1} = T_{y} * 1 - k1 * |lambda| ^ gamma, lambda < 0
+#                   1 + k2 * lambda, lambda >= 0
+
 #' @param k1 Gain parameter
 #' @param k2 Gain parameter
 #' @param gamma Asymmetry parameter
@@ -356,24 +359,6 @@ trend.hcr <- function(stk, ind, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
 # }}}
 
 # target.hcr {{{
-
-#' @param stk
-#' @param lim Lower limit for value of metric.
-#' @param target Desired value for metric.
-#' @param metric Quantity computed from 'stk', defaults to ssb. Function or character.
-#' @param output Quantity employed in forecast (fwd's 'quant'), defaults to 'fbar', character.
-#' @param args
-#' @param tracking
-#' @examples
-#' data(ple4)
-#' args <- list(ay=2015, data_lag=1, management_lag=1, frq=1)
-#' # Set as fbar ~ ssb
-#' hockeystick.hcr(ple4, lim=3e5, trigger=4e5, target=0.25, min=0,
-#'   metric="ssb", output="fbar", args=args, tracking=FLQuant())
-#' # Use for catch ~ depletion, with metric as a new function
-#' hockeystick.hcr(ple4, lim=0.10, trigger=0.40, target=140000, min=0,
-#'   metric=function(x) ssb(x) %/% ssb(x)[,1],
-#'   output="catch", dlow=0.85, dupp=1.15, args=args, tracking=FLQuant())
 
 target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar",
   nyears=3, args, tracking) {
