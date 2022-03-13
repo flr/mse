@@ -58,6 +58,10 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   slop <- FLQuant(slope$slope, dimnames=dimnames(mind), units="")
   ind <- FLQuants(mean=mind, slope=slop)
 
+  # TRACK
+  track(tracking, "cpue.ind", ac(args$ay)) <- mind
+  track(tracking, "slope.ind", ac(args$ay)) <- slop
+
   list(stk=stk, ind=ind, tracking=tracking)
 } # }}}
 
