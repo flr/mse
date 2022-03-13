@@ -412,6 +412,8 @@ cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
   
   # args
   ay <- args$ay
+  frq <- args$frq
+  man_lag <- args$management_lag
 
   # RECOVER slope & mean(cpue)
   slope <- ind$slope
@@ -421,14 +423,22 @@ cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
   ka <- ifelse(slope > 0, k1, k2)
   kb <- ifelse(mcpue > target, k3, k4)
 
-  # TAC_y-1 ~ TAC_y * 1 + ka * m + kb * (mcpue - target)
-  # TODO TAC: catch(om) / catch(stk) / TAC(y-1)
-  tac <- catch(stk)[, ac(ay-1)] * (1 + ka * slope + kb * (mcpue - target))
+  # GET previous TAC nfrom last hcr ...
+  tac <- tracking[[1]]['hcr', ac(ay)]
+  # ... OR catch
+  if(all(is.na(tac)))
+    tac <- seasonSums(catch(stk)[, ac(ay - args$data_lag)])
 
-  ctrl <- fwdControl(list(quant="catch", value=tac, year=ay + 1),
-    # TAC limits
-    list(quant="catch", min=dtaclow, max=dtacupp, relYear=ay - 1, year=ay + 1))
+  # TAC_y-1 ~ TAC_y * 1 + ka * m + kb * (mcpue - target)
+  tac <- tac * (1 + ka * slope + kb * (mcpue - target))
   
+  # CONTROL
+  ctrl <- fwdControl(
+    # TARGET for frq years
+    c(lapply(seq(ay + man_lag, ay + frq), function(x)
+      list(quant="catch", value=c(tac), year=x)))
+  )
+
 	return(list(ctrl=ctrl, tracking=tracking))
 } # }}}
 
