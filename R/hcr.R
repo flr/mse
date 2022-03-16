@@ -84,12 +84,12 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #' # Set as fbar ~ ssb
 #' hockeystick.hcr(ple4, lim=3e5, trigger=4e5, target=0.25, min=0,
 #'   metric="ssb", output="fbar", args=args,
-#'   tracking=FLQuant(dimnames=list(metric="B.om", year=2016)))
+#'   tracking=FLQuant(dimnames=list(metric="fbar.hcr", year=2016)))
 #' # Use for catch ~ depletion, with metric as a new function
 #' hockeystick.hcr(ple4, lim=0.10, trigger=0.40, target=140000, min=0,
 #'   metric=function(x) ssb(x) %/% ssb(x)[,1],
 #'   output="catch", dlow=0.85, dupp=1.15, args=args,
-#'   tracking=FLQuant(dimnames=list(metric="B.om", year=2016)))
+#'   tracking=FLQuant(dimnames=list(metric="catch.hcr", year=2016)))
 
 hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   output="fbar", dlow=NA, dupp=NA, args, tracking) {
@@ -99,15 +99,6 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   data_lag <- args$data_lag
   man_lag <- args$management_lag
   frq <- args$frq
-
-  # HANDLE output as character
-  # output <- as.character(substitute(output))
-  
-  # SET limits if NA
-  if(is.na(dlow))
-    dlow <- 1e-8
-  if(is.na(dupp))
-    dupp <- 1e8
 
   # COMPUTE metric
   met <- window(do.call(metric, list(stk)), start=ay - data_lag,
@@ -137,8 +128,10 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   track(tracking, paste0(output, ".hcr"), seq(ay + man_lag, ay + frq)) <- c(out)
 
   # APPLY limits
-  out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
-  out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
+  if(!is.na(dupp))
+    out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
+  if(!is.na(dlow))
+    out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
 
   # CONTROL
   ctrl <- fwdControl(
@@ -305,7 +298,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 #'  it=1), tracking=FLQuant(), k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
 
 trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=stock,
-  dlow=1e-6, dupp=1e6, args, tracking) {
+  dlow=NA, dupp=NA, args, tracking) {
 
   # args
   spread(args)
@@ -356,12 +349,14 @@ trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=stock,
   tac[,,,,, !id & lnas] <- tac[, dy,,,, !id & lnas] *
     (1 + k2 * slope[!id & lnas]) 
 
-  # TRACK initial tac
+  # TRACK initial TAC
   track(tracking, "tac.hcr", seq(ay + management_lag, ay + frq)) <- tac
 
   # LIMITS over previous output
-  tac[tac > pre * dupp] <- pre[tac > pre * dupp] * dupp
-  tac[tac < pre * dlow] <- pre[tac < pre * dlow] * dlow
+  if(!is.na(dupp))
+    tac[tac > pre * dupp] <- pre[tac > pre * dupp] * dupp
+  if(!is.na(dlow))
+    tac[tac < pre * dlow] <- pre[tac < pre * dlow] * dlow
 
   # CONTROL
   ctrl <- fwdControl(
