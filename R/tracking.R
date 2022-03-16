@@ -54,7 +54,8 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
 
     # CHECK step exists
     if(!step %in% dimnames(object[[1]])[[1]])
-      stop(paste("tracking does not contain the required step:", step))
+      object <- lapply(object, function(x)
+        expand(x, metric=c(dimnames(x)$metric, step)))
 
     object[[1]][step, ac(year)] <- c(value)
 
@@ -70,13 +71,13 @@ setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
 
     # CHECK step exists
     if(!step %in% dimnames(object[[1]])[[1]])
-      stop(paste("tracking does not contain the required step:", step))
+      object <- lapply(object, function(x)
+        expand(x, metric=c(dimnames(x)$metric, step)))
 
     if(length(object) == 1)
       object[[1]][step, ac(year)] <- c(value)
     else {
       len <- length(object)
-
       value <- rep(value, length=len)
       for(i in seq(len))
         object[[i]][step, ac(year)] <- c(value[i])
@@ -114,7 +115,8 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
     
     # CHECK step exists
     if(!step %in% dimnames(object[[1]])[[1]])
-      stop(paste("tracking does not contain the required step:", step))
+      object <- lapply(object, function(x)
+        expand(x, metric=c(dimnames(x)$metric, step)))
     
     for(i in names(object))
       object[[i]][step, ac(year)] <- value[[i]]
@@ -131,9 +133,8 @@ setReplaceMethod("track", signature(object="FLQuant", value="numeric"),
   function(object, step, year=dimnames(value)$year, ..., value) {
 
     # CHECK step exists
-    if(!step %in% dimnames(object)[[1]])
-      stop(paste("tracking does not contain the required step:", step))
-
+    if(!step %in% dimnames(object[[1]])[[1]])
+      object <- expand(object, metric=c(dimnames(object)$metric, step))
     object[step, ac(year)] <- c(value)
 
     return(object)
