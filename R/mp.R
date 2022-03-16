@@ -245,6 +245,10 @@ setMethod("goFish", signature(om="FLom"),
   mlag <- args$management_lag # years between assessment and management
   frq <- args$frq   # frequency
 
+  # CHECK inputs
+  dom <- dimnames(stock(om))
+  dst <- dimnames(observations(oem, "stk"))
+
   # COPY ctrl
 	ctrl0 <- ctrl
 
@@ -505,7 +509,7 @@ setMethod("goFish", signature(om="FLom"),
     
     # om <- do.call("mpDispatch", ctrl.om)$om
     out <- tryCatch(do.call("mpDispatch", ctrl.om),
-        error = function(e) break())
+      error = function(e) break())
     om <- out$om
 
     # final control
