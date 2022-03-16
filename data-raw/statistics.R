@@ -1,5 +1,5 @@
-# statistics.R - DESC
-# /statistics.R
+# statistics.R - performance statistics
+# mse/data-raw/statistics.R
 
 # Copyright European Union, 2018
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
@@ -55,8 +55,11 @@ statistics <- list(
   # C/MSY
   CMSY = list(~yearMeans(C/MSY), name = "C/MSY", desc = "Mean proportion of MSY"),
   # AAV
-  AAV = list(~yearMeans(abs(C[,-1] - C[,-dim(C)[2]]) / C[,-1]), name = "AAV(C)",
-    desc = "Catch average annual variability"),
+  AAVC = list(~yearMeans(abs(C[, -1] - C[, -dim(C)[2]]) / C[, -1]), name = "AAV(C)",
+    desc = "Average annual variability in catch"),
+  # IACC
+  IACC = list(~100 * yearSums(abs(C[, -1] - C[, -dim(C)[2]])) / yearSums(C),
+  name="IAC(C)", desc="Percentage inter-annual change in catch"),
   # PC0
   PC0 = list(~yearSums(C < 0.1 * MSY) / dim(C)[2], name = "P(shutdown)", 
     desc = "Probability of fishery shutdown")
