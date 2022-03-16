@@ -83,11 +83,13 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #' args <- list(ay=2015, data_lag=1, management_lag=1, frq=1)
 #' # Set as fbar ~ ssb
 #' hockeystick.hcr(ple4, lim=3e5, trigger=4e5, target=0.25, min=0,
-#'   metric="ssb", output="fbar", args=args, tracking=FLQuant())
+#'   metric="ssb", output="fbar", args=args,
+#'   tracking=FLQuant(dimnames=list(metric="B.om", year=2016)))
 #' # Use for catch ~ depletion, with metric as a new function
 #' hockeystick.hcr(ple4, lim=0.10, trigger=0.40, target=140000, min=0,
 #'   metric=function(x) ssb(x) %/% ssb(x)[,1],
-#'   output="catch", dlow=0.85, dupp=1.15, args=args, tracking=FLQuant())
+#'   output="catch", dlow=0.85, dupp=1.15, args=args,
+#'   tracking=FLQuant(dimnames=list(metric="B.om", year=2016)))
 
 hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   output="fbar", dlow=NA, dupp=NA, args, tracking) {
@@ -130,6 +132,9 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
     out[is.na(out)] <- 1
     pre[is.na(pre)] <- 1
   }
+
+  # TRACK initial tac
+  track(tracking, paste0(output, ".hcr"), seq(ay + man_lag, ay + frq)) <- c(out)
 
   # APPLY limits
   out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
@@ -299,8 +304,8 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 #'  trend.hcr(stock(om), args=list(ay=2003, data_lag=1, management_lag=1, frq=1,
 #'  it=1), tracking=FLQuant(), k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
 
-trend.hcr <- function(stk, ind, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
-  metric=stock) {
+trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=stock,
+  dlow=1e-6, dupp=1e6, args, tracking) {
 
   # args
   spread(args)
@@ -330,13 +335,18 @@ trend.hcr <- function(stk, ind, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
   slope[lnas] <- dat[iter %in% rnas, .(slope=coef(lm(log(data) ~ year))[2]),
     by=iter][, (slope)]
 
-  # TAC TODO GET TAC from tracking['hcr',] ?
-  tac <- tracking[[1]]['hcr', dy]
-  if(all(is.na(tac)))
-    tac <- seasonSums(unitSums(catch(stk)[, dy]))
+  # GET TAC from tracking['hcr',]
+  pre <- tracking[[1]]['hcr', dy]
+
+  # OR from previous catch
+  if(all(is.na(pre)))
+    pre <- seasonSums(unitSums(catch(stk)[, dy]))
 
   # FIND iters with negative slope
   id <- slope < 0
+
+  # CREATE tac object
+  tac <- pre
 
   # slope < 0
   tac[,,,,, id & lnas] <- tac[, dy,,,, id & lnas] *
@@ -345,6 +355,13 @@ trend.hcr <- function(stk, ind, args, tracking, k1=1.5, k2=3, gamma=1, nyears=5,
   # slope >= 0
   tac[,,,,, !id & lnas] <- tac[, dy,,,, !id & lnas] *
     (1 + k2 * slope[!id & lnas]) 
+
+  # TRACK initial tac
+  track(tracking, "tac.hcr", seq(ay + management_lag, ay + frq)) <- tac
+
+  # LIMITS over previous output
+  tac[tac > pre * dupp] <- pre[tac > pre * dupp] * dupp
+  tac[tac < pre * dlow] <- pre[tac < pre * dlow] * dlow
 
   # CONTROL
   ctrl <- fwdControl(
@@ -408,7 +425,7 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar",
 #'  "cpue.mean"), year=1990))))
 
 cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
-  dtaclow=0.85, dtacupp=1.15, args, tracking){
+  dtaclow=0.85, dtacupp=1.15, args, tracking) {
   
   # args
   ay <- args$ay
