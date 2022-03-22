@@ -324,3 +324,19 @@ setMethod("time", signature(x="FLmse"),
   }
 )
 # }}}
+
+# iter {{{
+setMethod("iter", signature(obj="FLmse"),
+  function(obj, iter) {
+
+    # OM
+    om(obj) <- iter(om(obj), iter)
+    # OEM
+    oem(obj) <- iter(oem(obj), iter)
+    # tracking
+    slot(obj, "tracking") <- iter(slot(obj, "tracking"), iter)
+
+    return(obj)
+  }
+)
+# }}}
