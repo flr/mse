@@ -509,7 +509,7 @@ setMethod("goFish", signature(om="FLom"),
     
     # om <- do.call("mpDispatch", ctrl.om)$om
     out <- tryCatch(do.call("mpDispatch", ctrl.om),
-      error = function(e) break())
+      error = function(e) return(list(out=om)))
     om <- out$om
 
     # final control
