@@ -8,6 +8,7 @@ Authors@R: c(person(given = "Iago", family = "Mosqueira", role = c("aut"),
 Description: A set of functions and methods to simplify the development and
   running of Management Strategy Evaluation (MSE) analyses using the FLR 
   packages and classes, and the a4a methods and algorithms. 
+X-schema.org-keywords: simulation, MSE, fisheries, flr, R
 Depends:
   R(>= 4.0),
   methods,
