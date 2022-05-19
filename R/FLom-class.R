@@ -332,13 +332,14 @@ setMethod("summary", signature(object="FLom"),
 # plot {{{
 
 setMethod("plot", signature(x="FLom", y="list"),
-  function(x, y, metrics="missing") {
-    do.call("plot", c(list(x=x, metrics=metrics), y))
+  function(x, y, ...) {
+
+    do.call("plot", c(list(x=x), y, list(...)))
   }
 )
 
 setMethod("plot", signature(x="FLom", y="missing"),
-  function(x, window=TRUE, metrics="missing", ...) {
+  function(x, window=TRUE, ...) {
 
     # PARSE args for FLmse objects
     args <- list(...)
@@ -364,11 +365,11 @@ setMethod("plot", signature(x="FLom", y="missing"),
     
     stocks[[1]] <- window(stocks[[1]], end=maxyear)
     
-    do.call("plot", c(list(x=FLStocks(stocks), metrics=metrics), args[!cls]))
+    do.call("plot", c(list(x=FLStocks(stocks)), args[!cls]))
     
     } else {
     
-      plot(stock(x), metrics=metrics, ...)
+      plot(stock(x), ...)
     
     }
   }
@@ -480,7 +481,7 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 # metrics {{{
 setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
-    FLQuants(metrics(object, list(SB=ssb, C=catch, F=fbar, B=stock, VB=vb)))
+    FLQuants(metrics(object, list(SB=ssb, C=catch, F=fbar)))
 }) # }}}
 
 # propagate {{{
