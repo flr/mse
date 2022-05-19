@@ -42,7 +42,8 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   dlag <- args$data_lag
   
   # SUBSET last nyears from ay - mlag
-  ind <- index(idx[[index]])[1, ac(seq(ay - dlag - (nyears - 1) , length=nyears))]
+  ind <- index(idx[[index]])[1, ac(seq(ay - dlag - (nyears - 1) ,
+    length=nyears))]
 
   # SLOPE by iter
   dat <- data.table(as.data.frame(ind))

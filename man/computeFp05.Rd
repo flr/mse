@@ -31,7 +31,7 @@ Calculates the Fbar value giving a maximum probability of ssb being below Blim o
 \examples{
 data(ple4)
 sr <- predictModel(model=bevholt, params=FLPar(a=1.4e6, b=1.5e5))
-fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.30, 0.60))
+fp05 <- computeFp05(ple4, sr, SBlim=150000, its=300, range=c(0.40, 0.50))
 # RUN projection for obtained Fp.05 value
 proj <- fwd(propagate(stf(ple4, nyears=100), 300), sr=sr,
   fbar=FLQuant(fp05, dimnames=list(year=2018:2117)),

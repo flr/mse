@@ -99,6 +99,3 @@ class validity. If an unnamed \code{FLQuant} object is provided, this is used
 for sizing, but not for populating any slot.
 }
 
-\examples{
-
-}

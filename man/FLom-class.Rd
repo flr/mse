@@ -102,9 +102,8 @@ Methods exist for various calculations based on values stored in the class:
 }
 
 \examples{
-
 data(ple4om)
-comb <- combine(iter(om, 1:10), iter(om, 11:25))
+comb <- combine(iter(om, 1:25), iter(om, 26:50))
 all.equal(om, comb)
 }
 \seealso{

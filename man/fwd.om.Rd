@@ -9,13 +9,9 @@ fwd.om(om, ctrl, ...)
 \arguments{
 \item{ctrl}{the fwdControl object with objectives and constraints}
 
+\item{...}{}
+
 \item{object}{the OM as a FLStock}
-
-\item{sr}{a FLSR with the stock-recruitment model}
-
-\item{sr.residuals}{a FLQuant with S/R residuals}
-
-\item{sr.residuals.mult}{logical about residuals being multiplicative}
 }
 \description{
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend

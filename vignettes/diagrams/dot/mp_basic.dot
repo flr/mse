@@ -1,0 +1,42 @@
+graph mp {
+  
+  /* GRAPH */
+  graph [ratio="fill", size="8.3,11.7!", margin=0.8]
+
+  /* EDGES */
+  edge [arrowhead="none"];
+  
+  /* NODES */
+  node [shape=box, fontsize=24];
+
+  /* Compulsory steps */
+  oem, est, hcr, om[shape=plaintext,
+    fontsize=36, fontcolor="#000000", fontname="Courier-Bold"];
+  
+  /* Inputs/Outputs/Arguments */
+  oemin [label="om (FLom)"];
+  oemargs [label="oem (FLoem)"];
+  
+  estin [label="stock (FLStock), indices (FLIndices)"];
+  estargs [label="method (function)"];
+  
+  hcrin [label="stock (FLStock)"];
+  hcrargs [label="method (function)"];
+  
+  omin [label="stock (FLStock), control (fwdControl)"];
+  omout [label="om (FLmse)"];
+  omargs [label="method (function)"];
+  omargs2 [label="deviates (FLQuant)"];
+
+  oem -- oemargs;
+    {rank=same; oem; oemargs;}
+  est -- estargs;
+    {rank=same; est; estargs;}
+  hcr -- hcrargs;
+    {rank=same; hcr; hcrargs;}
+  omargs2 -- om -- omargs;
+    {rank=same; om; omargs; omargs2;}
+  
+  /* Code flow */
+  oemin -- oem -- estin -- est -- hcrin -- hcr -- omin -- om -- omout;
+}
