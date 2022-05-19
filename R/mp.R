@@ -206,22 +206,20 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 			lst0 <- list(om=out$om, tracking=out$tracking, oem=out$oem)
 		}
 
-  # TODO CHECK outputs
-
-  # GET objects back from loop
-	om <- lst0$om
-
-  if(is.null(om))
+  # TODO: CHECK outputs
+  if(is.null(lst0$om))
     stop("goFish returned no results")
 
-	tracking <- window(lst0$tracking, start=iy, end=fy)
-	oem <- lst0$oem
+  # GET objects back from loop, up to last projected year
+	om <- window(lst0$om, end=vy[length(vy)])
+	oem <- window(lst0$oem, end=vy[length(vy)])
+	tracking <- window(lst0$tracking, start=iy, end=vy[length(vy)])
 
 	if(verbose) cat("\n")
 
 	# --- RETURN
-  res <- new("FLmse", om=lst0$om, args=args, oem=lst0$oem, control=ctrl,
-    tracking = lst0$tracking)
+  res <- new("FLmse", om=om, args=args, oem=oem, control=ctrl,
+    tracking = tracking)
 	
 	return(res)
 }
