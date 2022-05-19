@@ -36,7 +36,8 @@ mcmc <- mcsave * it
 fit <- sca(stk, idx, fit="MCMC",
   mcmc = SCAMCMC(mcmc = mcmc, mcsave = mcsave, mcprobe = 0.4))
 
-stk <- slim(stk + fit)
+# stk <- slim(stk + fit)
+stk <- stk + fit
 
 # Make SRRs
 
@@ -51,14 +52,10 @@ ac1 <- mean(apply(window(rec(stk), end=2008)@.Data, 6, function(x)
 library(FLSRTMB)
 
 srbh <- as.FLSR(stk, model="bevholtSV")
-res <- lapply(1:50, function(x) srrTMB(iter(srbh, x), spr=yearMeans(spr0y(stk))))
+res <- lapply(1:50, function(x) srrTMB(iter(srbh, x), spr0=spr0y(stk)))
 
-srbh <- srrTMB(srbh, spr=yearMeans(spr0y(stk)))
-
-params(srbh) <- propagate(params(srbh), 50)
-
-for(i in 1:50)
-  params(srbh)[,i] <- params(res[[i]])
+model(srbh) <- bevholt()
+params(srbh) <- do.call(cbind, lapply(res, params))
 
 # Deviances
 devbh <- ar1rlnorm(rho=ac1, years=dy:fy, iters=it, margSD=rv1*2)
