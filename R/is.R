@@ -169,3 +169,26 @@ seasonal.is <- function(stk, ctrl, args, ratio=rep(1/args$ns, args$ns),
 # }}}
 
 # allocate.is
+
+# splitTAC.is {{{
+
+#' @examples
+#' data(ple4)
+
+splitTAC.is <- function(stk, ctrl, allocation, args, tracking) {
+
+  # DIMS
+  yrs <- seq(dim(ctrl@target)[1])
+
+  ctrl <- fwdControl(
+    Map(function(yr, fi) list(year=ctrl$year[yr], fishery=fi, catch=1, 
+    quant="catch", value=ctrl[yr,]$value * allocation[fi]),
+    yr=yrs, fi=seq(length(allocation)))
+  )
+
+  return(list(ctrl=ctrl, tracking=tracking))
+}
+
+# }}}
+
+

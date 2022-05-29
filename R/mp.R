@@ -256,7 +256,6 @@ setMethod("goFish", signature(om="FLom"),
 
     if(verbose) {
       cat(i, " > ")
-      # p(sprintf("ay: %s", i), amount = 0)
     }
 
     # time (start)
@@ -274,10 +273,14 @@ setMethod("goFish", signature(om="FLom"),
 		sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
     
     # TRACK om
-    track(tracking, "F.om", dys) <- unitMeans(window(fbar(om), start=dy0, end=dyf))
-    track(tracking, "B.om", dys) <- unitSums(window(tsb(om), start=dy0, end=dyf))
-    track(tracking, "SB.om", dys) <- unitSums(window(ssb(om), start=dy0, end=dyf))
-    track(tracking, "C.om", dys) <- unitSums(window(catch(om), start=dy0, end=dy))
+    track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
+      start=dy0, end=dyf))
+    track(tracking, "B.om", dys) <- unitSums(window(tsb(om),
+      start=dy0, end=dyf))
+    track(tracking, "SB.om", dys) <- unitSums(window(ssb(om),
+      start=dy0, end=dyf))
+    track(tracking, "C.om", dys) <- unitSums(window(catch(om),
+      start=dy0, end=dy))
     
     # --- OEM: Observation Error Model
     
@@ -545,13 +548,14 @@ setMethod("goFish", signature(om="FLombf"),
 	y0 <- args$y0     # initial data year
 	fy <- args$fy     # final year
 	iy <- args$iy     # initial year of projection (also intermediate)
-	nsqy <- args$nsqy # number of years to compute status quo metrics
 	vy <- args$vy     # vector of years to be projected
-	data_lag <- args$data_lag  # years between assessment and last data
+  nsqy <- args$nsqy # years for status quo calculations
+	dlag <- args$data_lag  # years between assessment and last data
+  mlag <- args$management_lag # years between assessment and management
   frq <- args$frq   # frequency
 
   # TODO LOOP every module over stock
-  stks <- args$stock <- if(is.null(args$stock)) seq(length(biols(om))) else args$stock
+  args$stock <- if(is.null(args$stock)) seq(length(biols(om))) else args$stock
 
   # COPY ctrl
 	ctrl0 <- ctrl
@@ -562,22 +566,33 @@ setMethod("goFish", signature(om="FLombf"),
 
   for(i in vy) {
     
-    if(verbose) cat(i, " > ")
+    if(verbose) {
+      cat(i, " > ")
+    }
 
-    # time (start)   
-    track(tracking, "time", i) <- as.numeric(Sys.time())
+    # time (start)
+    stim <- Sys.time()
 
+    # args
     ay <- args$ay <- an(i)
-		dy <- args$dy <- ay - data_lag
+		dy <- args$dy <- ay - dlag
+    dys <- seq(ay - dlag - frq + 1, ay - dlag)
+    dy0 <- dys[1]
+    dyf <- dys[frq]
+    mys <- seq(ay + mlag, ay + mlag + frq - 1)
     
     # years for status quo computations 
-		sqy <- args$sqy <- ac(seq(ay - nsqy - data_lag + 1, dy))
+		sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
     
     # TRACK om TODO GAP? TODO dimensionality
-    track(tracking, "F.om", ay) <- window(fbar(om), start=dy, end=dy)
-    track(tracking, "B.om", ay) <- window(tsb(om), start=dy, end=dy)
-    track(tracking, "SB.om", ay) <- window(ssb(om), start=dy, end=dy)
-    track(tracking, "C.om", ay) <- unitSums(window(catch(om), start=dy, end=dy))
+    track(tracking, "F.om", ay) <- unitMeans(window(fbar(om),
+      start=dy, end=dy))
+    track(tracking, "B.om", ay) <- unitSums(window(tsb(om),
+      start=dy, end=dy))
+    track(tracking, "SB.om", ay) <- unitSums(window(ssb(om),
+      start=dy, end=dy))
+    track(tracking, "C.om", ay) <- unitSums(window(catch(om),
+      start=dy, end=dy))
     
     # --- OEM: Observation Error Model
  
@@ -587,7 +602,7 @@ setMethod("goFish", signature(om="FLombf"),
 		ctrl.oem$args <- args
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
-
+    
     stk <- stock(om)
 
     # APPLY oem over each biol
@@ -615,8 +630,8 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.est <- args(ctrl0$est)
 			ctrl.est$method <- method(ctrl0$est)
 			ctrl.est$args <- args
-
-			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
+			ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), 
+        ov=list(t1=flsval))
       ctrl.est$step <- "est"
       
       out.assess <- Map(function(x, y, z)
@@ -726,8 +741,8 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
 
       # DEBUG ASSIGN biol
-      if(all(is.na(ctrl$biol)))
-        ctrl$biol <- args$stock
+      #if(all(is.na(ctrl$biol)))
+      # ctrl$biol <- args$stock
 
 			tracking <- out$tracking
 

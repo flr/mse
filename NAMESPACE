@@ -30,6 +30,7 @@ export(
   "cpue.ind",
   "default.oem",
   "effort.is",
+  "effortlimit.fb",
   "expandGrid",
   "fixedC.hcr",
   "fixedF.hcr",

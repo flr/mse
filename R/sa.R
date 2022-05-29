@@ -29,9 +29,12 @@
 
 perfect.sa <- function(stk, idx, args, tracking, ...) {
  
-  stk <- window(stk, end=args$dy)
+  dy <- args$dy
+  ay <- args$ay
+
+  stk <- window(stk, end=dy)
   
-  track(tracking, "conv.est", ac(args$ay)) <- 1
+  track(tracking, "conv.est", ac(ay)) <- 1
   
   list(stk=stk, tracking=tracking)
 }

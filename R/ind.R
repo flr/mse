@@ -68,6 +68,14 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
 
 # len.ind {{{
 
+# TODO
+
+# - SD vs. age, does it increase?
+# sd = len * cv
+# TODO: arg for slot
+# 1. lenSamples(metric(oem))
+# 2. metric(lenSamples(perfect.oem), selex)
+
 len.ind <- function (stk, idx, args, tracking, indicator="mlc", params,
   nyears=3, cv=0.1, lmax=1.25, bin=1, n=500, ...) {
 
@@ -80,7 +88,7 @@ len.ind <- function (stk, idx, args, tracking, indicator="mlc", params,
   ialk <- invALK(params, age=seq(dims(stk)$min, dims(stk)$max),
     cv=cv, lmax=lmax, bin=bin)
 
-  # GENERATE length samples from catch.n (n)
+  # GENERATE length samples from TODO: metric
   samps <- lenSamples(window(catch.n(stk), start=ay - data_lag - nyears + 1,
     end=ay - data_lag), ialk, n=n)
 
