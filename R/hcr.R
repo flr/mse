@@ -67,6 +67,7 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 
 # hockeystick.hcr {{{
 
+
 #' @param stk
 #' @param lim Value of metric at which output is set to 'min'.
 #' @param trigger Value of metric below which output is linearly reduced towards 'min'.

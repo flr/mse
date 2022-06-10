@@ -181,7 +181,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 					verbose=verbose)
 				
         out <- do.call(goFish, call0)
-        
+
         # CHECK output
         if(!all(names(out) == c("om", "tracking", "oem", "args")))
           stop("Output of individual core is not correct")
@@ -328,6 +328,7 @@ setMethod("goFish", signature(om="FLom"),
       # EXTRACT ind(icators) if returned
       if(!is.null(out.assess$ind)) {
         ind <- out.assess$ind
+        # TRACK indicators
       } else {
         ind <- FLQuants()
       }
@@ -553,6 +554,8 @@ setMethod("goFish", signature(om="FLombf"),
 	dlag <- args$data_lag  # years between assessment and last data
   mlag <- args$management_lag # years between assessment and management
   frq <- args$frq   # frequency
+  bns <- names(biols(om))
+  fns <- names(fisheries(om))
 
   # TODO LOOP every module over stock
   args$stock <- if(is.null(args$stock)) seq(length(biols(om))) else args$stock
@@ -615,8 +618,8 @@ setMethod("goFish", signature(om="FLombf"),
 
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
-
-		observations(oem) <- lapply(o.out, "[[", "observations")
+		
+    observations(oem) <- lapply(o.out, "[[", "observations")
 
 		# tracking <- FLQuants(o.out[[1]]$tracking[[1]], o.out[[2]]$tracking[[2]])
 
@@ -639,8 +642,15 @@ setMethod("goFish", signature(om="FLombf"),
         x=stk0, y=idx0, z=tracking)
 
       stk0 <- FLStocks(lapply(out.assess, "[[", "stk"))
+
+      # EXTRACT ind(icators) if returned
+      if(!is.null(out.assess[[1]]$ind)) {
+        ind <- lapply(out.assess, "[[", "ind")
+      } else {
+        ind <- lapply(setNames(nm=bns), function(x) FLQuants())
+      }
       
-      # PASS args generated at est to ctrl
+      # TODO: PASS args generated at est to ctrl
       if (!is.null(out.assess$args)) {
         args(ctrl0$est)[names(out.assess$args)] <-
           out.assess$args
@@ -680,21 +690,25 @@ setMethod("goFish", signature(om="FLombf"),
 
 		# TODO REVIEW & TEST
     if(exists("hcrpars")){
-      track(tracking, "metric.phcr", seq(ay, ay+frq-1)) <- hcrpars[1, 1,, drop=TRUE]
+      track(tracking, "metric.phcr", seq(ay, ay+frq-1)) <-
+        hcrpars[1, 1,, drop=TRUE]
 		 }
 
 		# --- hcr: Harvest Control Rule
 		
     if (!is.null(ctrl0$hcr)){
-     
       ctrl.hcr <- args(ctrl0$hcr) 
 			ctrl.hcr$method <- method(ctrl0$hcr)
       
       # SELECT stock for hcr
-      if(!is.null(args$stock))
+      if(!is.null(args$stock)) {
         ctrl.hcr$stk <- stk0[[args$stock]]
-      else
+        ctrl.hcr$ind <- ind[[args$stock]]
+      } else {
+      # TODO: ADD extra checks
         ctrl.hcr$stk <- stk0
+        ctrl.hcr$stk <- ind
+      }
 
 			ctrl.hcr$args <- args
 			ctrl.hcr$tracking <- tracking
@@ -705,12 +719,13 @@ setMethod("goFish", signature(om="FLombf"),
 			out <- do.call("mpDispatch", ctrl.hcr)
       ctrl <- out$ctrl
 
-      # DEBUG ASSIGN biol
+      # BUG: ASSIGN biol
       if(all(is.na(ctrl$biol)))
-        ctrl$biol <- args$stock
+       ctrl$biol <- args$stock
 
 			tracking <- out$tracking
 		} else {
+      # BUG: DROP getCtrl
 			ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
     }
 
@@ -739,10 +754,6 @@ setMethod("goFish", signature(om="FLombf"),
 			out <- do.call("mpDispatch", ctrl.is)
 			
       ctrl <- out$ctrl
-
-      # DEBUG ASSIGN biol
-      #if(all(is.na(ctrl$biol)))
-      # ctrl$biol <- args$stock
 
 			tracking <- out$tracking
 
@@ -843,4 +854,4 @@ setMethod("goFish", signature(om="FLombf"),
     oem=oem, args=args)
 
   }
-)# }}}
+) # }}}

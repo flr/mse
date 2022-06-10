@@ -289,6 +289,38 @@ setMethod("tb", signature(object="FLombf"),
 )
 # }}}
 
+# rec, tsb {{{
+
+setMethod("rec", signature(object="FLombf"),
+  function(object, biol=NULL) {
+    
+    res <- FLQuants(lapply(biols(object), rec))
+
+    return(res)
+  }
+)
+
+setMethod("tsb", signature(object="FLombf"),
+  function(object, biol=NULL) {
+
+    res <- FLQuants(mapply(tsb, biols(object),
+      f=harvest(object), SIMPLIFY=FALSE))
+    
+    return(res)
+  }
+)
+
+setMethod("tb", signature(object="FLombf"),
+  function(object, biol=NULL) {
+
+    res <- FLQuants(mapply(tb, biols(object),
+      f=harvest(object), SIMPLIFY=FALSE))
+    
+    return(res)
+  }
+)
+# }}}
+
 # harvest {{{
 
 setMethod("harvest", signature(object="FLombf", catch="missing"),

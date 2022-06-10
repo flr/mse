@@ -119,6 +119,12 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
   if(!all(names(observations) == c("stk", "idx")))
     stop("observations(oem) must have elements 'stk' and 'idx'.")
 
+  # TODO: GENERATE length samples from OM: catch and indices, BUT needs selex
+  # - invALK
+  # - lenSamples
+
+  # AGGREGATE len samples over unit, 
+
   # SIMPLIFY to match dimensions of observations$stk
   simp <- (dim(observations$stk)[c(3,4,5)] == 1) + (dim(stk)[c(3,4,5)] == 1) < 2
   if(any(simp))

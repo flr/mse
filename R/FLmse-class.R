@@ -212,7 +212,7 @@ setMethod("plot", signature(x="FLmse", y="missing"),
 
 setMethod("plot", signature(x="FLo", y="FLmse"),
   function(x, y, ..., window=TRUE) {
-
+browser()
     args <- list(...)
 
     fms <- unlist(lapply(args, is, "FLmse"))

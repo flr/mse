@@ -76,8 +76,15 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
 # 1. lenSamples(metric(oem))
 # 2. metric(lenSamples(perfect.oem), selex)
 
+#' @examples
+#' data(ple4)
+#' data(ple4.indices)
+#' len.ind(ple4, ple4.indices, args=list(ay=2018, data_lag=1),
+#'  tracking=FLQuant(), params=FLPar(linf=132, k=0.080, t0=-0.35))
+
 len.ind <- function (stk, idx, args, tracking, indicator="mlc", params,
-  nyears=3, cv=0.1, lmax=1.25, bin=1, n=500, ...) {
+  nyears=3, cv=0.1, lmax=1.25, bin=1, n=500,
+  metric=function(stk) catch.n(stk), ...) {
 
   # EXTRACT args
   ay <- args$ay
@@ -88,14 +95,18 @@ len.ind <- function (stk, idx, args, tracking, indicator="mlc", params,
   ialk <- invALK(params, age=seq(dims(stk)$min, dims(stk)$max),
     cv=cv, lmax=lmax, bin=bin)
 
-  # GENERATE length samples from TODO: metric
-  samps <- lenSamples(window(catch.n(stk), start=ay - data_lag - nyears + 1,
+  # GENERATE length samples from metric
+  input <- do.call(metric, list(stk=stk, idx=idx)[names(formals(metric))])
+  samps <- lenSamples(window(input, start=ay - data_lag - nyears + 1,
     end=ay - data_lag), ialk, n=n)
 
   # CALL indicator
   ind <- lapply(indicator, do.call, args=c(list(samps), args0))
   names(ind) <- indicator
-  
+
+  # TODO: ADD to tracking
+  track(tracking, "len.ind", ac(ay)) <- ind[[1]][, ac(ay)]
+
   list(stk = stk, ind = FLQuants(ind), tracking = tracking)
 }
 # }}}
