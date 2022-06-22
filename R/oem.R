@@ -127,6 +127,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
 
   # SIMPLIFY to match dimensions of observations$stk
   simp <- (dim(observations$stk)[c(3,4,5)] == 1) + (dim(stk)[c(3,4,5)] == 1) < 2
+
   if(any(simp))
     stk <- simplify(stk, c("unit", "season", "area")[simp], harvest=FALSE)
   

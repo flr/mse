@@ -232,7 +232,8 @@ setGeneric("goFish", function(om, ...) standardGeneric("goFish"))
 
 setMethod("goFish", signature(om="FLom"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args, verbose) {
-  
+
+  # ARGUMENTS
   it <- args$it     # number of iterations
 	y0 <- args$y0     # initial data year
 	fy <- args$fy     # final year
@@ -295,7 +296,7 @@ setMethod("goFish", signature(om="FLom"),
     ctrl.oem$step <- "oem"
 	
     o.out <- do.call("mpDispatch", ctrl.oem)
-
+    
     stk0 <- o.out$stk
 		idx0 <- o.out$idx
 		observations(oem) <- o.out$observations
@@ -324,7 +325,7 @@ setMethod("goFish", signature(om="FLom"),
         })
       
       stk0 <- out.assess$stk
-
+      
       # EXTRACT ind(icators) if returned
       if(!is.null(out.assess$ind)) {
         ind <- out.assess$ind
@@ -388,23 +389,26 @@ setMethod("goFish", signature(om="FLom"),
 
       # TODO REVIEW interface
 			if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
-			ctrl.hcr$ioval <- list(iv=list(t1=flsval, t2=flqsval), ov=list(t1=flfval))
+
+			ctrl.hcr$ioval <- list(iv=list(t1=flsval, t2=flqsval), 
+        ov=list(t1=flfval))
+      
       ctrl.hcr$step <- "hcr"
       
       out.hcr <- tryCatch(do.call("mpDispatch", ctrl.hcr),
         error = function(e){
           track(tracking, "hcr", ac(args$ay)) <- -1
-          return(list(ctrl=as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]),
-            year=mys)), "fwdControl"),
-            tracking=tracking))
+          return(list(
+            ctrl=as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]),
+            year=mys)), "fwdControl"), tracking=tracking))
         })
     
       ctrl <- out.hcr$ctrl
 			tracking <- out.hcr$tracking
 		} else {
       # DEFAULTS to F = mean(Fbar) over nsqy years
-      ctrl <- as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]), year=mys)),
-        "fwdControl")
+      ctrl <- as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]), 
+        year=mys)), "fwdControl")
     }
 
     track(tracking, "hcr", mys) <- ctrl
@@ -509,7 +513,6 @@ setMethod("goFish", signature(om="FLom"),
 		ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
     ctrl.om$step <- "om"
     
-    # om <- do.call("mpDispatch", ctrl.om)$om
     out <- tryCatch(do.call("mpDispatch", ctrl.om),
       error = function(e) return(list(out=om)))
     om <- out$om
