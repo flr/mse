@@ -24,7 +24,7 @@ setMethod("merge", signature(x="FLQuant", y="data.table"),
 .combinegoFish <- function(...) {
   
   res <- list(...)
-	
+
   return(
   list(
     om = Reduce("combine", lapply(res, '[[', 1)),

@@ -106,12 +106,12 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
     end=ay - data_lag)
   
   # RULE
-    # BELOW lim
+  # BELOW lim
   out <- ifelse(met <= lim, min,
-    # BETWEEN lim and trigger
+  # BETWEEN lim and trigger
     ifelse(met < trigger,
       pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  min),
-    # ABOVE trigger
+  # ABOVE trigger
     target))
 
   # LIMITS over previous output
