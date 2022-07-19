@@ -44,7 +44,7 @@ A \emph{list} with elements \emph{ctrl}, of class \emph{fwdControl}, and \emph{t
 A HCR to set total catch based on SSB depletion level
 }
 \examples{
-data(sol274om)
+data(sol274)
 catchSSB.hcr(stock(om), MSY=140000, tracking=FLQuant(),
 args=list(ay=2018, data_lag=1, management_lag=1, frq=1))
 # APPLY hcr over a range of dtarget values
