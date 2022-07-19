@@ -6,6 +6,7 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
+data(ple4om)
 
 # --- catchSSB.hcr {{{
 
@@ -99,5 +100,22 @@ ggplot(res, aes(x=ssb, y=f)) +
   geom_segment(x=blim, xend=bsafe, y=fmin, yend=ftrg) +
   geom_segment(x=bsafe, xend=max(res$ssb), y=ftrg, yend=ftrg) +
   ylab(expression(bar(F))) + xlab("SSB (t)")
+
+# }}}
+
+# pid.hcr {{{
+
+# TODO: FWD om for F trajectory
+
+track <- FLQuants(FLQuant(dimnames=list(metric='hcr', year=2000:2005,
+  iter=seq(dims(om)$iter))))
+
+args <- list(ay=2003, data_lag=1, management_lag=1, frq=1, it=1)
+
+pid.hcr(stock(om), ind=FLQuant(), tracking=track, args=args,
+  nyears=5, metric=ssb, ref=yearMeans(ssb(om)), kp=0.5, ki=0.01, kd=0.7)
+
+pid.hcr(stock(om), ind=FLQuant(), tracking=track, args=args,
+  nyears=5, metric=ssb, ref=yearMeans(ssb(om)), kp=0.5, ki=0.02, kd=0.3)
 
 # }}}
