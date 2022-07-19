@@ -33,7 +33,7 @@ and does not append them to existing objects in \emph{observations}.
 }
 \examples{
 # On FLom
-data(ple4om)
+data(sol274)
 obs <- perfect.oem(stock(om), deviances=NULL, observations=NULL,
-  args=list(y0=1957, dy=2017), tracking=FLQuant())
+  args=list(y0=1957, dy=2021), tracking=FLQuant())
 }

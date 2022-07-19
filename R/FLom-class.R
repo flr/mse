@@ -455,8 +455,8 @@ setMethod("iter", signature(obj="FLom"),
 
 #' @rdname FLom-class
 #' @examples
-#' data(ple4om)
-#' comb <- combine(iter(om, 1:25), iter(om, 26:50))
+#' data(sol274)
+#' comb <- combine(iter(om, 1:50), iter(om, 51:100))
 #' all.equal(om, comb)
 
 setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){

@@ -31,9 +31,9 @@
 #'
 #' @examples
 #' # On FLom
-#' data(ple4om)
+#' data(sol274)
 #' obs <- perfect.oem(stock(om), deviances=NULL, observations=NULL,
-#'   args=list(y0=1957, dy=2017), tracking=FLQuant())
+#'   args=list(y0=1957, dy=2021), tracking=FLQuant())
 
 perfect.oem <- function(stk, deviances, observations, args, tracking,
   biomass=FALSE, ...) {
@@ -100,10 +100,11 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
 #' @seealso \link{mp}
 #' @keywords function
 #' @examples
-#' data(ple4om)
+#' data(sol274)
 #' # Generate samples from year 2000:2016
-#' sampling.oem(stock(om), deviances=deviances(oem), observations=observations(oem),
-#'   args=list(y0=2000, dy=2016, frq=1), tracking=FLQuant())
+#' sampling.oem(stock(om), deviances=deviances(oem),
+#'   observations=observations(oem),
+#'   args=list(y0=2000, dy=2021, frq=1), tracking=FLQuant())
 
 sampling.oem <- function(stk, deviances, observations, args, tracking) {
 
@@ -113,10 +114,10 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
   dyrs <- ac(seq(args$dy - args$frq + 1, args$dy))
 
   # CHECK inputs
-  if(!all(names(deviances) == c("stk", "idx")))
+  if(any(!c("stk", "idx") %in% names(deviances)))
     stop("deviances(oem) must have elements 'stk' and 'idx'.")
 
-  if(!all(names(observations) == c("stk", "idx")))
+  if(any(!c("stk", "idx") %in% names(observations)))
     stop("observations(oem) must have elements 'stk' and 'idx'.")
 
   # TODO: GENERATE length samples from OM: catch and indices, BUT needs selex

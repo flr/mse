@@ -37,5 +37,5 @@ delta_tac_min - constraint on the TAC
 delta_tac_max - constraint on the TAC
 }
 \examples{
-data(ple4om)
+data(sol274)
 }

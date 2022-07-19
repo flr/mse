@@ -23,7 +23,7 @@
 #' @return A *list* with elements *stk* and *tracking*.
 #'
 #' @examples
-#' data(ple4om)
+#' data(sol274)
 #' perfect.sa(stock(om), FLIndices(), args=list(ay=2018, dy=2017),
 #'   tracking=FLQuants(FLQuant(dimnames=list(metric="conv.est", year=2018))))
 

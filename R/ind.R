@@ -31,7 +31,7 @@ mlc.ind <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
 # cpue.ind {{{
 
 #' @examples
-#' data(ple4om)
+#' data(sol274)
 #' cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om))),
 #'   args=list(ay=2000, data_lag=1), tracking=FLQuant())
 
@@ -97,15 +97,30 @@ len.ind <- function (stk, idx, args, tracking, indicator="mlc", params,
 
   # GENERATE length samples from metric
   input <- do.call(metric, list(stk=stk, idx=idx)[names(formals(metric))])
+
   samps <- lenSamples(window(input, start=ay - data_lag - nyears + 1,
     end=ay - data_lag), ialk, n=n)
 
   # CALL indicator
-  ind <- lapply(indicator, do.call, args=c(list(samps), args0))
+  if(is.character(indicator)) {
+    indpars <- as(params, "list")
+
+    # SUBSET indicator arguments in params
+    indpars <- indpars[names(indpars) %in% names(formals(get(indicator)))]
+
+  } else if(is.function(indicator)) {
+    
+    indpars <- as(params, "list")[names(formals(indicator))]
+ 
+  }
+
+  ind <- lapply(indicator, do.call, args=c(list(samps), args0,
+    indpars))
+
   names(ind) <- indicator
 
-  # TODO: ADD to tracking
-  track(tracking, "len.ind", ac(ay)) <- ind[[1]][, ac(ay)]
+  # ADD to tracking on 'ay' as mean across years
+  track(tracking, "len.ind", ac(ay)) <- yearMeans(ind[[1]])
 
   list(stk = stk, ind = FLQuants(ind), tracking = tracking)
 }

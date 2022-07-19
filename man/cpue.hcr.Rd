@@ -22,7 +22,7 @@ cpue.hcr(
 cpue.hcr
 }
 \examples{
-data(ple4om)
+data(sol274om)
 ind <- cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om) \%/\% ssb(om)[,1])),
   args=list(ay=2000, data_lag=1), tracking=FLQuant(dimnames=list(
   metric=c("cpue.ind", "slope.ind"), year=2000, iter=1:50)))

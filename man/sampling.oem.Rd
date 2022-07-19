@@ -31,10 +31,11 @@ The FLStock object passed to \emph{sampling.oem} by the \emph{mp} function is si
 to match the dimensions of that present in the \emph{observations} slot.
 }
 \examples{
-data(ple4om)
+data(sol274)
 # Generate samples from year 2000:2016
-sampling.oem(stock(om), deviances=deviances(oem), observations=observations(oem),
-  args=list(y0=2000, dy=2016, frq=1), tracking=FLQuant())
+sampling.oem(stock(om), deviances=deviances(oem),
+  observations=observations(oem),
+  args=list(y0=2000, dy=2021, frq=1), tracking=FLQuant())
 }
 \seealso{
 \link{mp}

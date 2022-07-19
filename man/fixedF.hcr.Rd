@@ -16,7 +16,7 @@ No matter what get F = Ftarget
 The control argument is a list of parameters used by the HCR.
 }
 \examples{
-data(ple4om)
+data(sol274om)
 fixedF.hcr(stock(om), ftrg=0.15, args=list(ay=2017, management_lag=1,
   frq=1), tracking=FLQuant())
 }

@@ -47,11 +47,11 @@ F is set in year ay, based on SSB in year ay - data_lag
 }
 }
 \examples{
-data(ple4om)
+data(ple4)
 # Test for year when SSB > bsafe
-ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
   args=list(ay=2018, data_lag=1, management_lag=1), tracking=FLQuant())
 # Test for year when SSB < bsafe
-ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
 }

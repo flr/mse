@@ -31,12 +31,12 @@
 #'
 #' @return A *list* with elements *ctrl*, of class *fwdControl*, and *tracking*.
 #' @examples
-#' data(ple4om)
+#' data(ple4)
 #' # Test for year when SSB > bsafe
-#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+#' ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
 #'   args=list(ay=2018, data_lag=1, management_lag=1), tracking=FLQuant())
 #' # Test for year when SSB < bsafe
-#' ices.hcr(stock(om), fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+#' ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
 #'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
 
 ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
@@ -80,7 +80,7 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #' @param args
 #' @param tracking
 #' @examples
-#' data(ple4)
+#' data(sol274)
 #' args <- list(ay=2015, data_lag=1, management_lag=1, frq=1)
 #' # Set as fbar ~ ssb
 #' hockeystick.hcr(ple4, lim=3e5, trigger=4e5, target=0.25, min=0,
@@ -294,25 +294,31 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 #' @param gamma Asymmetry parameter
 #' @param nyears Number of years used in regression of log(stock).
 #' @examples
-#' data(ple4om)
+#' data(sol274)
 #'  trend.hcr(stock(om), args=list(ay=2003, data_lag=1, management_lag=1, frq=1,
 #'  it=1), tracking=FLQuant(), k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
 
-trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=stock,
-  dlow=NA, dupp=NA, args, tracking) {
+trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5,
+  metric=ssb, dlow=NA, dupp=NA, args, tracking) {
 
   # args
   spread(args)
   dy <- ac(ay - data_lag)
 
   # SELECT metric
-  if(is(metric, "function")) {
-    met <- do.call(metric, list(stk))
+
+  # ind, if only one,
+  if(missing(metric) & length(ind) == 1) {
+    metric <- ind[[1]]
   } else if (is(metric, "character")) {
+    # or EXTRACT from ind
     if(metric %in% names(ind))
       met <- ind[[metric]]
+    # or COMPUTE from stk,
     else
       met <- do.call(metric, list(stk))
+  } else if(is(metric, "function")) {
+    met <- do.call(metric, list(stk))
   }
 
   # CREATE data.table
@@ -413,7 +419,7 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar",
 #' cpue.hcr
 #'
 #' @examples
-#' data(ple4om)
+#' data(sol274)
 #' ind <- cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om) %/% ssb(om)[,1])),
 #'   args=list(ay=2000, data_lag=1), tracking=FLQuant(dimnames=list(
 #'   metric=c("cpue.ind", "slope.ind"), year=2000, iter=1:50)))
@@ -464,7 +470,7 @@ cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
 #' @param stk The perceived FLStock.
 #' @param control A list with the element ftrg (numeric).
 #' @examples
-#' data(ple4om)
+#' data(sol274)
 #' fixedF.hcr(stock(om), ftrg=0.15, args=list(ay=2017, management_lag=1,
 #'   frq=1), tracking=FLQuant())
 
@@ -492,7 +498,7 @@ fixedF.hcr <- function(stk, ftrg, args, tracking){
 #' @param stk The perceived FLStock.
 #' @param control A list with the element ctrg (numeric).
 #' @examples
-#' data(ple4om)
+#' data(sol274)
 #' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1,
 #'   frq=1), tracking=FLQuant())
 
@@ -510,6 +516,104 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
 	list(ctrl=ctrl, tracking=tracking)
 
 } # }}}
+
+# pid.hcr {{{
+
+# T_{y+1} = T_{y} * 1 - k1 * |lambda| ^ gamma, lambda < 0
+#                   1 + k2 * lambda, lambda >= 0
+
+#' @param stk
+#' @param ind
+#' @param kp
+#' @param ki
+#' @param kd
+#' @param nyears Number of years used in regression of log(stock).
+#' @param metric
+#' @param ref
+#' @examples
+#' data(sol274)
+#' track <- FLQuants(FLQuant(dimnames=list(metric='hcr', year=2000:2005,
+#'   iter=seq(dims(om)$iter))))
+#'  args <- list(ay=2003, data_lag=1, management_lag=1, frq=1, it=1)
+#' #
+#'  pid.hcr(stock(om), ind=FLQuant(), tracking=track, args=args,
+#'  nyears=5, metric=ssb, ref=yearMeans(ssb(om)), kp=0.5, ki=0.01, kd=0.7)
+#' # 
+#' control <- mpCtrl(list(
+#'   est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=pid.hcr,
+#'     args=list(metric=ssb, ref=yearMeans(ssb(om)), kp=0.5, ki=0.01, kd=0.7))))
+#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
+#' plot(om, PID=tes)
+
+pid.hcr <- function(stk, ind, kp=0, ki=0, kd=0, nyears=5,
+  metric=ssb, ref, dlow=NA, dupp=NA, args, tracking) {
+  
+  # args
+  spread(args)
+  dy <- ac(ay - data_lag)
+  dy1 <- ac(ay - data_lag - 1)
+
+  # SELECT metric
+
+  # ind, if only one,
+  if(missing(metric) & length(ind) == 1) {
+    metric <- ind[[1]]
+  } else if (is(metric, "character")) {
+    # or EXTRACT from ind
+    if(metric %in% names(ind))
+      met <- ind[[metric]]
+    # or COMPUTE from stk,
+    else
+      met <- do.call(metric, list(stk))
+  } else if(is(metric, "function")) {
+    met <- do.call(metric, list(stk))
+  }
+
+  # WINDOW metric
+  met <- window(met, start=ay - data_lag - (nyears - 1), end=ay - data_lag)
+  
+  # FIND iters with NAs
+
+  # GET TAC from tracking['hcr',]
+  pre <- tracking[[1]]['hcr', dy]
+
+  # OR from previous catch
+  if(all(is.na(pre)))
+    pre <- seasonSums(unitSums(catch(stk)[, dy]))
+
+  # CALCULATE divergence
+  e <- log(met %/% ref)
+
+  # COMPUTE control signal
+  u <- kp * e[, dy] + ki * yearSums(e) + kd * (e[, dy] - e[,dy1])
+
+  # COMPUTE factor
+  fac <- min(max(exp(u^1), exp(u^2)), exp(u^3))
+
+  # TAC
+  tac <- fac * pre
+
+  # TRACK initial TAC
+  track(tracking, "tac.hcr", seq(ay + management_lag, ay + frq)) <- tac
+
+  # LIMITS over previous output
+  if(!is.na(dupp))
+    tac[tac > pre * dupp] <- pre[tac > pre * dupp] * dupp
+  if(!is.na(dlow))
+    tac[tac < pre * dlow] <- pre[tac < pre * dlow] * dlow
+
+  # CONTROL
+  ctrl <- fwdControl(
+    # TAC for frq years
+    lapply(seq(ay + management_lag, ay + frq), function(x)
+    list(quant="catch", value=c(tac), year=x))
+  )
+
+  return(list(ctrl=ctrl, tracking=tracking))
+}
+
+# }}}
 
 # ---
 
@@ -558,7 +662,7 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 #' @return A *list* with elements *ctrl*, of class *fwdControl*, and *tracking*.
 #'
 #' @examples
-#' data(ple4om)
+#' data(sol274)
 #' catchSSB.hcr(stock(om), MSY=140000, tracking=FLQuant(),
 #' args=list(ay=2018, data_lag=1, management_lag=1, frq=1))
 #' # APPLY hcr over a range of dtarget values
@@ -635,5 +739,3 @@ indicator.hcr <- function (stk, hcrpars, args, tracking) {
     list(ctrl = ctrl, tracking = tracking)
 }
 # }}}
-
-

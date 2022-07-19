@@ -24,7 +24,7 @@ function. The estimates of abundance, catches and exploitation will thus be
 as precise as the OEM observation.
 }
 \examples{
-data(ple4om)
+data(sol274)
 perfect.sa(stock(om), FLIndices(), args=list(ay=2018, dy=2017),
   tracking=FLQuants(FLQuant(dimnames=list(metric="conv.est", year=2018))))
 }

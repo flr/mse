@@ -27,12 +27,12 @@
 #'
 #' @examples
 #' # dataset contains both OM (FLom) and OEM (FLoem)
-#' data(ple4om)
+#' data(sol274)
 #' # choose sa and hcr
 #' control <- mpCtrl(list(
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=catchSSB.hcr,
-#'     args=list(MSY=140000))))
+#'     args=list(MSY=14000))))
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
 #' # 'perfect.oem' is used if none is given
 #' tes <- mp(om, ctrl=control, args=list(iy=2017))
@@ -289,7 +289,6 @@ setMethod("goFish", signature(om="FLom"),
       start=dy0, end=dy))
     
     # --- OEM: Observation Error Model
-    
     ctrl.oem <- args(oem)
     ctrl.oem$method <- method(oem)
     ctrl.oem$deviances <- deviances(oem)
@@ -331,9 +330,8 @@ setMethod("goFish", signature(om="FLom"),
       out.assess <- tryCatch(do.call("mpDispatch", ctrl.est),
         # ERROR in whole set of iters
         error = function(e){
-          # SET conv.est to -1
-          track(tracking, "conv.est", ac(args$ay)) <- -1
-          return(list(stk=stk0, tracking=tracking))
+          message("Call to est method failed, check inputs")
+          print(e)
         }
       )
       
@@ -410,12 +408,8 @@ setMethod("goFish", signature(om="FLom"),
       
       out.hcr <- tryCatch(do.call("mpDispatch", ctrl.hcr),
         error = function(e){
-          stop("hcr could not be computed")
-          # TODO: DO individual iters
-          track(tracking, "hcr", ac(args$ay)) <- -1
-          return(list(
-            ctrl=as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]),
-            year=mys)), "fwdControl"), tracking=tracking))
+          message("Call to hcr method failed, check inputs")
+          print(e)
         })
     
       ctrl <- out.hcr$ctrl
@@ -527,7 +521,10 @@ setMethod("goFish", signature(om="FLom"),
     ctrl.om$step <- "om"
     
     out <- tryCatch(do.call("mpDispatch", ctrl.om),
-      error = function(e) return(list(out=om)))
+      error = function(e) {
+        message("Call to om projection method failed, check inputs")
+        print(e)})
+
     om <- out$om
 
     # final control

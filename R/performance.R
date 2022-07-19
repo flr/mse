@@ -49,9 +49,9 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #' @examples
 #'
 #' # LOAD example FLmse object
-#' data(ple4om)
-#' # GENERATE run from last 16 years of OM
-#' run <- window(stock(om), start=2000, end=2015)
+#' data(sol274)
+#' # GENERATE pseudo-run from last 20 years of OM
+#' run <- window(stock(om), start=2012, end=2021)
 #' # DEFINE statistics
 #' statistics <- list(
 #'   dCatch=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
@@ -65,14 +65,14 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #'     desc="Variance in fishing mortality"))
 #' # COMPUTE performance
 #' performance(run, statistics, refpts=FLPar(MSY=110000),
-#'   metrics=list(C=catch, F=fbar), years=list(2000:2015))
+#'   metrics=list(C=catch, F=fbar), years=list(2016:2021))
 #' # Minimum statistic, named list with formula and name
 #' performance(run, statistics=list(CMSY=list(~yearMeans(C/MSY), name="CMSY")),
 #'   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
-#'   years=list(2000:2015))
+#'   years=list(2012:2021))
 #' # return quantiles
 #' performance(run, statistics, refpts=FLPar(MSY=110000),
-#'   metrics=list(C=catch, F=fbar), years=list(2000:2015),
+#'   metrics=list(C=catch, F=fbar), years=list(2012:2021),
 #'   probs =  c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95))
 #' # DEFINE statistics without summaries
 #' statistics <- list(
@@ -81,7 +81,7 @@ setGeneric("performance", function(x, ...) standardGeneric("performance"))
 #'     desc="Catch over MSY"))
 #' # COMPUTE performance
 #' perf <- performance(run, statistics, refpts=FLPar(MSY=110000),
-#'   metrics=list(C=catch), years=list(2000:2015))
+#'   metrics=list(C=catch), years=list(2012:2021))
 #' # COMPUTE summaries
 #' perf[, .(CMSY=mean(data))]
 

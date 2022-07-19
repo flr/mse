@@ -25,7 +25,7 @@
 #' @param EFF0 The tracking array
 #' @param EFF Not used by this function but may be used by the other implementation functions
 #' @examples
-#' data(ple4om)
+#' data(sol274)
 
 # ADD initial TAC, initac=catch(stk[, ac(iy)])
 
