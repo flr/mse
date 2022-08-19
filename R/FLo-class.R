@@ -145,8 +145,8 @@ fwd.om <- function(om, ctrl, ...){
   # TODO ADD tryCatch
   om <- do.call("fwd", args)
 
-  if(dims(om)$iter != dims(args$object)$iter)
-    browser()
+  # if(dims(om)$iter != dims(args$object)$iter)
+  #  browser()
 
 	list(om=om)
 }

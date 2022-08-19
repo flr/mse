@@ -69,6 +69,8 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
 #'  tracking=FLQuant(dimnames=list(year=2018, metric='len.ind')),
 #'  params=FLPar(linf=132, k=0.080, t0=-0.35))
 
+# TODO: LOOP over metric
+
 len.ind <- function (stk, idx, args, tracking, indicators="lbar", params,
   nyears=3, cv=0.1, lmax=1.25, bin=1, n=500,
   metric=function(stk) catch.n(stk), ...) {

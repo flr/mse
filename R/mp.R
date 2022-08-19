@@ -156,7 +156,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   # p <- progressor(along=vy)
 
   # if(isTRUE(parallel) & cores > 1) {
-  if(isTRUE(parallel)) {
+  if(isTRUE(parallel) & it > 1) {
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
@@ -200,7 +200,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
         ctrl=ctrl,
         args=args,
         verbose=verbose)
-      
+
       out <- do.call(goFish, call0)
 
       lst0 <- list(om=out$om, tracking=out$tracking, oem=out$oem)
@@ -724,7 +724,9 @@ setMethod("goFish", signature(om="FLombf"),
     if (!is.null(ctrl0$hcr)){
       ctrl.hcr <- args(ctrl0$hcr) 
       ctrl.hcr$method <- method(ctrl0$hcr)
-      
+
+    # MAP
+
       # SELECT stock for hcr
       if(!is.null(args$stock)) {
         ctrl.hcr$stk <- stk0[[args$stock]]

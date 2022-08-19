@@ -644,13 +644,23 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
 setMethod("stock", signature(object="FLombf"),
   function(object) {
 
-    res <- FLStocks(lapply(names(biols(object)), function(x)
-      as.FLStock(biols(object)[[x]], fisheries=fisheries(object),
-      catch=x, full=TRUE)))
-    # DEBUG
-    names(res) <- names(biols(object))
+    bios <- names(biols(object))
 
-      return(res)
+    # Map fisheries and biols
+    fbmap <- lapply(fisheries(object), names)
+
+    # COERCE to FLStock(s)
+    res <- FLStocks(
+      # LAPPLY over biols
+      lapply(setNames(nm=names(biols(object))), function(x) {
+        as.FLStock(biols(object)[[x]],
+        # CHOOSE only matching fisheries
+        fisheries=fisheries(object)[unlist(lapply(fbmap, function(i)
+          x %in% i))], catch=x, full=TRUE)
+      }
+    ))
+
+    return(res)
   }
 )
 # }}}

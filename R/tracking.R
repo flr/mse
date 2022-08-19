@@ -51,7 +51,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
 
 setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
   function(object, step, year=dimnames(value)$year, ..., value) {
-
+    
     # CHECK step exists
     if(!step %in% dimnames(object[[1]])[[1]])
       object <- lapply(object, function(x)

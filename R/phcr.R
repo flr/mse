@@ -44,3 +44,7 @@ brp.phcr <- function(stk, model, params, args, tracking) {
 
   return(list(hcrpars=hcrpars, tracking=tracking))
 }
+
+cpue.phcr <- function(stk, ind, args, tracking) {
+
+}
