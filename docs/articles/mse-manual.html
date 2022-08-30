@@ -6,6 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Technical Manual for the mse FLR/a4a package • mse</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -13,12 +19,15 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Technical Manual for the mse FLR/a4a package">
 <meta property="og:description" content="mse">
+<meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,23 +40,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mse</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.2.1.9001</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.2.3</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -64,7 +67,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/flr/mse/">
+  <a href="https://github.com/flr/mse/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -83,75 +86,75 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Technical Manual for the mse FLR/a4a package</h1>
-                        <h4 class="author">Iago MOSQUEIRA (WMR)</h4>
-                        <h4 class="author">Ernesto JARDIM (MSC)</h4>
+                        <h4 data-toc-skip class="author">Iago MOSQUEIRA (WMR)</h4>
+                        <h4 data-toc-skip class="author">Ernesto JARDIM (MSC)</h4>
             
-            <h4 class="date">24 November, 2021</h4>
+            <h4 data-toc-skip class="date">30 August, 2022</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/flr/mse/blob/master/vignettes/mse-manual.Rmd"><code>vignettes/mse-manual.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/flr/mse/blob/HEAD/vignettes/mse-manual.Rmd" class="external-link"><code>vignettes/mse-manual.Rmd</code></a></small>
       <div class="hidden name"><code>mse-manual.Rmd</code></div>
 
     </div>
 
     
     
-<div id="introduction" class="section level1">
-<h1 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h1>
+<div class="section level2">
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
 <p>This is an introduction.</p>
 </div>
-<div id="s4-classes" class="section level1">
-<h1 class="hasAnchor">
-<a href="#s4-classes" class="anchor"></a>S4 classes</h1>
-<div id="flom" class="section level2">
-<h2 class="hasAnchor">
-<a href="#flom" class="anchor"></a>FLom</h2>
+<div class="section level2">
+<h2 id="s4-classes">S4 classes<a class="anchor" aria-label="anchor" href="#s4-classes"></a>
+</h2>
+<div class="section level3">
+<h3 id="flom">FLom<a class="anchor" aria-label="anchor" href="#flom"></a>
+</h3>
 <div class="figure" style="text-align: center">
 <img src="diagrams/FLom.png" alt="**FLom class**: Structure of the FLom class. Slot name followed by the slot class, in parenthesis." width="50%"><p class="caption">
 <strong>FLom class</strong>: Structure of the FLom class. Slot name followed by the slot class, in parenthesis.
 </p>
 </div>
 </div>
-<div id="flmse" class="section level2">
-<h2 class="hasAnchor">
-<a href="#flmse" class="anchor"></a>FLmse</h2>
+<div class="section level3">
+<h3 id="flmse">FLmse<a class="anchor" aria-label="anchor" href="#flmse"></a>
+</h3>
 <div class="figure" style="text-align: center">
 <img src="diagrams/FLmse.png" alt="**FLmse class**: Structure of the FLmse class. Slot name followed by the slot class, in parenthesis." width="50%"><p class="caption">
 <strong>FLmse class</strong>: Structure of the FLmse class. Slot name followed by the slot class, in parenthesis.
 </p>
 </div>
 </div>
-<div id="floem" class="section level2">
-<h2 class="hasAnchor">
-<a href="#floem" class="anchor"></a>FLoem</h2>
+<div class="section level3">
+<h3 id="floem">FLoem<a class="anchor" aria-label="anchor" href="#floem"></a>
+</h3>
 </div>
-<div id="fliem" class="section level2">
-<h2 class="hasAnchor">
-<a href="#fliem" class="anchor"></a>FLiem</h2>
+<div class="section level3">
+<h3 id="fliem">FLiem<a class="anchor" aria-label="anchor" href="#fliem"></a>
+</h3>
 </div>
-<div id="mpctrl" class="section level2">
-<h2 class="hasAnchor">
-<a href="#mpctrl" class="anchor"></a>mpCtrl</h2>
+<div class="section level3">
+<h3 id="mpctrl">mpCtrl<a class="anchor" aria-label="anchor" href="#mpctrl"></a>
+</h3>
 </div>
-<div id="msectrl" class="section level2">
-<h2 class="hasAnchor">
-<a href="#msectrl" class="anchor"></a>mseCtrl</h2>
+<div class="section level3">
+<h3 id="msectrl">mseCtrl<a class="anchor" aria-label="anchor" href="#msectrl"></a>
+</h3>
 </div>
 </div>
-<div id="functions" class="section level1">
-<h1 class="hasAnchor">
-<a href="#functions" class="anchor"></a>Functions</h1>
-<div id="mp" class="section level2">
-<h2 class="hasAnchor">
-<a href="#mp" class="anchor"></a>mp()</h2>
+<div class="section level2">
+<h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a>
+</h2>
+<div class="section level3">
+<h3 id="mp">mp()<a class="anchor" aria-label="anchor" href="#mp"></a>
+</h3>
 <div class="figure" style="text-align: center">
 <img src="diagrams/mp.svg" alt="Workflow of the mp() function." width="50%"><p class="caption">
 Workflow of the mp() function.
 </p>
 </div>
-<div id="args" class="section level3">
-<h3 class="hasAnchor">
-<a href="#args" class="anchor"></a>args</h3>
+<div class="section level4">
+<h4 id="args">args<a class="anchor" aria-label="anchor" href="#args"></a>
+</h4>
 <p>The <em>mp()</em> function takes as input a named list called <em>args</em>. These are arguments of the MSE run, and determine the time frame, frequency of application and lags. Only one argument is required:</p>
 <ul>
 <li>
@@ -180,65 +183,65 @@ Workflow of the mp() function.
 </ul>
 </div>
 </div>
-<div id="performance" class="section level2">
-<h2 class="hasAnchor">
-<a href="#performance" class="anchor"></a>performance()</h2>
+<div class="section level3">
+<h3 id="performance">performance()<a class="anchor" aria-label="anchor" href="#performance"></a>
+</h3>
 </div>
 </div>
-<div id="extending-mse-with-your-own-functions" class="section level1">
-<h1 class="hasAnchor">
-<a href="#extending-mse-with-your-own-functions" class="anchor"></a>Extending mse with your own functions</h1>
-<div id="hcr" class="section level2">
-<h2 class="hasAnchor">
-<a href="#hcr" class="anchor"></a>hcr</h2>
+<div class="section level2">
+<h2 id="extending-mse-with-your-own-functions">Extending mse with your own functions<a class="anchor" aria-label="anchor" href="#extending-mse-with-your-own-functions"></a>
+</h2>
+<div class="section level3">
+<h3 id="hcr">hcr<a class="anchor" aria-label="anchor" href="#hcr"></a>
+</h3>
 </div>
-<div id="sa" class="section level2">
-<h2 class="hasAnchor">
-<a href="#sa" class="anchor"></a>sa</h2>
+<div class="section level3">
+<h3 id="sa">sa<a class="anchor" aria-label="anchor" href="#sa"></a>
+</h3>
 </div>
 </div>
-<div id="more-information" class="section level1">
-<h1 class="hasAnchor">
-<a href="#more-information" class="anchor"></a>More information</h1>
+<div class="section level2">
+<h2 id="more-information">More information<a class="anchor" aria-label="anchor" href="#more-information"></a>
+</h2>
 <ul>
 <li>You can submit bug reports, questions or suggestions on <code>mse</code> at the <code>mse</code> issue page,<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> or on the <em>FLR</em> mailing list.</li>
-<li>Or send a pull request to <a href="https://github.com/flr/mse/" class="uri">https://github.com/flr/mse/</a>
+<li>Or send a pull request to <a href="https://github.com/flr/mse/" class="external-link uri">https://github.com/flr/mse/</a>
 </li>
 <li>For more information on the FLR Project for Quantitative Fisheries Science in R, visit the FLR webpage.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>
 </li>
 <li>The latest version of <code>mse</code> can always be installed using the <code>devtools</code> package, by calling</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R">    <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/">devtools</a></span><span class="op">)</span>
-    <span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">'flr/mse'</span><span class="op">)</span></code></pre></div>
-<div id="software-versions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#software-versions" class="anchor"></a>Software Versions</h2>
+<code class="sourceCode R"><span>    <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'flr/mse'</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="software-versions">Software Versions<a class="anchor" aria-label="anchor" href="#software-versions"></a>
+</h3>
 <ul>
-<li>R version 4.1.2 (2021-11-01)</li>
-<li>FLCore: 2.6.18.9002</li>
-<li>mse: 2.2.1.9001</li>
+<li>R version 4.2.1 (2022-06-23)</li>
+<li>FLCore: 2.6.19</li>
+<li>mse: 2.2.3</li>
 <li>
-<strong>Compiled</strong>: Wed Nov 24 07:45:17 2021</li>
+<strong>Compiled</strong>: Tue Aug 30 14:27:54 2022</li>
 <li>
-<strong>Git Hash</strong>: ec43547</li>
+<strong>Git Hash</strong>: a32b7da</li>
 </ul>
 </div>
-<div id="author-information" class="section level2">
-<h2 class="hasAnchor">
-<a href="#author-information" class="anchor"></a>Author information</h2>
+<div class="section level3">
+<h3 id="author-information">Author information<a class="anchor" aria-label="anchor" href="#author-information"></a>
+</h3>
 <p><strong>Iago MOSQUEIRA</strong>. Wageningen Marine Research. <strong>Ernesto JARDIM</strong>. Marine Stewardship Council.</p>
 </div>
 </div>
-<div id="references" class="section level1">
-<h1 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h1>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
 </div>
 <div class="footnotes">
 <hr>
 <ol>
-<li id="fn1"><p><a href="https://github.com/flr/mse/issues" class="uri">https://github.com/flr/mse/issues</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p><a href="http://flr-project.org" class="uri">http://flr-project.org</a><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn1"><p><a href="https://github.com/flr/mse/issues" class="external-link uri">https://github.com/flr/mse/issues</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p><a href="http://flr-project.org" class="external-link uri">http://flr-project.org</a><a href="#fnref2" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
   </div>
@@ -254,11 +257,13 @@ Workflow of the mp() function.
 
 
       <footer><div class="copyright">
-  <p>Developed by Iago Mosqueira, Ernesto Jardim.</p>
+  <p></p>
+<p>Developed by Iago Mosqueira, Ernesto Jardim.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -266,6 +271,8 @@ Workflow of the mp() function.
 
   
 
+
+  
 
   </body>
 </html>

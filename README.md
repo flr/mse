@@ -26,7 +26,7 @@ remotes::install_github("flr/mse")
 - [Help pages](http://flr-project.org/mse)
 
 ## License
-Copyright (c) 2016 European Union. European Commission Joint Research Centre D.02. Released under the [EUPL 1.1](https://joinup.ec.europa.eu/community/eupl/og_page/eupl).
+Copyright (c) 2016-2022 European Union. European Commission Joint Research Centre D.02. Released under the [EUPL 1.1](https://joinup.ec.europa.eu/community/eupl/og_page/eupl).
 
 ## Contact
 You are welcome to:
