@@ -420,11 +420,12 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar",
 #'
 #' @examples
 #' data(sol274)
-#' ind <- cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om) %/% ssb(om)[,1])),
-#'   args=list(ay=2000, data_lag=1), tracking=FLQuant(dimnames=list(
-#'   metric=c("cpue.ind", "slope.ind"), year=2000, iter=1:50)))
+#' ind <- cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om))),
+#'   args=list(ay=2000, data_lag=1),
+#'   tracking=FLQuant(dimnames=list(metric="ind", year=2000, iter=1:100)))
 #' cpue.hcr(stk=stock(om), ind=ind$ind, k1=0.1, k2=0.2, k3=0.1, k4=0.1,
-#'   args=list(ay=2000, frq=1, management_lag=1), tracking=FLQuants(FLQuant(1000, dimnames=list(metric="hcr", year=2000))))
+#'   args=list(ay=2000, frq=1, management_lag=1),
+#'   tracking=FLQuants(FLQuant(1000, dimnames=list(metric="hcr", year=2000))))
 
 cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
   dtaclow=0.85, dtacupp=1.15, args, tracking) {

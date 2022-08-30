@@ -11,7 +11,7 @@
 
 #' @examples
 #' data(sol274)
-#' cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om))),
+#' ind <- cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om))),
 #'   args=list(ay=2000, data_lag=1),
 #'   tracking=FLQuant(dimnames=list(metric="ind", year=2000, iter=1:100)))
 
