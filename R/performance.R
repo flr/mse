@@ -194,8 +194,8 @@ setMethod("performance", signature(x="FLStock"),
 
 #' @rdname performance
 #' @examples
-#' perf <- performance(FLStocks(B=run, A=run), statistics, refpts=FLPar(MSY=110000),
-#'    metrics=list(C=catch), years=list(2000:2015))
+#' perf <- performance(FLStocks(B=run, A=run), statistics, 
+#'   refpts=FLPar(MSY=110000), metrics=list(C=catch), years=list(2012:2015))
 
 setMethod("performance", signature(x="FLStocks"),
   function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,

@@ -28,7 +28,7 @@ system.time(
   mcfit <- aap(stock, indices, control=control, verbose=TRUE)
 )
 
-save(mcfit, file="sol274/mcfit.Rdata", compress="xz")
+save(mcfit, file="sol274/mcfit.RData", compress="xz")
 
 # SETUP for om, oem
 
@@ -101,7 +101,7 @@ oem <- FLoem(observations=obs, deviances=devs, method=sampling.oem)
 
 # SAVE
 
-save(om, oem, file="../data/sol274.Rdata", compress="xz")
+save(om, oem, file="../data/sol274.RData", compress="xz")
 
 # TEST
 
