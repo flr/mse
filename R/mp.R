@@ -199,7 +199,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
         iem=iem,
         ctrl=ctrl,
         args=args,
-        verbose=verbose)
+        verbose=verbose,
+        logfile=logfile)
 
       out <- do.call(goFish, call0)
 
@@ -511,7 +512,6 @@ setMethod("goFish", signature(om="FLom"),
     #----------------------------------------------------------
     # stock dynamics and OM projections
     #----------------------------------------------------------
-
     ctrl.om <- args(projection)
     ctrl.om$ctrl <- ctrl
     ctrl.om$om <- om

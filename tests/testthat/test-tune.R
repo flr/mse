@@ -14,21 +14,22 @@ library(testthat)
 
 # DATA: om, oem
 
-data(ple4om)
+data(sol274)
 data(statistics)
 
 
 # --- SIMPLE tests:
 
-mpargs <- list(iy=2017)
+mpargs <- list(iy=2021)
 
 
-# RUN 2: perfect.sa + catchSSB.hcr: dtarget=0.40, dlimit=0.10
+# RUN 2: perfect.sa + hockeystick.hcr(lim=2e4, trigger=4e4, target=0.21)
 
 ctrl <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=catchSSB.hcr, args=list(dtarget=0.40, dlimit=0.10,
-  lambda=1, MSY=100000))))
+  hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=3.1e4, trigger=4.3e4,
+    target=0.21, min=0.05, metric="ssb", output="fbar"))
+))
 
 r2 <- mp(om, oem=oem, args=mpargs, ctrl=ctrl)
 
