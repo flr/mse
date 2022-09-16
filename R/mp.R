@@ -154,9 +154,10 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   }
 
   # p <- progressor(along=vy)
+  
+  # RUN in parallel {
 
-  # if(isTRUE(parallel) & cores > 1) {
-  if(isTRUE(parallel) & it > 1) {
+  if(isTRUE(parallel) & cores > 1) {
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
@@ -199,8 +200,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
         iem=iem,
         ctrl=ctrl,
         args=args,
-        verbose=verbose,
-        logfile=logfile)
+        verbose=verbose, logfile=logfile)
 
       out <- do.call(goFish, call0)
 
