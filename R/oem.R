@@ -169,6 +169,8 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
 
   idx[upi] <- Map(function(x, y) {
 
+    dyrs <- intersect(dyrs, dimnames(y)$year)
+
     # CREATE survey obs
     res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
       index.q=index.q(x)[, dyrs] * y[, dyrs])
@@ -176,15 +178,17 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
     # SET 0s to min / 2
     index(res)[index(res) == 0] <- c(min(index(res)[index(res) > 0] / 2))
     
-    # SET 0s to min / 2
+    # ASSIGN index observation
     index(x)[, dyrs] <- index(res)
 
     return(window(x, end=dy))
 
   }, x=idx[upi], y=deviances$idx[upi])
 
-  for(i in seq(idx[upi]))
-    observations$idx[upi][[i]][, dyrs] <- idx[upi][[i]][, dyrs]
+  for(i in seq(idx[upi])) {
+    yrs <- intersect(dyrs, dimnames(idx[upi][[1]])$year)
+    observations$idx[upi][[i]][, yrs] <- idx[upi][[i]][, yrs]
+  }
 
   # return
   list(stk=stk, idx=idx, observations=observations, tracking=tracking)
