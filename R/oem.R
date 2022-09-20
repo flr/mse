@@ -159,7 +159,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
   idx <- observations$idx
   
   # CHOOSE indices to be updated (maxyear >= dy)
-  upi <- unlist(lapply(idx, function(x) unname(range(x, "maxyear")) > args$dy))
+  upi <- unlist(lapply(idx, function(x) unname(dims(x)$maxyear) > args$dy))
 
   if(is.null(deviances$idx) | length(deviances$idx) == 0) {
     deviances$idx <- lapply(observations$idx, function(x) index.q(x) %=% 1)
@@ -168,7 +168,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
   # APPLY survey() with deviances$idx on top of index.q
 
   idx[upi] <- Map(function(x, y) {
-    
+
     # CREATE survey obs
     res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
       index.q=index.q(x)[, dyrs] * y[, dyrs])

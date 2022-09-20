@@ -154,9 +154,10 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
   }
 
   # p <- progressor(along=vy)
+  
+  # RUN in parallel {
 
-  # if(isTRUE(parallel) & cores > 1) {
-  if(isTRUE(parallel) & it > 1) {
+  if(isTRUE(parallel) & cores > 1) {
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
@@ -511,7 +512,6 @@ setMethod("goFish", signature(om="FLom"),
     #----------------------------------------------------------
     # stock dynamics and OM projections
     #----------------------------------------------------------
-
     ctrl.om <- args(projection)
     ctrl.om$ctrl <- ctrl
     ctrl.om$om <- om
