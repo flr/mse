@@ -309,7 +309,7 @@ trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5,
 
   # ind, if only one,
   if(missing(metric) & length(ind) == 1) {
-    metric <- ind[[1]]
+    met <- ind[[1]]
   } else if (is(metric, "character")) {
     # or EXTRACT from ind
     if(metric %in% names(ind))
