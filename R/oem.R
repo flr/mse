@@ -186,8 +186,8 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
   }, x=idx[upi], y=deviances$idx[upi])
 
   for(i in seq(idx[upi])) {
-    yrs <- intersect(dyrs, dimnames(idx[upi][[1]])$year)
-    observations$idx[upi][[i]][, yrs] <- idx[upi][[i]][, yrs]
+    yrs <- intersect(dyrs, dimnames(idx[upi][[i]])$year)
+    observations$idx[upi][[i]][, yrs]<- idx[upi][[i]][, yrs]
   }
 
   # return
