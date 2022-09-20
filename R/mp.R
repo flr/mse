@@ -33,7 +33,7 @@
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=catchSSB.hcr,
 #'     args=list(MSY=14000))))
-#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
+#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017), parallel=TRUE)
 #' # 'perfect.oem' is used if none is given
 #' tes <- mp(om, ctrl=control, args=list(iy=2017))
 #' plot(om, TEST=tes)
@@ -199,7 +199,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
         iem=iem,
         ctrl=ctrl,
         args=args,
-        verbose=verbose)
+        verbose=verbose, logfile=logfile)
 
       out <- do.call(goFish, call0)
 
