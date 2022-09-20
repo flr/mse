@@ -81,6 +81,8 @@ setValidity("FLoem",
 setGeneric("observations", function(object, ...) standardGeneric("observations"))
 
 #' @rdname FLoem-class
+#' @examples
+#' data(sol274)
 
 setMethod("observations", "FLoem",
   function(object, ...) {
@@ -151,21 +153,51 @@ setReplaceMethod("observations", signature(object="FLoem", i="ANY", value="ANY")
 setGeneric("deviances", function(object, ...) standardGeneric("deviances"))
 
 #' @rdname FLoem-class
+#' @examples
+#' deviances(oem)
+#' deviances(oem, "stk")
+#' deviances(oem, "stk", "catch.n")
 
-setMethod("deviances", "FLoem", function(object) object@deviances)
+setMethod("deviances", "FLoem",
+  function(object, ...) {
+
+    args <- list(...)
+    object <- object@deviances
+
+    if(length(args) > 0) {
+      for(i in args)
+        object <- object[[i]]
+    }
+    return(object)
+  }
+)
 
 #' @rdname FLoem-class
 #' @param value the new object
 #' @aliases deviances<- deviances<--methods
 
-setGeneric("deviances<-", function(object, value) standardGeneric("deviances<-"))
+setGeneric("deviances<-", function(object, ..., value)
+  standardGeneric("deviances<-"))
 
 #' @rdname FLoem-class
 
-setReplaceMethod("deviances", signature("FLoem", "list"), function(object, value){
-	object@deviances <- value
-	object
-})
+setReplaceMethod("deviances", signature("FLoem", "list"),
+  function(object, ..., value) {
+
+    args <- list(...)
+
+    # ASSIGN to @deviances
+    if(length(args) == 0) {
+	    object@deviances <- value
+    # or to element
+    } else if(length(args) == 1) {
+	    object@deviances[[args[[1]]]] <- value
+    } else {
+      stop("Assign possible only for a single element (e.g. 'stk'")
+    }
+  	object
+  }
+)
 
 # }}}
 
