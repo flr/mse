@@ -391,7 +391,6 @@ setMethod("goFish", signature(om="FLom"),
     # --- hcr: Harvest Control Rule
 
     if (!is.null(ctrl0$hcr)){
-      
       ctrl.hcr <- args(ctrl0$hcr)
       ctrl.hcr$method <- method(ctrl0$hcr)
       ctrl.hcr$stk <- stk0

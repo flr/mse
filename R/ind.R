@@ -1,5 +1,5 @@
 # ind.R - DESC
-# /ind.R
+# mse/R/ind.R
 
 # Copyright Iago MOSQUEIRA (WMR), 2021
 # Author: Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
@@ -126,6 +126,71 @@ len.ind <- function (stk, idx, args, tracking, indicators="lbar", params,
   list(stk = stk, ind = FLQuants(ind), tracking = tracking)
 }
 # }}}
+
+
+#' @examples
+#' data(sol274)
+#' library(FLXSA)
+#' control <- mpCtrl(list(
+#'   est = mseCtrl(method=meta.est, args=list(
+#'   list(method='len.ind', indicators=c('lmean', 'lbar'),
+#'     params=FLPar(linf=35, k=0.352, t0=-0.26), cv=0.2, nyears=5),
+#'   list(method='xsa.sa'))),
+#' hcr = mseCtrl(method=meta.hcr,
+#'    args=list(list(method="trend.hcr", k1=1, k2=2, metric="lmean"),
+#'    list(method="trend.hcr", k1=2, k2=3, metric="lbar")))))
+#' run <- mp(om, oem=oem, ctrl=control, args=list(iy=2020, fy=2023))
+#' #
+#' control <- mpCtrl(list(
+#'   est = mseCtrl(method=meta.est, args=list(
+#'   list(method='len.ind', indicators=c('lmean', 'lbar'),
+#'     params=FLPar(linf=35, k=0.352, t0=-0.26), cv=0.2, nyears=5),
+#'   list(method='cpue.ind'))),
+#' hcr = mseCtrl(method=meta.hcr,
+#'    args=list(list(method="trend.hcr", k1=1, k2=2, metric="lmean"),
+#'    list(method="cpue.hcr", k1=2, k2=3, k3=1, k4=1)))))
+#' run <- mp(om, oem=oem, ctrl=control, args=list(iy=2020, fy=2023))
+
+meta.est <- function(stk, idx, ..., args, tracking) {
+  browser()
+ 
+  # GET est args list
+  eargs <- list(...)
+  
+  # CHECK eargs have 'method'
+  if(!all(unlist(lapply(eargs, function(x) "method" %in% names(x)))))
+    stop("args must contain list with an element called 'method'")
+  
+  # CHECK list has list w/ method + matching args
+  if(!all(unlist(lapply(eargs, function(x) all(names(x)[!grepl("method",
+    names(x))] %in% names(formals(x$method)))))))
+    stop("elements in each args list must match arguments in hcr function")
+
+  # APPLY each estimator
+  ests <- lapply(eargs, function(x)
+    do.call(x$method, c(list(stk=stk, idx=idx, args=args, tracking=tracking),
+      x[!grepl("method", names(x))])))
+
+  # MERGE ind
+  ind <- FLQuants(Reduce("c", lapply(ests, "[[", "ind")))
+
+  # RETURN a single stk (?)
+  istks <- which(unlist(lapply(ests, function(x) !"ind" %in% names(x))))
+
+  # ONE method without ind ?
+  if(length(istks) == 1)
+    stk <- ests[[istks]]$stk
+  # MORE than one (?)
+  else
+    stop("")
+
+  # TODO: tracking ? merge(FLQuant, FLQuant, ...)
+
+  lapply(lapply(ests, "[[", "tracking"), function(x) dim(x[[1]]))
+  lapply(lapply(ests, "[[", "tracking"), function(x) x[[1]])
+
+  return(list(stk=stk, ind=ind, tracking=tracking))
+}
 
 # TODO: REMOVE
 

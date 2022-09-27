@@ -199,6 +199,9 @@ setReplaceMethod("deviances", signature("FLoem", "list"),
   }
 )
 
+# TODO: setReplaceMethod("deviances", signature("FLoem", "FLQuant"),
+# TODO: setReplaceMethod("deviances", signature("FLoem", "FLQuants"),
+
 # }}}
 
 # show {{{

@@ -67,7 +67,6 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 
 # hockeystick.hcr {{{
 
-
 #' @param stk
 #' @param lim Value of metric at which output is set to 'min'.
 #' @param trigger Value of metric below which output is linearly reduced towards 'min'.
@@ -295,7 +294,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 #' @param nyears Number of years used in regression of log(stock).
 #' @examples
 #' data(sol274)
-#'  trend.hcr(stock(om), args=list(ay=2003, data_lag=1, management_lag=1, frq=1,
+#' trend.hcr(stock(om), args=list(ay=2003, data_lag=1, management_lag=1, frq=1,
 #'  it=1), tracking=FLQuant(), k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
 
 trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5,
@@ -616,6 +615,93 @@ pid.hcr <- function(stk, ind, kp=0, ki=0, kd=0, nyears=5,
 
 # }}}
 
+# meta.hcr {{{
+
+#' @examples
+#' data(sol274)
+#' control <- mpCtrl(list(
+#'   est = mseCtrl(method=len.ind, args=list(indicator=c('lmean', 'lbar'),
+#'    params=FLPar(linf=35, k=0.352, t0=-0.26), cv=0.2, nyears=5)),
+#' hcr = mseCtrl(method=meta.hcr,
+#'    args=list(list(method="trend.hcr", k1=1, k2=2, metric="lmean"),
+#'    list(method="trend.hcr", k1=2, k2=3, metric="lbar")))))
+#' run <- mp(om, oem=oem, ctrl=control, args=list(iy=2020, fy=2023))
+
+meta.hcr <- function(stk, ind, args, ..., tracking) {
+
+  # HCRs arguments
+  rargs <- list(...)
+
+  # CHECK rargs have 'method'
+  if(!all(unlist(lapply(rargs, function(x) "method" %in% names(x)))))
+    stop("args must contain list with an element called 'method'")
+  
+  # CHECK list has list w/ method + matching args
+  if(!all(unlist(lapply(rargs, function(x) all(names(x)[!grepl("method",
+    names(x))] %in% names(formals(x$method)))))))
+    stop("elements in each args list must match arguments in hcr function")
+
+  # APPLY each hcr
+  decs <- lapply(rargs, function(x)
+    do.call(x$method, c(list(ind=ind, stk=stk, args=args, tracking=tracking),
+      x[!grepl("method", names(x))])))
+
+  # CHECK methods use the same currency
+  if(!Reduce(all.equal, lapply(decs, function(x) as.character(x$ctrl$quant))))
+    stop("Individual hcrs must output the same quant (e.g. 'catch')")
+
+  # EXTRACT decisions
+  vals <- lapply(decs, function(x) x$ctrl@iters)
+
+  # MERGE by mean TODO: other functions?
+  val <- Reduce("+", vals) / length(vals)
+
+  # PREPARE output fwdControl
+  ctrl <- decs[[1]]$ctrl
+  iters(ctrl) <- val
+
+  # MERGE tracking
+  tracking <- FLQuants(Reduce(merge, lapply(decs, function(x) x$tracking)))
+
+	# return
+	list(ctrl=ctrl, tracking=tracking)
+}
+# }}}
+
+
+# merge(FLQuant) {{{
+
+setMethod("merge", signature(x="FLQuant", y="FLQuant"),
+  function(x, y) {
+
+    dnx <- dimnames(x)
+    dny <- dimnames(y)
+
+    # CHECK only quant AND/OR year to be merged
+    if(!all.equal(dnx[-c(1,2)], dny[-c(1,2)]))
+      stop("merge needs FLQuant objects with equal dimnames[3:6]")
+
+    qs <- unique(c(dnx[[1]], dny[[1]]))
+    ys <- unique(c(dnx[[2]], dny[[2]]))
+
+    out <- FLQuant(NA, dimnames=c(list(quant=qs, year=ys), dnx[3:6]))
+
+    out[dnx[[1]], dnx[[2]]] <- x[dnx[[1]], dnx[[2]]]
+    out[dny[[1]], dny[[2]]] <- y[dny[[1]], dny[[2]]]
+
+    return(out)
+  }
+)
+
+
+setMethod("merge", signature(x="FLQuants", y="FLQuants"),
+  function(x, y) {
+  return(Map(merge, x=x, y=y))
+  }
+)
+
+# }}}
+
 # ---
 
 # movingF.hcr {{{
@@ -728,15 +814,18 @@ catchSSB.hcr <- function(stk, dtarget=0.40, dlimit=0.10, lambda=1, MSY,
 #' @param args A list with generic arguments to be used by the function if needed.
 #' @param tracking The tracking matrix.
 indicator.hcr <- function (stk, hcrpars, args, tracking) {
-    ay <- args$ay
-    dy <- args$dy
-  	#sqy <- args$sqy
-  	mlag <- args$management_lag
-	if(!is(hcrpars, "FLQuant"))
+  ay <- args$ay
+  dy <- args$dy
+  #sqy <- args$sqy
+  mlag <- args$management_lag
+	
+  if(!is(hcrpars, "FLQuant"))
     hcrpars <- FLQuant(hcrpars, dimnames=list(iter=dimnames(stk@catch)$iter))
-	mult <- stk@indicator[,ac(dy)] / hcrpars
+	
+  mult <- stk@indicator[,ac(dy)] / hcrpars
 	#csq <- yearMeans(catch(stk)[,ac(dy)])
-    ctrl <- getCtrl(mult, "f", ay + mlag, dim(hcrpars)[6])
-    list(ctrl = ctrl, tracking = tracking)
+  ctrl <- getCtrl(mult, "f", ay + mlag, dim(hcrpars)[6])
+  
+  list(ctrl = ctrl, tracking = tracking)
 }
 # }}}
