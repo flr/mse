@@ -39,11 +39,11 @@ observations(object, i) <- value
 
 deviances(object, ...)
 
-\S4method{deviances}{FLoem}(object)
+\S4method{deviances}{FLoem}(object, ...)
 
-deviances(object) <- value
+deviances(object, ...) <- value
 
-\S4method{deviances}{FLoem,list}(object) <- value
+\S4method{deviances}{FLoem,list}(object, ...) <- value
 
 \S4method{show}{FLoem}(object)
 
@@ -96,3 +96,9 @@ class validity. If an unnamed \code{FLQuant} object is provided, this is used
 for sizing, but not for populating any slot.
 }
 
+\examples{
+data(sol274)
+deviances(oem)
+deviances(oem, "stk")
+deviances(oem, "stk", "catch.n")
+}
