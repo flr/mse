@@ -127,6 +127,7 @@ len.ind <- function (stk, idx, args, tracking, indicators="lbar", params,
 }
 # }}}
 
+# meta.est {{{
 
 #' @examples
 #' data(sol274)
@@ -191,6 +192,8 @@ meta.est <- function(stk, idx, ..., args, tracking) {
 
   return(list(stk=stk, ind=ind, tracking=tracking))
 }
+
+# }}}
 
 # TODO: REMOVE
 
