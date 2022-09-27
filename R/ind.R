@@ -153,7 +153,6 @@ len.ind <- function (stk, idx, args, tracking, indicators="lbar", params,
 #' run <- mp(om, oem=oem, ctrl=control, args=list(iy=2020, fy=2023))
 
 meta.est <- function(stk, idx, ..., args, tracking) {
-  browser()
  
   # GET est args list
   eargs <- list(...)
@@ -166,11 +165,12 @@ meta.est <- function(stk, idx, ..., args, tracking) {
   if(!all(unlist(lapply(eargs, function(x) all(names(x)[!grepl("method",
     names(x))] %in% names(formals(x$method)))))))
     stop("elements in each args list must match arguments in hcr function")
-
+  
   # APPLY each estimator
   ests <- lapply(eargs, function(x)
     do.call(x$method, c(list(stk=stk, idx=idx, args=args, tracking=tracking),
-      x[!grepl("method", names(x))])))
+      x[!grepl("method", names(x))]))
+  )
 
   # MERGE ind
   ind <- FLQuants(Reduce("c", lapply(ests, "[[", "ind")))
@@ -182,13 +182,11 @@ meta.est <- function(stk, idx, ..., args, tracking) {
   if(length(istks) == 1)
     stk <- ests[[istks]]$stk
   # MORE than one (?)
-  else
+  else if(length(istks) > 1)
     stop("")
 
-  # TODO: tracking ? merge(FLQuant, FLQuant, ...)
-
-  lapply(lapply(ests, "[[", "tracking"), function(x) dim(x[[1]]))
-  lapply(lapply(ests, "[[", "tracking"), function(x) x[[1]])
+  # MERGE tracking
+  tracking <- Reduce(merge, lapply(ests, function(x) x$tracking))
 
   return(list(stk=stk, ind=ind, tracking=tracking))
 }

@@ -656,7 +656,8 @@ meta.hcr <- function(stk, ind, ..., args, tracking,
   # APPLY each hcr
   decs <- lapply(rargs, function(x)
     do.call(x$method, c(list(ind=ind, stk=stk, args=args, tracking=tracking),
-      x[!grepl("method", names(x))])))
+      x[!grepl("method", names(x))]))
+  )
 
   # CHECK methods use the same currency
   if(!Reduce(all.equal, lapply(decs, function(x) as.character(x$ctrl$quant))))
