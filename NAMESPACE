@@ -45,6 +45,8 @@ export(
   "indicator.phcr",
   "indicator.is",
   "len.ind",
+  "meta.est",
+  "meta.hcr",
   "mlc.ind",
   "movingF.hcr",
   "movingF.phcr",
