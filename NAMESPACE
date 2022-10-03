@@ -64,6 +64,7 @@ export(
   "plot_hockeystick.hcr",
   "sampling.oem",
   "seasonal.is",
+  "simulator",
   "splitTAC.is",
   "tac.is",
   "target.hcr",
