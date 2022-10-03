@@ -129,6 +129,7 @@ initiate <- function(biol, B0, h=0.75) {
   n(biol)[na, 1] <- n(biol)[na, 1] / (1 - exp(-m(biol)[na, 1]))
   
   # ADD bevholtss3 SRR
+  browser()
   params(sr(biol)) <- FLPar(s=h, R0=res, v=ssb(biol)[,1])
 
   # RETURN FLBiol
@@ -179,8 +180,12 @@ deplete <- function(biol, sel, dep) {
   # FIT
   brp <- brp(brp)
 
-  # SET finer fbar range
-  fbar(brp) <- FLQuant(seq(0, max(refpts(brp)['crash', 'harvest']), length=301))
+  # SET finer fbar range on Fcrash
+  fmax <- max(refpts(brp)['crash', 'harvest'])
+  # or fmax
+  if(is.na(fmax))
+    fmax <- max(refpts(brp)['fmax', 'harvest']) * 1.25
+  fbar(brp) <- FLQuant(seq(0, fmax, length=301))
 
   # ADD Btgt
   refpts(brp, "target", "biomass") <- c(tb(biol)[,1] ) * dep
@@ -204,7 +209,8 @@ deplete <- function(biol, sel, dep) {
   # EXTRACT years matching idx by iter
   ii <- unlist(lapply(seq(length(idx)), function(x)
     seq((its[x] - 1) * (dmn[1] * dmn[2]) + (dmn[1] * (idx[x] - 1)) + 1,
-      (its[x] - 1) * (dmn[1] * dmn[2]) + (dmn[1] * (idx[x] - 1)) + dmn[1])))
+      (its[x] - 1) * (dmn[1] * dmn[2]) + (dmn[1] * (idx[x] - 1)) + dmn[1])
+    ))
 
   # ASSIGN via c()
   n(biol)[,1] <- vstn[ii]
