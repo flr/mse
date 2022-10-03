@@ -1,5 +1,5 @@
 # om.R - DESC
-# /home/mosquia/Active/MSE_PKG@flr/mse/R/om.R
+# mse/R/om.R
 
 # Copyright (c) WUR, 2022.
 # Author: Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
@@ -14,7 +14,7 @@ runOM <- function(lhs, history, deviances, ...) {
   # VARIABLES
   its <- dims(deviances)$iter
 
-  # CREATE equilibirum population
+  # CREATE equilibrium population
   eq <- lhEql(lhs, ...)
 
   # ADJUST fbar to history
@@ -54,14 +54,17 @@ runOM <- function(lhs, history, deviances, ...) {
 
 #' Initializes a population for a given virgin biomass.
 #'
-#' The `FLBiol` object to be initiated requires slots to be filled up for the
-#' mean weight-at-age (`wt`), natural mortality (`m`), time of spawning (`spwn`)
-#' and maturity (`mat`).
+#' Abundances at age for a population at virgin conditions at age. An `FLBiol`
+#' object is initiated by providing a target total biomass (`B0`) and a value
+#' for the stock-recruit steepness (`s`). The object requires slots to be
+#' already filled up for the mean weight-at-age (`wt`), natural mortality
+#' (`m`), time of spawning (`spwn`) and maturity at age (`mat`).
 #'
-#' @param biom Initial or virgin biomass.
-#' @param B0 Population biology, `FLBiol`.
+#' @param biol An `FLBiol` object to nbe initiated.
+#' @param B0 Initial or virgin biomass.
 #'
-#' @return An updated `FLBiol` with abundances set in year 1 to match the requested biomas.
+#' @return An updated `FLBiol` with abundances set in teh first year to match
+#' the requested biomas.
 #' @export
 #'
 #' @examples
@@ -101,10 +104,10 @@ initiate <- function(biol, B0, h=0.75) {
   # RUN for iters
   #for(i in seq(its)) {
   res <- foreach(i=seq(its), .combine=c) %dopar% {
-    
+
     # EXTRACT to vectors
-    wt <- c(wt(biol)[, 1,,,,i])
-    m <- c(m(biol)[, 1,,,,i])
+    m <- c(iter(m(biol)[, 1],i))
+    wt <- c(iter(wt(biol)[, 1],i))
     n <- c(n(biol)[, 1,,,,i])
 
     res <- optim(init, foo, method="Brent", lower=1, upper=1e12,
@@ -182,10 +185,6 @@ deplete <- function(biol, sel, dep) {
   # ADD Btgt
   refpts(brp, "target", "biomass") <- c(tb(biol)[,1] ) * dep
 
-  # BUG: DIFF target
-  # c(refpts(brp)['target', 'biomass'])
-  # c(refpts(brp)['virgin', 'biomass']) * c(dep)
-
   # FIND refpts$target fbars in fbar(brp)
 
   ftarget <- c(refpts(brp)["target", "harvest",])
@@ -209,6 +208,8 @@ deplete <- function(biol, sel, dep) {
 
   # ASSIGN via c()
   n(biol)[,1] <- vstn[ii]
+
+  attr(biol, "refpts") <- refpts(brp)
 
   return(biol)
 }
@@ -247,21 +248,27 @@ deplete <- function(biol, sel, dep) {
 #'   seq(1050, 400, length=10)), dimnames=list(year=11:30))))
 #' plot(sim$biol)
 
-simulator <- function(biol, fisheries, v, h=0.75, dep=0, sigmaR=0,
+simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0,
   history, deviances=ar1rlnorm(rho=0, years=dimnames(biol)$year, iter=1,
     meanlog=0, sdlog=sigmaR), invalk="missing") {
   
   # INITIATE N0
-  nbiol <- initiate(biol, B0=v, h=h)
+  nbiol <- initiate(biol, B0=B0, h=h)
 
-  # COMBINED selectivity
+  # COMBINED selectivity for depletion, catch 1
+  if (length(fis) > 1)
+    sel <- Reduce("+", lapply(fis, function(x) catch.sel(x[[1]])) *
+      lapply(fis, function(x) catch.n(x[[1]]))) /
+      Reduce("+", lapply(fis, function(x) catch.n(x[[1]])))
+  else
+    sel <- catch.sel(fis[[1]][[1]])
 
-  # DEPLETE to d
-  nbiol <- deplete(nbiol, sel=catch.sel(fisheries[[1]][[1]])[,1], dep=dep)
+  # DEPLETE to dep
+  nbiol <- deplete(nbiol, sel=sel[,1], dep=dep)
 
   # ADD age devs, no bias correction needed
   lage <- dims(biol)$age
-  n(biol)[-lage, 1] <- n(biol)[-lage, 1] * rlnorm(lage - 1, 0, sigmaR)
+  n(nbiol)[-lage, 1] <- n(nbiol)[-lage, 1] * rlnorm(lage - 1, 0, sigmaR)
 
   # CONVERT history
   if(!is(history, "fwdControl"))
@@ -285,5 +292,3 @@ simulator <- function(biol, fisheries, v, h=0.75, dep=0, sigmaR=0,
 }
 
 # }}}
-
-
