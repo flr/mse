@@ -129,7 +129,6 @@ initiate <- function(biol, B0, h=0.75) {
   n(biol)[na, 1] <- n(biol)[na, 1] / (1 - exp(-m(biol)[na, 1]))
   
   # ADD bevholtss3 SRR
-  browser()
   params(sr(biol)) <- FLPar(s=h, R0=res, v=ssb(biol)[,1])
 
   # RETURN FLBiol
@@ -262,12 +261,12 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0,
   nbiol <- initiate(biol, B0=B0, h=h)
 
   # COMBINED selectivity for depletion, catch 1
-  if (length(fis) > 1)
-    sel <- Reduce("+", lapply(fis, function(x) catch.sel(x[[1]])) *
-      lapply(fis, function(x) catch.n(x[[1]]))) /
+  if (length(fisheries) > 1)
+    sel <- Reduce("+", lapply(fisheries, function(x) catch.sel(x[[1]])) *
+      lapply(fisheries, function(x) catch.n(x[[1]]))) /
       Reduce("+", lapply(fis, function(x) catch.n(x[[1]])))
   else
-    sel <- catch.sel(fis[[1]][[1]])
+    sel <- catch.sel(fisheries[[1]][[1]])
 
   # DEPLETE to dep
   nbiol <- deplete(nbiol, sel=sel[,1], dep=dep)
@@ -285,8 +284,8 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0,
     deviances <- rlnorm(1, log(deviances), sigmaR)
 
   # FWD w/history
-  res <- fwd(nbiol, fisheries, control=history, deviances=deviances,
-    effort_max=1e6)
+  res <- suppressWarnings(fwd(nbiol, fisheries, control=history,
+    deviances=deviances, effort_max=1e6))
 
   # LEN samples
   if(!missing(invalk)) {
