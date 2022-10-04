@@ -253,8 +253,8 @@ deplete <- function(biol, sel, dep) {
 #'   seq(1050, 400, length=10)), dimnames=list(year=11:30))))
 #' plot(sim$biol)
 
-simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0,
-  history, deviances=ar1rlnorm(rho=0, years=dimnames(biol)$year, iter=1,
+simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
+  history, deviances=ar1rlnorm(rho=rho, years=dimnames(biol)$year, iter=1,
     meanlog=0, sdlog=sigmaR), invalk="missing") {
   
   # INITIATE N0
