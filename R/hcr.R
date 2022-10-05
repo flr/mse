@@ -79,7 +79,7 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #' @param args
 #' @param tracking
 #' @examples
-#' data(sol274)
+#' data(ple4)
 #' args <- list(ay=2015, data_lag=1, management_lag=1, frq=1)
 #' # Set as fbar ~ ssb
 #' hockeystick.hcr(ple4, lim=3e5, trigger=4e5, target=0.25, min=0,
@@ -139,6 +139,10 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
     c(lapply(seq(ay + man_lag, ay + frq), function(x)
       list(quant=output, value=c(out), year=x)))
   )
+
+  # SET fbar ages
+  ctrl$minAge <- range(stk, "minfbar")
+  ctrl$maxAge <- range(stk, "maxfbar")
 
 	list(ctrl=ctrl, tracking=tracking)
 }

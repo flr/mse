@@ -33,6 +33,9 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
   ay <- args$ay
 
   stk <- window(stk, end=dy)
+
+  if(all(is.na(harvest(stk))))
+    harvest(stk) <- harvest(stock.n(stk), catch.n(stk), m(stk))
   
   track(tracking, "conv.est", ac(ay)) <- 1
   

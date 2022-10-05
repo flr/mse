@@ -642,7 +642,7 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
 
 # stock {{{
 setMethod("stock", signature(object="FLombf"),
-  function(object) {
+  function(object, full=TRUE) {
 
     bios <- names(biols(object))
 
@@ -656,7 +656,7 @@ setMethod("stock", signature(object="FLombf"),
         as.FLStock(biols(object)[[x]],
         # CHOOSE only matching fisheries
         fisheries=fisheries(object)[unlist(lapply(fbmap, function(i)
-          x %in% i))], catch=x, full=TRUE)
+          x %in% i))], catch=x, full=full)
       }
     ))
 
