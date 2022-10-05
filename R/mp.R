@@ -161,7 +161,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
-
+    
     # LOOP and combine
     lst0 <- foreach(j=its, 
       .packages="mse", 
@@ -177,7 +177,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
           fb=fb,    # TODO needs it selection
           projection=projection,
           iem=iem,  # TODO needs it selection
-          ctrl= iters(ctrl, j),
+          ctrl= iter(ctrl, j),
           args=c(args[!names(args) %in% "it"], it=length(j)),
           verbose=verbose, logfile=logfile)
 
@@ -187,7 +187,6 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
         if(!all(names(out) == c("om", "tracking", "oem", "args")))
           stop("Output of individual core is not correct")
         out
-        # list(om=out$om, tracking=out$tracking, oem=out$oem)
       }
     } else {
       
@@ -600,7 +599,7 @@ setMethod("goFish", signature(om="FLombf"),
 
     # time (start)
     stim <- Sys.time()
-
+    
     # args
     ay <- args$ay <- an(i)
     dy <- args$dy <- ay - dlag
@@ -873,7 +872,7 @@ setMethod("goFish", signature(om="FLombf"),
     # track(tracking, "fwd", seq(ay, ay+frq-1)) <- ctrl
     track(tracking, "time", ay) <- as.numeric(Sys.time()) - tracking[[1]]["time", i]
 
-    gc()
+    invisible(gc())
   }
   
   # RETURN
