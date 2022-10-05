@@ -263,7 +263,18 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     sel <- catch.sel(fisheries[[1]][[1]])
 
   # DEPLETE to dep
-  nbiol <- deplete(nbiol, sel=sel[,1], dep=dep)
+  its <- dims(biol)$iter
+
+  if(its > 500) {
+    dep <- rep(dep, length=its)
+    bls <- split(seq(its), ceiling(seq_along(seq(its)) / 250))
+
+    nbiol <- foreach(i=bls, .combine=combine) %dopar% { 
+      deplete(iter(nbiol, i), sel=iter(sel[, 1], i), dep=dep[i])
+    }
+  } else {
+    nbiol <- deplete(nbiol, sel=sel[, 1], dep=dep)
+  }
 
   # ADD age devs, no bias correction needed
   lage <- dims(biol)$age
