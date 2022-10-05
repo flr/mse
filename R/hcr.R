@@ -111,7 +111,7 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
     ifelse(met < trigger,
       pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  min),
   # ABOVE trigger
-    target))
+    c(target)))
 
   # LIMITS over previous output
   pre <- unitSums(seasonSums(window(do.call(output, list(stk)),
@@ -219,7 +219,8 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
     ifelse(met < trigger,
       pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  min),
     # ABOVE trigger
-    target))
+    c(target))
+  )
 
   # LABELS as list
   labels <- as.list(labels)
