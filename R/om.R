@@ -74,7 +74,7 @@ runOM <- function(lhs, history, deviances, ...) {
 #' initiate(propagate(ple4.biol, 100), B0=runif(100, 3e5, 5e5))
 
 initiate <- function(biol, B0, h=0.75) {
-
+  
   # SET iters
   dms <- dims(biol)
   its <- dms$iter
@@ -82,7 +82,7 @@ initiate <- function(biol, B0, h=0.75) {
   B0 <- rep(B0, length=its)
 
   sr(biol) <- predictModel(model=bevholtss3()$model,
-    params=propagate(FLPar(s=NA, R0=NA, v=NA), its))
+    params=propagate(FLPar(s=h, R0=NA, v=B0), its))
 
   # SOLVE R0 for B0, WT, M + F
   foo <- function(R0, n, m, wt, b0) {
@@ -97,12 +97,11 @@ initiate <- function(biol, B0, h=0.75) {
     return(sum((c(b0) - sum(wt * n)) ^ 2))
   }
  
-  # TODO: DEAL with iters in biol, B0 and h
+  # TODO: DEAL with iters only in biol, B0 and h
 
   init <- 1000
 
   # RUN for iters
-  #for(i in seq(its)) {
   res <- foreach(i=seq(its), .combine=c) %dopar% {
 
     # EXTRACT to vectors
@@ -128,8 +127,8 @@ initiate <- function(biol, B0, h=0.75) {
   # pg
   n(biol)[na, 1] <- n(biol)[na, 1] / (1 - exp(-m(biol)[na, 1]))
   
-  # ADD bevholtss3 SRR
-  params(sr(biol)) <- FLPar(s=h, R0=res, v=ssb(biol)[,1])
+  # ADD R0 param
+  params(sr(biol))$R0 <- res
 
   # RETURN FLBiol
   return(biol)
@@ -160,27 +159,22 @@ deplete <- function(biol, sel, dep) {
   # USE only first year of sel
   sel <- sel[, 1]
 
-  # TODO: FLBRP(FLBiol, sel)
   # FLBRP
   brp <- FLBRP(stock.wt=waa, landings.wt=waa, discards.wt=waa, bycatch.wt=waa,
     mat=mat, landings.sel=sel, m=maa,
-    discards.sel=sel%=%0, bycatch.harvest=sel%=%0,
+    discards.sel=sel %=% 0, bycatch.harvest=sel %=% 0,
     harvest.spwn=maa %=% 0, m.spwn=maa %=% 0,
     availability=maa %=% 1,
     range=c(minfbar=0, maxfbar=mag, plusgroup=mag))
  
-  # TODO: sr bevholtss3 -> bevholt
   # ADD sr
   psr <- params(sr)
   npsr <- abPars("bevholt", spr0=psr$v / psr$R0, s=psr$s, v=psr$v)
   model(brp) <- bevholt()$model
   params(brp) <- FLPar(a=npsr$a, b=npsr$b)
 
-  # FIT
-  brp <- brp(brp)
-
   # SET finer fbar range on Fcrash
-  fmax <- max(refpts(brp)['crash', 'harvest'])
+  fmax <- max(computeRefpts(brp)['crash', 'harvest'])
   # or fmax
   if(is.na(fmax))
     fmax <- max(refpts(brp)['fmax', 'harvest']) * 1.25
@@ -279,10 +273,6 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   if(!is(history, "fwdControl"))
     history <- as(history, "fwdControl")
   
-  # SET deviances
-  if(!missing(deviances))
-    deviances <- rlnorm(1, log(deviances), sigmaR)
-
   # FWD w/history
   res <- suppressWarnings(fwd(nbiol, fisheries, control=history,
     deviances=deviances, effort_max=1e6))
