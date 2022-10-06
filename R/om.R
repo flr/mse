@@ -254,7 +254,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   # INITIATE N0
   nbiol <- initiate(biol, B0=B0, h=h)
 
-  # COMBINED selectivity for depletion, catch 1
+  # COMBINED selectivity for depletion, catch 1 across fisheries
   if (length(fisheries) > 1)
     sel <- Reduce("+", lapply(fisheries, function(x) catch.sel(x[[1]])) *
       lapply(fisheries, function(x) catch.n(x[[1]]))) /
@@ -269,7 +269,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     dep <- rep(dep, length=its)
     bls <- split(seq(its), ceiling(seq_along(seq(its)) / 250))
 
-    nbiol <- foreach(i=bls, .combine=combine) %dopar% { 
+    nbiol <- foreach(i=bls, .combine=bcombine) %dopar% { 
       deplete(iter(nbiol, i), sel=iter(sel[, 1], i), dep=dep[i])
     }
   } else {
@@ -297,4 +297,16 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   return(res)
 }
 
+# }}}
+
+# bcombine including refpts attr {{{
+bcombine <- function(x, y, ...) {
+
+  args <- c(list(x, y), list(...))
+  res <- do.call(combine, args)
+
+  attr(res, "refpts") <- Reduce(combine, lapply(args, slot, "refpts"))
+
+  return(res)
+}
 # }}}
