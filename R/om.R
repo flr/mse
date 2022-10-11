@@ -267,9 +267,9 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
 
   if(its > 500) {
     dep <- rep(dep, length=its)
-    bls <- split(seq(its), ceiling(seq_along(seq(its)) / 250))
+    bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
 
-    nbiol <- foreach(i=bls, .combine=bcombine) %dopar% { 
+    nbiol <- foreach(i=bls, .combine=bcombine) %dopar% {
       deplete(iter(nbiol, i), sel=iter(sel[, 1], i), dep=dep[i])
     }
   } else {
@@ -284,18 +284,14 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   if(!is(history, "fwdControl"))
     history <- as(history, "fwdControl")
 
-  # SET effort to match F
-  for(i in seq(fisheries))
-    effort(fisheries[[i]])[] <- 
-      quantMeans(nbiol@refpts['target', 'harvest'] /
-        catch.sel(fisheries[[i]][[1]]) * catch.q(fisheries[[1]][[i]])$alpha *
-        n(biol) * wt(biol) ^ catch.q(fisheries[[1]][[i]])$beta)
+  # SET effort to match F target
+  for(i in seq(fisheries)) {
+    effort(fisheries[[i]])[] <- c(nbiol@refpts['target', 'harvest'])
+  }
 
   # FWD w/history
   res <- suppressWarnings(fwd(nbiol, fisheries, control=history,
     deviances=deviances, effort_max=1e6))
-
-  # CHECK
 
   # LEN samples
   if(!missing(invalk)) {
@@ -306,6 +302,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   return(res)
 }
 
+_
 # }}}
 
 # bcombine including refpts attr {{{
