@@ -302,7 +302,6 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   return(res)
 }
 
-_
 # }}}
 
 # bcombine including refpts attr {{{
