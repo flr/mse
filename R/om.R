@@ -287,11 +287,15 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   # SET effort to match F
   for(i in seq(fisheries))
     effort(fisheries[[i]])[] <- 
-      quantMeans(nbiol@refpts['target', 'harvest'] / catch.sel(fisheries[[i]][[1]]) * catch.q(fisheries[[1]][[i]])$alpha)
+      quantMeans(nbiol@refpts['target', 'harvest'] /
+        catch.sel(fisheries[[i]][[1]]) * catch.q(fisheries[[1]][[i]])$alpha *
+        n(biol) * wt(biol) ^ catch.q(fisheries[[1]][[i]])$beta)
 
   # FWD w/history
   res <- suppressWarnings(fwd(nbiol, fisheries, control=history,
     deviances=deviances, effort_max=1e6))
+
+  # CHECK
 
   # LEN samples
   if(!missing(invalk)) {
