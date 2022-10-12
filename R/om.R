@@ -258,7 +258,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   if (length(fisheries) > 1)
     sel <- Reduce("+", lapply(fisheries, function(x) catch.sel(x[[1]])) *
       lapply(fisheries, function(x) catch.n(x[[1]]))) /
-      Reduce("+", lapply(fis, function(x) catch.n(x[[1]])))
+      Reduce("+", lapply(fisheries, function(x) catch.n(x[[1]])))
   else
     sel <- catch.sel(fisheries[[1]][[1]])
 
