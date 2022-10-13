@@ -269,7 +269,8 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     dep <- rep(dep, length=its)
     bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
 
-    nbiol <- foreach(i=bls, .combine=bcombine) %dopar% {
+    nbiol <- foreach(i=bls, .combine=bcombine,
+      .packages=c("mse", "FLBRP")) %dopar% {
       deplete(iter(nbiol, i), sel=iter(sel[, 1], i), dep=dep[i])
     }
   } else {
@@ -283,6 +284,8 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   # CONVERT history
   if(!is(history, "fwdControl"))
     history <- as(history, "fwdControl")
+
+  # TODO: CHECK history dims & fisheries
 
   # SET effort to match F target
   for(i in seq(fisheries)) {
