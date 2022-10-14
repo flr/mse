@@ -270,7 +270,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
 
     nbiol <- foreach(i=bls, .combine=bcombine,
-      .packages=c("FLCore", "FLFisheries", "FLasher", "mse", "FLBRP")) %dopar% {
+      .packages=c("FLCore", "FLFishery", "FLasher", "mse", "FLBRP")) %dopar% {
       deplete(iter(nbiol, i), sel=iter(sel[, 1], i), dep=dep[i])
     }
   } else {
