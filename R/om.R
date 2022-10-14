@@ -242,7 +242,7 @@ deplete <- function(biol, sel, dep) {
 #'   landings.n=fq %=% 1, discards.n=fq %=% 0,
 #'   catch.sel=fq %=% c(0.1, 0.3, 0.4, 0.8, 0.9, 1)))
 #' # Project for 20 year catch trend: c(50, 100-800, 1050-400)
-#' sim <- simulator(bio, FLFisheries(A=fis), v=13000, d=0.01,
+#' sim <- simulator(bio, FLFisheries(A=fis), B0=13000, d=0.01,
 #'   history=FLQuants(catch=FLQuant(c(50, seq(100, 800, length=9),
 #'   seq(1050, 400, length=10)), dimnames=list(year=11:30))))
 #' plot(sim$biol)

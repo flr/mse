@@ -630,9 +630,8 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
     
-    stk <- stock(om, full=FALSE)
+    stk <- stock(om, full=TRUE)
     
-    # APPLY oem over each biol
     o.out <- Map(function(stk, dev, obs, tra) {
       do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
@@ -660,7 +659,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), 
         ov=list(t1=flsval))
       ctrl.est$step <- "est"
-      
+
       out.assess <- Map(function(x, y, z)
         do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z))),
         x=stk0, y=idx0, z=tracking)
@@ -783,7 +782,8 @@ setMethod("goFish", signature(om="FLombf"),
 
       tracking <- out$tracking
 
-      track(tracking, "isys", seq(ay, ay+frq-1)) <- ctrl
+      # BUG: DEAL with multirow ctrl
+      track(tracking, "isys", seq(ay, ay+frq-1)) <- ctrl[1,]
     }    
 
     #----------------------------------------------------------
