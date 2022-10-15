@@ -141,8 +141,10 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   )
 
   # SET fbar ages
-  ctrl$minAge <- range(stk, "minfbar")
-  ctrl$maxAge <- range(stk, "maxfbar")
+  if(output %in% c("f", "fbar")) {
+    ctrl$minAge <- range(stk, "minfbar")
+    ctrl$maxAge <- range(stk, "maxfbar")
+  }
 
 	list(ctrl=ctrl, tracking=tracking)
 }
