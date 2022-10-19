@@ -181,11 +181,15 @@ splitTAC.is <- function(stk, ctrl, allocation, args, tracking) {
   frq <- args$frq
   yrs <- ctrl$year
 
+  # CHECK quant in fwdControl is catch
+  if(ctrl$quant != "catch")
+    stop("splitTAc.is expects a catch-based fwdControl")
+
   ctrl <- fwdControl(
     Map(function(yr, fi) {
         list(year=yr, fishery=fi, catch=1, biol=an(NA),
     quant="catch", value=ctrl[ctrl$year==yr,]$value * allocation[fi])
-        },
+      },
     yr=rep(yrs, length(allocation)),
     fi=rep(seq(length(allocation)), each=length(yrs)))
   )
