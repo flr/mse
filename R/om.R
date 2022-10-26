@@ -302,6 +302,10 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     res$lengths <- lapply(cafs, lenSamples, invALK=invalk, n=250)
   }
 
+  # OUTPUT
+  res$priors <- data.table(B0=B0, dep=dep, h=h)
+  res$deviances <- deviances
+
   return(res)
 }
 
