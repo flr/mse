@@ -261,8 +261,8 @@ setMethod("discards", signature(object="FLombf"),
 setMethod("ssb", signature(object="FLombf"),
   function(object, biol=NULL) {
     
-    res <- FLQuants(mapply(ssb, biols(object),
-      f=harvest(object), SIMPLIFY=FALSE))
+    res <- FLQuants(Map(ssb, object=biols(object),
+      harvest=harvest(object)))
 
     return(res)
   }
