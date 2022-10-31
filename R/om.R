@@ -94,6 +94,7 @@ initiate <- function(biol, B0, h=0.75) {
     # plusgroup
     n[a] <- n[a] / (1 - exp(-m[a]))
 
+    return((c(b0) - sum(wt * n)))
     return(sum((c(b0) - sum(wt * n)) ^ 2))
   }
  
@@ -105,14 +106,12 @@ initiate <- function(biol, B0, h=0.75) {
   res <- foreach(i=seq(its), .combine=c) %dopar% {
 
     # EXTRACT to vectors
-    m <- c(iter(m(biol)[, 1],i))
-    wt <- c(iter(wt(biol)[, 1],i))
-    n <- c(n(biol)[, 1,,,,i])
+    m <- c(iter(m(biol)[, 1], i))
+    wt <- c(iter(wt(biol)[, 1], i))
+    n <- c(iter(n(biol)[, 1], i))
 
-    res <- optim(init, foo, method="Brent", lower=1, upper=1e12,
-      n=n, m=m, wt=wt, b0=B0[i])
-
-    res$par
+    res <- uniroot(foo, c(1, 1e12), n=n, m=m, wt=wt, b0=B0[i])
+    res$root
   }
 
   # RECONSTRUCT initial population
@@ -262,15 +261,27 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   else
     sel <- catch.sel(fisheries[[1]][[1]])
 
+  # RESCALE to 1
+  sel <- sel %/% apply(sel, 2:6, max)
+
   # DEPLETE to dep
   its <- dims(biol)$iter
 
   if(its > 500) {
+
+    # SPLIT in 500 iter blocks
     dep <- rep(dep, length=its)
     bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
 
+    # SET progresssor
+    p <- progressor(length(bls))
+
+    # LOOP over blocks
     nbiol <- foreach(i=bls, .combine=bcombine,
-      .packages=c("FLCore", "FLFishery", "FLasher", "mse", "FLBRP")) %dopar% {
+    .packages=c("FLCore", "FLBRP")) %dopar% {
+
+      p()
+
       deplete(iter(nbiol, i), sel=iter(sel[, 1], i), dep=dep[i])
     }
   } else {
@@ -282,8 +293,9 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   n(nbiol)[-lage, 1] <- n(nbiol)[-lage, 1] * rlnorm(lage - 1, 0, sigmaR)
 
   # CONVERT history
-  if(!is(history, "fwdControl"))
+  if(!is(history, "fwdControl")) {
     history <- as(history, "fwdControl")
+  }
 
   # TODO: CHECK history dims & fisheries
 
@@ -295,7 +307,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   # FWD w/history
   res <- suppressWarnings(fwd(nbiol, fisheries, control=history,
     deviances=deviances, effort_max=1e6))
-
+  
   # LEN samples
   if(!missing(invalk)) {
     cafs <- lapply(res$fisheries, function(x) catch.n(x[[1]]) + 1e-6)
