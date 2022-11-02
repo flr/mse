@@ -248,7 +248,7 @@ deplete <- function(biol, sel, dep) {
 
 simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   history, deviances=ar1rlnorm(rho=rho, years=dimnames(biol)$year, iter=1,
-    meanlog=0, sdlog=sigmaR), invalk="missing") {
+    meanlog=0, sdlog=sigmaR), B0change=NULL, invalk="missing") {
   
   # INITIATE N0
   nbiol <- initiate(biol, B0=B0, h=h)
@@ -288,26 +288,61 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     nbiol <- deplete(nbiol, sel=sel[, 1], dep=dep)
   }
 
-  # ADD age devs, no bias correction needed
+  # ADD initial age devs, no bias correction needed
   lage <- dims(biol)$age
   n(nbiol)[-lage, 1] <- n(nbiol)[-lage, 1] * rlnorm(lage - 1, 0, sigmaR)
+
+  # MAP refpts & keep target F
+  targetf <- c(nbiol@refpts['target', 'harvest'])
+  attr(nbiol, "refpts") <- remap(nbiol@refpts)
+
+  # ALTER SRR
+  
+  if(!is.null(B0change)) {
+
+    # EXPAND FLPar
+    pas <- params(sr(nbiol))
+    pay <- FLPar(NA, dimnames=list(params=c("s", "R0", "v"),
+      year=dimnames(biol)$year, iter=dimnames(biol)$iter))
+
+    # ASSIGN first year,
+    pay[, 1,]<- pas
+    # steepness
+    pay['s', ,] <- pas['s',]
+    # SET B0 and R0 trends
+    pay['v', ,] <- apply(pas$v, 2, '*', c(B0change))
+    pay['R0', ,] <- apply(pas$R0, 2, '*', c(B0change))
+
+    params(sr(nbiol)) <- pay
+  
+    # RESCALE refpts by year
+    rps <- nbiol@refpts
+    rpy <- FLPar(NA, dimnames=list(param=dimnames(rps)$param, 
+      year=dimnames(biol)$year, iter=dimnames(rps)$iter))
+    rpy[,1,] <- rps
+
+    rpy[c('FMSY'),]  <- rps[c('FMSY'),] 
+
+    for(i in c('SBMSY', 'BMSY', 'B0', 'SB0'))
+     rpy[i,] <- apply(rps[i, ], 2, '*', c(B0change))
+
+  }
 
   # CONVERT history
   if(!is(history, "fwdControl")) {
     history <- as(history, "fwdControl")
   }
-
   # TODO: CHECK history dims & fisheries
 
   # SET effort to match F target
   for(i in seq(fisheries)) {
-    effort(fisheries[[i]])[] <- c(nbiol@refpts['target', 'harvest'])
+    effort(fisheries[[i]])[] <- targetf
   }
 
   # FWD w/history
   res <- suppressWarnings(fwd(nbiol, fisheries, control=history,
     deviances=deviances, effort_max=1e6))
-  
+
   # LEN samples
   if(!missing(invalk)) {
     cafs <- lapply(res$fisheries, function(x) catch.n(x[[1]]) + 1e-6)

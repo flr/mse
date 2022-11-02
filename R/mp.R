@@ -596,7 +596,7 @@ setMethod("goFish", signature(om="FLombf"),
     if(verbose) {
       cat(i, " > ")
     }
-
+    
     # time (start)
     stim <- Sys.time()
     
