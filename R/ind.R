@@ -20,30 +20,32 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   # ARGS
   ay <- args$ay
   dlag <- args$data_lag
+  dyrs <- ac(seq(ay - dlag - (nyears - 1) , length=nyears))
   
   # SUBSET last nyears from ay - mlag
-  met <- index(idx[[index]])[1, ac(seq(ay - dlag - (nyears - 1) ,
-    length=nyears))]
+  met <- biomass(idx[[index]])[1, dyrs]
 
   # SLOPE by iter
   dat <- data.table(as.data.frame(met))
-  slope <- dat[, .(data=coef(lm(log(data)~year))[2]), by=iter]
+  slope <- dat[, .(data=coef(lm(log(data) ~ year))[2]), by=iter]
 
   # WEIGHTED average index of last ayears
-  mean <- yearSums(tail(met, ayears) * 
-   c(0.50 * seq(1, ayears - 1) / sum(seq(1, ayears - 1)), 0.50))
-  # LABEL as from last data year
-  dimnames(mean) <- list(year=ay - dlag)
-
+  ywts <- c(0.50 * seq(1, ayears - 1) / sum(seq(1, ayears - 1)), 0.50)
+  wmean <- expand(yearSums(tail(met, ayears) * ywts), year=ay - dlag)
+  
+  # AVERAGE index
+  mean <- expand(yearMeans(tail(met, ayears)), year=ay - dlag)
+  
   # OUTPUT
   slope <- FLQuant(slope$data, dimnames=dimnames(mean), units="")
-  ind <- FLQuants(mean=mean, slope=slope)
+  ind <- FLQuants(wmean=wmean, slope=slope, mean=mean)
 
   # TRACK
   track(tracking, "mean.ind", ac(ay)) <- mean
+  track(tracking, "wmean.ind", ac(ay)) <- wmean
   track(tracking, "slope.ind", ac(ay)) <- slope
 
-  list(stk=stk, ind=ind, tracking=tracking)
+  return(list(stk=stk, ind=ind, tracking=tracking))
 
 } # }}}
 
@@ -157,7 +159,7 @@ meta.est <- function(stk, idx, ..., args, tracking) {
   # GET est args list
   eargs <- list(...)
   
-  # CHECK eargs have 'method'
+  # CHECK args have 'method'
   if(!all(unlist(lapply(eargs, function(x) "method" %in% names(x)))))
     stop("args must contain list with an element called 'method'")
   

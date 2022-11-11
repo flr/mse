@@ -104,7 +104,8 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   met <- window(do.call(metric, list(stk)), start=ay - data_lag,
     end=ay - data_lag)
   
-  # RULE
+  # APPLY rule
+
   # BELOW lim
   out <- ifelse(met <= lim, min,
   # BETWEEN lim and trigger
@@ -132,7 +133,7 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
     out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
   if(!is.na(dlow))
     out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
-
+  
   # CONTROL
   ctrl <- fwdControl(
     # TARGET for frq years

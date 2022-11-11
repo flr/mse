@@ -246,7 +246,7 @@ deplete <- function(biol, sel, dep) {
 #'   seq(1050, 400, length=10)), dimnames=list(year=11:30))))
 #' plot(sim$biol)
 
-simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
+simulatorold <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   history, deviances=ar1rlnorm(rho=rho, years=dimnames(biol)$year, iter=1,
     meanlog=0, sdlog=sigmaR), B0change=NULL, invalk="missing") {
   
@@ -277,7 +277,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     p <- progressor(length(bls))
 
     # LOOP over blocks
-    nbiol <- foreach(i=bls, .combine=bcombine,
+    nbiol <- foreach(i=bls, .combine=.bcombine, .multicombine=TRUE,
     .packages=c("FLCore", "FLBRP")) %dopar% {
 
       p()
@@ -358,8 +358,159 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
 
 # }}}
 
-# bcombine including refpts attr {{{
-bcombine <- function(x, y, ...) {
+# simulatorp {{{
+
+#' @param biol
+#' @param fisheries
+#' @param v Virgin total biomass or carrying capacity (K).
+#' @param h Steepness of the Beverton & Holt stock-recruitment relationship.
+#' @param d Initial depletion level, as proportion of v.
+#' @param sigmaR Variance of the recruitment deviances.
+#' @param rho Autocorrelation in recruitment, only used if no deviances are provided.
+#' @param control Past history for forward projection, tipically a catch series.
+#' @param deviances Deviances over the stock-recruits relationship
+#' @param invalk Inverse Age-Length Key to generate length samples from the generated catch-at-age.
+#' @examples
+#' NULL
+
+simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
+  history, deviances=ar1rlnorm(rho=rho, years=dimnames(biol)$year, iter=1,
+    meanlog=0, sdlog=sigmaR), B0change=NULL, invalk=NULL) {
+
+  # DIMS
+  nage <- dims(biol)$age
+  nyr <- dims(biol)$year
+  nfs <- length(fisheries)
+  its <- length(c(B0))
+  bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
+  
+  # SET progresssor
+  p <- progressor(length(bls))
+
+  # PROPAGATE objects, if needed
+  if(dims(biol)$iter == 1)
+    biol <- lapply(bls, function(x) propagate(biol, length(x)))
+  else if(dims(biol)$iter == its)
+    biol <- lapply(bls, iter, obj=biol)
+  else
+    biol <- list(`1`=biol)
+
+  if(dims(fisheries[[1]])$iter == 1)
+    fisheries <- lapply(bls, function(x) lapply(fisheries,
+      function(y) propagate(y, iter=length(x))))
+  else if(dims(fisheries[[1]])$iter == its)
+    fisheries <- lapply(bls, iter, obj=fisheries)
+  else
+    fisheries <- list(`1`=fisheries)
+
+  # LOOP over iter blocks
+
+  sim <- foreach(i=names(bls), .combine=.lcombine, .multicombine=TRUE,
+    .packages=c("FLCore", "FLBRP", "FLasher")) %dopar% {
+
+    # SET iters
+    it <- bls[[i]]
+    ni <- length(it)
+
+    # GET objects
+    bio <- biol[[i]]
+    fis <- fisheries[[i]]
+    
+    # INITIATE N0
+    nbio <- initiate(bio, B0=B0[it], h=h[it])
+
+    # COMBINED selectivity for depletion, catch 1 across fisheries
+    if (nfs > 1)
+    sel <- Reduce("+", lapply(fis, function(x) catch.sel(x[[1]])) *
+      lapply(fis, function(x) catch.n(x[[1]]))) /
+      Reduce("+", lapply(fis, function(x) catch.n(x[[1]])))
+    else
+      sel <- catch.sel(fis[[1]][[1]])
+
+    # RESCALE selex to 1
+    sel <- sel %/% apply(sel, 2:6, max)
+
+    # DEPLETE to dep level by iter
+    nbio <- deplete(nbio, sel=sel, dep=dep[it])
+
+    # ADD initial age devs, no bias correction needed
+    n(nbio)[-nage, 1] <- n(nbio)[-nage, 1] * rlnorm(nage - 1, 0, sigmaR)
+
+    # MAP refpts & keep target F
+    targetf <- c(nbio@refpts['target', 'harvest'])
+    # attr(nbio, "refpts") <- remap(nbio@refpts, MSY=c("msy", "yield"))
+    rps <- remap(nbio@refpts, MSY=c("msy", "yield"))
+
+    # ALTER SRR
+  
+    if(!is.null(B0change)) {
+
+      # EXPAND FLPar
+      pas <- params(sr(nbio))
+      pay <- FLPar(NA, dimnames=list(params=c("s", "R0", "v"),
+       year=dimnames(nbio)$year, iter=it))
+
+      # ASSIGN first year,
+      pay[, 1,]<- pas
+      # steepness
+      pay['s', ,] <- pas['s',]
+      # SET B0 and R0 trends
+      pay['v', ,] <- apply(pas$v, 2, '*', c(B0change))
+      pay['R0', ,] <- apply(pas$R0, 2, '*', c(B0change))
+
+      params(sr(nbio)) <- pay
+  
+      # RESCALE refpts by year
+      rpy <- FLPar(NA, dimnames=list(param=dimnames(rps)$param, 
+        year=dimnames(nbio)$year, iter=it))
+      rpy[,1,] <- rps
+
+      rpy[c('FMSY'),]  <- rps[c('FMSY'),] 
+
+      for(i in c('SBMSY', 'BMSY', 'B0', 'SB0'))
+        rpy[i,] <- apply(rps[i, ], 2, '*', c(B0change))
+
+    }
+
+    # SET effort to match F target
+    for(i in seq(fis)) {
+      effort(fis[[i]])[] <- targetf
+    }
+
+    # CONVERT history
+    # TODO: DEAL w/ iters in history
+    if(!is(history, "fwdControl")) {
+      history <- as(history, "fwdControl")
+    }
+    
+    # FWD w/history
+    res <- suppressWarnings(fwd(nbio, fis, control=history,
+      deviances=iter(deviances, it), effort_max=1e6))
+
+    # LEN samples
+    if(!is.null(invalk)) {
+      cafs <- lapply(res$fisheries, function(x) catch.n(x[[1]]) + 1e-6)
+      res$lengths <- lapply(cafs, lenSamples, invALK=invalk, n=250)
+    }
+
+    # OUTPUT
+    res$priors <- data.table(B0=B0, dep=dep, h=h)
+    res$deviances <- iter(deviances, it)
+    res$refpts <- rps
+
+    # UPDATE progressr report
+    p()
+
+    return(res)
+  }
+
+  return(sim)
+}
+
+# }}}
+
+# .bcombine including refpts attr {{{
+.bcombine <- function(x, y, ...) {
 
   args <- c(list(x, y), list(...))
   res <- do.call(combine, args)
@@ -367,5 +518,24 @@ bcombine <- function(x, y, ...) {
   attr(res, "refpts") <- Reduce(combine, lapply(args, slot, "refpts"))
 
   return(res)
+}
+# }}}
+
+# .lcombine simulator list {{{
+.lcombine <- function(x, y, ...) {
+
+  args <- c(list(x, y), list(...))
+
+  out <- list(biol=do.call(.bcombine, lapply(args, '[[', 'biol')),
+    fisheries=do.call(combine, lapply(args, '[[', 'fisheries')),
+    priors=do.call(rbind, lapply(args, '[[', 'priors')),
+    deviances=do.call(combine, lapply(args, '[[', 'deviances')),
+    refpts=do.call(combine, lapply(args, '[[', 'refpts'))
+  )
+
+  if("lengths" %in% names(x))
+    out$lengths <- do.call(combine, lapply(args, '[[', 'lengths'))
+
+  return(out)
 }
 # }}}
