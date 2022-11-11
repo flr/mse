@@ -631,10 +631,14 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$step <- "oem"
     
     stk <- stock(om, full=TRUE)
-    
+
     o.out <- Map(function(stk, dev, obs, tra) {
-      do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
+      obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
+      # PICK UP fbar range from observations
+      range(obs.oem$stk, c("minfbar", "maxfbar")) <- 
+        range(obs$stk, c("minfbar", "maxfbar")) 
+      return(obs.oem)
       }, stk=stk, obs=observations(oem), dev=deviances(oem), tra=tracking)
 
     # EXTRACT oem observations
@@ -643,7 +647,7 @@ setMethod("goFish", signature(om="FLombf"),
     idx0 <- lapply(o.out, "[[", "idx")
     
     observations(oem) <- lapply(o.out, "[[", "observations")
-
+    
     # tracking <- FLQuants(o.out[[1]]$tracking[[1]], o.out[[2]]$tracking[[2]])
 
     # DEBUG
@@ -747,6 +751,23 @@ setMethod("goFish", signature(om="FLombf"),
       # BUG: ASSIGN biol
       if(all(is.na(ctrl$biol)))
        ctrl$biol <- args$stock
+      
+      # COUNT targets with 'f' or 'fbar', need minAge, maxAge
+      fbis <- target(ctrl)[ctrl$quant %in% c("f", "fbar"),]
+
+      # SET fbar ages if missing
+      if(nrow(fbis) > 0) {
+        
+        # GET fbar ranges
+        frgs <- lapply(stk0, range, c("minfbar", "maxfbar"))
+        
+        # CHANGE on those missing
+        for(i in unique(fbis$biol)) {
+          fbis[fbis$biol == i, c("minAge", "maxAge")]  <- frgs[[i]]
+        }
+        # ASSIGN back into ctrl
+        target(ctrl)[ctrl$quant %in% c("f", "fbar"),] <- fbis
+      }
 
       tracking <- out$tracking
     } else {
