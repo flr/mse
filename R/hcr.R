@@ -417,6 +417,14 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar",
     lapply(seq(ay + man_lag, ay + frq), function(x)
       list(quant=output, value=c(out), year=x, relYear=x-1)))
 
+  # SET fbar ages
+  if(output %in% c("f", "fbar")) {
+    ctrl$minAge <- range(stk, "minfbar")
+    ctrl$maxAge <- range(stk, "maxfbar")
+  }
+
+
+
 	list(ctrl=ctrl, tracking=tracking)
 }
 # }}}
