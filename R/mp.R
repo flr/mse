@@ -568,7 +568,7 @@ setMethod("goFish", signature(om="FLom"),
 setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
     verbose, logfile) {
-  
+
   it <- args$it     # number of iterations
   y0 <- args$y0     # initial data year
   fy <- args$fy     # final year
@@ -631,7 +631,7 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$step <- "oem"
     
     stk <- stock(om, full=TRUE)
-
+    
     o.out <- Map(function(stk, dev, obs, tra) {
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))

@@ -331,13 +331,6 @@ setMethod("summary", signature(object="FLom"),
 
 # plot {{{
 
-setMethod("plot", signature(x="FLom", y="list"),
-  function(x, y, ...) {
-
-    do.call("plot", c(list(x=x), y, list(...)))
-  }
-)
-
 setMethod("plot", signature(x="FLom", y="missing"),
   function(x, window=TRUE, ...) {
 

@@ -540,45 +540,40 @@ setMethod("fwd", signature(object="FLombf", fishery="missing", control="fwdContr
 
 # plot {{{
 setMethod("plot", signature(x="FLombf", y="missing"),
-  function(x, metrics=list(SBMSY=ssb ~ SBmsy, FMSY=fbar ~ Fmsy)) {
+  function(x, ...) {
+    
+    # GET extra args
+    args <- list(...)
 
-    # 1. TODO SB/SBMSY + F/FMSY
-    ssbs <- lapply(ssb(x), unitSums)
-    p1 <- plot(ssbs) + ylim(c(0,NA)) +
-      ylab(paste0("SSB (", units(ssbs[[1]]) , ")"))
+    # DISPATCH if args are FLmse
+    if(length(args) == 0) {
 
-    # 2. catch by fleet
-    cas <- lapply(catch(fisheries(x)), unitSums)
-    p2 <- plot(cas) + ylim(c(0, NA)) +
-      ylab(paste0("Catch (", units(cas[[1]]), ")")) +
-      theme(legend.position="bottom")
+      # 1. SSB
+      ssbs <- lapply(ssb(x), unitSums)
+      p1 <- plot(ssbs) + ylim(c(0,NA)) +
+        ylab(paste0("SSB (", units(ssbs[[1]]) , ")"))
 
-    # COMBINE p1 + p2
-    return(p1 + p2)
+      # 2. F
+      fs <- lapply(fbar(x), unitMeans)
+      p2 <- plot(fs) + ylim(c(0,NA)) +
+        ylab(paste0("F"))
 
+      # 3. catch by fleet
+      cas <- lapply(catch(fisheries(x)), unitSums)
+      p3 <- plot(cas) + ylim(c(0, NA)) +
+        ylab(paste0("Catch (", units(cas[[1]]), ")")) +
+        theme(legend.position="bottom")
+
+      # COMBINE p1 + p2
+      return((p1 / p2) | p3)
+    
+    } else {
+
+      plot(x, args)
+
+    }
  }) # }}}
 
-# plot(FLombf, fwdControl) {{{
-
-setMethod("plot", signature(x="FLombf", y="fwdControl"),
-  function(x, y, fill="#E69F00", ...) {
-
-    yrs <- range(y$year)
-
-    # CREATE standard plot
-    p <- plot(x, ...)
-
-    # GET x variable
-    if(rlang::as_name(p$mapping$x) == "date") {
-      yrs <- range(p$data[with(p$data, year %in% yrs), "date"])
-    }
-
-    p + geom_vline(xintercept=yrs[1], alpha=0.4) +
-      geom_vline(xintercept=yrs[2], alpha=0.2) +
-      annotate("rect", xmin = yrs[1], xmax = yrs[2], ymin = -Inf, ymax = Inf,
-        fill = fill, alpha=0.1)
-  }
-) # }}}
 
 # index.hat {{{
 

@@ -208,40 +208,55 @@ setMethod("plot", signature(x="FLmse", y="missing"),
     # PLOT om
     plot(om(x), ...)
   }
-) 
-
-setMethod("plot", signature(x="FLo", y="FLmse"),
-  function(x, y, ..., window=TRUE) {
-    
-    args <- list(...)
-
-    fms <- unlist(lapply(args, is, "FLmse"))
-
-    stocks <- lapply(c(list(x, om(y)), args[fms]), stock)
-
-    # WINDOW om
-    if(isTRUE(window))
-      maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))
-    else
-      maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$maxyear)))
-    
-    stocks[[1]] <- window(stocks[[1]], end=maxyear)
-
-    # SORT OUT names
-    if(is.null(names(stocks)))
-      names(stocks) <- rep(character(1), length(stocks))
-    idx <- names(stocks) == character(1)
-    if(length(idx) > 0)
-      names(stocks)[idx] <- unlist(lapply(stocks, name))[idx]
-    idx <- names(stocks) == character(1)
-    if(length(idx) > 0)
-      names(stocks)[idx] <- c("OM", paste0("MP", seq(sum(idx)-1)))[idx]
- 
-    # PLOT FLStocks + args
-    nfs <- unlist(lapply(args, function(x) !is(x, "FLmse")))
-    do.call("plot", c(list(x=FLStocks(stocks)), args[nfs]))
-  }
 )
+
+.plotom <- function(stocks, window=TRUE) {
+ 
+  # WINDOW om
+  if(isTRUE(window))
+    maxyear <- min(unlist(lapply(stocks[-1], function(i) dims(i)$minyear)))
+  else
+    maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(i)$maxyear)))
+    
+  stocks[[1]] <- window(stocks[[1]], end=maxyear)
+
+  # SORT OUT names
+  if(is.null(names(stocks)))
+    names(stocks) <- c("OM", paste0("MP", seq(length(stocks) - 1)))
+ 
+  # PLOT FLStocks
+  plot(FLStocks(stocks))
+
+}
+
+setMethod("plot", signature(x="FLombf", y="FLmse"),
+  function(x, y, ..., window=TRUE) {
+
+    # MERGE all FLmse args
+    y <- c(list(y), list(...))
+
+    plot(x, y, window=window)
+  })
+
+setMethod("plot", signature(x="FLombf", y="list"),
+  function(x, y, window=TRUE) {
+
+    # EXTRACT stock(om) as FLStocks
+    oms <- stock(x)
+
+    # EXTRACT FLStocks from each FLmse
+    mses <- lapply(y, stock)
+
+    # COMBINE by biol
+    stks <- lapply(seq(oms), function(i)
+      FLStocks(c(list(oms[[i]]), lapply(mses, "[[", i)))
+    )
+
+    if(length(stks) == 1)
+      .plotom(stks[[1]], window=window)
+    else
+      Reduce("|", lapply(stks, .plotom, window=window))
+  })
 # }}}
 
 # summary {{{
