@@ -410,7 +410,7 @@ setMethod("goFish", signature(om="FLom"),
           message("Call to hcr method failed, check inputs")
           print(e)
         })
-    
+      
       ctrl <- out.hcr$ctrl
       tracking <- out.hcr$tracking
     } else {

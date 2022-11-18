@@ -574,7 +574,6 @@ setMethod("plot", signature(x="FLombf", y="missing"),
     }
  }) # }}}
 
-
 # index.hat {{{
 
 setGeneric('index.hat', function(object, stock, ...)

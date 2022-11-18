@@ -229,7 +229,7 @@ setMethod("plot", signature(x="FLmse", y="missing"),
 
 }
 
-setMethod("plot", signature(x="FLombf", y="FLmse"),
+setMethod("plot", signature(x="FLo", y="FLmse"),
   function(x, y, ..., window=TRUE) {
 
     # MERGE all FLmse args
@@ -237,6 +237,18 @@ setMethod("plot", signature(x="FLombf", y="FLmse"),
 
     plot(x, y, window=window)
   })
+
+setMethod("plot", signature(x="FLom", y="list"),
+  function(x, y, window=TRUE) {
+
+    # MERGE stocks in list
+    stks <- FLStocks(c(stock(x), lapply(y, stock)))
+
+    # PLOT
+    .plotom(stks, window=window)
+
+  }
+)
 
 setMethod("plot", signature(x="FLombf", y="list"),
   function(x, y, window=TRUE) {

@@ -92,7 +92,7 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #'   tracking=FLQuant(dimnames=list(metric="catch.hcr", year=2016)))
 
 hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
-  output="fbar", dlow=NA, dupp=NA, args, tracking) {
+  output="fbar", dlow=NA, dupp=NA, all=TRUE, args, tracking) {
   
   # EXTRACT args
   ay <- args$ay
@@ -107,10 +107,10 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   # APPLY rule
 
   # BELOW lim
-  out <- ifelse(met <= lim, min,
+  out <- ifelse(met <= lim, c(min),
   # BETWEEN lim and trigger
     ifelse(met < trigger,
-      pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  min),
+      pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  c(min)),
   # ABOVE trigger
     c(target)))
 
@@ -128,12 +128,25 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   # TRACK initial tac
   track(tracking, paste0(output, ".hcr"), seq(ay + man_lag, ay + frq)) <- c(out)
 
-  # APPLY limits
-  if(!is.na(dupp))
+  # APPLY limits, always or if met < trigger
+  if(!is.na(dupp)) {
+    if(all) {
     out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
-  if(!is.na(dlow))
+    } else {
+    out[out > pre * dupp & met < trigger] <- pre[out > pre * dupp & met <
+      trigger] * dupp
+    }
+  }
+
+  if(!is.na(dlow)) {
+    if(all) {
     out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
-  
+    } else {
+    out[out < pre * dlow & met < trigger] <- pre[out < pre * dlow & met <
+      trigger] * dlow
+    }
+  }
+
   # CONTROL
   ctrl <- fwdControl(
     # TARGET for frq years
