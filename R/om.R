@@ -213,7 +213,7 @@ deplete <- function(biol, sel, dep) {
 }
 # }}}
 
-# simulator {{{
+# simulatorold {{{
 
 #' @param biol
 #' @param fisheries
@@ -358,7 +358,7 @@ simulatorold <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
 
 # }}}
 
-# simulatorp {{{
+# simulator {{{
 
 #' @param biol
 #' @param fisheries
@@ -415,7 +415,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     # GET objects
     bio <- biol[[i]]
     fis <- fisheries[[i]]
-    
+
     # INITIATE N0
     nbio <- initiate(bio, B0=B0[it], h=h[it])
 
@@ -467,7 +467,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
 
       rpy[c('FMSY'),]  <- rps[c('FMSY'),] 
 
-      for(i in c('SBMSY', 'BMSY', 'B0', 'SB0'))
+      for(i in c('SBMSY', 'BMSY', 'B0', 'SB0', 'MSY'))
         rpy[i,] <- apply(rps[i, ], 2, '*', c(B0change))
 
     }
@@ -495,6 +495,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
 
     # OUTPUT
     res$priors <- data.table(B0=B0, dep=dep, h=h)
+    deviances(res$biol) <- iter(deviances, it)
     res$deviances <- iter(deviances, it)
     res$refpts <- rps
 

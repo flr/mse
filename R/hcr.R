@@ -638,6 +638,8 @@ pid.hcr <- function(stk, ind, kp=0, ki=0, kd=0, nyears=5,
 
 # meta.hcr {{{
 
+# TODO: USE for sequential: pchr(CHOOSE hcr)
+
 #' @examples
 #' data(sol274)
 #' control <- mpCtrl(list(
