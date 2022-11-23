@@ -147,10 +147,13 @@ setReplaceMethod("observations", signature(object="FLoem", i="ANY", value="ANY")
 	object
 })
 
-#' @rdname FLoem-class
 #' @aliases deviances deviances-methods
-
 setGeneric("deviances", function(object, ...) standardGeneric("deviances"))
+#' @param value the new object
+#' @aliases deviances<- deviances<--methods
+
+setGeneric("deviances<-", function(object, ..., value)
+  standardGeneric("deviances<-"))
 
 #' @rdname FLoem-class
 #' @examples
@@ -171,13 +174,6 @@ setMethod("deviances", "FLoem",
     return(object)
   }
 )
-
-#' @rdname FLoem-class
-#' @param value the new object
-#' @aliases deviances<- deviances<--methods
-
-setGeneric("deviances<-", function(object, ..., value)
-  standardGeneric("deviances<-"))
 
 #' @rdname FLoem-class
 
