@@ -13,7 +13,7 @@
 
 tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   args, prob=0.5, tol=0.01, maxit=12, verbose=TRUE,
-  years=ac(seq(args$iy+1, args$fy)), ...) {
+  years=ac(seq(args$iy + 1, args$fy - 1)), ...) {
   
   # args
   args$fy <- if(is.null(args$fy)) dims(om)$maxyear else args$fy
