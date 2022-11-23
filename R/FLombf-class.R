@@ -512,19 +512,26 @@ setMethod("dimnames", signature(x="FLombf"),
 # fwd (FLombf) {{{
 
 setMethod("fwd", signature(object="FLombf", fishery="missing", control="fwdControl"), 
-  function(object, control, ...) {
+  function(object, control, deviances="missing", ...) {
     
     # ADD object FCB if missing
     if(all(is.na(FCB(control))))
       FCB(control) <- FCB(object)
-    
+
     # deviances
-    deviances <- lapply(biols(object), function(x) {
-      if(!is.null(x@rec$residuals))
-        x@rec$residuals
-      else
-        n(x)[1,] %=% 1
-    })
+    if(missing(deviances)) {
+      deviances <- lapply(biols(object), function(x) {
+        if(!is.null(x@rec$deviances))
+          x@rec$deviances
+        else
+          n(x)[1,] %=% 1
+      })
+    }
+
+    # COERCE to FLQuants if given as FLQuant and a single stock
+    if(is(deviances, "FLQuant") & length(biols(object)) == 1) {
+      deviances <- FLQuants(deviances)
+    }
 
     # CALL fwd(FLBiols, FLFisheries)
     res <- fwd(object@biols, object@fisheries, control=control,
