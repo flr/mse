@@ -315,11 +315,13 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 #' @param nyears Number of years used in regression of log(stock).
 #' @examples
 #' data(sol274)
-#' trend.hcr(stock(om), args=list(ay=2003, data_lag=1, management_lag=1, frq=1,
-#'  it=1), tracking=FLQuant(), k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
+#' trend.hcr(stock(om), ind=FLQuants(), args=list(ay=2003, data_lag=1,
+#' management_lag=1, frq=1, it=1), tracking=FLQuant(), k1=1.5, k2=3,
+#' gamma=1, nyears=5, metric=ssb)
 
-trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5,
-  metric=ssb, dlow=NA, dupp=NA, args, tracking) {
+trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
+  dlow=NA, dupp=NA, initac=seasonSums(unitSums(catch(stk)[, dy])),
+  args, tracking) {
 
   # args
   spread(args)
@@ -354,13 +356,13 @@ trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5,
   slope <- rep(NA, it)
   slope[lnas] <- dat[iter %in% rnas, .(slope=coef(lm(log(data) ~ year))[2]),
     by=iter][, (slope)]
-
+  
   # GET TAC from tracking['hcr',]
   pre <- tracking[[1]]['hcr', dy]
 
   # OR from previous catch
   if(all(is.na(pre)))
-    pre <- seasonSums(unitSums(catch(stk)[, dy]))
+    pre <- pre %=% c(initac)
 
   # FIND iters with negative slope
   id <- slope < 0
