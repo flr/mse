@@ -271,8 +271,8 @@ setMethod("ssb", signature(object="FLombf"),
 setMethod("tsb", signature(object="FLombf"),
   function(object, biol=NULL) {
 
-    res <- FLQuants(mapply(tsb, biols(object),
-      f=harvest(object), SIMPLIFY=FALSE))
+    res <- FLQuants(Map(tsb, biols(object),
+      f=harvest(object)))
     
     return(res)
   }
@@ -281,8 +281,8 @@ setMethod("tsb", signature(object="FLombf"),
 setMethod("tb", signature(object="FLombf"),
   function(object, biol=NULL) {
 
-    res <- FLQuants(mapply(tb, biols(object),
-      f=harvest(object), SIMPLIFY=FALSE))
+    res <- FLQuants(Map(tb, biols(object),
+      f=harvest(object)))
     
     return(res)
   }
