@@ -141,12 +141,12 @@ initiate <- function(biol, B0, h=0.75) {
 #' ini <- initiate(propagate(ple4.biol, 100), B0=runif(100, 3e5, 5e5))
 #' dep <- deplete(ini, sel=catch.sel(ple4)[, 10], dep=runif(100, 0.10, 0.90))
 
-deplete <- function(biol, sel, dep) {
+deplete <- function(biol, sel, dep, minfbar=dims(biol)$min, 
+  maxfbar=dims(biol)$max) {
 
   # GET dims
   dm <- dim(n(biol))
   myr <- dims(biol)$minyear
-  mag <- dims(biol)$max
 
   # EXTRACT slots
   waa <- wt(biol)[, 1]
@@ -164,7 +164,7 @@ deplete <- function(biol, sel, dep) {
     discards.sel=sel %=% 0, bycatch.harvest=sel %=% 0,
     harvest.spwn=maa %=% 0, m.spwn=maa %=% 0,
     availability=maa %=% 1,
-    range=c(minfbar=0, maxfbar=mag, plusgroup=mag))
+    range=c(minfbar=minfbar, maxfbar=maxfbar, plusgroup=maxfbar))
  
   # ADD sr
   psr <- params(sr)
@@ -213,151 +213,6 @@ deplete <- function(biol, sel, dep) {
 }
 # }}}
 
-# simulatorold {{{
-
-#' @param biol
-#' @param fisheries
-#' @param v Virgin total biomass or carrying capacity (K).
-#' @param h Steepness of the Beverton & Holt stock-recruitment relationship.
-#' @param d Initial depletion level, as proportion of v.
-#' @param sigmaR Variance of the recruitment deviances.
-#' @param rho Autocorrelation in recruitment, only used if no deviances are provided.
-#' @param control Past history for forward projection, tipically a catch series.
-#' @param deviances Deviances over the stock-recruits relationship
-#' @param invalk Inverse Age-Length Key to generate length samples from the generated catch-at-age.
-#' @examples
-#' fq <- FLQuant(NA, dimnames=list(age=1:6, year=10:30))
-#' # BIOL
-#' bio <- FLBiol(
-#' wt=fq %=% seq(0.03, 8, length=6),
-#' m=fq %=% c(0.6, 0.3, rep(0.2, 4)),
-#' spwn=fq[1,] %=% 0.5,
-#' rec=predictModel(model=rec~a, params=FLPar(a=1765)),
-#' mat=predictModel(model=~mat, FLQuants(mat=fq %=% c(0, 0.2, 0.5, rep(1,3)))))
-#' # FISHERY
-#' fis <- FLFishery(
-#'   effort=FLQuant(25/10000, dimnames=list(year=10:30)),
-#' A=FLCatch(landings.wt=wt(bio), discards.wt=wt(bio),
-#'   landings.n=fq %=% 1, discards.n=fq %=% 0,
-#'   catch.sel=fq %=% c(0.1, 0.3, 0.4, 0.8, 0.9, 1)))
-#' # Project for 20 year catch trend: c(50, 100-800, 1050-400)
-#' sim <- simulator(bio, FLFisheries(A=fis), B0=13000, d=0.01,
-#'   history=FLQuants(catch=FLQuant(c(50, seq(100, 800, length=9),
-#'   seq(1050, 400, length=10)), dimnames=list(year=11:30))))
-#' plot(sim$biol)
-
-simulatorold <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
-  history, deviances=ar1rlnorm(rho=rho, years=dimnames(biol)$year, iter=1,
-    meanlog=0, sdlog=sigmaR), B0change=NULL, invalk="missing") {
-  
-  # INITIATE N0
-  nbiol <- initiate(biol, B0=B0, h=h)
-
-  # COMBINED selectivity for depletion, catch 1 across fisheries
-  if (length(fisheries) > 1)
-    sel <- Reduce("+", lapply(fisheries, function(x) catch.sel(x[[1]])) *
-      lapply(fisheries, function(x) catch.n(x[[1]]))) /
-      Reduce("+", lapply(fisheries, function(x) catch.n(x[[1]])))
-  else
-    sel <- catch.sel(fisheries[[1]][[1]])
-
-  # RESCALE to 1
-  sel <- sel %/% apply(sel, 2:6, max)
-
-  # DEPLETE to dep
-  its <- dims(biol)$iter
-
-  if(its > 500) {
-
-    # SPLIT in 500 iter blocks
-    dep <- rep(dep, length=its)
-    bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
-
-    # SET progresssor
-    p <- progressor(length(bls))
-
-    # LOOP over blocks
-    nbiol <- foreach(i=bls, .combine=.bcombine, .multicombine=TRUE,
-    .packages=c("FLCore", "FLBRP")) %dopar% {
-
-      p()
-
-      deplete(iter(nbiol, i), sel=iter(sel[, 1], i), dep=dep[i])
-    }
-  } else {
-    nbiol <- deplete(nbiol, sel=sel[, 1], dep=dep)
-  }
-
-  # ADD initial age devs, no bias correction needed
-  lage <- dims(biol)$age
-  n(nbiol)[-lage, 1] <- n(nbiol)[-lage, 1] * rlnorm(lage - 1, 0, sigmaR)
-
-  # MAP refpts & keep target F
-  targetf <- c(nbiol@refpts['target', 'harvest'])
-  attr(nbiol, "refpts") <- remap(nbiol@refpts)
-
-  # ALTER SRR
-  
-  if(!is.null(B0change)) {
-
-    # EXPAND FLPar
-    pas <- params(sr(nbiol))
-    pay <- FLPar(NA, dimnames=list(params=c("s", "R0", "v"),
-      year=dimnames(biol)$year, iter=dimnames(biol)$iter))
-
-    # ASSIGN first year,
-    pay[, 1,]<- pas
-    # steepness
-    pay['s', ,] <- pas['s',]
-    # SET B0 and R0 trends
-    pay['v', ,] <- apply(pas$v, 2, '*', c(B0change))
-    pay['R0', ,] <- apply(pas$R0, 2, '*', c(B0change))
-
-    params(sr(nbiol)) <- pay
-  
-    # RESCALE refpts by year
-    rps <- nbiol@refpts
-    rpy <- FLPar(NA, dimnames=list(param=dimnames(rps)$param, 
-      year=dimnames(biol)$year, iter=dimnames(rps)$iter))
-    rpy[,1,] <- rps
-
-    rpy[c('FMSY'),]  <- rps[c('FMSY'),] 
-
-    for(i in c('SBMSY', 'BMSY', 'B0', 'SB0'))
-     rpy[i,] <- apply(rps[i, ], 2, '*', c(B0change))
-
-  }
-
-  # CONVERT history
-  if(!is(history, "fwdControl")) {
-    history <- as(history, "fwdControl")
-  }
-  # TODO: CHECK history dims & fisheries
-
-  # SET effort to match F target
-  for(i in seq(fisheries)) {
-    effort(fisheries[[i]])[] <- targetf
-  }
-
-  # FWD w/history
-  res <- suppressWarnings(fwd(nbiol, fisheries, control=history,
-    deviances=deviances, effort_max=1e6))
-
-  # LEN samples
-  if(!missing(invalk)) {
-    cafs <- lapply(res$fisheries, function(x) catch.n(x[[1]]) + 1e-6)
-    res$lengths <- lapply(cafs, lenSamples, invALK=invalk, n=250)
-  }
-
-  # OUTPUT
-  res$priors <- data.table(B0=B0, dep=dep, h=h)
-  res$deviances <- deviances
-
-  return(res)
-}
-
-# }}}
-
 # simulator {{{
 
 #' @param biol
@@ -375,7 +230,8 @@ simulatorold <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
 
 simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   history, deviances=ar1rlnorm(rho=rho, years=dimnames(biol)$year, iter=1,
-    meanlog=0, sdlog=sigmaR), B0change=NULL, invalk=NULL) {
+    meanlog=0, sdlog=sigmaR), B0change=NULL, invalk=NULL,  
+    minfbar=dims(biol)$min, maxfbar=dims(biol)$max) {
 
   # DIMS
   nage <- dims(biol)$age
@@ -431,7 +287,8 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     sel <- sel %/% apply(sel, 2:6, max)
 
     # DEPLETE to dep level by iter
-    nbio <- deplete(nbio, sel=sel, dep=dep[it])
+    nbio <- deplete(nbio, sel=sel, dep=dep[it], minfbar=minfbar, 
+      maxfbar=maxfbar)
 
     # ADD initial age devs, no bias correction needed
     n(nbio)[-nage, 1] <- n(nbio)[-nage, 1] * rlnorm(nage - 1, 0, sigmaR)

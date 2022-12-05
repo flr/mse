@@ -320,7 +320,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 #' gamma=1, nyears=5, metric=ssb)
 
 trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
-  dlow=NA, dupp=NA, initac=seasonSums(unitSums(catch(stk)[, dy])),
+  dlow=NA, dupp=NA, initac=seasonSums(unitSums(catch(stk)[, iy])),
   args, tracking) {
 
   # args
@@ -361,7 +361,7 @@ trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
   pre <- tracking[[1]]['hcr', dy]
 
   # OR from previous catch
-  if(all(is.na(pre)))
+  if(all(is.na(pre)) & ay == iy)
     pre <- pre %=% c(initac)
 
   # FIND iters with negative slope
