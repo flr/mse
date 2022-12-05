@@ -38,8 +38,9 @@
 #' tes <- mp(om, ctrl=control, args=list(iy=2017))
 #' plot(om, TEST=tes)
 
-mp <- function(om, oem=NULL, iem=NULL, ctrl, args, scenario="NA",
-  tracking="missing", logfile=tempfile(), verbose=TRUE, parallel=TRUE){
+mp <- function(om, oem=NULL, iem=NULL, ctrl=control, control=ctrl, args,
+  scenario="NA", tracking="missing", logfile=tempfile(), verbose=TRUE,
+  parallel=TRUE){
 
   dis <- dims(om)
   dmns <- dimnames(om)
