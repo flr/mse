@@ -320,7 +320,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 #' gamma=1, nyears=5, metric=ssb)
 
 trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
-  dlow=NA, dupp=NA, initac=seasonSums(unitSums(catch(stk)[, iy])),
+  dlow=NA, dupp=NA, initac=seasonSums(unitSums(catch(stk)[, dy])),
   args, tracking) {
 
   # args
@@ -379,7 +379,7 @@ trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
     (1 + k2 * slope[!id & lnas]) 
 
   # TRACK initial TAC
-  track(tracking, "tac.hcr", seq(ay + management_lag, ay + frq)) <- tac
+  track(tracking, "tac.hcr", seq(ay + management_lag, ay + frq - 1)) <- tac
 
   # LIMITS over previous output
   if(!is.na(dupp))
@@ -401,7 +401,7 @@ trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
 
 # target.hcr {{{
 
-target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar",
+target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="catch",
   nyears=3, args, tracking) {
 
   # EXTRACT args
@@ -430,9 +430,12 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="fbar",
   ctrl <- fwdControl(
     # TARGET for frq years
     lapply(seq(ay + man_lag, ay + frq), function(x)
-      list(quant=output, value=c(out), year=x, relYear=x-1)))
-
-  	list(ctrl=ctrl, tracking=tracking)
+      list(quant=output, value=c(out), year=x, relYear=x-1,
+        fishery=1, catch=1, relFishery=1, relCatch=1,
+        biol=ifelse(output %in% c("f", "fbar"), 1, NA),
+        relBiol=ifelse(output %in% c("f", "fbar"), 1, NA)
+        )))
+  list(ctrl=ctrl, tracking=tracking)
 }
 # }}}
 
