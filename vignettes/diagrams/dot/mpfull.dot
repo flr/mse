@@ -1,0 +1,81 @@
+graph mp {
+  
+  /* GRAPH */
+  graph [ratio="fill", size="8.3,11.7!", margin=0.8]
+
+  /* EDGES */
+  edge [arrowhead="none"];
+  
+  /* NODES */
+  node [shape=box, fontsize=24];
+
+  /* Compulsory steps */
+  oem, est, hcr, om[shape=plaintext,
+    fontsize=36, fontcolor="#000000", fontname="Courier-Bold"];
+  
+  /* Optional steps */
+  phcr, isys, tm, iem, fb[shape=plaintext,
+    fontsize=36, fontcolor="#000000", fontname="Courier"];
+
+  /* Inputs/Outputs/Arguments */
+  oemin [label="om (FLom)"];
+  oemargs [label="oem (FLoem)"];
+  oemname [label="Observation Error Model"];
+  
+  estin [label="stock (FLStock), indices (FLIndices)"];
+  estargs [label="method (function)"];
+  estname [label="Stock status estimator"];
+  
+  phcrin [label="stock (FLStock)"];
+  phcrargs [label="method (function)"];
+  phcrname [label="Pre-harvest Control Rule"];
+  
+  hcrin [label="stock (FLStock)"];
+  hcrargs [label="method (function)"];
+  hcrname [label="Harvest Control Rule"];
+  
+  isin [label="control (fwdControl)"];
+  isargs [label="method (function)"];
+  isname [label="Implementation system"];
+  
+  tmin [label="control (fwdControl)"];
+  tmargs [label="method (function)"];
+  tmname [label="Technical measures"];
+  
+  iemin [label="control (fwdControl)"];
+  iemargs [label="iem (FLiem)"];
+  iemname [label="Implementation Error Model"];
+  
+  fbin [label="control (fwdControl)"];
+  fbargs [label="method (function)"];
+  fbname [label="Fleet behaviour"];
+  
+  omin [label="stock (FLStock), control (fwdControl)"];
+  omout [label="om (FLmse)"];
+  omargs [label="method (function)"];
+  omargs2 [label="deviates (FLQuant)"];
+  omname [label="Forward projection"];
+
+  oem -- oemargs;
+    {rank=same; oem; oemargs; oemname;}
+  est -- estargs;
+    {rank=same; est; estargs; estname;}
+  phcr -- phcrargs;
+    {rank=same; phcr; phcrargs; phcrname;}
+  hcr -- hcrargs;
+    {rank=same; hcr; hcrargs; hcrname;}
+  isys -- isargs;
+    {rank=same; isys; isargs; isname;}
+  tm -- tmargs;
+    {rank=same; tm; tmargs; tmname;}
+  iem -- iemargs;
+    {rank=same; iem; iemargs; iemname;}
+  fb -- fbargs;
+    {rank=same; fb; fbargs; fbname;}
+  omargs2 -- om -- omargs;
+    {rank=same; om; omargs; omargs2; omname;}
+  
+  /* Code flow */
+  oemin -- oem -- estin -- est -- phcrin -- phcr -- hcrin -- hcr -- isin -- isys;
+  isys -- tmin -- tm -- iemin -- iem -- fbin -- fb -- omin -- om -- omout;
+}
