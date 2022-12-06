@@ -164,7 +164,7 @@ deplete <- function(biol, sel, dep, minfbar=dims(biol)$min,
     discards.sel=sel %=% 0, bycatch.harvest=sel %=% 0,
     harvest.spwn=maa %=% 0, m.spwn=maa %=% 0,
     availability=maa %=% 1,
-    range=c(minfbar=minfbar, maxfbar=maxfbar, plusgroup=maxfbar))
+    range=c('minfbar'=minfbar, 'maxfbar'=maxfbar, 'plusgroup'=maxfbar))
  
   # ADD sr
   psr <- params(sr)
@@ -239,6 +239,8 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   nfs <- length(fisheries)
   its <- length(c(B0))
   bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
+  minfbar <- minfbar
+  maxfbar <- maxfbar
   
   # SET progresssor
   p <- progressor(length(bls))
