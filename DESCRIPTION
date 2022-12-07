@@ -61,6 +61,7 @@ Collate:
   'data.R'
   'db.R'
   'utilities.R'
+  'plot.R'
 VignetteBuilder: knitr
 License: EUPL
 LazyLoad: Yes
