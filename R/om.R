@@ -228,10 +228,11 @@ deplete <- function(biol, sel, dep, minfbar=dims(biol)$min,
 #' @examples
 #' NULL
 
-simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
-  history, deviances=ar1rlnorm(rho=rho, years=dimnames(biol)$year, iter=1,
-    meanlog=0, sdlog=sigmaR), B0change=NULL, invalk=NULL,  
-    minfbar=dims(biol)$min, maxfbar=dims(biol)$max) {
+simulator <- function(biol, fisheries, history, B0, h, dep=0,
+  iter=dims(biol)$iter, sigmaR=0, rho=0, B0change=NULL, invalk=NULL,
+  deviances=ar1rlnorm(rho=rho, years=dimnames(biol)$year,
+    meanlog=0, sdlog=sigmaR),
+  minfbar=dims(biol)$min, maxfbar=dims(biol)$max) {
 
   # DIMS
   nage <- dims(biol)$age
@@ -239,19 +240,18 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
   nfs <- length(fisheries)
   its <- length(c(B0))
   bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
-  minfbar <- minfbar
-  maxfbar <- maxfbar
   
   # SET progresssor
   p <- progressor(length(bls))
 
   # PROPAGATE objects, if needed
+
   if(dims(biol)$iter == 1)
-    biol <- lapply(bls, function(x) propagate(biol, length(x)))
+    biols <- lapply(bls, function(x) propagate(biol, length(x)))
   else if(dims(biol)$iter == its)
-    biol <- lapply(bls, iter, obj=biol)
+    biols <- lapply(bls, iter, obj=biol)
   else
-    biol <- list(`1`=biol)
+    biols <- list(`1`=biol)
 
   if(dims(fisheries[[1]])$iter == 1)
     fisheries <- lapply(bls, function(x) lapply(fisheries,
@@ -271,7 +271,7 @@ simulator <- function(biol, fisheries, B0, h, dep=0, sigmaR=0, rho=0,
     ni <- length(it)
 
     # GET objects
-    bio <- biol[[i]]
+    bio <- biols[[i]]
     fis <- fisheries[[i]]
 
     # INITIATE N0
