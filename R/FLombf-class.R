@@ -325,14 +325,9 @@ setMethod("tb", signature(object="FLombf"),
 
 setMethod("harvest", signature(object="FLombf", catch="missing"),
   function(object, biol=seq(biols(object))) {
-    
-    # GET partial Fs by biol - fishery
-    pfs <- partialF(object, biol=biol)
-    
-    # ADD UP by biol
-    res <- FLQuants(lapply(pfs, Reduce, f="+"))
 
-    return(res)
+    # GET partial Fs by biol - fishery
+    harvest(biols(object)[biol], fisheries(object))
   }
 )
 
