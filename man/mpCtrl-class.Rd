@@ -38,6 +38,7 @@
 \alias{tm<-,mpCtrl,function-method}
 \alias{show,mpCtrl-method}
 \alias{iters,mpCtrl-method}
+\alias{iter,mpCtrl-method}
 \alias{method,mpCtrl-method}
 \alias{method<-,mpCtrl,function-method}
 \alias{method<-,mpCtrl-method}
@@ -91,6 +92,8 @@ tm(object) <- value
 \S4method{show}{mpCtrl}(object)
 
 \S4method{iters}{mpCtrl}(object, iter)
+
+\S4method{iter}{mpCtrl}(obj, iter)
 
 \S4method{method}{mpCtrl}(object, element)
 

@@ -7,17 +7,20 @@
 initiate(biol, B0, h = 0.75)
 }
 \arguments{
-\item{B0}{Population biology, \code{FLBiol}.}
+\item{biol}{An \code{FLBiol} object to nbe initiated.}
 
-\item{biom}{Initial or virgin biomass.}
+\item{B0}{Initial or virgin biomass.}
 }
 \value{
-An updated \code{FLBiol} with abundances set in year 1 to match the requested biomas.
+An updated \code{FLBiol} with abundances set in teh first year to match
+the requested biomas.
 }
 \description{
-The \code{FLBiol} object to be initiated requires slots to be filled up for the
-mean weight-at-age (\code{wt}), natural mortality (\code{m}), time of spawning (\code{spwn})
-and maturity (\code{mat}).
+Abundances at age for a population at virgin conditions at age. An \code{FLBiol}
+object is initiated by providing a target total biomass (\code{B0}) and a value
+for the stock-recruit steepness (\code{s}). The object requires slots to be
+already filled up for the mean weight-at-age (\code{wt}), natural mortality
+(\code{m}), time of spawning (\code{spwn}) and maturity at age (\code{mat}).
 }
 \examples{
 data(ple4.biol)

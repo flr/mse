@@ -12,11 +12,7 @@
 \alias{observations<--methods}
 \alias{observations<-,FLoem,missing,list-method}
 \alias{observations<-,FLoem,ANY,FLStock-method}
-\alias{deviances}
-\alias{deviances-methods}
 \alias{deviances,FLoem-method}
-\alias{deviances<-}
-\alias{deviances<--methods}
 \alias{deviances<-,FLoem,list-method}
 \alias{show,FLoem-method}
 \alias{iter,FLoem-method}
@@ -37,11 +33,7 @@ observations(object, i) <- value
 
 \S4method{observations}{FLoem,ANY,FLStock}(object, i) <- value
 
-deviances(object, ...)
-
 \S4method{deviances}{FLoem}(object, ...)
-
-deviances(object, ...) <- value
 
 \S4method{deviances}{FLoem,list}(object, ...) <- value
 
