@@ -82,7 +82,7 @@ initiate <- function(biol, B0, h=0.75) {
   B0 <- rep(B0, length=its)
 
   sr(biol) <- predictModel(model=bevholtss3()$model,
-    params=propagate(FLPar(s=h, R0=NA, v=B0), its))
+    params=propagate(FLPar(s=h, R0=NA, v=NA), its))
 
   # SOLVE R0 for B0, WT, M + F
   foo <- function(R0, n, m, wt, b0) {
@@ -95,7 +95,6 @@ initiate <- function(biol, B0, h=0.75) {
     n[a] <- n[a] / (1 - exp(-m[a]))
 
     return((c(b0) - sum(wt * n)))
-    return(sum((c(b0) - sum(wt * n)) ^ 2))
   }
  
   # TODO: DEAL with iters only in biol, B0 and h
@@ -128,6 +127,7 @@ initiate <- function(biol, B0, h=0.75) {
   
   # ADD R0 param
   params(sr(biol))$R0 <- res
+  params(sr(biol))$v <- ssb(biol)[,1]
 
   # RETURN FLBiol
   return(biol)
@@ -147,6 +147,15 @@ deplete <- function(biol, sel, dep, minfbar=dims(biol)$min,
   # GET dims
   dm <- dim(n(biol))
   myr <- dims(biol)$minyear
+  mag <- dims(biol)$max
+
+  # CHECK inputs
+  # dep ~ [0,1]
+  if(!all(dep <= 1 & dep >= 0))
+    stop("depletion (dep) must fall between 0 and 1.")
+  # maxfbar <= mag
+  if(maxfbar > mag)
+    maxfbar <- mag
 
   # EXTRACT slots
   waa <- wt(biol)[, 1]
@@ -164,48 +173,26 @@ deplete <- function(biol, sel, dep, minfbar=dims(biol)$min,
     discards.sel=sel %=% 0, bycatch.harvest=sel %=% 0,
     harvest.spwn=maa %=% 0, m.spwn=maa %=% 0,
     availability=maa %=% 1,
-    range=c('minfbar'=minfbar, 'maxfbar'=maxfbar, 'plusgroup'=maxfbar))
- 
+    range=c('minfbar'=minfbar, 'maxfbar'=maxfbar, 'plusgroup'=mag))
+
   # ADD sr
   psr <- params(sr)
   npsr <- abPars("bevholt", spr0=psr$v / psr$R0, s=psr$s, v=psr$v)
   model(brp) <- bevholt()$model
   params(brp) <- FLPar(a=npsr$a, b=npsr$b)
-
-  # SET finer fbar range on Fcrash
-  fmax <- max(computeRefpts(brp)['crash', 'harvest'])
-  # or fmax
-  if(is.na(fmax))
-    fmax <- max(refpts(brp)['fmax', 'harvest']) * 1.25
-  fbar(brp) <- FLQuant(seq(0, fmax, length=301))
-
+  
   # ADD Btgt
-  refpts(brp, "target", "biomass") <- c(tb(biol)[,1] ) * dep
+  brp <- brp(brp)
+  refpts(brp, "target", "biomass") <- c(refpts(brp)['virgin', 'biomass',]) * dep
+  
+  # SET fbar as ftarget by iter
+  fbar(brp) <- FLQuant(c(refpts(brp)['target', 'harvest',]),
+    dim=c(1, 1, 1, 1, 1, dm[6]))
 
-  # FIND refpts$target fbars in fbar(brp)
+  # COMPUTE & ASSIGN stock.n
+  n(biol)[,1] <- stock.n(brp)
 
-  ftarget <- c(refpts(brp)["target", "harvest",])
-  fbars <- c(fbar(brp))
-  idx <- seq(301)[max.col(-abs(outer(ftarget, fbars,"-")))]
-
-  # COMPUTE stock.n
-  stn <- stock.n(brp)
-
-  # CONVERT to vector
-  vstn <- c(stn)
-
-  # GET dimensions and iters
-  dmn <- dim(stn)
-  its <- seq(dmn[6])
-
-  # EXTRACT years matching idx by iter
-  ii <- unlist(lapply(seq(length(idx)), function(x)
-    seq((its[x] - 1) * (dmn[1] * dmn[2]) + (dmn[1] * (idx[x] - 1)) + 1,
-      (its[x] - 1) * (dmn[1] * dmn[2]) + (dmn[1] * (idx[x] - 1)) + dmn[1])
-    ))
-
-  # ASSIGN via c()
-  n(biol)[,1] <- vstn[ii]
+  # TEST: abs(range(c(tb(biol)[,1]) / (B0 * dep)))
 
   attr(biol, "refpts") <- refpts(brp)
 
@@ -270,7 +257,7 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
     it <- bls[[i]]
     ni <- length(it)
 
-    # GET objects
+    # GET objects by iter group from lists
     bio <- biols[[i]]
     fis <- fisheries[[i]]
 
@@ -291,6 +278,8 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
     # DEPLETE to dep level by iter
     nbio <- deplete(nbio, sel=sel, dep=dep[it], minfbar=minfbar, 
       maxfbar=maxfbar)
+
+    # BUG: harvest
 
     # ADD initial age devs, no bias correction needed
     n(nbio)[-nage, 1] <- n(nbio)[-nage, 1] * rlnorm(nage - 1, 0, sigmaR)
@@ -333,7 +322,7 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
 
     # SET effort to match F target
     for(i in seq(fis)) {
-      effort(fis[[i]])[] <- targetf
+      effort(fis[[i]])[] <- abs(targetf)
     }
 
     # CONVERT history

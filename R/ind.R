@@ -203,7 +203,7 @@ mlc.ind <- function (stk, idx, args, vbPars=c(linf=120, k=0.2, t0=0), ...) {
   args0 <- list(...)
   tracking <- args0$tracking
 
-	vbObj <- FLa4a:::a4aGr(
+	vbObj <- FLa4a::a4aGr(
 	  grMod=~linf*(1 - exp(-k * (t - t0))),      
 	  grInvMod=~t0 - 1/k * log(1 - len / linf),      
 	  params=FLPar(linf=vbPars["linf"], k=vbPars["k"], t0=vbPars["t0"],
