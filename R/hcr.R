@@ -7,6 +7,33 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
+setFCB <- function(output=c("catch", "landings", "discards", "fbar", "f",
+  "effort"), relative=FALSE, element=1) {
+
+  # SELECT output from possible values
+  output <- match.arg(output)
+
+  # EXTRACT valid FCB for output
+  targets <- subset(FLasher:::.vfcb, quant == output)[1,]
+
+  # BUILD FCB list
+  fcb <- ifelse(unlist(targets[c("fishery", "catch", "biol")]),
+    element, as.numeric(NA))
+
+  # ADD relative if needed
+  if(relative)
+    fcb <- c(fcb, setNames(fcb, nm=c("relFishery", "relCatch", "relBiol")))
+
+  fcb
+}
+
+
+setFCB('effort')
+setFCB('effort', rel=TRUE)
+
+setFCB('catch')
+setFCB('catch', rel=TRUE)
+
 
 # ices.hcr {{{
 
@@ -401,6 +428,39 @@ trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
 
 # target.hcr {{{
 
+#' Target-based harvest control rule to adjust input or output from CPUE
+#'
+#' Short description
+#' 
+#' \deqn{}{}
+#' 
+#' @references Hoshino, E., Hillary, R., Davies, C., Satria, F., Sadiyah, L., Ernawati, T., and Proctor, C. 2020.  Development of pilot empirical harvest strategies for tropical tuna in indonesian archipelagic waters: case studies of skipjack and yellowfin tuna. *Fisheries Research*, 227:105539, doi:10.1016/j.fishres.2020.105539.
+#' @param ind
+#' @param lim
+#' @param target
+#' @param r
+#' @param metric
+#' @param output
+#' @param nyears
+#' @param args
+#' @param tracking
+#' @return A list containing *ctrl*, a `fwdControl` object, and *tracking*, an `FLQuant`.
+#' @author The FLR Team
+#' @seealso \link{FLComp}
+#' @keywords utilities
+#' @examples
+#' data(sol274)
+#' #
+#' est <- cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om))),
+#'   args=list(ay=2000, data_lag=1),
+#'   tracking=FLQuant(dimnames=list(metric="ind", year=2000, iter=1:100)))
+#' #
+#' target.hcr(ind=est$ind, lim=28000, target=40000,
+#'   metric="wmean", output="catch",
+#'   args=list(ay=2000, frq=1, data_lag=1, management_lag=1),
+#'   tracking=FLQuants(sol174=FLQuant(1000, dimnames=list(metric="hcr",
+#'   year=2000))))
+
 target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="catch",
   nyears=3, args, tracking) {
 
@@ -410,31 +470,28 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="catch",
   man_lag <- args$management_lag
   frq <- args$frq
 
-  # COMPUTE metric multiplier
-
+  # COMPUTE metric
   met <- yearMeans(window(ind[[metric]], start=ay - data_lag - nyears + 1,
     end=ay - data_lag))
 
-  # RULE
+  # APPLY rule
     # BELOW lim, E_[y+1] = E_y / 2 * (I_recent / I_lim) ^ 2 * r
-  out <- ifelse(met < lim, 1 / 2 * (met / lim) ^ 2 * r,
+  out <- ifelse(met < lim, 1 / 2 * (met / lim) ^ (2 * r),
     # ABOVE lim, E_[y+1] = E_y * ((1 + (I_recent - I_lim) / (I_tar - I_lim)) / 2) ^ r
-    ((1 + (met - lim) / (target - lim)) / 2) ^ r
-    )
+    ((1 + (met - lim) / (target - lim)) / 2) ^ r)
 
   # IF NA, set to previous value
   # if(any(is.na(out)))
   #   out[is.na(out)] <- tracking[[1]]['hcr', ac(ay - 1)][is.na(out)]
 
-  # CONTROL
-  ctrl <- fwdControl(
-    # TARGET for frq years
-    lapply(seq(ay + man_lag, ay + frq), function(x)
-      list(quant=output, value=c(out), year=x, relYear=x-1,
-        fishery=1, catch=1, relFishery=1, relCatch=1,
-        biol=ifelse(output %in% c("f", "fbar"), 1, NA),
-        relBiol=ifelse(output %in% c("f", "fbar"), 1, NA)
-        )))
+  ctrl <- fwdControl(lapply(seq(ay + man_lag, ay + frq), function(x) {
+    # target and year
+    c(list(quant=output, value=c(out), year=x, relYear=x - 1),
+      # FCB
+      setFCB(output, relative=TRUE))
+    }
+  ))
+
   list(ctrl=ctrl, tracking=tracking)
 }
 # }}}
@@ -450,19 +507,20 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="catch",
 #'   tracking=FLQuant(dimnames=list(metric="ind", year=2000, iter=1:100)))
 #' cpue.hcr(stk=stock(om), ind=ind$ind, k1=0.1, k2=0.2, k3=0.1, k4=0.1,
 #'   args=list(ay=2000, frq=1, management_lag=1),
-#'   tracking=FLQuants(FLQuant(1000, dimnames=list(metric="hcr", year=2000))))
+#'   tracking=FLQuants(sol174=FLQuant(1000, dimnames=list(metric="hcr",
+#'   year=2000))))
 
 cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
-  dtaclow=0.85, dtacupp=1.15, args, tracking) {
-  
+  dtaclow=0.85, dtacupp=1.15, slope="slope", mean="mean", args, tracking) {
+
   # args
   ay <- args$ay
   frq <- args$frq
   man_lag <- args$management_lag
 
   # RECOVER slope & mean(cpue)
-  slope <- ind$slope
-  mcpue <- ind$mean
+  slope <- ind[[slope]]
+  mcpue <- ind[[mean]]
 
   # CALCULATE new tac
   ka <- ifelse(slope > 0, k1, k2)
