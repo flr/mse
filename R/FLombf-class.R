@@ -48,10 +48,40 @@ setValidity("FLombf",
     # C matches Cs per F
     # unique(B) = length(biols)
 
-    # TODO
-    TRUE
-})
+  # EXTRACT dims
+  dis <- c("min", "max", "minyear", "maxyear", "unit", "season",
+    "area", "iter")
 
+  bdims <- rbindlist(lapply(biols(object), function(x)
+    as.data.table((dims(x)[dis]))
+  ), idcol="biol")
+
+  fdims <- rbindlist(lapply(fisheries(object), function(x)
+    as.data.table((dims(x)[dis]))
+  ), idcol="fishery")
+
+  cdims <- rbindlist(lapply(fisheries(object), function(f)
+    rbindlist(lapply(f, function(c) as.data.table(dims(c)[dis])),
+      idcol="catch")), idcol="fishery")
+
+  odims <- rbindlist(list(bdims, fdims, cdims), fill=TRUE)
+
+  # CHECK all years match
+  if(max(c(length(unique(odims$minyear)), length(unique(odims$maxyear)))) > 1)
+    return("'year' dimension does not match on different slots")
+
+  # CHECK iters match
+  if(length(unique(odims$iter)) > 1)
+    return("'iter' dimension does not match on different slots")
+
+  for (i in unique(odims$biol)[!is.na(unique(odims$biol))])
+    if(any(unlist(odims[catch == i, .(max)]) > c(odims[biol == i, .(max)])))
+      return("'age' dimensions in biol ", i, " and its catches do not match")
+    if(any(unlist(odims[catch == i, .(min)]) < c(odims[biol == i, .(min)])))
+      return("'age' dimensions in biol ", i, " and its catches do not match")
+
+  return(TRUE)
+})
 
 # }}}
 
