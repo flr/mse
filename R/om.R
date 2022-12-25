@@ -81,6 +81,7 @@ initiate <- function(biol, B0, h=0.75) {
   na <- dms$age
   B0 <- rep(B0, length=its)
 
+  # SETUP initial sr
   sr(biol) <- predictModel(model=bevholtss3()$model,
     params=propagate(FLPar(s=h, R0=NA, v=NA), its))
 
@@ -99,7 +100,8 @@ initiate <- function(biol, B0, h=0.75) {
  
   # TODO: DEAL with iters only in biol, B0 and h
 
-  init <- 1000
+  # INITIAL value, assumes 1,000 rec per t SSB.
+  init <- B0
 
   # RUN for iters
   res <- foreach(i=seq(its), .combine=c) %dopar% {
@@ -175,7 +177,7 @@ deplete <- function(biol, sel, dep, minfbar=dims(biol)$min,
     availability=maa %=% 1,
     range=c('minfbar'=minfbar, 'maxfbar'=maxfbar, 'plusgroup'=mag))
 
-  # ADD sr
+  # ADD sr as bevholt(a,b)
   psr <- params(sr)
   npsr <- abPars("bevholt", spr0=psr$v / psr$R0, s=psr$s, v=psr$v)
   model(brp) <- bevholt()$model
@@ -279,17 +281,14 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
     nbio <- deplete(nbio, sel=sel, dep=dep[it], minfbar=minfbar, 
       maxfbar=maxfbar)
 
-    # BUG: harvest
-
     # ADD initial age devs, no bias correction needed
     n(nbio)[-nage, 1] <- n(nbio)[-nage, 1] * rlnorm(nage - 1, 0, sigmaR)
 
     # MAP refpts & keep target F
-    targetf <- c(nbio@refpts['target', 'harvest'])
-    # attr(nbio, "refpts") <- remap(nbio@refpts, MSY=c("msy", "yield"))
     rps <- remap(nbio@refpts, MSY=c("msy", "yield"))
+    targetf <- c(nbio@refpts["target", "harvest"])
 
-    # ALTER SRR
+    # ALTER SRR if B0(K) changes in time
   
     if(!is.null(B0change)) {
 
@@ -313,8 +312,10 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
         year=dimnames(nbio)$year, iter=it))
       rpy[,1,] <- rps
 
+      # F is constant
       rpy[c('FMSY'),]  <- rps[c('FMSY'),] 
 
+      # BIOMASS is scaled
       for(i in c('SBMSY', 'BMSY', 'B0', 'SB0', 'MSY'))
         rpy[i,] <- apply(rps[i, ], 2, '*', c(B0change))
 
