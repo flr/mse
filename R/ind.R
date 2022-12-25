@@ -25,10 +25,6 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   # SUBSET last nyears from ay - mlag
   met <- biomass(idx[[index]])[1, dyrs]
 
-  # SLOPE by iter
-  dat <- data.table(as.data.frame(met))
-  slope <- dat[, .(data=coef(lm(log(data) ~ year))[2]), by=iter]
-
   # WEIGHTED average index of last ayears
   ywts <- c(0.50 * seq(1, ayears - 1) / sum(seq(1, ayears - 1)), 0.50)
   wmean <- expand(yearSums(tail(met, ayears) * ywts), year=ay - dlag)
@@ -36,8 +32,12 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   # AVERAGE index
   mean <- expand(yearMeans(tail(met, ayears)), year=ay - dlag)
   
-  # OUTPUT
+  # SLOPE by iter
+  dat <- data.table(as.data.frame(met))
+  slope <- dat[, .(data=coef(lm(log(data) ~ year))[2]), by=iter]
   slope <- FLQuant(slope$data, dimnames=dimnames(mean), units="")
+
+  # OUTPUT
   ind <- FLQuants(wmean=wmean, slope=slope, mean=mean)
 
   # TRACK
@@ -45,7 +45,7 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   track(tracking, "wmean.ind", ac(ay)) <- wmean
   track(tracking, "slope.ind", ac(ay)) <- slope
 
-  return(list(stk=stk, ind=ind, tracking=tracking))
+  return(list(stk=stk, ind=ind, tracking=tracking, cpue=met))
 
 } # }}}
 
