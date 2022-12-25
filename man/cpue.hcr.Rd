@@ -14,6 +14,8 @@ cpue.hcr(
   target = 1,
   dtaclow = 0.85,
   dtacupp = 1.15,
+  slope = "slope",
+  mean = "mean",
   args,
   tracking
 )
@@ -28,5 +30,6 @@ ind <- cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om))),
   tracking=FLQuant(dimnames=list(metric="ind", year=2000, iter=1:100)))
 cpue.hcr(stk=stock(om), ind=ind$ind, k1=0.1, k2=0.2, k3=0.1, k4=0.1,
   args=list(ay=2000, frq=1, management_lag=1),
-  tracking=FLQuants(FLQuant(1000, dimnames=list(metric="hcr", year=2000))))
+  tracking=FLQuants(sol174=FLQuant(1000, dimnames=list(metric="hcr",
+  year=2000))))
 }
