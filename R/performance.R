@@ -89,7 +89,7 @@ setMethod("performance", signature(x="FLQuants"),
   function(x, statistics, refpts=FLPar(),
     years=setNames(list(dimnames(x[[1]])$year), nm=dims(x[[1]])$maxyear),
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
-    
+
     # CHECK x /refpts names cover all required by statistics
     stats.names <- unique(unlist(lapply(statistics,
       function(x) all.vars(x[[1]][[2]]))))
@@ -102,7 +102,7 @@ setMethod("performance", signature(x="FLQuants"),
       c("age", "year", "unit", "season", "area"))
 
     if(!all(stats.names %in% valid.names))
-      stop("Name of metric, refpt or function in statistics might not be found: ",
+      stop("Name of metric, refpt or function in statistics not found: ",
         paste(stats.names[!stats.names %in% valid.names], collapse=", "))
     
     # CREATE years list
@@ -277,13 +277,22 @@ setMethod("performance", signature(x="list"),
 # }}}
 
 # performance(FLom) {{{
+
 #' @rdname performance
 
 setMethod("performance", signature(x="FLom"),
-  function(x, refpts=x@refpts, ...) {
+  function(x, refpts=x@refpts, metrics=NULL, statistics=NULL, ...) {
 
-    return(performance(stock(x), refpts=refpts, ...))
+    # BUG: metrics argument hides metrics method
+    if(is.null(metrics))
+      metrics <- metrics(x)
+
+    # DEFAULT statistics
+    if(is.null(statistics))
+      statistics <- mse::statistics[c("SB0", "SBMSY", "FMSY", "C", "AAVC")]
     
+    return(performance(stock(x), refpts=refpts, metrics=metrics, 
+      statistics=statistics, ...))
   }
 )
 # }}}

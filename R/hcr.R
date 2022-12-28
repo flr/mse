@@ -7,33 +7,8 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-setFCB <- function(output=c("catch", "landings", "discards", "fbar", "f",
-  "effort"), relative=FALSE, element=1) {
 
-  # SELECT output from possible values
-  output <- match.arg(output)
-
-  # EXTRACT valid FCB for output
-  targets <- subset(FLasher:::.vfcb, quant == output)[1,]
-
-  # BUILD FCB list
-  fcb <- ifelse(unlist(targets[c("fishery", "catch", "biol")]),
-    element, as.numeric(NA))
-
-  # ADD relative if needed
-  if(relative)
-    fcb <- c(fcb, setNames(fcb, nm=c("relFishery", "relCatch", "relBiol")))
-
-  fcb
-}
-
-
-setFCB('effort')
-setFCB('effort', rel=TRUE)
-
-setFCB('catch')
-setFCB('catch', rel=TRUE)
-
+# -- ABSOLUTE
 
 # ices.hcr {{{
 
@@ -249,8 +224,8 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
   # GET observations
   if(!missing(obs)) {
     obs <- model.frame(metrics(obs, list(met=get(metric), out=get(output))))
-    xlim <- max(obs$met) * 1.05
-    ylim <- max(obs$out) * 1.05
+    xlim <- max(obs$met, na.rm=TRUE) * 1.05
+    ylim <- max(obs$out, na.rm=TRUE) * 1.05
   }
  
   # SET met values
@@ -275,22 +250,23 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
     coord_cartesian(ylim = c(0, ylim), clip="off") +
     # DROP xlab(toupper(metric)) + ylab(toupper(output)) +
     # TARGET
-    geom_segment(aes(x=0, xend=trigger * 1.25, y=target, yend=target), linetype=2) +
-    annotate("text", x=0, y=target + ylim / 30, label=labels$target, hjust="left") +
+    geom_segment(aes(x=0, xend=trigger * 1.25, y=target, yend=target), 
+      linetype=2) +
+    annotate("text", x=0, y=target + ylim / 30, label=labels$target, 
+      hjust="left") +
     # MIN
     annotate("text", x=0, y=min + ylim / 30, label=labels$min, hjust="left") +
     # TRIGGER
     geom_segment(aes(x=trigger, xend=trigger, y=0, yend=target), linetype=2) +
-    annotate("text", x=trigger, y=-ylim / 40, label=labels$trigger, vjust="bottom") +
+    annotate("text", x=trigger, y=-ylim / 40, label=labels$trigger, 
+      vjust="bottom") +
     # LIMIT
     geom_segment(aes(x=lim, xend=lim, y=0, yend=min), linetype=2) +
     annotate("text", x=lim, y=-ylim / 40, label=labels$limit, vjust="bottom") +
     # HCR line
     geom_line()
 
-  if(!missing(obs)) {
-    p <- p + geom_point(data=obs)
-  }
+  # KOBE
 
   if(kobe) {
   
@@ -326,10 +302,82 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 
   }
 
+  # OBS
+  
+  if(!missing(obs)) {
+    # PLOT line if 1 iter
+    if(length(unique(obs$iter)) == 1)
+      p <- p + geom_point(data=obs, alpha=alpha) +
+        geom_path(data=obs, alpha=alpha) +
+        geom_label(data=subset(obs, year %in% c(min(year), max(year))),
+          aes(label=year), fill=c('gray', 'white'), alpha=1)
+    # PLOT with alpha if multiple
+    else
+      p <- p + geom_point(data=obs, alpha=alpha)
+  }
+
   return(p)
 }
 
 # }}}
+
+# fixedF.hcr {{{
+
+#' A fixed target f
+#'
+#' No matter what get F = Ftarget
+#' The control argument is a list of parameters used by the HCR.
+#' @param stk The perceived FLStock.
+#' @param control A list with the element ftrg (numeric).
+#' @examples
+#' data(sol274)
+#' fixedF.hcr(stock(om), ftrg=0.15, args=list(ay=2017, management_lag=1,
+#'   frq=1), tracking=FLQuant())
+
+fixedF.hcr <- function(stk, ftrg, args, tracking){
+  
+  # args
+	ay <- args$ay
+  mlag <- args$management_lag
+  frq <- args$frq
+
+	# create control object
+  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="fbar", value=c(ftrg))
+
+	# return
+	list(ctrl=ctrl, tracking=tracking)
+
+} # }}}
+
+# fixedC.hcr {{{
+
+#' A fixed catch HCR
+#'
+#' No matter what get C = ctrg
+#' The control argument is a list of parameters used by the HCR.
+#' @param stk The perceived FLStock.
+#' @param control A list with the element ctrg (numeric).
+#' @examples
+#' data(sol274)
+#' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1,
+#'   frq=1), tracking=FLQuant())
+
+fixedC.hcr <- function(stk, ctrg, args, tracking){
+
+  # args
+	ay <- args$ay
+  mlag <- args$management_lag
+  frq <- args$frq
+
+	# create control object
+  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="catch", value=c(ctrg))
+
+	# return
+	list(ctrl=ctrl, tracking=tracking)
+
+} # }}}
+
+# -- RELATIVE
 
 # trend.hcr {{{
 
@@ -385,6 +433,7 @@ trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
     by=iter][, (slope)]
   
   # GET TAC from tracking['hcr',]
+  # TODO: FIX as for hockeystick
   pre <- tracking[[1]]['hcr', dy]
 
   # OR from previous catch
@@ -545,62 +594,6 @@ cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
 	return(list(ctrl=ctrl, tracking=tracking))
 } # }}}
 
-# fixedF.hcr {{{
-
-#' A fixed target f
-#'
-#' No matter what get F = Ftarget
-#' The control argument is a list of parameters used by the HCR.
-#' @param stk The perceived FLStock.
-#' @param control A list with the element ftrg (numeric).
-#' @examples
-#' data(sol274)
-#' fixedF.hcr(stock(om), ftrg=0.15, args=list(ay=2017, management_lag=1,
-#'   frq=1), tracking=FLQuant())
-
-fixedF.hcr <- function(stk, ftrg, args, tracking){
-  
-  # args
-	ay <- args$ay
-  mlag <- args$management_lag
-  frq <- args$frq
-
-	# create control object
-  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="fbar", value=c(ftrg))
-
-	# return
-	list(ctrl=ctrl, tracking=tracking)
-
-} # }}}
-
-# fixedC.hcr {{{
-
-#' A fixed catch HCR
-#'
-#' No matter what get C = ctrg
-#' The control argument is a list of parameters used by the HCR.
-#' @param stk The perceived FLStock.
-#' @param control A list with the element ctrg (numeric).
-#' @examples
-#' data(sol274)
-#' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1,
-#'   frq=1), tracking=FLQuant())
-
-fixedC.hcr <- function(stk, ctrg, args, tracking){
-
-  # args
-	ay <- args$ay
-  mlag <- args$management_lag
-  frq <- args$frq
-
-	# create control object
-  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="catch", value=c(ctrg))
-
-	# return
-	list(ctrl=ctrl, tracking=tracking)
-
-} # }}}
-
 # pid.hcr {{{
 
 # T_{y+1} = T_{y} * 1 - k1 * |lambda| ^ gamma, lambda < 0
@@ -699,6 +692,8 @@ pid.hcr <- function(stk, ind, kp=0, ki=0, kd=0, nyears=5,
 
 # }}}
 
+# -- COMBINE
+
 # meta.hcr {{{
 
 # TODO: USE for sequential: pchr(CHOOSE hcr)
@@ -761,6 +756,29 @@ meta.hcr <- function(stk, ind, ..., args, tracking,
 }
 # }}}
 
+# -- FUNCTIONS
+
+# setFCB {{{
+setFCB <- function(output=c("catch", "landings", "discards", "fbar", "f",
+  "effort"), relative=FALSE, element=1) {
+
+  # SELECT output from possible values
+  output <- match.arg(output)
+
+  # EXTRACT valid FCB for output
+  targets <- subset(FLasher:::.vfcb, quant == output)[1,]
+
+  # BUILD FCB list
+  fcb <- ifelse(unlist(targets[c("fishery", "catch", "biol")]),
+    element, as.numeric(NA))
+
+  # ADD relative if needed
+  if(relative)
+    fcb <- c(fcb, setNames(fcb, nm=c("relFishery", "relCatch", "relBiol")))
+
+  fcb
+}
+# }}}
 
 # ---
 
