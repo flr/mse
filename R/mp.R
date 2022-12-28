@@ -38,12 +38,18 @@
 #' tes <- mp(om, ctrl=control, args=list(iy=2017))
 #' plot(om, TEST=tes)
 
-mp <- function(om, oem=NULL, iem=NULL, ctrl=control, control=ctrl, args,
+mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   scenario="NA", tracking="missing", logfile=tempfile(), verbose=TRUE,
   parallel=TRUE){
 
-  dis <- dims(om)
-  dmns <- dimnames(om)
+  # dims & dimnames
+  if(is(om, 'list')) {
+    dis <- dims(om[[1]])
+    dmns <- dimnames(om[[1]])
+  } else {
+    dis <- dims(om)
+    dmns <- dimnames(om)
+  }
 
   # --- EXTRACT args
 
@@ -87,8 +93,8 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl=control, control=ctrl, args,
   }
 
   # number of seasons & units
-  ns <- args$ns <- dims(om)$season
-  nu <- args$nu <- dims(om)$unit
+  ns <- args$ns <- dis$season
+  nu <- args$nu <- dis$unit
 
   # --- RUN checks on inputs
 
@@ -117,6 +123,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl=control, control=ctrl, args,
     season=dmns$season,
     iter=1:args$it))
 
+  # TODO: 
   if(is(om, "FLombf")) {
     tracking <- FLQuants(setNames(rep(list(tracking), length(names(biols(om)))),
       names(biols(om))))
@@ -131,9 +138,6 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl=control, control=ctrl, args,
   # SET seed
   if (!is.null(args$seed)) set.seed(args$seed)
   
-  # PREPARE objects for loop call
-  projection <- projection(om)
-
   # SET fleetBehaviour to NULL if not given
   # TODO CHECK and WARN if fb in control
   if (exists(fleetBehaviour(om)))
@@ -146,17 +150,23 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl=control, control=ctrl, args,
     oem <- default.oem(om)
   }
   
-  # PREPARE for parallel if needed
-  cores <- getDoParWorkers()
+  # PARSE parallel options
+  
+  cores <- 1
 
+  # parallel tells number of workers, needed for doFuture
   if(is.numeric(parallel)) {
     cores <- parallel
+    parallel <- TRUE
+  # TAKEN from doPar
+  } else if(getDoParRegistered()) {
+    cores <- getDoParWorkers()
     parallel <- TRUE
   }
 
   # p <- progressor(along=vy)
   
-  # RUN in parallel {
+  # RUN goFish
 
   if(isTRUE(parallel) & cores > 1) {
 
@@ -176,7 +186,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl=control, control=ctrl, args,
           oem = iter(oem, j),
           tracking = iter(tracking, j),
           fb=fb,    # TODO needs it selection
-          projection=projection,
+          projection=projection(om),
           iem=iem,  # TODO needs it selection
           ctrl= iter(ctrl, j),
           args=c(args[!names(args) %in% "it"], it=length(j)),
@@ -196,7 +206,7 @@ mp <- function(om, oem=NULL, iem=NULL, ctrl=control, control=ctrl, args,
         oem = oem,
         tracking = tracking,
         fb=fb,
-        projection=projection,
+        projection=projection(om),
         iem=iem,
         ctrl=ctrl,
         args=args,
