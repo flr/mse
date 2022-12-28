@@ -95,8 +95,8 @@ setMethod('show', signature('FLo'),
 # metrics {{{
 setMethod("metrics", signature(object="FLo", metrics="list"),
   function(object, metrics) {
-    return(lapply(metrics, function(x)
-      do.call(x, list(object))))
+    return(FLQuants(lapply(metrics, function(x)
+      do.call(x, list(object)))))
   }
 ) # }}}
 
