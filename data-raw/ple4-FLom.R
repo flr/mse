@@ -52,7 +52,8 @@ ac1 <- mean(apply(window(rec(stk), end=2008)@.Data, 6, function(x)
 library(FLSRTMB)
 
 srbh <- as.FLSR(stk, model="bevholtSV")
-res <- lapply(1:50, function(x) srrTMB(iter(srbh, x), spr0=spr0y(stk)))
+res <- lapply(seq(it), function(x)
+  srrTMB(iter(srbh, x), spr0=spr0y(iter(stk, x))))
 
 model(srbh) <- bevholt()
 params(srbh) <- do.call(cbind, lapply(res, params))
@@ -65,21 +66,6 @@ residuals(srbh) <- devbh
 
 brp <- brp(FLBRP(stk, srbh))
 
-refpts(brp)
-
-foo <- function(object, metrics) {
-
-  res <- mapply(function(x, y) {
-    flp <- FLPar(PAR=object[x[1], x[2]])
-    dimnames(flp)$params <- y
-    return(flp)
-  }, metrics, names(metrics), SIMPLIFY=FALSE)
-
-  Reduce(rbind, res)
-}
-
-mets <- list(FMSY=c("msy", "harvest"), SBMSY=c("msy", "ssb"))
-
 # Set up future assumptions
 stk <- fwdWindow(stk, brp, end=fy)
 idx[["BTS"]] <- window(idx[["BTS"]], end=fy)
@@ -88,7 +74,7 @@ idx[["BTS"]] <- window(idx[["BTS"]], end=fy)
 fb <- mseCtrl(method=hyperstability.fb, args=list(beta=0.8))
 
 # OM object
-om <- FLom(stock=stk, sr=srbh, refpts=foo(refpts(brp), mets),
+om <- FLom(stock=stk, sr=srbh, refpts=remap(refpts(brp)),
   projection=mseCtrl(method=fwd.om))
 
 # OEM

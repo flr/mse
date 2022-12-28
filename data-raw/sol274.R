@@ -11,11 +11,12 @@
 # - SETS future deviances on stk and idx.
 
 
-library(AAP)
 library(mse)
+library(AAP)
+library(FLBRP)
 library(FLSRTMB)
 
-# LOAD data
+# --- LOAD data, inputs and results of 2022 ICES WGNSSK sol.27.4 SA
 
 load('sol274/data.Rdata')
 
@@ -30,51 +31,52 @@ system.time(
 
 save(mcfit, file="sol274/mcfit.RData", compress="xz")
 
-# SETUP for om, oem
+# --- SETUP om & oem
 
 load('sol274/mcfit.Rdata')
 
+# FINAL year
 fy <- 2042
+
+# SET iters, to sample from McMC
 it <- 100
 idx <- sample(seq(1000), it)
 
 # SUBSAMPLE iters
-
 runmc <- iter(stock + mcfit, idx)
 
+# ALTER iter dimnames
 dimnames(runmc) <- list(iter=seq(it))
 
-# FIT SRR
+# - FIT SRR
 
-srr <- as.FLSR(runmc, model="bevholtSV")
+sr <- as.FLSR(runmc, model="bevholtSV")
 
-res <- parallel::mclapply(seq(dims(srr)$iter), function(i)
-  srrTMB(iter(srr, i), spr0=spr0y(stock)), mc.cores=3)
+srr <- Reduce(combine, parallel::mclapply(seq(dims(sr)$iter), function(i)
+  srrTMB(iter(sr, i), spr0=spr0y(stock)), mc.cores=3))
 
-# TODO: SIMPLIFY
-pars <- Reduce(combine, lapply(res, params))
-resid <- Reduce(combine, lapply(res, residuals))
-fits <- Reduce(combine, lapply(res, fitted))
+# - GET biological refpts
 
-params(srr) <- pars
-residuals(srr) <- resid
-fitted(srr) <- fits
-srr@model <- bevholt()$model
+brp <-  brp(FLBRP(runmc, sr=srr))
 
+# MERGE biological & ICES refpts
+refpts <- rbind(remap(refpts(brp)), propagate(refpts, 100))
+
+# EXTEND srr into future
 srr <- window(srr, end=fy)
 
+# RESAMPLE last 21 years of residuals
 residuals(srr)[, ac(2022:fy)] <- exp(residuals(srr)[, sample(ac(2000:2021),
   21)])
 
-# OM
+# CONSTRUCT om
 
 om <- FLom(stock=fwdWindow(runmc, end=fy), refpts=refpts, sr=srr,
   projection=mseCtrl(method=fwd.om))
 
-# OEM
+# - CONSTRUCT oem
 
 # observations: stk, idx, lens
-
 index.q(indices$BTS)[] <- q.hat(mcfit)$BTS
 index.q(indices$SNS)[] <- q.hat(mcfit)$SNS[1:6,]
 
@@ -85,11 +87,9 @@ obs <- list(stk=propagate(fwdWindow(runmc, end=fy), it),
 vbpars <- FLPar(linf=38.4, k=0.306, t0=-1.70)
 ialk <- invALK(vbpars, age=1:10, cv=0.15, lmax=1.25)
 lsam <- lenSamples(window(catch.n(obs$stk), end=2021), ialk)
-
 obs$len <- window(lsam, end=2042)
 
 # deviances
-
 devs <- list(stk=list(
     catch.n=rlnorm(it, window(catch.n(runmc), end=fy) %=% 0, 0.15)),
   idx=lapply(obs$idx, function(x) rlnorm(it,
@@ -103,18 +103,19 @@ oem <- FLoem(observations=obs, deviances=devs, method=sampling.oem)
 
 save(om, oem, file="../data/sol274.RData", compress="xz")
 
-# TEST
+
+# --- TEST
 
 # BUG: mpCtrl(est=, hcr=)
 # BUG: args from refpts, wrong dims
 
 control <- mpCtrl(list(
-  # perfect.sa
+  # perfect.sa (shortcut)
   est=mseCtrl(method=perfect.sa),
   # hockeystick.hcr(refpts)
   hcr=mseCtrl(method=hockeystick.hcr,
-    args=list(lim=c(refpts$Blim), trigger=c(refpts$Btrigger),
-      target=c(refpts$Fmsy))),
+    args=list(lim=c(refpts$Blim)[1], trigger=c(refpts$Btrigger)[1],
+      target=c(refpts$Fmsy)[1])),
   # TAC fwd
   isys=mseCtrl(method=tac.is, args=list(dtaclow=0.85, dtacupp=1.15))
 ))
