@@ -27,8 +27,9 @@ population, and one or more indices of abundance are derived from surveys
 or CPUE data.
 }
 \details{
-The FLStock object passed to \emph{sampling.oem} by the \emph{mp} function is simplified
-to match the dimensions of that present in the \emph{observations} slot.
+The FLStock object passed to \emph{sampling.oem} by the \emph{mp} function is
+simplified to match the dimensions of that present in the \emph{observations}
+slot.
 }
 \examples{
 data(sol274)
