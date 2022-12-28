@@ -16,14 +16,27 @@ target.hcr(
   tracking
 )
 }
-\arguments{
-\item{PARAM}{Lorem ipsum dolor sit amet}
-}
 \value{
-RETURN Lorem ipsum dolor sit amet
+A list containing \emph{ctrl}, a \code{fwdControl} object, and \emph{tracking}, an \code{FLQuant}.
 }
 \description{
+Short description
+}
+\details{
 \deqn{}{}
+}
+\examples{
+data(sol274)
+#
+est <- cpue.ind(stock(om), FLIndices(CPUE=FLIndexBiomass(index=ssb(om))),
+  args=list(ay=2000, data_lag=1),
+  tracking=FLQuant(dimnames=list(metric="ind", year=2000, iter=1:100)))
+#
+target.hcr(ind=est$ind, lim=28000, target=40000,
+  metric="wmean", output="catch",
+  args=list(ay=2000, frq=1, data_lag=1, management_lag=1),
+  tracking=FLQuants(sol174=FLQuant(1000, dimnames=list(metric="hcr",
+  year=2000))))
 }
 \references{
 Hoshino, E., Hillary, R., Davies, C., Satria, F., Sadiyah, L., Ernawati, T., and Proctor, C. 2020.  Development of pilot empirical harvest strategies for tropical tuna in indonesian archipelagic waters: case studies of skipjack and yellowfin tuna. \emph{Fisheries Research}, 227:105539, doi:10.1016/j.fishres.2020.105539.
@@ -34,4 +47,4 @@ Hoshino, E., Hillary, R., Davies, C., Satria, F., Sadiyah, L., Ernawati, T., and
 \author{
 The FLR Team
 }
-\keyword{classes}
+\keyword{utilities}

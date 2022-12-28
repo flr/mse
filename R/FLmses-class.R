@@ -23,7 +23,7 @@ setMethod("FLmses", signature(object="list", performance="missing"),
 
     # COMPUTE performance IF statistics
     if(!missing(statistics)) {
-      # years
+      # AND for years
       if(missing(years)) {
         years <- do.call(seq,
           unname(dims(stock(object[[1]]))[c('minyear', 'maxyear')]))

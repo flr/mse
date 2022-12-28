@@ -51,7 +51,7 @@
   ...
 )
 
-\S4method{performance}{FLom}(x, refpts = x@refpts, ...)
+\S4method{performance}{FLom}(x, refpts = x@refpts, metrics = NULL, statistics = NULL, ...)
 }
 \arguments{
 \item{statistics}{statistics to be computed, as formula, name and description, \code{list}}

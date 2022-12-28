@@ -87,8 +87,9 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
 #' population, and one or more indices of abundance are derived from surveys
 #' or CPUE data.
 #'
-#' The FLStock object passed to *sampling.oem* by the *mp* function is simplified
-#' to match the dimensions of that present in the *observations* slot.
+#' The FLStock object passed to *sampling.oem* by the *mp* function is
+#' simplified to match the dimensions of that present in the *observations*
+#' slot.
 #'
 #' @param stk An FLStock object as obtained by the call to *stock(om)*.
 #' @param deviances A named list of deviances, see Details.
@@ -126,7 +127,8 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
 
   # AGGREGATE len samples over unit, 
 
-  # SIMPLIFY to match dimensions of observations$stk
+  # SIMPLIFY stk to match dimensions of observations$stk
+
   simp <- (dim(observations$stk)[c(3,4,5)] == 1) + (dim(stk)[c(3,4,5)] == 1) < 2
 
   if(any(simp))
@@ -134,7 +136,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
   
   # SUBSET year range
 	stk <- window(stk, start=y0, end=dy, extend=FALSE)
-
+ 
   # --- STK
 
   if(!is.null(deviances$stk)) {
@@ -150,8 +152,9 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
     discards(stk)[, dyrs] <- computeDiscards(stk[, dyrs])
     catch(stk)[, dyrs] <- computeCatch(stk[, dyrs])
 
-    # STORE for shortcut 
-    observations$stk[, dyrs] <- stk[, dyrs]
+  # STORE for shortcut 
+  observations$stk[, dyrs] <- stk[, dyrs]
+
   }
 
   # --- IDX
@@ -189,7 +192,6 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
     observations$idx[upi][[i]][, yrs]<- idx[upi][[i]][, yrs]
   }
 
-  # return
   list(stk=stk, idx=idx, observations=observations, tracking=tracking)
 
 } # }}}

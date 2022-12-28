@@ -42,3 +42,20 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
   list(stk=stk, tracking=tracking)
 }
 # }}}
+
+# shortcut.sa {{{
+shortcut.sa <- function(stk, idx, args, tracking, ...) {
+ 
+  dy <- args$dy
+  ay <- args$ay
+
+  stk <- window(stk, end=dy)
+
+  if(all(is.na(harvest(stk))))
+    harvest(stk) <- harvest(stock.n(stk), catch.n(stk), m(stk))
+  
+  track(tracking, "conv.est", ac(ay)) <- 1
+  
+  list(stk=stk, tracking=tracking)
+}
+# }}}
