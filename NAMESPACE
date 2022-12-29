@@ -1,11 +1,11 @@
 import("methods")
 import("data.table")
-import("ggplotFL")
-import("FLCore")
 import("foreach")
 import("parallelly")
 import("progressr")
 import("patchwork")
+import("FLCore")
+import("ggplotFL")
 import("FLasher")
 
 importFrom("FLBRP",

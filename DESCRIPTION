@@ -64,8 +64,8 @@ Collate:
   'plot.R'
 VignetteBuilder: knitr
 License: EUPL
-LazyLoad: Yes
-LazyData: No
+LazyLoad: true
+LazyData: true
 BugReports: https://github.com/flr/mse/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

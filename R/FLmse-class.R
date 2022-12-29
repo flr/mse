@@ -75,7 +75,7 @@ setGeneric("om<-", function(object, value) standardGeneric("om<-"))
 
 #' @rdname FLom-class
 setReplaceMethod("om", signature("FLmse", "FLo"), function(object, value){
-	object@oem <- value
+	object@om <- value
 	object
 })
 

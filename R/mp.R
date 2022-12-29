@@ -39,7 +39,7 @@
 #' plot(om, TEST=tes)
 
 mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
-  scenario="NA", tracking="missing", logfile=tempfile(), verbose=TRUE,
+  scenario="NA", tracking="missing", logfile=tempfile(), verbose=FALSE,
   parallel=TRUE){
 
   # dims & dimnames
@@ -163,8 +163,6 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     cores <- getDoParWorkers()
     parallel <- TRUE
   }
-
-  # p <- progressor(along=vy)
   
   # RUN goFish
 
@@ -267,14 +265,18 @@ setMethod("goFish", signature(om="FLom"),
   # COPY ctrl
   ctrl0 <- ctrl
   
+  p <- progressor(along=vy, offset=1)
+
   # go fish!
 
   for(i in vy) {
   
-    if(verbose) {
-      cat(i, " - ")
-    }
+  if(verbose) {
+    cat(i, " - ")
+  }
     
+  p(message = sprintf(paste0("[", i, "]")))
+
     # time (start)
     stim <- Sys.time()
 
@@ -556,8 +558,6 @@ setMethod("goFish", signature(om="FLom"),
     # CLEAR memory
 
     gc()
-    
-    # p()
   }
   
   # TRACK om in final years
