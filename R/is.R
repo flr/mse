@@ -27,7 +27,7 @@
 #' @examples
 #' data(sol274)
 
-# ADD initial TAC, initac=catch(stk[, ac(iy)])
+# ADD initial TAC or F, initac=catch(stk[, ac(iy)])
 
 tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=10,
   fmin=0, initac=catch(stk[, ac(iy - 1)]), tracking) {
@@ -67,6 +67,7 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=10,
       list(year=seq(ay - dlag + 1, length=mlag), quant="fbar",
         value=rep(c(fbar(stk)[, ac(dy)]), mlag)),
       list(year=ay + mlag, quant="fbar", value=ctrl$value))
+
   } else {
 
     fctrl <- fwdControl(
@@ -199,5 +200,3 @@ splitTAC.is <- function(stk, ctrl, allocation, args, tracking) {
 }
 
 # }}}
-
-

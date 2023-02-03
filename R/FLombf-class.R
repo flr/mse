@@ -32,8 +32,8 @@ setMethod("initialize", "FLombf",
       if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
       if (!missing(projection)) .Object@projection <- projection
       if(missing(FCB))
-        .Object@FCB <- FLasher:::FCB(FLasher:::fcb2int(FLasher:::guessfcb(biols,
-          fisheries), biols, fisheries))
+        .Object@FCB <- FCB(fcb2int(guessfcb(biols, fisheries),
+          biols, fisheries))
       else
         .Object@FCB <- FCB
       .Object <- callNextMethod(.Object, ...)
@@ -667,8 +667,9 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
 }) # }}}
 
 # stock {{{
+
 setMethod("stock", signature(object="FLombf"),
-  function(object, full=TRUE) {
+  function(object, full=TRUE, byfishery=FALSE) {
 
     bios <- names(biols(object))
 
@@ -679,16 +680,30 @@ setMethod("stock", signature(object="FLombf"),
     res <- FLStocks(
       # LAPPLY over biols
       lapply(setNames(nm=names(biols(object))), function(x) {
-        as.FLStock(biols(object)[[x]],
-        # CHOOSE only matching fisheries
-        fisheries=fisheries(object)[unlist(lapply(fbmap, function(i)
-          x %in% i))], catch=x, full=full)
+        # CHOOSE matching fisheries
+        fisheries <- fisheries(object)[unlist(lapply(fbmap, function(i)
+          x %in% i))]
+        stk <- as.FLStock(biols(object)[[x]], fisheries=fisheries,
+          catch=x, full=full)
+        # ADD fisheries catch data as areas, if requested
+        if(byfishery) {
+          dat <- FLQuants(lapply(setNames(nm=c('landings.n', 'landings.wt',
+            'discards.n', 'discards.wt')),
+            function(s) abind(lapply(fisheries, s, x))))
+          stk@landings.n <- dat$landings.n
+          stk@landings.wt <- dat$landings.wt
+          stk@discards.n <- dat$discards.n
+          stk@discards.wt <- dat$discards.wt
+          catch(stk) <- computeCatch(stk, 'all')
+        }
+      return(stk)
       }
     ))
 
     return(res)
   }
 )
+
 # }}}
 
 # propagate {{{

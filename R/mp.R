@@ -39,7 +39,7 @@
 #' plot(om, TEST=tes)
 
 mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
-  scenario="NA", tracking="missing", logfile=tempfile(), verbose=FALSE,
+  scenario="NA", tracking="missing", logfile=tempfile(), verbose=TRUE,
   parallel=TRUE){
 
   # dims & dimnames
@@ -108,7 +108,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # --- INIT tracking
   
-  metric <- c("F.om", "B.om", "SB.om", "C.om", "C.obs",
+  metric <- c("F.om", "B.om", "SB.om", "C.om", "C.obs", "B.obs", "SB.obs",
     "F.est", "B.est", "SB.est", "C.est", "conv.est", "iem")
   steps <- c("phcr", "hcr", "isys", "tm")
 
@@ -170,6 +170,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
+
+    cat("logfile\n", file=logfile)
     
     # LOOP and combine
     lst0 <- foreach(j=its, 
@@ -178,7 +180,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
       .inorder=TRUE) %dopar% {
-      
+
         call0 <- list(
           om = iter(om, j),
           oem = iter(oem, j),
@@ -260,7 +262,7 @@ setMethod("goFish", signature(om="FLom"),
 
   # LOGFILE header
   cat("pid", "year", dimnames(tracking[[1]])[[1]], sep="\t", "\n",
-    file=logfile)
+    file=logfile, append=TRUE)
 
   # COPY ctrl
   ctrl0 <- ctrl
@@ -324,13 +326,17 @@ setMethod("goFish", signature(om="FLom"),
     observations(oem) <- o.out$observations
     tracking <- o.out$tracking
     
+    track(tracking, "B.obs", dys) <- unitSums(window(stock(stk0),
+      start=dy0, end=dyf))
+    track(tracking, "SB.obs", dys) <- unitSums(window(ssb(stk0),
+      start=dy0, end=dyf))
     track(tracking, "C.obs", dys) <- unitSums(window(catch(stk0),
       start=dy0, end=dyf))
 
     # --- est: Estimator of stock statistics
 
     if (!is.null(ctrl0$est)) {
-      ctrl.est <- args(ctrl0$est)
+      ctrl.est <- unclass(args(ctrl0$est))
       ctrl.est$method <- method(ctrl0$est)
       ctrl.est$stk <- stk0
       ctrl.est$idx <- idx0
@@ -347,7 +353,7 @@ setMethod("goFish", signature(om="FLom"),
           print(e)
         }
       )
-      
+
       stk0 <- out.assess$stk
       
       # EXTRACT ind(icators) if returned
@@ -366,6 +372,7 @@ setMethod("goFish", signature(om="FLom"),
       tracking <- out.assess$tracking
     }
 
+    # TODO: DO NOT WRITE if ind
     track(tracking, "F.est", dys) <- unitMeans(window(fbar(stk0),
       start=dy0, end=dyf))
     track(tracking, "B.est", dys) <- unitSums(window(stock(stk0),
@@ -545,9 +552,11 @@ setMethod("goFish", signature(om="FLom"),
     track(tracking, "time", ay) <- as.numeric(difftime(Sys.time(), stim,
       units = "mins")) / args$it
   
-    # OUTPUT summary to logfile
+    # CPU process   
     id <- Sys.getpid()
+    track(tracking, "pid", ay) <- id
 
+    # OUTPUT summary to logfile
     lapply(dys, function(x)
       cat(id, x, c(iterMeans(tracking[[1]][, ac(x)])), "\n", sep="\t",
         file=logfile, append=TRUE))
@@ -640,8 +649,8 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$args <- args
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
-    
-    stk <- stock(om, full=TRUE)
+   
+    stk <- stock(om, full=TRUE, byfishery=TRUE)
     
     o.out <- Map(function(stk, dev, obs, tra) {
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
@@ -705,7 +714,8 @@ setMethod("goFish", signature(om="FLombf"),
     track(tracking, "SB.est", seq(ay, ay + frq - 1)) <- 
       window(lapply(stk0, ssb), start=dy, end=dy + frq - 1)
     track(tracking, "C.est", seq(ay, ay + frq - 1)) <- 
-      window(lapply(stk0, catch), start=dy, end=dy + frq - 1)
+      lapply(window(lapply(stk0, catch), start=dy, end=dy + frq - 1),
+        areaSums)
 
     # --- phcr: HCR parameterization
     
@@ -887,7 +897,6 @@ setMethod("goFish", signature(om="FLombf"),
     #----------------------------------------------------------
     # stock dynamics and OM projections
     #----------------------------------------------------------
-
     ctrl.om <- args(projection)
     ctrl.om$ctrl <- ctrl
     ctrl.om$om <- om
@@ -900,7 +909,7 @@ setMethod("goFish", signature(om="FLombf"),
     om <- do.call("mpDispatch", ctrl.om)$om
 
     # time (end)   
-    # DEBUG
+    # BUG:
     # track(tracking, "fwd", seq(ay, ay+frq-1)) <- ctrl
     track(tracking, "time", ay) <- as.numeric(Sys.time()) - tracking[[1]]["time", i]
 

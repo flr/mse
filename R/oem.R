@@ -78,6 +78,51 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
 
 } # }}}
 
+# shortcut.oem {{{
+
+shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
+
+  # DIMENSIONS
+  y0 <- ac(args$y0)
+  dy <- ac(args$dy)
+  dyrs <- ac(seq(args$dy - args$frq + 1, args$dy))
+
+  # GET perfect stock
+	stk <- window(stk, start=y0, end=dy, extend=FALSE)
+  
+  # SIMPLIFY to match observations$stk
+  dio <- dim(observations$stk)
+  dis <- dim(stk)
+
+  if(!is.null(dio)) {
+    if(dio[3] > dis[3])
+      stk <- nounit(stk)
+    if(dio[4] > dis[4])
+      stk <- noseason(stk)
+  }
+
+  # ADD deviances
+  if(!is.null(deviances$stk)) {
+
+    # APPLY deviances and ASSIGN to stk slots in dyrs
+    for(i in names(deviances$stk)) {
+      slot(stk, i)[, dyrs] <-
+      do.call(i, list(object=stk))[, dyrs] * deviances$stk[[i]][, dyrs] + 0.001
+    }
+
+    # COMPUTE aggregated slots
+    landings(stk)[, dyrs] <- computeLandings(stk[, dyrs])
+    discards(stk)[, dyrs] <- computeDiscards(stk[, dyrs])
+    catch(stk)[, dyrs] <- computeCatch(stk[, dyrs])
+  }
+
+  # STORE observations
+  observations$stk <- stk
+
+	list(stk=stk, idx=FLIndices(), observations=observations, tracking=tracking)
+
+} # }}}
+
 # sampling.oem {{{
 
 #' Samples from an operating model to obtain catch, biology and abundance data

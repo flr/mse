@@ -143,9 +143,15 @@ fwd.om <- function(om, ctrl, ...){
 	args$control <- ctrl
 
   # TODO ADD tryCatch
-  om <- do.call("fwd", args)
+  om <- tryCatch(do.call("fwd", args),
+    # error, RETURN om TODO: track
+    error = function(e) {
+      stop()
+    }
+  )
 
-  # if(dims(om)$iter != dims(args$object)$iter)
+  # DEBUG for NAs
+  #if(any(is.na(stock.n(stock(om))[, ac(unique(ctrl$year))])))
   #  browser()
 
 	list(om=om)

@@ -98,7 +98,7 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #'   output="catch", dlow=0.85, dupp=1.15, args=args,
 #'   tracking=FLQuant(dimnames=list(metric="catch.hcr", year=2016)))
 
-hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
+hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
   output="fbar", dlow=NA, dupp=NA, all=TRUE, args, tracking) {
   
   # EXTRACT args
@@ -108,8 +108,12 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   frq <- args$frq
 
   # COMPUTE metric
-  met <- window(do.call(metric, list(stk)), start=ay - data_lag,
+  met <- window(selectMetric(metric, stk, ind), start=ay - data_lag,
     end=ay - data_lag)
+
+  # TRACK metric
+  #track(tracking, "met.hcr", seq(ay + man_lag, ay + frq)) <- c(met)
+  track(tracking, "met.hcr", ay - data_lag) <- c(met)
   
   # APPLY rule
 
@@ -136,6 +140,7 @@ hockeystick.hcr <- function(stk, lim, trigger, target, min=0, metric="ssb",
   track(tracking, paste0(output, ".hcr"), seq(ay + man_lag, ay + frq)) <- c(out)
 
   # APPLY limits, always or if met < trigger
+
   if(!is.na(dupp)) {
     if(all) {
     out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
@@ -396,32 +401,20 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
 #' @examples
 #' data(sol274)
 #' trend.hcr(stock(om), ind=FLQuants(), args=list(ay=2003, data_lag=1,
-#' management_lag=1, frq=1, it=1), tracking=FLQuant(), k1=1.5, k2=3,
-#' gamma=1, nyears=5, metric=ssb)
+#'   management_lag=1, frq=1, it=1),
+#'   tracking=FLQuant(dimnames=list(metric='tac.hcr', year=2003)),
+#'   k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
 
 trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
   dlow=NA, dupp=NA, initac=seasonSums(unitSums(catch(stk)[, dy])),
   args, tracking) {
 
-  # args
+  # EXTRACT args
   spread(args)
   dy <- ac(ay - data_lag)
 
   # SELECT metric
-
-  # ind, if only one,
-  if(missing(metric) & length(ind) == 1) {
-    met <- ind[[1]]
-  } else if (is(metric, "character")) {
-    # or EXTRACT from ind
-    if(metric %in% names(ind))
-      met <- ind[[metric]]
-    # or COMPUTE from stk,
-    else
-      met <- do.call(metric, list(stk))
-  } else if(is(metric, "function")) {
-    met <- do.call(metric, list(stk))
-  }
+  met <- selectMetric(metric, stk, ind)
 
   # CREATE data.table
   dat <- data.table(as.data.frame(met[, ac(seq(ay - data_lag - (nyears - 1),
@@ -437,9 +430,11 @@ trend.hcr <- function(stk, ind, k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb,
   slope[lnas] <- dat[iter %in% rnas, .(slope=coef(lm(log(data) ~ year))[2]),
     by=iter][, (slope)]
   
-  # GET TAC from tracking['hcr',]
-  # TODO: FIX as for hockeystick
-  pre <- tracking[[1]]['hcr', dy]
+  # GET previous TAC from tracking['hcr',]
+  pre <- unitSums(seasonSums(window(do.call("catch", list(stk)),
+    start=ay - data_lag, end=ay - data_lag)))
+
+  # pre <- tracking[[1]]['tac.hcr', dy]
 
   # OR from previous catch
   if(all(is.na(pre)) & ay == iy)
@@ -782,6 +777,33 @@ setFCB <- function(output=c("catch", "landings", "discards", "fbar", "f",
     fcb <- c(fcb, setNames(fcb, nm=c("relFishery", "relCatch", "relBiol")))
 
   fcb
+}
+# }}}
+
+# selecMetric {{{
+
+selectMetric <- function(metric="missing", stk, ind) {
+
+    # MISSING metric? ind
+    if(missing(metric)) {
+      if(length(ind) == 1) {
+        met <- ind[[1]]
+      } else {
+        met <- ind
+      }
+    # CHARACTER?
+    } else if (is(metric, "character")) {
+      # EXTRACT from ind,
+      if(metric %in% names(ind))
+        met <- ind[[metric]]
+      # or COMPUTE from stk
+      else
+        met <- do.call(metric, list(stk))
+    # FUNCTION?
+    } else if(is(metric, "function")) {
+      met <- do.call(metric, list(stk))
+    }
+    return(met)
 }
 # }}}
 

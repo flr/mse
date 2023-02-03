@@ -399,6 +399,8 @@ setMethod("fwdWindow", signature(x="FLom", y="missing"),
 
     stock(x) <- fwdWindow(stock(x), end=end, nsq=nsq, ...)
 
+    sr(x) <- window(sr(x), end=end, ...)
+
     return(x)
 
   }
@@ -485,5 +487,12 @@ setMethod("propagate", signature(object="FLom"),
     sr(object) <- propagate(sr(object), iter=iter, fill.iter=fill.iter)
 
     return(object)
+  }
+) # }}}
+
+# dim {{{
+setMethod("dim", signature(x="FLom"),
+  function(x) {
+    return(dim(stock(x)))
   }
 ) # }}}
