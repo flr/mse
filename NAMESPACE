@@ -144,6 +144,8 @@ exportMethods(
   "projection",
   "projection<-",
   "rec",
+  "refpts",
+  "refpts<-",
   "sr<-",
   "ssb",
   "stock",
