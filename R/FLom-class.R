@@ -222,7 +222,7 @@ setMethod("stock.n", signature(object="FLom"),
 
 setMethod("stock.wt", signature(object="FLom"),
   function(object) {
-    return(mat(stock.wt(object)))
+    return(stock.wt(stock(object)))
   }
 )
 # }}}
@@ -291,7 +291,8 @@ setMethod("summary", signature(object="FLom"),
       met <- try(iterMedians(do.call(i, list(object))), silent=TRUE)
       if(is(met, "FLQuant"))
         cat(" ", paste0(i, ":"),
-          paste(format(range(met), trim=TRUE, digits=2), collapse=' - '),
+          paste(format(range(met, na.rm=TRUE), trim=TRUE, digits=2),
+            collapse=' - '),
           paste0(" (", units(met), ")"),
           "\n")
       else

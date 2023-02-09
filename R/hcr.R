@@ -112,7 +112,6 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
     end=ay - data_lag)
 
   # TRACK metric
-  #track(tracking, "met.hcr", seq(ay + man_lag, ay + frq)) <- c(met)
   track(tracking, "met.hcr", ay - data_lag) <- c(met)
   
   # APPLY rule
