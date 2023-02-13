@@ -150,10 +150,6 @@ fwd.om <- function(om, ctrl, ...){
     }
   )
 
-  # DEBUG for NAs
-  #if(any(is.na(stock.n(stock(om))[, ac(unique(ctrl$year))])))
-  #  browser()
-
 	list(om=om)
 }
 # }}}
