@@ -303,9 +303,9 @@ setMethod("performance", signature(x="FLombf"),
   function(x, statistics, refpts=x@refpts, metrics,
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     probs=NULL, mp=NULL) {
-    
+
     # CALL for metrics by biol
-    mets <- metrics(x, metrics)
+    mets <- lapply(metrics, do.call, list(x))
 
     # SET list with biols' metrics
     mets <- lapply(setNames(nm=names(biols(x))),
