@@ -14,7 +14,7 @@ mp(
   scenario = "NA",
   tracking = "missing",
   logfile = tempfile(),
-  verbose = FALSE,
+  verbose = TRUE,
   parallel = TRUE
 )
 }

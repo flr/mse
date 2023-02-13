@@ -40,8 +40,8 @@
 #' # Test for year when SSB < bsafe
 #' ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
 #'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
-#' hockeystick.hcr(ple4, lim=2e5, trigger=3e5, target=0.15, min=0.05,
-#'   metric="ssb", output="fbar",
+#' hockeystick.hcr(ple4, ind=FLQuant(), lim=2e5, trigger=3e5, target=0.15,
+#'   min=0.05, metric="ssb", output="fbar",
 #'   args=list(ay=2018, data_lag=1, management_lag=1, frq=1),
 #'   tracking=FLQuant(dimnames=list(metric="fbar.hcr", year=2000:2020)))
 
@@ -89,14 +89,14 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #' data(ple4)
 #' args <- list(ay=2015, data_lag=1, management_lag=1, frq=1)
 #' # Set as fbar ~ ssb
-#' hockeystick.hcr(ple4, lim=3e5, trigger=4e5, target=0.25, min=0,
-#'   metric="ssb", output="fbar", args=args,
-#'   tracking=FLQuant(dimnames=list(metric="fbar.hcr", year=2016)))
+#' hockeystick.hcr(ple4, ind=FLQuant(), lim=3e5, trigger=4e5, target=0.25,
+#'   min=0, metric="ssb", output="fbar", args=args,
+#'   tracking=FLQuant(dimnames=list(metric="fbar.hcr", year=2014:2016)))
 #' # Use for catch ~ depletion, with metric as a new function
-#' hockeystick.hcr(ple4, lim=0.10, trigger=0.40, target=140000, min=0,
-#'   metric=function(x) ssb(x) %/% ssb(x)[,1],
+#' hockeystick.hcr(ple4, ind=FLQuant(), lim=0.10, trigger=0.40, target=140000,
+#'   min=0, metric=function(x) ssb(x) %/% ssb(x)[,1],
 #'   output="catch", dlow=0.85, dupp=1.15, args=args,
-#'   tracking=FLQuant(dimnames=list(metric="catch.hcr", year=2016)))
+#'   tracking=FLQuant(dimnames=list(metric="catch.hcr", year=2014:2016)))
 
 hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
   output="fbar", dlow=NA, dupp=NA, all=TRUE, args, tracking) {
