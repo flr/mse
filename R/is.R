@@ -148,8 +148,8 @@ indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"),
 
 # seasonal.is {{{
 
-seasonal.is <- function(stk, ctrl, args, ratio=rep(1/args$ns, args$ns),
-  tracking, ...){
+seasonal.is <- function(stk, ctrl, args, ratio=rep(1 / args$ns, args$ns),
+  tracking, ...) {
 
   nseas <- args$ns
 

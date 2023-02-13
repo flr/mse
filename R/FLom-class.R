@@ -416,7 +416,7 @@ setMethod("fwdWindow", signature(x="FLom", y="missing"),
 
 setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl"),
   function(object, control, maxF=4, deviances=residuals(sr(object)), ...) {
-    
+
     stock(object) <- fwd(stock(object), sr=sr(object), control=control,
       maxF=maxF, deviances=deviances, ...)
 
