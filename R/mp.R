@@ -602,6 +602,9 @@ setMethod("goFish", signature(om="FLombf"),
   bns <- names(biols(om))
   fns <- names(fisheries(om))
 
+  # CHECK oem mode (byfishery)
+  byfishery <- isTRUE(args(oem)$byfishery)
+
   # TODO LOOP every module over stock
   args$stock <- if(is.null(args$stock)) seq(length(biols(om))) else args$stock
 
@@ -650,8 +653,10 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$args <- args
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
-   
-    stk <- stock(om, full=TRUE, byfishery=TRUE)
+ 
+    # GET OM observation
+
+    stk <- stock(om, full=TRUE, byfishery=byfishery)
     
     o.out <- Map(function(stk, dev, obs, tra) {
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
@@ -916,7 +921,7 @@ setMethod("goFish", signature(om="FLombf"),
 
     invisible(gc())
   }
-  
+
   # RETURN
   list(om=window(om, start=iy, end=fy), tracking=window(tracking, end=fy),
     oem=oem, args=args)
