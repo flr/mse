@@ -316,7 +316,31 @@ setMethod("window", signature(x="FLoem"),
 
     return(x)
   }
-) # }}}
+) 
+
+setMethod("fwdWindow", signature(x="FLoem", y="missing"),
+  function(x, end, nsq=3) {
+
+    # observations
+    if(length(observations(x)$stk) > 0 &&
+      end > dims(observations(oem)$stk)$maxyear)
+      observations(x)$stk <- fwdWindow(observations(x)$stk, end=end, nsq=nsq)
+    
+    if(length(observations(x)$idx) > 0)
+    observations(x)$idx <- fwdWindow(observations(x)$idx, end=end, nsq=nsq)
+
+    # deviances
+    deviances(x) <- rapply(deviances(x), function(i)
+      window(i, end=end), how='list')
+
+    return(x)
+  }
+)
+
+
+
+
+# }}}
 
 # propagate {{{
 setMethod("propagate", signature(object="FLoem"),
