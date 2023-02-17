@@ -65,7 +65,7 @@ Collate:
 VignetteBuilder: knitr
 License: EUPL
 LazyLoad: true
-LazyData: true
+LazyData: false
 BugReports: https://github.com/flr/mse/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
