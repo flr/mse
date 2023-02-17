@@ -497,3 +497,17 @@ setMethod("dim", signature(x="FLom"),
     return(dim(stock(x)))
   }
 ) # }}}
+
+# deviances {{{
+
+setMethod("deviances", signature(object="FLom"),
+  function(object) {
+    return(residuals(sr(object)))
+  })
+
+setReplaceMethod("deviances", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    residuals(sr(object)) <- value
+    return(object)
+  })
+# }}}

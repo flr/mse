@@ -5,7 +5,7 @@
 # Author: Ernesto JARDIM (MSC) <ernesto.jardim@msc.org>
 #         Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
 #
-# Distributed under the terms of the EUPL-1.2
+# Distributed under the terms of the European Union Public Licence (EUPL) V.1.2.
 
 
 # FLoem {{{
