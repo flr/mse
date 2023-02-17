@@ -108,8 +108,15 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # --- INIT tracking
   
-  metric <- c("F.om", "B.om", "SB.om", "C.om", "C.obs", "B.obs", "SB.obs",
-    "F.est", "B.est", "SB.est", "C.est", "conv.est", "iem")
+  metric <- c(
+    # om
+    "B.om", "SB.om", "C.om", "F.om",
+    # oem
+    "B.obs", "SB.obs", "C.obs",
+    # est
+    "B.est", "SB.est", "C.est", "F.est", "conv.est",
+    # iem
+    "iem")
   steps <- c("phcr", "hcr", "isys", "tm")
 
   if (!missing(tracking))
@@ -117,7 +124,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # SETUP tracking FLQs
   tracking <- FLQuant(NA, dimnames=list(
-    metric=c(metric, steps[steps %in% names(ctrl)], "time", "fwd", "fb"),
+    metric=c(metric, steps[steps %in% names(ctrl)], "fb", "fwd", "time", "pid"),
     year=ac(seq(iy - data_lag - frq + 1, fy + management_lag)),
     unit="unique",
     season=dmns$season,
@@ -161,7 +168,6 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # TAKEN from doPar
   } else if(getDoParRegistered()) {
     cores <- getDoParWorkers()
-    parallel <- TRUE
   }
   
   # RUN goFish
