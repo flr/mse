@@ -7,7 +7,7 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-# movingF.hcr {{{
+# movingF.phcr {{{
 movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, args, hcrpars, tracking) {
 
   # args
@@ -26,12 +26,6 @@ movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, args, hcrpa
 	list(hcrpars=hcrpars, tracking=tracking)	
 } # }}}
 
-# indicator.phcr
-indicator.phcr <- function(stk, itrg, args, tracking, ...){
-	if(is(itrg, 'FLPar')) hcrpars <- itrg else hcrpars <- FLPar(itrg=itrg) 
-	list(hcrpars=hcrpars, tracking=tracking)	
-}
-
 # brp.phcr
 
 brp.phcr <- function(stk, model, params, args, tracking) {
@@ -43,8 +37,4 @@ brp.phcr <- function(stk, model, params, args, tracking) {
   hcrpars <- FLPar(sbsafe=c(rps["msy", "ssb", ]))
 
   return(list(hcrpars=hcrpars, tracking=tracking))
-}
-
-cpue.phcr <- function(stk, ind, args, tracking) {
-
 }

@@ -43,7 +43,6 @@ export(
   "hyperstability.fb",
   "ices.hcr",
   "indicator.hcr",
-  "indicator.phcr",
   "indicator.is",
   "initiate",
   "len.ind",
