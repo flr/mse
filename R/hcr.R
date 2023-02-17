@@ -117,12 +117,18 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
   # APPLY rule
 
   # BELOW lim
-  out <- ifelse(met <= lim, c(min),
-  # BETWEEN lim and trigger
+  out <- ifelse(met <= lim, min,
+    # BETWEEN lim and trigger
     ifelse(met < trigger,
-      pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  c(min)),
-  # ABOVE trigger
-    c(target)))
+      # diff(met - lim) * gradient + min
+      (met - lim) * ((target - min) / (trigger - lim)) + min,
+    # ABOVE trigger
+    target)
+  )
+
+  # TRACK decision
+  track(tracking, "decision.hcr", ay) <- ifelse(met <= lim, 1,
+    ifelse(met < trigger, 2, 3))
 
   # LIMITS over previous output
   pre <- unitSums(seasonSums(window(do.call(output, list(stk)),
@@ -135,7 +141,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
     pre[is.na(pre)] <- 1
   }
 
-  # TRACK initial tac
+  # TRACK initial target
   track(tracking, paste0(output, ".hcr"), seq(ay + man_lag, ay + frq)) <- c(out)
 
   # APPLY limits, always or if met < trigger
@@ -226,7 +232,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
     output <- "fbar"
 
   # SET args
-  spread(args)
+  spread(lapply(args, c))
   xlim <- trigger * 1.50
   ylim <- target * 1.50
   
@@ -244,9 +250,10 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
   out <- ifelse(met <= lim, min,
     # BETWEEN lim and trigger
     ifelse(met < trigger,
-      pmax(c(target * ((met - trigger) / (trigger - lim) + 1)),  min),
+      # diff(met - lim) * gradient + min
+      (met - lim) * ((target - min) / (trigger - lim)) + min,
     # ABOVE trigger
-    c(target))
+    target)
   )
 
   # LABELS as list
@@ -271,7 +278,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
       vjust="bottom") +
     # LIMIT
     geom_segment(aes(x=lim, xend=lim, y=0, yend=min), linetype=2) +
-    annotate("text", x=lim, y=-ylim / 40, label=labels$limit, vjust="bottom") +
+    annotate("text", x=lim, y=-ylim / 40, label=labels$lim, vjust="bottom") +
     # HCR line
     geom_line()
 
@@ -329,6 +336,8 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 }
 
 # }}}
+
+# TODO: fixed.hcr
 
 # fixedF.hcr {{{
 
