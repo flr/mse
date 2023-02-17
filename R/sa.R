@@ -45,7 +45,7 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
 
 # shortcut.sa {{{
 
-shortcut.sa <- function(stk, idx, args, tracking, ...) {
+Ashortcut.sa <- function(stk, idx, args, tracking, ...) {
  
   # DIMS
   dy <- args$dy
@@ -75,5 +75,27 @@ shortcut.sa <- function(stk, idx, args, tracking, ...) {
   track(tracking, "conv.est", ac(ay)) <- 1
   
   list(stk=stk, tracking=tracking)
+}
+# }}}
+
+# shortcut.sa {{{
+
+shortcut.sa <- function(stk, idx, SSBdevs, args, tracking, ...) {
+ 
+  # DIMS
+  dy <- args$dy
+  ay <- args$ay
+  it <- args$it
+
+  # SUBSET oem stock
+  stk <- window(stk, end=dy)
+
+  ind <- FLQuants(
+    # SSBcv
+    ssb=ssb(stk) * window(SSBdevs, end=dy))
+
+  track(tracking, "conv.est", ac(ay)) <- 1
+
+  list(stk=stk, ind=ind, tracking=tracking)
 }
 # }}}
