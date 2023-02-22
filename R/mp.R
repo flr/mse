@@ -243,8 +243,6 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
 # }}}
 
-setGeneric("goFish", function(om, ...) standardGeneric("goFish"))
-
 # goFish FLom {{{
 
 setMethod("goFish", signature(om="FLom"),
@@ -934,3 +932,53 @@ setMethod("goFish", signature(om="FLombf"),
 
   }
 ) # }}}
+
+# mps {{{
+
+mps <- function(om, oem, ctrl, args, ...) {
+
+  # GET ... arguments
+  opts <- list(...)
+  
+  # PARSING a single module
+  if(length(opts) > 1)
+    stop("mps() can only alter a single module, called for: ", names(opts))
+  
+  # DO options refer to ctrl elements?
+  if(!names(opts) %in% names(ctrl))
+    stop("options refer to modules not present in ctrl")
+
+  # PARSE options on first element (module)
+  
+  module <- names(opts)[[1]]
+
+  # MAX number of values
+  largs <- max(unlist(lapply(opts[[module]], length)))
+ 
+  # RECYCLE if shorter
+  mopts <- lapply(opts[[module]], function(i) {
+    rep(i, length=largs)
+  })
+
+  # LOOP over values
+
+  res <- foreach(i = seq(largs)) %dopar% {
+ 
+    args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
+
+    tryCatch(mp(om, oem=oem, ctrl=ctrl, args=args, parallel=FALSE),
+      error=function(e) {
+        stop("Call to mp failed")
+      })
+  }
+
+  # RENAME list elements
+
+  if(length(mopts) == 1)
+    names(res) <- paste(module, names(mopts)[1], round(mopts[[1]]), sep='_')
+  else
+    names(res) <- paste(module, seq(largs), sep='_')
+
+  return(res)
+}
+# }}}

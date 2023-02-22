@@ -1,5 +1,5 @@
-# generics.R - DESC
-# /generics.R
+# generics.R - Method generics defined in the package
+# mse/R/generics.R
 
 # Copyright Iago MOSQUEIRA (WMR), 2021
 # Author: Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
@@ -38,11 +38,9 @@ setGeneric("undebug", useAsDefault = base::undebug)
 
 # }}}
 
-# track<- {{{
+setGeneric("goFish", function(om, ...) standardGeneric("goFish"))
+
+setGeneric("merge", useAsDefault = base::merge)
+
 setGeneric("track<-", function(object, ..., value)
   standardGeneric("track<-"))
-# }}}
-
-# merge {{{
-setGeneric("merge", useAsDefault = base::merge)
-#}}}
