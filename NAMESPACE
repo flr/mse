@@ -55,6 +55,7 @@ export(
   "mpCtrl",
   "mpDispatch",
   "mpa.tm",
+  "mps",
   "mseCtrl",
   "noise.iem",
   "perfect.oem",
