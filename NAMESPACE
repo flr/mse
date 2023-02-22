@@ -63,6 +63,7 @@ export(
   "plot_hockeystick.hcr",
   "sampling.oem",
   "seasonal.is",
+  "shortcut.sa",
   "simulator",
   "splitTAC.is",
   "tac.is",
