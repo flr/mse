@@ -19,53 +19,78 @@
 #' management year (`ay + mlag`) or years (`seq(ay + mlag, ay + mlag + freq`).
 #' An assumption is made on the mortality in the assessment year (`ay`), which
 #' becomes the intermediate year in this projection. By default this is set
-#' to Fbar = Fstatusquo, that is, the same fishing mortality estimated in the 
+#' to Fbar = Fsq, that is, the same fishing mortality estimated in the 
 #' last data year (`ay - data_lag`).
 #'
-#' - recruitment
+#' The projection applies a constant recruitment, equal to the geometric mean
+#' over an specified number of years. By default all years minus the last two
+#' are included in the calculation. An specific set of years can be employed,
+#' by specifying a character vector of year names, or two values can be given
+#' for the number of years to be inlcuded, counting from the last, and how many
+#' years to exclude at the end. For example, `c(30, 2)` will use the last 30
+#' years but excluding the last two, usually worst estimated.
 #'
-
-#' The projection uses geometric mean recruitment. Fbar in the intermediate years (i.e. years between last data year and ay+1) are set as the mean of the last nsqy years.
-#' The control argument is a list of parameters:
-#' nsqy - number of years to average over to get Fbar for STF
-#' delta_tac_min - constraint on the TAC
-#' delta_tac_max - constraint on the TAC
 #' @param stk The perceived FLStock.
-#' @param imp_control A list with the elements: nsqy, delta_tac_min, delta_tac_max
-#' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
-#' @param EFF0 The tracking array
-#' @param EFF Not used by this function but may be used by the other implementation functions
+#' @param ctrl The fwdControl output by the *hcr* step, target must be 'fbar'.
+#' @param args The MSE run arguments.
+#' @param recyrs Years to use for geometric mean recruitment if projection. Defaults to all years minus the last two.
+#' @param Fdevs Deviances on the fbar input to incorporate error and bias when MP is run using the pseudo-estimators 'perfect.sa' or 'shortcut.sa'.
+#' @param dtaclow Limit to decreases in output catch, as a proportional change (0.85 for 15%). Applied only when metric > lim, as set by 'hcr' step.
+#' @param dtacupp Limit to increases in output catch, as a proportional change (1.15 for 15%). Applied only when metric > lim, as set by 'hcr' step.
+#' @param fmin Minimum fbar to apply when catch change limits are use.
+#' @param initac Initial catch from which to compute catch change limits. Defaults to previous observed catch.
+#' @param tracking The tracking object.
 #' @examples
+#' data(sol274)
+#' # Setup control with tac.is
+#' control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
+#'   hcr=mseCtrl(method=hockeystick.hcr,
+#'     args=list(lim=0, trigger=4.3e5, target=0.21)),
+#'   isys=mseCtrl(method=tac.is)))
+#' # Run MP until 2025
+#' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2025))
+#' # Plot run time series
+#' plot(om, TAC.IS=run)
 
-# ADD initial TAC or F, initac=catch(stk[, ac(iy)])
-
-# all years - 2
-# -25 
-
-tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=30,
-  fmin=0, initac=catch(stk[, ac(iy - 1)]), Fdevs=fbar(stk) %=% 1, tracking) {
+tac.is <- function(stk, ctrl, args,
+  recyrs=c(dims(stk)$year, 2), Fdevs=fbar(stk) %=% 1,
+  dtaclow=NA, dtacupp=NA, fmin=0, initac=catch(stk[, ac(iy - 1)]),
+  tracking) {
 
   # EXTRACT args
-
-  ay <- args$ay
-  dy <- args$dy
-  iy <- args$iy
-  mlag <- args$management_lag
-  dlag <- args$data_lag
-  nsqy <- args$nsqy
+  spread(args)
 
   # PREPARE stk until ay + mlag, biology as in last nsqy years
-  fut <- stf(stk, end=ay + mlag, wts.nyears=nsqy)
-
-  # SET recruitment
-  gmnrec <- exp(yearMeans(log(rec(stk)[, rev(dimnames(stk)$year)[2:recyrs+1]])))
-  srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
+  fut <- fwdWindow(stk, end=ay + management_lag, nsq=nsqy)
   
+  # PARSE recyrs
+  if(is.numeric(recyrs)) {
+    if(length(recyrs) == 1) {
+      if(recyrs < 0) {
+        recyrs <- c(dims(stk)$year, -recyrs)
+      } else {
+        recyrs <- c(recyrs, 0)
+      }
+    }
+    id <- seq(dim(stk)[2] - recyrs[1] + 1, length=recyrs[1] - recyrs[2])
+    recyrs <- dimnames(stk)$year[id]
+  }
+
+  # CHECK recyrs
+  if(!all(recyrs %in% dimnames(stk)$year))
+    stop("'recyrs' cannot be found in input stk")
+
+  # SET GM recruitment
+  
+  gmnrec <- exp(yearMeans(log(rec(stk)[, recyrs])))
+
+  srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
+
   # ADD F deviances
   ftar <- ctrl$value * Fdevs[, ac(dy)]
 
-  # FORECAST for iyrs and my IF mlag > 0, else only my
-  if(mlag > 0) {
+  # FORECAST for iyrs and my IF mlag > 0,
+  if(management_lag > 0) {
  
     # SET F for intermediate year
     fsq <- fbar(stk)[, ac(dy)]
@@ -74,27 +99,27 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=30,
 
     # CONSTRUCT fwd control
     fctrl <- fwdControl(
-      # ay as intermediate
-      list(year=seq(ay - dlag + 1, length=mlag), quant="fbar",
-        value=rep(c(fsq), mlag)),
+      # ay as intermediate with Fsq
+      list(year=seq(ay - data_lag + 1, length=management_lag), quant="fbar",
+        value=rep(c(fsq), management_lag)),
       # target
-      list(year=ay + mlag, quant="fbar", value=ftar))
+      list(year=ay + management_lag, quant="fbar", value=ftar))
 
+  # else only for my
   } else {
-
     fctrl <- fwdControl(
-      list(year=ay + mlag, quant="fbar", value=ftar))
+      list(year=ay + management_lag, quant="fbar", value=ftar))
   }
 
-  # RUN STF fwd
+  # RUN STF ffwd
   fut <- ffwd(fut, sr=srr, control=fctrl)
 
   # EXTRACT catches
-  TAC <- c(catch(fut)[, ac(ay + mlag)])
+  TAC <- c(catch(fut)[, ac(ay + management_lag)])
 
   # ID iters where hcr set met trigger and F > fmin
   id <- c(tracking[[1]]["decision.hcr", ac(ay)] > 2) &
-    c(fbar(fut)[, ac(ay + mlag)] > fmin)
+    c(fbar(fut)[, ac(ay + management_lag)] > fmin)
 
   # GET TAC dy / ay - 1
   if(ay == iy)
@@ -102,12 +127,16 @@ tac.is <- function(stk, ctrl, args, dtaclow=NA, dtacupp=NA, recyrs=30,
   else
     prev_tac <- c(tracking[[1]]["isys", ac(ay)])
 
-  # APPLY upper and lower TAC limit, only for id
-  TAC[id] <- pmin(TAC[id], c(prev_tac)[id] * dtacupp)
-  TAC[id] <- pmax(TAC[id], c(prev_tac)[id] * dtaclow)
+  # APPLY upper and lower TAC limit, if not NA and only for id iters
+  if(!is.na(dtacupp)) {
+    TAC[id] <- pmin(TAC[id], c(prev_tac)[id] * dtacupp)
+  }
+  if(!is.na(dtaclow)) {
+    TAC[id] <- pmax(TAC[id], c(prev_tac)[id] * dtaclow)
+  }
 
   # CONSTRUCT fwdControl
-  ctrl <- fwdControl(list(year=ay + mlag, quant="catch", value=TAC))
+  ctrl <- fwdControl(list(year=ay + management_lag, quant="catch", value=TAC))
 
   return(list(ctrl=ctrl, tracking=tracking))
 }
