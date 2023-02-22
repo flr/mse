@@ -24,7 +24,7 @@ setMethod("plot", signature(x="FLmse", y="missing"),
   if(isTRUE(window))
     maxyear <- min(unlist(lapply(stocks[-1], function(i) dims(i)$minyear)))
   else
-    maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(i)$maxyear)))
+    maxyear <- min(unlist(lapply(stocks[-1], function(i) dims(i)$maxyear)))
     
   stocks[[1]] <- window(stocks[[1]], end=maxyear)
 
