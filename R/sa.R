@@ -80,7 +80,7 @@ Ashortcut.sa <- function(stk, idx, args, tracking, ...) {
 
 # shortcut.sa {{{
 
-shortcut.sa <- function(stk, idx, SSBdevs, args, tracking, ...) {
+shortcut.sa <- function(stk, idx, SSBdevs=ssb(stk) %=% 1, args, tracking, ...) {
  
   # DIMS
   dy <- args$dy
