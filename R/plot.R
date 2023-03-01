@@ -18,7 +18,7 @@ setMethod("plot", signature(x="FLmse", y="missing"),
 # }}}
 
 # .plotom {{{
-.plotom <- function(stocks, window=TRUE) {
+.plotom <- function(stocks, window=TRUE, ...) {
  
   # WINDOW om
   if(isTRUE(window))
@@ -33,7 +33,7 @@ setMethod("plot", signature(x="FLmse", y="missing"),
     names(stocks) <- c("OM", paste0("MP", seq(length(stocks) - 1)))
  
   # PLOT FLStocks
-  plot(FLStocks(stocks))
+  plot(FLStocks(stocks), ...)
 
 }
 # }}}
@@ -49,13 +49,13 @@ setMethod("plot", signature(x="FLo", y="FLmse"),
   })
 
 setMethod("plot", signature(x="FLom", y="list"),
-  function(x, y, window=TRUE) {
+  function(x, y, window=TRUE, ...) {
 
     # MERGE stocks in list
     stks <- FLStocks(c(stock(x), lapply(y, stock)))
 
     # PLOT
-    .plotom(stks, window=window)
+    .plotom(stks, window=window, ...)
 
   }
 )
