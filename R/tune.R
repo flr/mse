@@ -95,6 +95,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     return(rmax)
 
   # CHECK range includes 0
+  # TODO: PROPOSE wider range, min * 0.5, max * 1.5, and restart (recursive?).
   if((obmin * obmax) > 0) {
     warning("Range of hcr param(s) cannot achieve requested tuning objective probability")
     return(list(min=rmin, max=rmax))
@@ -228,8 +229,8 @@ tunegrid <- function(om, oem="missing", control, metric, statistic, grid, args,
 #'   desc="ICES P.05"))
 #' # CALL bisect over 100 years, Fp.05 calculated over last 50.
 #' fp05fwd <- bisect(stock, sr=srr, deviances=devs, metrics=list(SB=ssb), 
-#' refpts=FLPar(SBlim=150000), statistic=statistic, years=2018:2118,
-#' pyears=2069:2118, tune=list(fbar=c(0.1, 1)), prob=0.05)
+#'   refpts=FLPar(SBlim=150000), statistic=statistic, years=2018:2118,
+#'   pyears=2069:2118, tune=list(fbar=c(0.1, 1)), prob=0.05)
 
 bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
   statistic, years, pyears=years, tune, prob, tol=0.01, maxit=15, verbose=TRUE) {

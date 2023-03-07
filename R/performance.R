@@ -329,6 +329,10 @@ setMethod("performance", signature(x="FLombf"),
 
 # performance(FLmse) {{{
 
+#' @examples
+#' data(sol274)
+#' data(statistics)
+
 setMethod("performance", signature(x="FLmse"),
   function(x, ...) {
     performance(x@om, ...)

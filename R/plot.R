@@ -6,6 +6,59 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
+# FLo, ... {{{
+setMethod("plot", signature(x="FLo", y="missing"),
+  function(x, ...) {
+
+    args <- list(...)
+    metrics <- args$metrics
+
+    # COMPUTE metrics
+    if(is.null(metrics))
+      mets <- metrics(x)
+    else
+      mets <- do.call("metrics", list(object=x, metrics=metrics))
+
+    plot(mets)
+  }
+)
+setMethod("plot", signature(x="FLo", y="FLmse"),
+  function(x, y, ..., window=TRUE) {
+
+    # MERGE all FLmse args
+    y <- c(list(y), list(...))
+
+    plot(x, y, window=window)
+  }
+)
+
+setMethod("plot", signature(x="FLom", y="list"),
+  function(x, y, window=TRUE, ...) {
+
+    # WINDOW om
+    if(isTRUE(window))
+      maxyear <- min(unlist(lapply(y, function(i) dims(i)$minyear)))
+    else
+      maxyear <- min(unlist(lapply(y, function(i) dims(i)$maxyear)))
+  
+    x <- window(x, end=maxyear)
+
+    # PARSE args
+    args <- list(...)
+    metrics <- args$metrics
+
+    # COMPUTE metrics
+    if(is.null(metrics))
+      mets <- lapply(c(list(OM=x), y), metrics)
+    else
+      mets <- lapply(c(list(OM=x), y), metrics, metrics=metrics)
+
+    # PLOT
+    args$metrics <- NULL
+    do.call(plotListFLQuants, c(list(x=mets), args))
+  }
+)
+# }}}
 
 # FLmse, missing {{{
 setMethod("plot", signature(x="FLmse", y="missing"),
@@ -38,28 +91,6 @@ setMethod("plot", signature(x="FLmse", y="missing"),
 }
 # }}}
 
-# FLo, FLmse, ... {{{
-setMethod("plot", signature(x="FLo", y="FLmse"),
-  function(x, y, ..., window=TRUE) {
-
-    # MERGE all FLmse args
-    y <- c(list(y), list(...))
-
-    plot(x, y, window=window)
-  })
-
-setMethod("plot", signature(x="FLom", y="list"),
-  function(x, y, window=TRUE, ...) {
-
-    # MERGE stocks in list
-    stks <- FLStocks(c(stock(x), lapply(y, stock)))
-
-    # PLOT
-    .plotom(stks, window=window, ...)
-
-  }
-)
-# }}}
 
 # FLombf, list, ... {{{
 setMethod("plot", signature(x="FLombf", y="list"),

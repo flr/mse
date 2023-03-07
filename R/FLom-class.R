@@ -330,45 +330,6 @@ setMethod("summary", signature(object="FLom"),
 )
 # }}}
 
-# plot {{{
-
-setMethod("plot", signature(x="FLom", y="missing"),
-  function(x, window=TRUE, ...) {
-
-    # PARSE args for FLmse objects
-    args <- list(...)
-    cls <- unlist(lapply(args, is, "FLmse"))
-
-    if(any(cls)) {
-      stocks <- lapply(c(list(x), args[cls]), stock)
-
-      # SORT OUT names
-      if(is.null(names(stocks)))
-        names(stocks) <- rep(character(1), length(stocks))
-      idx <- names(stocks) == character(1)
-      names(stocks)[idx] <- unlist(lapply(stocks, name))[idx]
-      idx <- names(stocks) == character(1)
-      names(stocks)[idx] <- 
-        c("OM", paste0("MP", seq(length(cls))))[idx]
-
-    # WINDOW om
-    if(window)
-      maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$minyear)))
-    else
-      maxyear <- min(unlist(lapply(stocks[-1], function(x) dims(x)$maxyear)))
-    
-    stocks[[1]] <- window(stocks[[1]], end=maxyear)
-    
-    do.call("plot", c(list(x=FLStocks(stocks)), args[!cls]))
-    
-    } else {
-    
-      plot(stock(x), ...)
-    
-    }
-  }
-) # }}}
-
 # dims {{{
 setMethod("dims", signature(obj="FLom"),
   function(obj) {
