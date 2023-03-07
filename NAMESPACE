@@ -62,6 +62,7 @@ export(
   "perfect.sa",
   "pid.hcr",
   "plot_hockeystick.hcr",
+  "relative",
   "sampling.oem",
   "seasonal.is",
   "shortcut.sa",
@@ -69,6 +70,7 @@ export(
   "splitTAC.is",
   "tac.is",
   "target.hcr",
+  "total",
   "trend.hcr",
   "tunebisect",
   "tunegrid")
