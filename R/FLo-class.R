@@ -98,7 +98,10 @@ setMethod("metrics", signature(object="FLo", metrics="list"),
     return(FLQuants(lapply(metrics, function(x)
       do.call(x, list(object)))))
   }
-) # }}}
+)
+
+
+# }}}
 
 # debug {{{
 
@@ -153,3 +156,25 @@ fwd.om <- function(om, ctrl, ...){
 	list(om=om)
 }
 # }}}
+
+# relative (metrics) {{{
+
+relative <- list(
+  `SB/SB[MSY]`=function(x) setunits(unitSums(ssb(x)) %/% refpts(x)$SBMSY, ""),
+  `SB/SB[0]`=function(x) setunits(unitSums(ssb(x)) %/% refpts(x)$SB0, ""),
+  `B/B[0]`=function(x) setunits(unitSums(tsb(x)) %/% refpts(x)$B0, ""),
+  `F/F[MSY]`=function(x) setunits(unitMeans(fbar(x)) %/% refpts(x)$FMSY, "")) 
+
+# }}}
+
+# total (metrics) {{{
+
+trec <- function(x) areaSums(unitSums(rec(x)))
+tssb <- function(x) areaSums(unitSums(ssb(x)))
+tcatch <- function(x) areaSums(unitSums(catch(x)))
+tfbar <- function(x) areaMeans(unitMeans(fbar(x)))
+
+total <- list(Rec=trec, SSB=tssb, Catch=tcatch, F=tfbar)
+
+# }}}
+
