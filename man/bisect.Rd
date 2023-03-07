@@ -36,8 +36,8 @@ statistic <- list(FP05=list(~yearMeans((SB/SBlim) < 1), name="P.05",
   desc="ICES P.05"))
 # CALL bisect over 100 years, Fp.05 calculated over last 50.
 fp05fwd <- bisect(stock, sr=srr, deviances=devs, metrics=list(SB=ssb), 
-refpts=FLPar(SBlim=150000), statistic=statistic, years=2018:2118,
-pyears=2069:2118, tune=list(fbar=c(0.1, 1)), prob=0.05)
+  refpts=FLPar(SBlim=150000), statistic=statistic, years=2018:2118,
+  pyears=2069:2118, tune=list(fbar=c(0.1, 1)), prob=0.05)
 }
 \references{
 {Burden, Richard L.; Faires, J. Douglas (1985), "2.1 The Bisection Algorithm", Numerical Analysis (3rd ed.), PWS Publishers, ISBN 0-87150-857-5}
