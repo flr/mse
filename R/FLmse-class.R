@@ -127,10 +127,6 @@ setReplaceMethod("tracking", signature("FLmse", "FLQuant"),
 # control
 
 #' @rdname FLmse-class
-#' @aliases control control-methods
-setGeneric("control", function(object, ...) standardGeneric("control"))
-
-#' @rdname FLmse-class
 setMethod("control", "FLmse",
   function(object, i="missing") {
     if(missing(i))
@@ -139,10 +135,6 @@ setMethod("control", "FLmse",
       return(object@control[[i]])
   })
 
-#' @rdname FLmse-class
-#' @param value the new object
-#' @aliases control<- control<--methods
-setGeneric("control<-", function(object, ..., value) standardGeneric("control<-"))
 
 #' @rdname FLom-class
 setReplaceMethod("control", signature("FLmse", "mpCtrl"),

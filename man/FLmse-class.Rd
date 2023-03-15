@@ -15,11 +15,7 @@
 \alias{tracking,FLmse-method}
 \alias{tracking<-}
 \alias{tracking<--methods}
-\alias{control}
-\alias{control-methods}
 \alias{control,FLmse-method}
-\alias{control<-}
-\alias{control<--methods}
 \alias{oem}
 \alias{oem-methods}
 \alias{oem,FLmse-method}
@@ -45,11 +41,7 @@ tracking(object, ...)
 
 tracking(object, ...) <- value
 
-control(object, ...)
-
 \S4method{control}{FLmse}(object, i = "missing")
-
-control(object, ...) <- value
 
 oem(object, ...)
 
