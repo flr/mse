@@ -46,9 +46,9 @@
 #' control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
 #'   hcr=mseCtrl(method=hockeystick.hcr,
 #'     args=list(lim=0, trigger=4.3e5, target=0.21)),
-#'   isys=mseCtrl(method=tac.is)))
+#'   isys=mseCtrl(method=tac.is, args=list(recyrs=-3))))
 #' # Run MP until 2025
-#' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2025))
+#' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2022))
 #' # Plot run time series
 #' plot(om, TAC.IS=run)
 
@@ -63,17 +63,20 @@ tac.is <- function(stk, ctrl, args,
   # PREPARE stk until ay + mlag, biology as in last nsqy years
   fut <- fwdWindow(stk, end=ay + management_lag, nsq=nsqy)
   
-  # PARSE recyrs
+  # PARSE recyrs if numeric
   if(is.numeric(recyrs)) {
     if(length(recyrs) == 1) {
       if(recyrs < 0) {
-        recyrs <- c(dims(stk)$year, -recyrs)
+        recyrs <- c(dims(stk)$year, recyrs)
       } else {
         recyrs <- c(recyrs, 0)
       }
     }
-    id <- seq(dim(stk)[2] - recyrs[1] + 1, length=recyrs[1] - recyrs[2])
-    recyrs <- dimnames(stk)$year[id]
+  
+  id <- seq(max(1, dim(stk)[2] - recyrs[1] + recyrs[2] + 1),
+    dim(stk)[2] + recyrs[2])
+ 
+  recyrs <- dimnames(stk)$year[id]
   }
 
   # CHECK recyrs
