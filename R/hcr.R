@@ -247,6 +247,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
   met <- seq(0, xlim, length=200)
 
   # BELOW lim
+  # TODO: APPLY over args sets, 'set'
   out <- ifelse(met <= lim, min,
     # BETWEEN lim and trigger
     ifelse(met < trigger,
@@ -260,8 +261,10 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
   labels <- as.list(labels)
  
   # DATA
+  # TODO: ADD 'set'
   dat <- data.frame(met=met, out=out)
   
+  # TODO: ADD aes(group='set')
   p <- ggplot(dat, aes(x=met, y=out)) +
     coord_cartesian(ylim = c(0, ylim), clip="off") +
     # DROP xlab(toupper(metric)) + ylab(toupper(output)) +
@@ -283,6 +286,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
     geom_line()
 
   # KOBE
+  # TODO: ONLY if set = 1
 
   if(kobe) {
   
@@ -291,7 +295,8 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
     yinf <- ifelse(xtarget < trigger,
       pmax(c(target * ((xtarget - trigger) / (trigger - lim) + 1)),  min),
       target)
-    yell <- geom_polygon(data=data.frame(x=c(args$lim, xtarget, xtarget, args$lim),
+    yell <- geom_polygon(data=data.frame(
+      x=c(args$lim, xtarget, xtarget, args$lim),
       y=c(args$min, args$min, yinf, args$min)),
       aes(x=x, y=y), fill="yellow", alpha=alpha)
   } else {
@@ -315,11 +320,9 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
       x=c(0, args$lim, args$trigger, xlim, xlim, 0, 0),
       y=c(args$min, args$min, args$target, args$target, ylim, ylim, args$min)),
       aes(x=x, y=y), fill="red", alpha=alpha)
-
   }
 
   # OBS
-  
   if(!missing(obs)) {
     # PLOT line if 1 iter
     if(length(unique(obs$iter)) == 1)
@@ -331,7 +334,6 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
     else
       p <- p + geom_point(data=obs, alpha=alpha)
   }
-
   return(p)
 }
 
