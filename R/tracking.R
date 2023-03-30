@@ -16,11 +16,12 @@
 #' tracking
 
 setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
-  function(object, step, year=value$year, iter=seq(dim(object[[1]])[6]), ..., value) {
+  function(object, step, year=value$year, iter=seq(dim(object[[1]])[6]),
+    ..., value) {
 
     # SINGLE stock
     if(length(unique(value$biol)) == 1) {
-      object[[1]][step, ac(year),,,, iter] <- value@iters[1, 'value',]
+      object[[1]][step, ac(year),,,, iter] <- value@iters[, 'value',]
 
     # MULTIPLE stocks
     } else {
