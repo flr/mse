@@ -40,7 +40,5 @@ setGeneric("undebug", useAsDefault = base::undebug)
 
 setGeneric("goFish", function(om, ...) standardGeneric("goFish"))
 
-setGeneric("merge", useAsDefault = base::merge)
-
 setGeneric("track<-", function(object, ..., value)
   standardGeneric("track<-"))

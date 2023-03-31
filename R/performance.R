@@ -175,7 +175,7 @@ setMethod("performance", signature(x="FLStock"),
   function(x, statistics, refpts=FLPar(),
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     metrics=FLCore::metrics(x), probs=NULL, mp=NULL) {
-      
+
       # CREATE or PASS FLQuants
       if(is(metrics, "FLQuants"))
         flqs <- metrics

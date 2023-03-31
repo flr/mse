@@ -162,7 +162,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 #' #  grid=grid, args=mseargs, years=list(2030:2039), iters=1:100)
 
 tunegrid <- function(om, oem="missing", control, metric, statistic, grid, args,
-  years=ac(seq(args$iy+1, args$fy)), parallel=FALSE, verbose=FALSE, 
+  years=ac(seq(args$iy + 1, args$fy)), parallel=FALSE, verbose=FALSE, 
   iters=dims(om)$iter, ...) {
 
   if(!missing(iters)) {
