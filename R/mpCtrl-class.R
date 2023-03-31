@@ -161,11 +161,11 @@ setMethod("iters", signature(object = "mpCtrl"), function(object, iter){
 
 #' @rdname mpCtrl-class
 setMethod("iter", signature(obj = "mpCtrl"), function(obj, iter){
-
-	ctrl <- lapply(obj, function(x) {
+	
+  ctrl <- lapply(obj, function(x) {
 		lst0 <- lapply(x@args, function(y){
       if(is(y, "numeric") & !is(y, "array"))
-        return(c(FLCore::iter(FLPar(t(y)), iter)))
+        return(y)
       if(is(y, "FLArray") | is(y, "FLPar"))
         return(FLCore::iter(y, iter))
       else
@@ -217,7 +217,7 @@ setReplaceMethod("args", signature(object="mpCtrl", value="function"),
 #  })
 # }}}
 
-# debug & undebug  {{{
+# debug & undebu  {{{
 
 #' @rdname debug-mse
 #' Objects of calss mpCtrl contain one or more modules (mseCtrl). The module to

@@ -172,13 +172,13 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   
   # RUN goFish
 
-  if(isTRUE(parallel) & cores > 1) {
+  if(isTRUE(parallel) & ncores > 1) {
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
 
     cat("logfile\n", file=logfile)
-    
+
     # LOOP and combine
     lst0 <- foreach(j=its, 
       .packages="mse", 
@@ -277,11 +277,11 @@ setMethod("goFish", signature(om="FLom"),
 
   for(i in vy) {
   
-  if(verbose) {
-    cat(i, " - ")
-  }
+    if(verbose) {
+      cat(i, " - ")
+    }
     
-  p(message = sprintf(paste0("[", i, "]")))
+    p(message = sprintf(paste0("[", i, "]")))
 
     # time (start)
     stim <- Sys.time()
