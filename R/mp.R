@@ -172,7 +172,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   
   # RUN goFish
 
-  if(isTRUE(parallel) & ncores > 1) {
+  if(isTRUE(parallel) & cores > 1) {
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
