@@ -169,12 +169,10 @@ relative <- list(
 
 # total (metrics) {{{
 
-trec <- function(x) areaSums(unitSums(rec(x)))
-tssb <- function(x) areaSums(unitSums(ssb(x)))
-tcatch <- function(x) areaSums(unitSums(catch(x)))
-tfbar <- function(x) areaMeans(unitMeans(fbar(x)))
-
-total <- list(Rec=trec, SSB=tssb, Catch=tcatch, F=tfbar)
+total <- list(
+  R = function(x) areaSums(unitSums(rec(x))),
+  SB = function(x) areaSums(unitSums(ssb(x))),
+  C = function(x) areaSums(unitSums(catch(x))),
+  F = function(x) areaMeans(unitMeans(fbar(x))))
 
 # }}}
-

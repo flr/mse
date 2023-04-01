@@ -61,7 +61,7 @@ statistics <- list(
   IACC = list(~100 * yearSums(abs(C[, -1] - C[, -dim(C)[2]])) / yearSums(C),
   name="IAC(C)", desc="Percentage inter-annual change in catch"),
   # PC0
-  PC0 = list(~yearSums(C < 0.1 * MSY) / dim(C)[2], name = "P(shutdown)", 
+  PC0 = list(~yearSums(C < 0.01 * MSY) / dim(C)[2], name = "P(shutdown)", 
     desc = "Probability of fishery shutdown")
   )
 
