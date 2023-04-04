@@ -962,14 +962,13 @@ mps <- function(om, oem, ctrl, args, ...) {
 
   # LOOP over values
 
-  res <- foreach(i = seq(largs)) %dopar% {
- 
+  res <- foreach(i = seq(largs), .errorhandling='remove') %dopar% {
+
+    # MODIFY module args
     args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
 
-    tryCatch(mp(om, oem=oem, ctrl=ctrl, args=args, parallel=FALSE),
-      error=function(e) {
-        stop("Call to mp failed")
-      })
+    # CALL mp, parallel left to work along MPs
+    mp(om, oem=oem, ctrl=ctrl, args=args, parallel=FALSE)
   }
 
   # RENAME list elements
