@@ -12,7 +12,8 @@
 #' @examples
 #' tracking <- FLQuants(FLQuant(dimnames=list(metric="hcr",
 #'   year=1990:1992, iter=1:10), units=""))
-#' track(tracking, "hcr", 1990) <- fwdControl(year=1990, quant="fbar", value=0.15)
+#' track(tracking, "hcr", 1990) <- fwdControl(year=1990, quant="fbar",
+#' value=0.15)
 #' tracking
 
 setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
@@ -21,7 +22,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
 
     # SINGLE stock
     if(length(unique(value$biol)) == 1) {
-      object[[1]][step, ac(year),,,, iter] <- value@iters[, 'value',]
+      object[[1]][step, ac(year),,,, iter] <- value@iters[1, 'value',]
 
     # MULTIPLE stocks
     } else {
