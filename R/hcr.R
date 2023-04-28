@@ -214,9 +214,10 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
 #'   metric="ssb", output="fbar")  
 #' plot_hockeystick.hcr(args, kobe=TRUE, xtarget=1) +
 #' geom_vline(xintercept=1)
+#' plot_hockeystick.hcr(args, obs=3e5)
 
-plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
-  xtarget=args$trigger, alpha=0.3,
+plot_hockeystick.hcr <- function(args, obs="missing",
+  kobe=FALSE, xtarget=args$trigger, alpha=0.3,
   labels=c(lim="limit", trigger="trigger", min="min", target="target")) {
   
   # EXTRACT args from mpCtrl
@@ -236,14 +237,7 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
   xlim <- trigger * 1.50
   ylim <- target * 1.50
   
-  # GET observations
-  if(!missing(obs)) {
-    obs <- model.frame(metrics(obs, list(met=get(metric), out=get(output))))
-    xlim <- max(obs$met, na.rm=TRUE) * 1.05
-    ylim <- max(obs$out, na.rm=TRUE) * 1.05
-  }
- 
-  # SET met values
+    # SET met values
   met <- seq(0, xlim, length=200)
 
   # BELOW lim
@@ -324,15 +318,28 @@ plot_hockeystick.hcr <- function(args, obs="missing", kobe=FALSE,
 
   # OBS
   if(!missing(obs)) {
-    # PLOT line if 1 iter
-    if(length(unique(obs$iter)) == 1)
-      p <- p + geom_point(data=obs, alpha=alpha) +
-        geom_path(data=obs, alpha=alpha) +
-        geom_label(data=subset(obs, year %in% c(min(year), max(year))),
-          aes(label=year), fill=c('gray', 'white'), alpha=1)
-    # PLOT with alpha if multiple
-    else
-      p <- p + geom_point(data=obs, alpha=alpha)
+    # FLStock
+    if(is.FLStock(obs)) {
+      obs <- model.frame(metrics(obs, list(met=get(metric), out=get(output))))
+      xlim <- max(obs$met, na.rm=TRUE) * 1.05
+      ylim <- max(obs$out, na.rm=TRUE) * 1.05
+
+      # PLOT line if 1 iter
+      if(length(unique(obs$iter)) == 1)
+        p <- p + geom_point(data=obs, alpha=alpha) +
+          geom_path(data=obs, alpha=alpha) +
+          geom_label(data=subset(obs, year %in% c(min(year), max(year))),
+            aes(label=year), fill=c('gray', 'white'), alpha=1)
+      # PLOT with alpha if multiple
+      else
+        p <- p + geom_point(data=obs, alpha=alpha)
+    }
+    # NUMERIC
+    else if(is.numeric(obs)) {
+      obs <- data.frame(met=obs, out=out[which.min(abs(met - obs))])
+      p <- p + geom_point(data=obs, colour="red", size=3)
+    }
+
   }
   return(p)
 }
