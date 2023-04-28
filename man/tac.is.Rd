@@ -64,9 +64,9 @@ data(sol274)
 control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
   hcr=mseCtrl(method=hockeystick.hcr,
     args=list(lim=0, trigger=4.3e5, target=0.21)),
-  isys=mseCtrl(method=tac.is)))
+  isys=mseCtrl(method=tac.is, args=list(recyrs=-3))))
 # Run MP until 2025
-run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2025))
+run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2022))
 # Plot run time series
 plot(om, TAC.IS=run)
 }
