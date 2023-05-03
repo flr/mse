@@ -31,12 +31,13 @@
 #' # choose sa and hcr
 #' control <- mpCtrl(list(
 #'   est = mseCtrl(method=perfect.sa),
-#'   hcr = mseCtrl(method=catchSSB.hcr,
-#'     args=list(MSY=14000))))
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+#'   trigger=41500, target=0.27))))
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017), parallel=TRUE)
+#' plot(om, tes)
 #' # 'perfect.oem' is used if none is given
 #' tes <- mp(om, ctrl=control, args=list(iy=2017))
-#' plot(om, TEST=tes)
+#' plot(om, tes)
 
 mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   scenario="NA", tracking="missing", logfile=tempfile(), verbose=TRUE,
@@ -285,7 +286,7 @@ setMethod("goFish", signature(om="FLom"),
 
     # time (start)
     stim <- Sys.time()
-
+    
     # args
     ay <- args$ay <- an(i)
     dy <- args$dy <- ay - dlag
@@ -444,6 +445,7 @@ setMethod("goFish", signature(om="FLom"),
         year=mys)), "fwdControl")
     }
 
+    # tracking multiple targets/limits, one year
     track(tracking, "hcr", mys) <- ctrl
 
     #----------------------------------------------------------
@@ -935,7 +937,7 @@ setMethod("goFish", signature(om="FLombf"),
 
 # mps {{{
 
-mps <- function(om, oem, ctrl, args, ...) {
+mps <- function(om, oem, ctrl, args, verbose=TRUE, ...) {
 
   # GET ... arguments
   opts <- list(...)
@@ -949,7 +951,6 @@ mps <- function(om, oem, ctrl, args, ...) {
     stop("options refer to modules not present in ctrl")
 
   # PARSE options on first element (module)
-  
   module <- names(opts)[[1]]
 
   # MAX number of values
@@ -964,11 +965,14 @@ mps <- function(om, oem, ctrl, args, ...) {
 
   res <- foreach(i = seq(largs), .errorhandling='remove') %dopar% {
 
+    if(verbose)
+      cat("(", i, ")")
+
     # MODIFY module args
     args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
 
     # CALL mp, parallel left to work along MPs
-    mp(om, oem=oem, ctrl=ctrl, args=args, parallel=FALSE)
+    mp(om, oem=oem, ctrl=ctrl, args=args, parallel=FALSE, verbose=verbose)
   }
 
   # RENAME list elements
