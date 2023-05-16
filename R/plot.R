@@ -91,7 +91,6 @@ setMethod("plot", signature(x="FLmse", y="missing"),
 }
 # }}}
 
-
 # FLombf, list, ... {{{
 setMethod("plot", signature(x="FLombf", y="list"),
   function(x, y, window=TRUE) {

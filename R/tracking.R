@@ -20,7 +20,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
   function(object, step, year=value$year, iter=seq(dim(object[[1]])[6]),
     ..., value) {
 
-    # SINGLE stock
+    # SINGLE stock, tracks first row only
     if(length(unique(value$biol)) == 1) {
       object[[1]][step, ac(year),,,, iter] <- value@iters[1, 'value',]
 

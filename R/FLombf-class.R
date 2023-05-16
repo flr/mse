@@ -32,7 +32,7 @@ setMethod("initialize", "FLombf",
       if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
       if (!missing(projection)) .Object@projection <- projection
       if(missing(FCB))
-        .Object@FCB <- FCB(fcb2int(guessfcb(biols, fisheries),
+        .Object@FCB <- FLFishery::FCB(fcb2int(guessfcb(biols, fisheries),
           biols, fisheries))
       else
         .Object@FCB <- FCB

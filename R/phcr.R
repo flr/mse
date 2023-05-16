@@ -26,7 +26,7 @@ movingF.phcr <- function(stk, frp="f0.1", model="missing", interval, args, hcrpa
 	list(hcrpars=hcrpars, tracking=tracking)	
 } # }}}
 
-# brp.phcr
+# brp.phcr {{{
 
 brp.phcr <- function(stk, model, params, args, tracking) {
 
@@ -38,3 +38,17 @@ brp.phcr <- function(stk, model, params, args, tracking) {
 
   return(list(hcrpars=hcrpars, tracking=tracking))
 }
+# }}}
+
+# run(2022), Fsqo(2023), F0(2024)
+
+# intermediate.phcr {{{
+
+intermediate.phcr <- function(stk, sr) {
+
+  # FWD seq(iy, ay) w/ fbar=Fsquo
+
+  #
+
+}
+# }}}

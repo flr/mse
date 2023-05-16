@@ -262,7 +262,7 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
     # GET objects by iter group from lists
     bio <- biols[[i]]
     fis <- fisheries[[i]]
-
+    
     # INITIATE N0
     nbio <- initiate(bio, B0=B0[it], h=h[it])
 

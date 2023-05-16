@@ -6,6 +6,7 @@ import("progressr")
 import("patchwork")
 import("FLCore")
 import("ggplotFL")
+import("FLFishery")
 import("FLasher")
 
 importFrom("FLBRP",

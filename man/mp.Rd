@@ -48,10 +48,11 @@ data(sol274)
 # choose sa and hcr
 control <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=catchSSB.hcr,
-    args=list(MSY=14000))))
+  hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+  trigger=41500, target=0.27))))
 tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017), parallel=TRUE)
+plot(om, tes)
 # 'perfect.oem' is used if none is given
 tes <- mp(om, ctrl=control, args=list(iy=2017))
-plot(om, TEST=tes)
+plot(om, tes)
 }
