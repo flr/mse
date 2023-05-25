@@ -45,41 +45,6 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
 
 # shortcut.sa {{{
 
-Ashortcut.sa <- function(stk, idx, args, tracking, ...) {
- 
-  # DIMS
-  dy <- args$dy
-  ay <- args$ay
-
-  # SUBSET oem stock
-  stk <- window(stk, end=dy)
-
-  # PARSE ...
-  slots <- list(...)
-
-  if(length(slots) > 0) {
-    # TRIM to dy
-    slots <- lapply(slots, window, end=dy)
-    # ADD error
-    for(i in names(slots)) {
-      slot(stk, i) <- slot(stk, i) * slots[[i]]
-    }
-  }
-
-  # UPDATE aggregates
-  stock(stk) <- computeStock(stk)
-
-  # RECALCULATE harvest BUG: uniroot, no sign change found in 1000 iterations
-  #  harvest(stk) <- harvest(stock.n(stk), catch.n(stk), m(stk))
-  
-  track(tracking, "conv.est", ac(ay)) <- 1
-  
-  list(stk=stk, tracking=tracking)
-}
-# }}}
-
-# shortcut.sa {{{
-
 shortcut.sa <- function(stk, idx, SSBdevs=ssb(stk) %=% 1, args, tracking, ...) {
  
   # DIMS
