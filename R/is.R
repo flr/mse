@@ -219,6 +219,23 @@ seasonal.is <- function(stk, ctrl, args, ratio=rep(1 / args$ns, args$ns),
 
 # }}}
 
+# sp.is {{{
+
+sp.is <- function(stk, ctrl, Ftarget=refpts(stk)$Ftarget,
+  metric="stock", output="catch", args, tracking) {
+  
+  ctrl$quant <- output
+  ctrl$value <- ctrl$value * do.call(metric, list(stk))[, ac(args$dy)] *
+    Ftarget
+  if(!output %in% c('f', 'fbar'))
+    ctrl$minAge <- ctrl$maxAge <- NA
+
+  return(list(ctrl=ctrl, tracking=tracking))
+}
+
+
+# }}}
+
 # TODO: TURN splitTAC into allocate.is
 
 # splitTAC.is {{{

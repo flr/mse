@@ -68,6 +68,7 @@ export(
   "seasonal.is",
   "shortcut.sa",
   "simulator",
+  "sp.is",
   "splitTAC.is",
   "tac.is",
   "target.hcr",
