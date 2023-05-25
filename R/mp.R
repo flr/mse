@@ -963,7 +963,8 @@ mps <- function(om, oem, ctrl, args, verbose=TRUE, ...) {
 
   # LOOP over values
 
-  res <- foreach(i = seq(largs), .errorhandling='remove') %dopar% {
+  res <- foreach(i = seq(largs), .errorhandling='pass',
+    .packages = NULL) %dopar% {
 
     if(verbose)
       cat("(", i, ")")
@@ -975,13 +976,21 @@ mps <- function(om, oem, ctrl, args, verbose=TRUE, ...) {
     mp(om, oem=oem, ctrl=ctrl, args=args, parallel=FALSE, verbose=verbose)
   }
 
-  # RENAME list elements
+  # STOP or WARN if missing runs
+  done <- unlist(lapply(res, is, "FLmse"))
 
+  if(sum(done) == 0)
+    stop("None of the calls to mp() returned results, check inputs")
+
+  if(sum(done) < largs)
+    warning(paste("Some calls to mp() did not run:"), seq(largs)[!done])
+
+  # RENAME list elements
   if(length(mopts) == 1)
     names(res) <- paste(module, names(mopts)[1], round(mopts[[1]]), sep='_')
   else
     names(res) <- paste(module, seq(largs), sep='_')
 
-  return(res)
+  return(res[done])
 }
 # }}}
