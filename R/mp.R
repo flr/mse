@@ -7,6 +7,8 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
+options(doFuture.rng.onMisuse = "ignore")
+
 # mp {{{
 
 #' mp executes a single run of a Management Procedure
@@ -963,11 +965,14 @@ mps <- function(om, oem, ctrl, args, verbose=TRUE, ...) {
 
   # LOOP over values
 
+  # p <- progressor(along=seq(largs), offset=1)
+
   res <- foreach(i = seq(largs), .errorhandling='pass',
-    .packages = NULL) %dopar% {
+    .packages = "mse") %dopar% {
 
     if(verbose)
       cat("(", i, ")")
+      # p(message = sprintf(paste0("[", i, "]")))
 
     # MODIFY module args
     args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
