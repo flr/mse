@@ -229,6 +229,8 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
   nfs <- length(fisheries)
   its <- length(c(B0))
   bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
+
+  # CHECK match history and first year with N
   
   # SET progresssor
   p <- progressor(length(bls))
@@ -318,7 +320,6 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
       # BIOMASS is scaled
       for(i in c('SBMSY', 'BMSY', 'B0', 'SB0', 'MSY'))
         rpy[i,] <- apply(rps[i, ], 2, '*', c(B0change))
-
     }
 
     # SET effort to match F target

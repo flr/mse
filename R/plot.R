@@ -19,7 +19,7 @@ setMethod("plot", signature(x="FLo", y="missing"),
     else
       mets <- do.call("metrics", list(object=x, metrics=metrics))
 
-    plot(mets)
+    plot(mets) + ylim(c(0, NA))
   }
 )
 setMethod("plot", signature(x="FLo", y="FLmse"),

@@ -84,6 +84,7 @@ setMethod("initialize", "FLom",
       if (!missing(refpts)) .Object@refpts <- refpts
       if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
       if (!missing(projection)) .Object@projection <- projection
+      else .Object@projection <- mseCtrl(method=fwd.om)
       .Object <- callNextMethod(.Object, ...)
       .Object
 })
@@ -371,14 +372,15 @@ setMethod("fwdWindow", signature(x="FLom", y="missing"),
 # fwd {{{
 
 #' @examples
-#' data(p4om)
+#' data(ple4om)
 #' res <- fwd(om, control=fwdControl(year=2018:2030, quant="f",
 #'   value=rep(c(refpts(om)$FMSY), 13)))
 
 setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl"),
-  function(object, control, maxF=4, deviances=residuals(sr(object)), ...) {
+  function(object, control, sr=object@sr, deviances=residuals(sr(object)),
+    maxF=4, ...) {
 
-    stock(object) <- fwd(stock(object), sr=sr(object), control=control,
+    stock(object) <- fwd(stock(object), sr=sr, control=control,
       maxF=maxF, deviances=deviances, ...)
 
     return(object)
