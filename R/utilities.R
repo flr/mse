@@ -66,3 +66,21 @@ find.original.name <- function(fun) {
   registerDoSEQ()
 }
 # }}}
+
+# combinations {{{
+
+combinations <- function(...) {
+
+  # GET all inputs
+  args <- list(...)
+  
+  # GENERATE all combinations
+  combs <- as.list(do.call(expand.grid, args))
+
+  # DELETE attributes and RENAME
+  attributes(combs) <- NULL
+  names(combs) <- names(args)
+
+  return(combs)
+}
+# }}}
