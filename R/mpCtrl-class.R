@@ -135,10 +135,41 @@ setReplaceMethod("tm", signature("mpCtrl", "function"), function(object, value){
 
 #' @rdname mpCtrl-class
 setMethod("show", signature(object = "mpCtrl"),
-  function(object)
-  {
-    cat("Modules:\n")
-    print(names(object))
+  function(object) {
+
+    cat("An object of class 'mpCtrl'\n")
+
+    Map(function(mod, modname) {
+    
+      # module name
+      cat(paste("Module: ", modname), "\n")
+      
+      # method
+      cat(paste("  method:", find.original.name(method(mod))), "\n")
+      
+      # args
+      cat(paste("  args:"), "\n")
+      
+      # numeric
+      idx <- !unlist(lapply(args(mod), is, "FLArray"))
+
+      if(any(idx)) {
+        nargs <- args(mod)[idx]
+        cat(paste0("     ", paste(paste(names(nargs), nargs, sep=" = "),
+          collapse=", "), "."), "\n")
+      }
+
+      # FLQuant: dim, year range
+      if(any(!idx)) {
+        qargs <- args(mod)[!idx]
+
+        Map(function(arg, argname) {
+          cat(paste0("    ", argname, " (", class(arg)  ,"): [",
+            paste(dim(arg), collapse=" "), "]"), "\n")
+        }, arg=qargs, argname=names(qargs))
+      }
+    }, mod=object, modname=names(object))
+
  }) # }}}
 
 # DEBUG WHY iters?
