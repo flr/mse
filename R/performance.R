@@ -126,7 +126,7 @@ setMethod("performance", signature(x="FLQuants"),
     # CHECK statistics are unique
     if(length(names(statistics)) != length(unique(names(statistics))))
       stop("'statistics' must have unique names.")
-
+    
     # LOOP over years
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over statistics
@@ -144,7 +144,9 @@ setMethod("performance", signature(x="FLQuants"),
     
     # ADD statistic name(s)
     inds <- lapply(statistics, '[[', 'name')
-    inds <- data.table(statistic=names(inds), name=unlist(inds))
+    descs <- lapply(statistics, '[[', 'desc')
+    inds <- data.table(statistic=names(inds), name=unlist(inds),
+      desc=unlist(descs))
     setkey(inds, statistic)
 
     # MERGE
@@ -154,7 +156,7 @@ setMethod("performance", signature(x="FLQuants"),
     if(!is.null(probs)) {
       # statistic year name data prob
       res <- res[, .(data=quantile(data, probs=probs, na.rm=TRUE), prob=probs),
-        by=.(statistic, year, name)]
+        by=.(statistic, year, name, desc)]
     }
     
     # mp if not NULL
