@@ -939,7 +939,7 @@ setMethod("goFish", signature(om="FLombf"),
 
 # mps {{{
 
-mps <- function(om, oem, ctrl, args, verbose=TRUE, ...) {
+mps <- function(om, oem, ctrl, args, names=NULL, verbose=TRUE, ...) {
 
   # GET ... arguments
   opts <- list(...)
@@ -991,10 +991,12 @@ mps <- function(om, oem, ctrl, args, verbose=TRUE, ...) {
     warning(paste("Some calls to mp() did not run:"), seq(largs)[!done])
 
   # RENAME list elements
-  if(length(mopts) == 1)
-    names(res) <- paste(module, names(mopts)[1], round(mopts[[1]]), sep='_')
-  else
-    names(res) <- paste(module, seq(largs), sep='_')
+  if(is.null(names)) {
+    if(length(mopts) == 1)
+      names(res) <- paste(module, names(mopts)[1], round(mopts[[1]]), sep='_')
+    else
+      names(res) <- paste(module, seq(largs), sep='_')
+  }
 
   return(res[done])
 }
