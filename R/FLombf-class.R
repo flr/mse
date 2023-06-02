@@ -351,7 +351,7 @@ setMethod("tb", signature(object="FLombf"),
 )
 # }}}
 
-# harvest {{{
+# harvest, partialF, computeHarvest {{{
 
 setMethod("harvest", signature(object="FLombf", catch="missing"),
   function(object, biol=seq(biols(object))) {

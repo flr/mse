@@ -15,13 +15,13 @@ Depends:
   FLCore(>= 2.6.18),
   ggplotFL(>= 2.6.10),
   data.table,
+  foreach,
+  progressr,
   FLFishery,
   FLasher(>= 0.6.7),
   FLBRP(>= 2.5.8)
 Imports:
-  foreach,
   parallelly,
-  progressr,
   patchwork
 Additional_repositories: http://flr-project.org/R
 Suggests:

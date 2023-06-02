@@ -1,6 +1,5 @@
 import("methods")
 import("data.table")
-import("foreach")
 import("parallelly")
 import("progressr")
 import("patchwork")
