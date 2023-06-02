@@ -46,15 +46,15 @@
 #' control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
 #'   hcr=mseCtrl(method=hockeystick.hcr,
 #'     args=list(lim=0, trigger=4.3e5, target=0.21)),
-#'   isys=mseCtrl(method=tac.is, args=list(recyrs=-3))))
+#'   isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
 #' # Run MP until 2025
-#' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2022))
+#' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2024))
 #' # Plot run time series
 #' plot(om, TAC.IS=run)
 
-tac.is <- function(stk, ctrl, args,
+tac.is <- function(stk, ctrl, args, output="catch",
   recyrs=c(dims(stk)$year, 2), Fdevs=fbar(stk) %=% 1,
-  dtaclow=NA, dtacupp=NA, fmin=0, initac=catch(stk[, ac(iy - 1)]),
+  dtaclow=NA, dtacupp=NA, fmin=0, initac=metrics(stk, output)[, ac(iy - 1)],
   tracking) {
 
   # EXTRACT args
@@ -83,6 +83,7 @@ tac.is <- function(stk, ctrl, args,
   if(!all(recyrs %in% dimnames(stk)$year))
     stop("'recyrs' cannot be found in input stk")
 
+  # TODO: OTHER rec options
   # SET GM recruitment
   
   gmnrec <- exp(yearMeans(log(rec(stk)[, recyrs])))
@@ -98,7 +99,7 @@ tac.is <- function(stk, ctrl, args,
     # SET F for intermediate year
     fsq <- fbar(stk)[, ac(dy)]
 
-    # TODO: ADD catch option
+    # TODO: ADD TAC option
 
     # CONSTRUCT fwd control
     fctrl <- fwdControl(
@@ -139,7 +140,7 @@ tac.is <- function(stk, ctrl, args,
   }
 
   # CONSTRUCT fwdControl
-  ctrl <- fwdControl(list(year=ay + management_lag, quant="catch", value=TAC))
+  ctrl <- fwdControl(list(year=ay + management_lag, quant=output, value=TAC))
 
   return(list(ctrl=ctrl, tracking=tracking))
 }
