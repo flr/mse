@@ -965,20 +965,19 @@ mps <- function(om, oem, ctrl, args, names=NULL, verbose=TRUE, ...) {
 
   # LOOP over values
 
-  # p <- progressor(along=seq(largs), offset=1)
+  p <- progressor(along=seq(largs), offset=1)
 
   res <- foreach(i = seq(largs), .errorhandling='pass',
     .packages = "mse") %dopar% {
 
     if(verbose)
-      cat("(", i, ")")
-      # p(message = sprintf(paste0("[", i, "]")))
+      p(message = sprintf(paste0("[", i, "]")))
 
     # MODIFY module args
     args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
 
     # CALL mp, parallel left to work along MPs
-    mp(om, oem=oem, ctrl=ctrl, args=args, parallel=FALSE, verbose=verbose)
+    mp(om, oem=oem, ctrl=ctrl, args=args, parallel=FALSE, verbose=FALSE)
   }
 
   # STOP or WARN if missing runs
