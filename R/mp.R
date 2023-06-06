@@ -676,7 +676,6 @@ setMethod("goFish", signature(om="FLombf"),
       }, stk=stk, obs=observations(oem), dev=deviances(oem), tra=tracking)
 
     # EXTRACT oem observations
-
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
     
@@ -720,7 +719,6 @@ setMethod("goFish", signature(om="FLombf"),
     }
 
     # TRACK est
-
     track(tracking, "F.est", seq(ay, ay + frq - 1)) <- 
       window(lapply(stk0, fbar), start=dy, end=dy + frq - 1)
     track(tracking, "B.est", seq(ay, ay + frq - 1)) <- 

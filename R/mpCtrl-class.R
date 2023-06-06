@@ -27,6 +27,10 @@
 #' @name mpCtrl-class
 #' @rdname mpCtrl-class
 #' @examples
+#' mpCtrl(list(
+#'   est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+#'   trigger=41500, target=0.27))))
 
 mpCtrl <- setClass("mpCtrl", contains="list")
 
@@ -134,10 +138,15 @@ setReplaceMethod("tm", signature("mpCtrl", "function"), function(object, value){
 # show {{{
 
 #' @rdname mpCtrl-class
+#' @examples
+#' mpCtrl(list(
+#'   est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+#'   trigger=41500, target=0.27))))
 setMethod("show", signature(object = "mpCtrl"),
   function(object) {
 
-    cat("An object of class 'mpCtrl'\n")
+    cat("An object of class 'mpCtrl'\n\n")
 
     Map(function(mod, modname) {
     
@@ -150,29 +159,31 @@ setMethod("show", signature(object = "mpCtrl"),
       # args
       cat(paste("  args:"), "\n")
       
-      # numeric
-      idx <- !unlist(lapply(args(mod), is, "FLArray"))
+      # args
+      if(length(args(mod)) > 0) {
+        idx <- unlist(lapply(args(mod), is, "FLArray"))
 
-      if(any(idx)) {
-        nargs <- args(mod)[idx]
-        cat(paste0("     ", paste(paste(names(nargs), nargs, sep=" = "),
-          collapse=", "), "."), "\n")
-      }
+        # numeric
+        if(any(!idx)) {
+          nargs <- args(mod)[!idx]
+          cat(paste0("     ", paste(paste(names(nargs), nargs, sep=" = "),
+            collapse=", "), "."), "\n")
+        }
 
-      # FLQuant: dim, year range
-      if(any(!idx)) {
-        qargs <- args(mod)[!idx]
+        # FLQuant: dim, year range
+        if(any(idx)) {
+          qargs <- args(mod)[idx]
 
-        Map(function(arg, argname) {
-          cat(paste0("    ", argname, " (", class(arg)  ,"): [",
-            paste(dim(arg), collapse=" "), "]"), "\n")
-        }, arg=qargs, argname=names(qargs))
+          Map(function(arg, argname) {
+            cat(paste0("    ", argname, " (", class(arg)  ,"): [",
+              paste(dim(arg), collapse=" "), "]"), "\n")
+          }, arg=qargs, argname=names(qargs))
+        }
       }
     }, mod=object, modname=names(object))
 
  }) # }}}
 
-# DEBUG WHY iters?
 # iters {{{
 
 #' @rdname mpCtrl-class
@@ -248,7 +259,7 @@ setReplaceMethod("args", signature(object="mpCtrl", value="function"),
 #  })
 # }}}
 
-# debug & undebu  {{{
+# debug & undebug  {{{
 
 #' @rdname debug-mse
 #' Objects of calss mpCtrl contain one or more modules (mseCtrl). The module to
