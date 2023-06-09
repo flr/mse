@@ -1,5 +1,5 @@
 # FLombf-class.R - DESC
-# /FLombf-class.R
+# mse/R/FLombf-class.R
 
 # Copyright Iago MOSQUEIRA (WMR), 2020
 # Author: Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
@@ -502,9 +502,12 @@ setMethod("window", signature(x="FLombf"),
 # fwdWindow {{{
 
 setMethod("fwdWindow", signature(x="FLombf", y="missing"),
-  function(x, end=dims(x)$maxyear, nsq=3) {
+  function(x, end=dims(x)$maxyear + 10, nsq=3, ...) {
 
-    biols(x) <- lapply(biols(x), fwdWindow, end=end, nsq=nsq)
+    if(end == dims(x)$maxyear)
+      return(x)
+
+    biols(x) <- lapply(biols(x), fwdWindow, end=end, nsq=nsq, ...)
     fisheries(x) <- lapply(fisheries(x), fwdWindow, end=end, nsq=nsq)
 
     return(x)
@@ -767,4 +770,54 @@ setMethod("combine", signature(x = "FLombf", y = "FLombf"), function(x, y, ...){
     return(x)
 	}
 })
+# }}}
+
+# deviances {{{
+
+setMethod("deviances", signature(object="FLombf"),
+  function(object, biol=names(biols(object))) {
+
+    res <- lapply(biols(object), deviances)
+
+    if(length(biol) == 1)
+      return(res[[biol]])
+    else
+      return(res[biol])
+  })
+
+setReplaceMethod("deviances", signature(object="FLombf", value="FLQuant"),
+  function(object, biol=names(biols(object)), value) {
+    
+    # HACK
+    if(missing(value)) {
+      value <- biol
+      biol <- names(biols(object))
+    }
+
+    if(length(biol) > 1) {
+      warning("A single FLQuant will be assigned to more than one biol.")
+    }
+
+    value <- FLQuants(setNames(rep(list(value), length(biol)), nm=biol))
+
+    deviances(object, biol=biol) <- value
+
+    return(object)
+  })
+
+setReplaceMethod("deviances", signature(object="FLombf", value="FLQuants"),
+  function(object, biol=names(biols(object)), value) {
+
+    # HACK
+    if(missing(value)) {
+      value <- biol
+      biol <- names(biols(object))
+    }
+
+    biols(object) <- Map(function(x,y) {
+      deviances(x) <- y
+      return(x)}, x=biols(object), y=value)
+
+    return(object)
+  })
 # }}}
