@@ -937,7 +937,7 @@ setMethod("goFish", signature(om="FLombf"),
 
 # mps {{{
 
-mps <- function(om, oem, ctrl, args, names=NULL, verbose=TRUE, ...) {
+mps <- function(om, oem, iem=NULL, ctrl, args, names=NULL, verbose=TRUE, ...) {
 
   # GET ... arguments
   opts <- list(...)
@@ -975,7 +975,7 @@ mps <- function(om, oem, ctrl, args, names=NULL, verbose=TRUE, ...) {
     args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
 
     # CALL mp, parallel left to work along MPs
-    mp(om, oem=oem, ctrl=ctrl, args=args, parallel=FALSE, verbose=FALSE)
+    mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE, verbose=FALSE)
   }
 
   # STOP or WARN if missing runs
