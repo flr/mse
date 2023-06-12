@@ -504,10 +504,12 @@ setMethod("window", signature(x="FLombf"),
 setMethod("fwdWindow", signature(x="FLombf", y="missing"),
   function(x, end=dims(x)$maxyear + 10, nsq=3, ...) {
 
+    # RETURN if no new years
     if(end == dims(x)$maxyear)
       return(x)
-
+    
     biols(x) <- lapply(biols(x), fwdWindow, end=end, nsq=nsq, ...)
+
     fisheries(x) <- lapply(fisheries(x), fwdWindow, end=end, nsq=nsq)
 
     return(x)

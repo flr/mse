@@ -316,40 +316,39 @@ setMethod("window", signature(x="FLoem"),
 
     return(x)
   }
-) 
+)
 
 setMethod("fwdWindow", signature(x="FLoem", y="missing"),
-  function(x, end, nsq=3) {
+  function(x, end, nsq=3, ...) {
 
     # observations
-    if(length(observations(x)$stk) > 0 &&
-      end > dims(observations(oem)$stk)$maxyear)
-      observations(x)$stk <- fwdWindow(observations(x)$stk, end=end, nsq=nsq)
-    
-    if(length(observations(x)$idx) > 0)
-    observations(x)$idx <- fwdWindow(observations(x)$idx, end=end, nsq=nsq)
+    observations(x) <- rapply(observations(x), fwdWindow,
+      classes=c("FLStock", "FLIndex", "FLIndexBiomass"),
+      how="replace", end=end, nsq=nsq)
 
     # deviances
-    deviances(x) <- rapply(deviances(x), function(i)
-      window(i, end=end), how='list')
+    deviances(x) <- rapply(deviances(x), window, classes=c("FLQuant"),
+      how="replace",  end=end, nsq=nsq)
 
     return(x)
   }
 )
-
-
-
-
 # }}}
 
 # propagate {{{
 setMethod("propagate", signature(object="FLoem"),
 	function(object, iter, fill.iter=TRUE) {
-
+    
     # observations
     if(!is.null(observations(object)) & length(observations(object)) > 0) {
-      observations(object) <- rapply(observations(object), propagate,
-        how='replace', iter=iter, fill.iter=fill.iter)
+      observations(object) <- rapply(observations(object),
+      function(x, iter, fill.iter) {
+        if(!is.null(selectMethod("propagate", signature=class(x)[1],
+          optional=TRUE)))
+          return(propagate(x, iter=iter, fill=fill.iter))
+        else
+          return(x)
+      }, how='replace', iter=iter, fill.iter=fill.iter)
     }
 
     # deviances

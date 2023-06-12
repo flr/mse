@@ -663,18 +663,21 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$step <- "oem"
  
     # GET OM observation
-
     stk <- stock(om, full=TRUE, byfishery=byfishery)
     
+    # APPLY oem
     o.out <- Map(function(stk, dev, obs, tra) {
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
+
       # PICK UP fbar range from observations
       range(obs.oem$stk, c("minfbar", "maxfbar")) <- 
         range(obs$stk, c("minfbar", "maxfbar")) 
-      return(obs.oem)
-      }, stk=stk, obs=observations(oem), dev=deviances(oem), tra=tracking)
 
+      return(obs.oem)
+      }, stk=stk, obs=observations(oem)[names(stk)], dev=deviances(oem),
+        tra=tracking)
+    
     # EXTRACT oem observations
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
