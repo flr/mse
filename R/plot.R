@@ -91,6 +91,42 @@ setMethod("plot", signature(x="FLmse", y="missing"),
 }
 # }}}
 
+# FLombf {{{
+setMethod("plot", signature(x="FLombf", y="missing"),
+  function(x, ...) {
+    
+    # GET extra args
+    args <- list(...)
+
+    # DISPATCH if args are FLmse
+    if(length(args) == 0) {
+
+      # 1. SSB
+      ssbs <- lapply(ssb(x), unitSums)
+      p1 <- plot(ssbs) + ylim(c(0,NA)) +
+        ylab(paste0("SSB (", units(ssbs[[1]]) , ")"))
+
+      # 2. F
+      fs <- lapply(fbar(x), unitMeans)
+      p2 <- plot(fs) + ylim(c(0,NA)) +
+        ylab(paste0("F"))
+
+      # 3. catch by fleet
+      cas <- lapply(catch(fisheries(x)), unitSums)
+      p3 <- plot(cas) + ylim(c(0, NA)) +
+        ylab(paste0("Catch (", units(cas[[1]]), ")")) +
+        theme(legend.position="bottom")
+
+      # COMBINE p1 + p2
+      return((p1 / p2) | p3)
+    
+    } else {
+
+      plot(x, args)
+
+    }
+ }) # }}}
+
 # FLombf, list, ... {{{
 setMethod("plot", signature(x="FLombf", y="list"),
   function(x, y, window=TRUE) {

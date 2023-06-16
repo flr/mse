@@ -101,7 +101,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # --- RUN checks on inputs
 
-  #TODO CHECK control: c('est', 'hcr') %in% names(control)
+  # TODO CHECK control: c('est', 'hcr') %in% names(control)
 
   # TODO CHECK iy is correct
   # TODO dims stk, idx
@@ -624,7 +624,7 @@ setMethod("goFish", signature(om="FLombf"),
     deviances(oem) <- rep(list(NULL), length(biols(om)))
 
   for(i in vy) {
-    
+
     if(verbose) {
       cat(i, " > ")
     }
@@ -663,8 +663,8 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$step <- "oem"
  
     # GET OM observation
-    stk <- stock(om, full=TRUE, byfishery=byfishery)
-    
+    # BUG: Warning messages: 1: In .local(x, i, ...) : Selected elements do not form a coherent 6D array
+    stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
     # APPLY oem
     o.out <- Map(function(stk, dev, obs, tra) {
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,

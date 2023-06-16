@@ -1,7 +1,7 @@
 # FLoem-class.R - DESC
 # mse/R/FLoem-class.R
 
-# Copyright European Union, 2018
+# Copyright European Union, 2018-2023
 # Author: Ernesto JARDIM (MSC) <ernesto.jardim@msc.org>
 #         Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
 #
