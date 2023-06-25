@@ -158,6 +158,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # SETUP default oem
   if(is.null(oem)){
     oem <- default.oem(om)
+    missingoem <- TRUE
   }
   
   # PARSE parallel options
@@ -226,13 +227,18 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       lst0 <- list(om=out$om, tracking=out$tracking, oem=out$oem)
     }
 
-  # TODO: CHECK outputs
+  # CHECK outputs
   if(!is(lst0$om, "FLo"))
     stop("goFish returned no results")
 
   # GET objects back from loop, up to last projected year
   om <- window(lst0$om, end=vy[length(vy)])
-  oem <- window(lst0$oem, end=vy[length(vy)])
+
+  if(missingoem)
+    oem <- FLoem()
+  else
+    oem <- window(lst0$oem, end=vy[length(vy)])
+
   tracking <- window(lst0$tracking, start=iy, end=vy[length(vy)])
 
   if(verbose) cat("\n")
@@ -940,7 +946,8 @@ setMethod("goFish", signature(om="FLombf"),
 
 # mps {{{
 
-mps <- function(om, oem, iem=NULL, ctrl, args, names=NULL, verbose=TRUE, ...) {
+mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL,
+  verbose=TRUE, ...) {
 
   # GET ... arguments
   opts <- list(...)
