@@ -76,17 +76,54 @@ FLom <- setClass("FLom",
 setGeneric("FLom")
 
 setMethod("initialize", "FLom",
-    function(.Object,
-             ...,
+    function(.Object, ...,
              stock, sr, refpts, fleetBehaviour, projection) {
-      if (!missing(stock)) .Object@stock <- stock 
-      if (!missing(sr)) .Object@sr <- sr
-      if (!missing(refpts)) .Object@refpts <- refpts
-      if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
-      if (!missing(projection)) .Object@projection <- projection
-      else .Object@projection <- mseCtrl(method=fwd.om)
-      .Object <- callNextMethod(.Object, ...)
-      .Object
+      # slots
+      if (!missing(stock))
+        .Object@stock <- stock 
+      if (!missing(sr))
+        .Object@sr <- sr
+      else if(missing(sr) & !missing(stock))
+        .Object@sr <- as.FLSR(stock)
+      if (!missing(refpts))
+        .Object@refpts <- refpts
+      if (!missing(fleetBehaviour))
+        .Object@fleetBehaviour <- fleetBehaviour
+      if (!missing(projection))
+        .Object@projection <- projection
+      else
+        .Object@projection <- mseCtrl(method=fwd.om)
+      
+      # args
+      args <- list(...)
+
+      # HANDLE params and/or model
+      if("model" %in% names(args)) {
+        model(.Object@sr) <- args[['model']]
+        args$model <- NULL
+      }
+
+      if("params" %in% names(args)){
+        # SUBSET params to those matching model
+        if(length(.Object@sr@model) > 0) {
+          pars <- dimnames(FLCore:::getFLPar(.Object@sr, .Object@sr@model))[[1]]
+        }
+        .Object@sr@params <- args[['params']][pars,]
+        args$params <- NULL
+      }
+
+      # PARSE end
+
+      # HANDLE deviances
+      if("deviances" %in% names(args)) {
+        deviances(.Object) <- args[['deviances']]
+        args$deviances <- NULL
+      }
+
+      # DISPATCH
+      .Object <- do.call(callNextMethod, c(list(.Object), args))
+
+      return(.Object)
 })
 
 setValidity("FLom",
@@ -358,11 +395,14 @@ setMethod("window", signature(x="FLom"),
 # fwdWindow {{{
 
 setMethod("fwdWindow", signature(x="FLom", y="missing"),
-  function(x, end=dims(x)$maxyear, nsq=3, ...) {
+  function(x, end=dims(x)$maxyear, nsq=3, deviances=NULL, ...) {
 
     stock(x) <- fwdWindow(stock(x), end=end, nsq=nsq, ...)
 
     sr(x) <- window(sr(x), end=end, ...)
+
+    if(!is.null(deviances))
+      deviances(x) <- deviances
 
     return(x)
 
@@ -382,6 +422,16 @@ setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl
 
     stock(object) <- fwd(stock(object), sr=sr, control=control,
       maxF=maxF, deviances=deviances, ...)
+
+    return(object)
+  })
+
+setMethod("fwd", signature(object="FLom", fishery="ANY", control="missing"),
+  function(object, fishery=NULL, sr=object@sr, deviances=residuals(sr(object)),
+    maxF=4, ...) {
+    
+    stock(object) <- fwd(stock(object), sr=sr, maxF=maxF,
+      deviances=deviances, ...)
 
     return(object)
   })
@@ -440,7 +490,7 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 # metrics {{{
 setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
-    FLQuants(metrics(object, list(SB=ssb, C=catch, F=fbar)))
+    FLQuants(metrics(object, list(R=rec, SB=ssb, C=catch, F=fbar)))
 }) # }}}
 
 # propagate {{{
@@ -470,7 +520,12 @@ setMethod("deviances", signature(object="FLom"),
 
 setReplaceMethod("deviances", signature(object="FLom", value="FLQuant"),
   function(object, value) {
-    residuals(sr(object)) <- value
+
+    dms <- dims(object)
+
+    residuals(sr(object)) <- append(window(residuals(sr(object)),
+      start=dms$minyear, end=dims(value)$minyear - 1), value)
+
     return(object)
   })
 # }}}
