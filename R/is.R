@@ -9,7 +9,6 @@
 
 # tac.is {{{
 
-
 #' TAC implementation system module
 #'
 #' Performs a short term forecast (STF) for the target fishing mortality to
