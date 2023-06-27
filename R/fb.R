@@ -28,7 +28,32 @@ hyperstability.fb <- function(ctrl, beta=1, maxF=2, alpha=maxF^(1-beta), trackin
 	
 } # }}}
 
-# effortlimit.fb
+# response.fb {{{
+
+response.fb <- function(ctrl, args, tracking) {
+
+  # GET current and previous decision year
+  ay <- args$ay
+  dy <- args$dy
+  py <- ac(ay + args$management_lag)
+
+  # GET past catch
+  past <- tracking[[1]]['C.om', ac(dy)]
+
+  # ID iters where TAC_ay < C_dy
+  min <- ifelse(ctrl$value < c(past), 1, 0)
+
+  mctrl <- fwdControl(year=py, quant="effort", relYear=ay,
+    fishery=1, relFishery=1, min=min)
+
+  #
+  track(tracking, "fb.imp", ac(ay)) <- min
+
+  return(list(ctrl=merge(ctrl, mctrl), tracking=tracking))
+}
+# }}}
+
+# effortlimit.fb {{{
 
 effortlimit.fb <- function(ctrl, max=1, tracking, args) {
 
@@ -39,3 +64,4 @@ effortlimit.fb <- function(ctrl, max=1, tracking, args) {
 
   return(list(ctrl=ctrl, tracking=tracking))
 }
+# }}}

@@ -64,6 +64,7 @@ export(
   "pid.hcr",
   "plot_hockeystick.hcr",
   "relative",
+  "response.fb",
   "sampling.oem",
   "seasonal.is",
   "shortcut.sa",
