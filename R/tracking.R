@@ -20,9 +20,13 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
   function(object, step, year=value$year, iter=seq(dim(object[[1]])[6]),
     ..., value) {
 
+    # FIND target row(s)
+    target <- which(!is.na(apply(iters(value), 1:2, function(x)
+      sum(x))[,'value']))
+
     # SINGLE stock, tracks first row only
     if(length(unique(value$biol)) == 1) {
-      object[[1]][step, ac(year),,,, iter] <- value@iters[1, 'value',]
+      object[[1]][step, ac(year),,,, iter] <- value@iters[target, 'value',]
 
     # MULTIPLE stocks
     } else {

@@ -535,10 +535,9 @@ setMethod("goFish", signature(om="FLom"),
       ctrl.fb$step <- "fb"
 
       out <- do.call("mpDispatch", ctrl.fb)
-
       ctrl <- out$ctrl
       tracking <- out$tracking
-      
+
       track(tracking, "fb", mys) <- ctrl
     }
 
@@ -561,7 +560,7 @@ setMethod("goFish", signature(om="FLom"),
     om <- out$om
 
     # final control
-    track(tracking, "fwd", mys) <- ctrl
+    track(tracking, "fwd", mys) <- ctrl[1,]
     
     # time (in minutes, per iter)   
     track(tracking, "time", ay) <- as.numeric(difftime(Sys.time(), stim,

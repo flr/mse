@@ -9,21 +9,23 @@
 
 # noise.iem {{{
 
-# TODO bias-correct
+noise.iem <- function(ctrl, noise, multiplicative=TRUE, args, tracking){
 
-noise.iem <- function(ctrl, fun="rlnorm", mean=0, sd=0.1, multiplicative=TRUE,
-  args, tracking){
-  # eh? number of non NA values in target. But if there are NAs then we need to
-  # know their position for the *ctrl@iters later
-	# use decision taken in year considering management lag
-	iem <- list(mean = mean, sd = sd, n = sum(!is.na(ctrl@iters)))
-	if(multiplicative){
-		ctrl@iters <- do.call(fun, iem) * ctrl@iters
-	} else {
-		ctrl@iters <- do.call(fun, iem) + ctrl@iters
-	}
-	lst <- list(ctrl=ctrl, tracking=tracking)
-	lst
+  # MISSING noise
+  if(missing(noise)) {
+    warning("'iem' setup with no 'noise' argument, adding no noise.")
+	  return(list(ctrl=ctrl, tracking=tracking)) 
+  }
+
+  # APPLY noise
+  if(multiplicative) {
+    iters(ctrl)[, 'value',]  <- iters(ctrl)[, 'value',] * noise[, ac(args$ay)]
+  } else {
+    iters(ctrl)[, 'value',]  <- iters(ctrl)[, 'value',] + noise[, ac(args$ay)]
+  }
+  
+	return(list(ctrl=ctrl, tracking=tracking)) 
+	
 } # }}}
 
 # partial.iem {{{
