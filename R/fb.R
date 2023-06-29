@@ -30,7 +30,7 @@ hyperstability.fb <- function(ctrl, beta=1, maxF=2, alpha=maxF^(1-beta), trackin
 
 # response.fb {{{
 
-response.fb <- function(ctrl, args, tracking) {
+response.fb <- function(ctrl, min=0.90, args, tracking) {
 
   # GET current and previous decision year
   ay <- args$ay
@@ -38,15 +38,15 @@ response.fb <- function(ctrl, args, tracking) {
   py <- ac(ay + args$management_lag)
 
   # GET past catch
-  past <- tracking[[1]]['C.om', ac(dy)]
+  past <- tracking[[1]]['C.obs', ac(dy)]
 
   # ID iters where TAC_ay < C_dy
-  min <- ifelse(ctrl$value < c(past), 1, 0)
+  min <- ifelse(ctrl$value < c(past), min, 0)
 
   mctrl <- fwdControl(year=py, quant="effort", relYear=ay,
     fishery=1, relFishery=1, min=min)
 
-  #
+  # TRACK if min is aplied
   track(tracking, "fb.imp", ac(ay)) <- min
 
   return(list(ctrl=merge(ctrl, mctrl), tracking=tracking))
