@@ -239,7 +239,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   else
     oem <- window(lst0$oem, end=vy[length(vy)])
 
-  tracking <- window(lst0$tracking, start=iy, end=vy[length(vy)])
+  tracking <- window(lst0$tracking, end=vy[length(vy)])
 
   if(verbose) cat("\n")
 
@@ -537,7 +537,7 @@ setMethod("goFish", signature(om="FLom"),
       out <- do.call("mpDispatch", ctrl.fb)
       ctrl <- out$ctrl
       tracking <- out$tracking
-
+      
       track(tracking, "fb", mys) <- ctrl
     }
 
