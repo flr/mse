@@ -148,8 +148,11 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # SET seed
   if (!is.null(args$seed)) set.seed(args$seed)
   
+  # CHECK and WARN if fb in control
+  if("fb" %in% names(control))
+     stop("control contains an 'fb' element, should be fleetBehaviour(om)")
+
   # SET fleetBehaviour to NULL if not given
-  # TODO CHECK and WARN if fb in control
   if (exists(fleetBehaviour(om)))
     fb <- fleetBehaviour(om)
   else 
@@ -195,9 +198,9 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
           om = iter(om, j),
           oem = iter(oem, j),
           tracking = iter(tracking, j),
-          fb=fb,    # TODO needs it selection
+          fb=iter(fb, j),
           projection=projection(om),
-          iem=iem,  # TODO needs it selection
+          iem=iter(iem, j),
           ctrl= iter(ctrl, j),
           args=c(args[!names(args) %in% "it"], it=length(j)),
           verbose=verbose, logfile=logfile)
@@ -280,7 +283,7 @@ setMethod("goFish", signature(om="FLom"),
   # COPY ctrl
   ctrl0 <- ctrl
   
-  p <- progressor(along=vy, offset=1)
+  p <- progressor(along=vy, offset=0)
 
   # go fish!
 
