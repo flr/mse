@@ -164,6 +164,19 @@ setReplaceMethod("sr", signature("FLom", "FLSR"), function(object, value){
 	object
 })
 
+setReplaceMethod("sr", signature("FLom", "FLQuant"), function(object, value){
+
+  # CONSTRUCT FLSR: value as params, model=rec~a
+  pars <- FLPar(c(value), dimnames=list(params='a', year=dimnames(value)$year,
+    iter=dimnames(value)$iter))
+
+  sr(object) <- FLSR(model=rec~a, params=pars)
+
+  return(object)
+})
+
+
+
 # }}}
 
 # accessors to stock slots {{{

@@ -948,8 +948,7 @@ setMethod("goFish", signature(om="FLombf"),
 
 # mps {{{
 
-mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL,
-  verbose=TRUE, ...) {
+mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, ...) {
 
   # GET ... arguments
   opts <- list(...)
@@ -975,13 +974,12 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL,
 
   # LOOP over values
 
-  p <- progressor(along=seq(largs), offset=1)
+  p <- progressor(along=seq(largs), offset=0)
 
   res <- foreach(i = seq(largs), .errorhandling='pass',
     .packages = "mse") %dopar% {
 
-    if(verbose)
-      p(message = sprintf(paste0("[", i, "]")))
+    p(message = sprintf(paste0("[", i, "]")))
 
     # MODIFY module args
     args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
