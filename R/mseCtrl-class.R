@@ -151,5 +151,6 @@ setMethod("iter", signature(obj = "mseCtrl"),
 
 	do.call(class(obj), list(obj))
 })
+# }}}
 
 

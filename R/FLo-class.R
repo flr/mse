@@ -151,9 +151,9 @@ fwd.om <- function(om, ctrl, ...){
 	args$object <- om
 	args$control <- ctrl
 
-  # TODO ADD tryCatch
+  # CALL using tryCatch
   om <- tryCatch(do.call("fwd", args),
-    # error, RETURN om TODO: track
+    # error, STOP
     error = function(e) {
       stop("fwd() could not be run, check args and ctrl, use debug(om)")
     }

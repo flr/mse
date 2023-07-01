@@ -13,7 +13,7 @@ setClass("FLmses",
 
 # }}}
 
-# FLmses() constructor
+# FLmses() {{{
 
 setGeneric("FLmses", function(object, performance, ...)
   standardGeneric("FLmses"))
@@ -36,6 +36,7 @@ setMethod("FLmses", signature(object="list", performance="missing"),
 
   }
 )
+# }}}
 
 #setMethod("FLmses", signature(object="FLmse", performance="missing"),
 #  function(object, statistics="missing", years="missing", metrics="missing") {
