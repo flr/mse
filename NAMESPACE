@@ -1,6 +1,7 @@
 import("methods")
 import("data.table")
 import("parallelly")
+import("doFuture")
 import("progressr")
 import("patchwork")
 import("FLCore")

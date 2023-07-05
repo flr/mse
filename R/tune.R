@@ -174,7 +174,7 @@ tunegrid <- function(om, oem="missing", control, metric, statistic, grid, args,
 
   # dopar LOOP over grid
 
-  res <- foreach(i=seq(dim(grid)[1]), .errorhandling = "remove") %dopar% {
+  res <- foreach(i=seq(dim(grid)[1]), .errorhandling = "remove") %dofuture% {
 
     # TODO ADD progressr
 

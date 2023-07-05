@@ -9,7 +9,7 @@
 #' Creates a single table of output from an FLmse object
 #'
 #' @param object Input object with MSE results
-' @param metrics List of metrics to be computed on relevant slots
+#' @param metrics List of metrics to be computed on relevant slots
 #'
 #' @return A `data.table` object
 

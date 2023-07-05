@@ -43,7 +43,7 @@ tune <- function(mp, grid, statistics, refpts, ...) {
       initial = 1, style=3)
   
   # LOOP over grid rows
-  out <- foreach(i = seq(nrow(df))) %dopar% {
+  out <- foreach(i = seq(nrow(df))) %dofuture% {
     
     # CALL mp
     run <- do.call(mp, c(args, list(hcrparams=as(df[i,][, !"run", with=FALSE],
@@ -86,7 +86,7 @@ doRuns <- function(mp, grid, metrics=missing, ...) {
   message(paste("Running grid with", nrow(df), "combinations."))
 
   # LOOP over grid rows
-  out <- foreach(i = seq(nrow(df)), .errorhandling="remove") %dopar% {
+  out <- foreach(i = seq(nrow(df)), .errorhandling="remove") %dofuture% {
 
     message(paste0("[", i, "]"))
     

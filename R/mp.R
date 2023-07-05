@@ -162,6 +162,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if(is.null(oem)){
     oem <- default.oem(om)
     missingoem <- TRUE
+  } else {
+    missingoem <- FALSE
   }
   
   # PARSE parallel options
@@ -192,7 +194,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .combine=.combinegoFish,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
-      .inorder=TRUE) %dopar% {
+      .inorder=TRUE) %dofuture% {
 
         call0 <- list(
           om = iter(om, j),
@@ -976,8 +978,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, ...) {
 
   p <- progressor(along=seq(largs), offset=0)
 
-  res <- foreach(i = seq(largs), .errorhandling='pass',
-    .packages = "mse") %dopar% {
+  res <- foreach(i = seq(largs), .errorhandling='pass') %dofuture% {
 
     p(message = sprintf(paste0("[", i, "]")))
 
