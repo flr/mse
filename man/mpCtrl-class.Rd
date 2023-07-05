@@ -146,3 +146,13 @@ class validity. If an unnamed \code{FLQuant} object is provided, this is used
 for sizing, but not for populating any slot.
 }
 
+\examples{
+mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+  trigger=41500, target=0.27))))
+mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+  trigger=41500, target=0.27))))
+}

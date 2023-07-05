@@ -138,7 +138,7 @@ setMethod("performance", signature(x="FLQuants"),
             lapply(as(refpts, 'list'), rep, each=length(i)))), drop=FALSE)
       }), idcol="statistic", fill=TRUE)[,c("statistic", "data", "iter")]
     }), idcol="year")
-    
+
     # Set DT keys
     setkey(res, statistic, year)
     

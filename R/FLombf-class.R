@@ -371,9 +371,6 @@ setMethod("partialF", signature(object="FLombf", fisheries="missing"),
   }
 )
 
-setGeneric("computeHarvest", function(object, catch, ...)
-		standardGeneric("computeHarvest"))
-
 setMethod("computeHarvest", signature(object="FLombf", catch="missing"),
   function(object) {
     

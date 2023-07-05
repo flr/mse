@@ -8,12 +8,13 @@ tac.is(
   stk,
   ctrl,
   args,
+  output = "catch",
   recyrs = c(dims(stk)$year, 2),
   Fdevs = fbar(stk) \%=\% 1,
   dtaclow = NA,
   dtacupp = NA,
   fmin = 0,
-  initac = catch(stk[, ac(iy - 1)]),
+  initac = metrics(stk, output)[, ac(iy - 1)],
   tracking
 )
 }
@@ -64,9 +65,9 @@ data(sol274)
 control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
   hcr=mseCtrl(method=hockeystick.hcr,
     args=list(lim=0, trigger=4.3e5, target=0.21)),
-  isys=mseCtrl(method=tac.is, args=list(recyrs=-3))))
+  isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
 # Run MP until 2025
-run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2022))
+run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2024))
 # Plot run time series
 plot(om, TAC.IS=run)
 }

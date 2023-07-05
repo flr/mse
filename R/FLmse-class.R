@@ -290,3 +290,10 @@ setMethod("iter", signature(obj="FLmse"),
   }
 )
 # }}}
+
+# dims {{{
+setMethod("dims", signature(obj="FLmse"),
+  function(obj) {
+    dims(om(obj))
+  }
+) # }}}

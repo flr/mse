@@ -568,7 +568,7 @@ setMethod("goFish", signature(om="FLom"),
     # time (in minutes, per iter)   
     track(tracking, "time", ay) <- as.numeric(difftime(Sys.time(), stim,
       units = "mins")) / args$it
-  
+
     # CPU process   
     id <- Sys.getpid()
     track(tracking, "pid", ay) <- id
