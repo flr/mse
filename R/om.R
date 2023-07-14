@@ -104,7 +104,7 @@ initiate <- function(biol, B0, h=0.75) {
   init <- B0
 
   # RUN for iters
-  res <- foreach(i=seq(its), .combine=c) %dopar% {
+  res <- foreach(i=seq(its), .combine=c) %dofuture% {
 
     # EXTRACT to vectors
     m <- c(iter(m(biol)[, 1], i))
@@ -254,8 +254,8 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
 
   # LOOP over iter blocks
 
-  sim <- foreach(i=names(bls), .combine=.lcombine, .multicombine=TRUE,
-    .packages=c("FLCore", "FLBRP", "FLasher")) %dopar% {
+  sim <- foreach(i=names(bls), .combine=.lcombine,
+    .multicombine=TRUE) %dofuture% {
 
     # SET iters
     it <- bls[[i]]
