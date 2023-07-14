@@ -334,7 +334,7 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
     }
     
     # FWD w/history
-    res <- suppressWarnings(fwd(nbio, fis, control=history,
+    res <- suppressWarnings(fwd(nbio, fis, control=iter(history, it),
       deviances=iter(deviances, it), effort_max=1e6))
 
     # LEN samples
