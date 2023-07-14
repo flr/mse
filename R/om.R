@@ -254,8 +254,8 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
 
   # LOOP over iter blocks
 
-  sim <- foreach(i=names(bls), .combine=.lcombine, .multicombine=TRUE,
-    .packages=c("FLCore", "FLBRP", "FLasher")) %dofuture% {
+  sim <- foreach(i=names(bls), .combine=.lcombine,
+    .multicombine=TRUE) %dofuture% {
 
     # SET iters
     it <- bls[[i]]
