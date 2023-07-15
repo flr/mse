@@ -239,6 +239,14 @@ setMethod("performance", signature(x="list"),
   function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,
     probs=NULL, grid="missing", mp=NULL, mc.cores=1, ...) {
     
+    # COERCE OMs added as reference
+    x <- lapply(x, function(i) {
+      if(is(i, 'FLo'))
+        return(FLmse(om=i))
+      else
+        return(i)
+    })
+
     # HANDLE list(mse)
     if(all(unlist(lapply(x, is, 'FLmse')))) {
       return(rbindlist(lapply(x, function(i) do.call(performance,
