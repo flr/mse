@@ -68,6 +68,7 @@ export(
   "response.fb",
   "sampling.oem",
   "seasonal.is",
+  "shortcut_devs",
   "shortcut.sa",
   "simulator",
   "sp.is",

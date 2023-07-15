@@ -56,7 +56,7 @@ shortcut.sa <- function(stk, idx, SSBdevs=ssb(stk) %=% 1, args, tracking, ...) {
   stk <- window(stk, end=dy)
 
   ind <- FLQuants(
-    # SSBcv
+    # SSB + devs
     ssb=ssb(stk) * window(SSBdevs, end=dy))
 
   track(tracking, "conv.est", ac(ay)) <- 1
@@ -64,3 +64,19 @@ shortcut.sa <- function(stk, idx, SSBdevs=ssb(stk) %=% 1, args, tracking, ...) {
   list(stk=stk, ind=ind, tracking=tracking)
 }
 # }}}
+
+# shortcut_devs {{{
+
+# GET new Fphi, Fcv values.
+
+shortcut_devs <- function(om, Fcv=0.212, Fphi=0.423, SSBcv=0, SSBphi=0) {
+  
+  devs <- FLQuants(
+    F=ar1rlnorm(Fphi, dimnames(om)$year, dims(om)$iter, 0, Fcv),
+    SSB=ar1rlnorm(0, dimnames(om)$year, dims(om)$iter, 0, SSBcv)
+  )
+
+  return(devs)
+}
+# }}}
+
