@@ -48,6 +48,7 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
 shortcut.sa <- function(stk, idx, SSBdevs=ssb(stk) %=% 1, args, tracking, ...) {
  
   # DIMS
+  y0 <- args$y0
   dy <- args$dy
   ay <- args$ay
   it <- args$it
@@ -57,7 +58,7 @@ shortcut.sa <- function(stk, idx, SSBdevs=ssb(stk) %=% 1, args, tracking, ...) {
 
   ind <- FLQuants(
     # SSB + devs
-    ssb=ssb(stk) * window(SSBdevs, end=dy))
+    ssb=ssb(stk) * window(SSBdevs, start=y0, end=dy))
 
   track(tracking, "conv.est", ac(ay)) <- 1
 

@@ -176,7 +176,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     parallel <- TRUE
   # TAKEN from doPar
   } else if(getDoParRegistered()) {
-    cores <- getDoParWorkers()
+    cores <- nbrOfWorkers()
   }
   
   # RUN goFish
@@ -188,9 +188,11 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
     cat("logfile\n", file=logfile)
 
+    if(verbose)
+      message("Running on ", nbrOfWorkers(), " nodes.")
+
     # LOOP and combine
     lst0 <- foreach(j=its, 
-      .packages="mse", 
       .combine=.combinegoFish,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
@@ -291,12 +293,13 @@ setMethod("goFish", signature(om="FLom"),
 
   for(i in vy) {
   
-    if(verbose) {
+    if(verbose & !handlers(global = NA)){
       cat(i, " - ")
     }
-    
-    p(message = sprintf(paste0("[", i, "]")))
 
+    # REPORT progress
+    p(message = sprintf(paste0("[", i, "]")))
+ 
     # time (start)
     stim <- Sys.time()
     
@@ -582,9 +585,8 @@ setMethod("goFish", signature(om="FLom"),
     
     cat(id, paste0("[", ay, "]"), c(iterMeans(tracking[[1]][, ac(ay)])),
       "\n", sep="\t", file=logfile, append=TRUE)
- 
-    # CLEAR memory
 
+    # CLEAR memory
     gc()
   }
   
@@ -950,7 +952,8 @@ setMethod("goFish", signature(om="FLombf"),
 
 # mps {{{
 
-mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, ...) {
+mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
+  ...) {
 
   # GET ... arguments
   opts <- list(...)
@@ -976,17 +979,42 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, ...) {
 
   # LOOP over values
 
-  p <- progressor(along=seq(largs), offset=0)
+  if(parallel) {
 
-  res <- foreach(i = seq(largs), .errorhandling='pass') %dofuture% {
+    message("Running on ", nbrOfWorkers(), " nodes.")
 
-    p(message = sprintf(paste0("[", i, "]")))
+    p <- progressor(along=seq(largs), offset=0)
 
-    # MODIFY module args
-    args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
+    res <- foreach(i = seq(largs), .errorhandling='pass') %dofuture% {
 
-    # CALL mp, parallel left to work along MPs
-    mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE, verbose=FALSE)
+      # MODIFY module args
+      args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
+
+      # CALL mp, parallel left to work along MPs
+      run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
+         verbose=FALSE)
+      
+      p(message = sprintf(paste0("[", i, "]")))
+
+      return(run)
+    }
+  } else {
+
+    p <- progressor(along=seq(largs), offset=0)
+
+    res <- lapply(seq(largs), function(i) {
+
+      # MODIFY module args
+      args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
+
+      # CALL mp, parallel left to work along MPs
+      run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
+         verbose=FALSE)
+
+      p(message = sprintf(paste0("[", i, "]")))
+
+      return(run)
+    })
   }
 
   # STOP or WARN if missing runs
