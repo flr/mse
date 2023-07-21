@@ -985,10 +985,12 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
 
     p <- progressor(along=seq(largs), offset=0)
 
-    res <- foreach(i = seq(largs), .errorhandling='pass') %dofuture% {
+    res <- foreach(i = seq(largs), .errorhandling="pass",
+      .options.future=list(globals=structure(TRUE,
+      add=c("ctrl", "mopts", "module")))) %dofuture% {
 
       # MODIFY module args
-      args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
+      args(ctrl[[module]])[names(mopts)] <- lapply(mopts, "[", i)
 
       # CALL mp, parallel left to work along MPs
       run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
