@@ -196,10 +196,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .combine=.combinegoFish,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
-      
       .options.future=list(globals=structure(FALSE, add=c("om", "oem",
       "tracking", "fb", "iem", "ctrl", "args", "verbose", "logfile"))),
-
       .inorder=TRUE) %dofuture% {
       
         call0 <- list(
