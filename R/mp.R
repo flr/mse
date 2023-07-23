@@ -196,8 +196,12 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .combine=.combinegoFish,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
-      .inorder=TRUE) %dofuture% {
+      
+      .options.future=list(globals=structure(FALSE, add=c("om", "oem",
+      "tracking", "fb", "iem", "ctrl", "args", "verbose", "logfile"))),
 
+      .inorder=TRUE) %dofuture% {
+      
         call0 <- list(
           om = iter(om, j),
           oem = iter(oem, j),
@@ -986,8 +990,8 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
     p <- progressor(along=seq(largs), offset=0)
 
     res <- foreach(i = seq(largs), .errorhandling="pass",
-      .options.future=list(globals=structure(TRUE,
-      add=c("ctrl", "mopts", "module")))) %dofuture% {
+      .options.future=list(globals=structure(FALSE, add=c("ctrl", "module",
+      "mopts", "om", "oem", "iem", "args")))) %dofuture% {
 
       # MODIFY module args
       args(ctrl[[module]])[names(mopts)] <- lapply(mopts, "[", i)
