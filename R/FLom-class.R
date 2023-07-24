@@ -409,10 +409,10 @@ setMethod("window", signature(x="FLom"),
 
 setMethod("fwdWindow", signature(x="FLom", y="missing"),
   function(x, end=dims(x)$maxyear, nsq=3, deviances=NULL, ...) {
-
+    
     stock(x) <- fwdWindow(stock(x), end=end, nsq=nsq, ...)
 
-    sr(x) <- window(sr(x), end=end, ...)
+    sr(x) <- window(sr(x), end=end)
 
     if(!is.null(deviances))
       deviances(x) <- deviances

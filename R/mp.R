@@ -7,7 +7,6 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-options(doFuture.rng.onMisuse = "ignore")
 
 # mp {{{
 
@@ -197,7 +196,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
       .options.future=list(globals=structure(FALSE, add=c("om", "oem",
-      "tracking", "fb", "iem", "ctrl", "args", "verbose", "logfile"))),
+      "tracking", "fb", "iem", "ctrl", "args", "verbose", "logfile"),
+      seed=TRUE)),
       .inorder=TRUE) %dofuture% {
       
         call0 <- list(
@@ -989,7 +989,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
 
     res <- foreach(i = seq(largs), .errorhandling="pass",
       .options.future=list(globals=structure(FALSE, add=c("ctrl", "module",
-      "mopts", "om", "oem", "iem", "args")))) %dofuture% {
+      "mopts", "om", "oem", "iem", "args"), seed=TRUE))) %dofuture% {
 
       # MODIFY module args
       args(ctrl[[module]])[names(mopts)] <- lapply(mopts, "[", i)
