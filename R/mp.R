@@ -145,7 +145,10 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # track(tracking, "F.om", hyrs) <- window(catch(om), start=hyrs[1], end=hyrs[2])
   
   # SET seed
-  if (!is.null(args$seed)) set.seed(args$seed)
+  if (!is.null(args$seed))
+    seed <- args$seed
+  else
+    seed <- TRUE
   
   # CHECK and WARN if fb in control
   if("fb" %in% names(control))
@@ -197,7 +200,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .errorhandling = "remove", 
       .options.future=list(globals=structure(FALSE, add=c("om", "oem",
       "tracking", "fb", "iem", "ctrl", "args", "verbose", "logfile"),
-      seed=TRUE)),
+      seed=seed)),
       .inorder=TRUE) %dofuture% {
       
         call0 <- list(
@@ -960,6 +963,12 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   # GET ... arguments
   opts <- list(...)
   
+  # SET seed
+  if (!is.null(args$seed))
+    seed <- args$seed
+  else
+    seed <- TRUE
+  
   # PARSING a single module
   if(length(opts) > 1)
     stop("mps() can only alter a single module, called for: ", names(opts))
@@ -989,7 +998,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
 
     res <- foreach(i = seq(largs), .errorhandling="pass",
       .options.future=list(globals=structure(FALSE, add=c("ctrl", "module",
-      "mopts", "om", "oem", "iem", "args"), seed=TRUE))) %dofuture% {
+      "mopts", "om", "oem", "iem", "args"), seed=seed))) %dofuture% {
 
       # MODIFY module args
       args(ctrl[[module]])[names(mopts)] <- lapply(mopts, "[", i)
