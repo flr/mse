@@ -113,12 +113,22 @@ setMethod("plot", signature(x="FLombf", y="missing"),
 
       # 3. catch by fleet
       cas <- lapply(catch(fisheries(x)), unitSums)
-      p3 <- plot(cas) + ylim(c(0, NA)) +
+
+      p3 <- ggplot(cas, aes(x=date, y=data, group=qname, fill=qname,
+          colour=qname)) +
+        geom_flquantiles(probs=c(0.25, 0.50, 0.75), alpha=0.3) +
+        geom_flquantiles(probs=c(0.05, 0.50, 0.95), alpha=0.3) +
+        ylim(c(0, NA)) +
         ylab(paste0("Catch (", units(cas[[1]]), ")")) +
-        theme(legend.position="bottom")
+        # TODO: WRITE geom_label_end
+          geom_label_repel(data=as.data.frame(
+          lapply(cas, function(x) window(iterMedians(x), start=-1)),
+          date=TRUE), aes(label = qname), nudge_x = 2, na.rm = TRUE,
+          fill='white') +
+        theme(legend.position="none")
 
       # COMBINE p1 + p2
-      return((p1 / p2) | p3)
+      return(wrap_plots(p1/p2,p3))
     
     } else {
 
