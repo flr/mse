@@ -198,7 +198,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .combine=.combinegoFish,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
-      .options.future=list(globals=structure(FALSE, add=c("om", "oem",
+      .options.future=list(globals=structure(TRUE, add=c("om", "oem",
       "tracking", "fb", "iem", "ctrl", "args", "verbose", "logfile"),
       seed=seed)),
       .inorder=TRUE) %dofuture% {
@@ -997,7 +997,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
     p <- progressor(along=seq(largs), offset=0)
 
     res <- foreach(i = seq(largs), .errorhandling="pass",
-      .options.future=list(globals=structure(FALSE, add=c("ctrl", "module",
+      .options.future=list(globals=structure(TRUE, add=c("ctrl", "module",
       "mopts", "om", "oem", "iem", "args"), seed=seed))) %dofuture% {
 
       # MODIFY module args
