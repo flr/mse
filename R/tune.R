@@ -88,7 +88,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   
   # PRINT result
   if(verbose)
-    message(paste0("[2] diff: ", format(obmax, digits=2))
+    message(paste0("[2] diff: ", format(obmax, digits=2)))
   
   # CHECK cmax result
   if(isTRUE(all.equal(obmax, 0, tolerance=tol)))
@@ -124,7 +124,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
     # PRINT result
     if(verbose)
-      message(paste0("[", count + 2, "] diff: ", format(obmid, digits=2))
+      message(paste0("[", count + 2, "] diff: ", format(obmid, digits=2)))
   
     # CHECK and RETURN cmid result
     if(isTRUE(all.equal(obmid, 0, tolerance=tol))) {
