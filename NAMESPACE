@@ -122,6 +122,7 @@ exportMethods(
   "fleetBehaviour",
   "fleetBehaviour<-",
   "FLmse",
+  "FLmses",
   "FLoem",
   "FLom",
   "FLombf",
