@@ -63,7 +63,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   
   # PRINT result
   if(verbose)
-    cat(paste0("[1] diff: ", format(obmin, digits=2), "\n"))
+    message(paste0("[1] diff: ", format(obmin, digits=2)))
 
   # CHECK cmin result
   if(isTRUE(all.equal(obmin, 0, tolerance=tol)))
@@ -76,8 +76,8 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
   # PRINT at top
   if(verbose)
-    cat(paste0("[2] ", names(tune), ": ",
-      unlist(cmax$hcr@args[names(tune)])), "\n")
+    message(paste0("[2] ", names(tune), ": ",
+      unlist(cmax$hcr@args[names(tune)])))
 
   rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
     verbose=verbose, ...)
@@ -88,7 +88,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   
   # PRINT result
   if(verbose)
-    cat(paste0("[2] diff: ", format(obmax, digits=2), "\n"))
+    message(paste0("[2] diff: ", format(obmax, digits=2))
   
   # CHECK cmax result
   if(isTRUE(all.equal(obmax, 0, tolerance=tol)))
@@ -113,8 +113,8 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
     # PRINT at top
     if(verbose)
-      cat(paste0("[", count + 2, "] ", names(tune), ": ",
-        format(unlist(cmid$hcr@args[names(tune)]), digits=3)), "\n")
+      message(paste0("[", count + 2, "] ", names(tune), ": ",
+        format(unlist(cmid$hcr@args[names(tune)]), digits=3)))
 
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
       verbose=verbose, ...)
@@ -124,7 +124,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
     # PRINT result
     if(verbose)
-      cat(paste0("[", count + 2, "] diff: ", format(obmid, digits=2), "\n"))
+      message(paste0("[", count + 2, "] diff: ", format(obmid, digits=2))
   
     # CHECK and RETURN cmid result
     if(isTRUE(all.equal(obmid, 0, tolerance=tol))) {

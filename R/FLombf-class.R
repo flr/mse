@@ -629,7 +629,18 @@ setMethod("[", signature(x="FLombf"),
 # metrics {{{
 setMethod("metrics", signature(object="FLombf", metrics="missing"),
   function(object) {
-    is(metrics(object, list(SB=ssb, C=catch, F=fbar)))
+    
+    # CALL for metrics by biol
+    mets <- lapply(metrics, do.call, list(object))
+
+    # SET list with biols' metrics
+    mets <- lapply(setNames(nm=names(biols(x))),
+      function(i) FLQuants(lapply(X=mets, FUN="[[", i)))
+
+    if(length(mets) == 1)
+      return(mets[[1]])
+
+    return(mets)
 }) # }}}
 
 # stock {{{

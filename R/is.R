@@ -236,30 +236,31 @@ sp.is <- function(stk, ctrl, Ftarget=refpts(stk)$Ftarget,
 
 # }}}
 
-# TODO: TURN splitTAC into allocate.is
-
-# splitTAC.is {{{
+# splitcatch.is {{{
 
 #' @examples
 #' data(ple4)
 
-splitTAC.is <- function(stk, ctrl, allocation, args, tracking) {
+splitcatch.is <- function(stk, ctrl, split, args, tracking) {
 
   # DIMS
   frq <- args$frq
   yrs <- ctrl$year
 
+  # SET as proportions
+  split <- split / sum(split)
+
   # CHECK quant in fwdControl is catch
-  if(ctrl$quant != "catch")
-    stop("splitTAc.is expects a catch-based fwdControl")
+  if(unique(ctrl$quant) != "catch")
+    stop("splitcatch.is expects a catch-based fwdControl")
 
   ctrl <- fwdControl(
     Map(function(yr, fi) {
         list(year=yr, fishery=fi, catch=1, biol=an(NA),
-    quant="catch", value=ctrl[ctrl$year==yr,]$value * allocation[fi])
+    quant="catch", value=ctrl[ctrl$year==yr,]$value * split[fi])
       },
-    yr=rep(yrs, length(allocation)),
-    fi=rep(seq(length(allocation)), each=length(yrs)))
+    yr=rep(yrs, length(split)),
+    fi=rep(seq(length(split)), each=length(yrs)))
   )
 
 

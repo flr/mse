@@ -313,7 +313,7 @@ setMethod("performance", signature(x="FLombf"),
   function(x, statistics, refpts=x@refpts, metrics,
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
     probs=NULL, mp=NULL) {
-
+    
     # CALL for metrics by biol
     mets <- lapply(metrics, do.call, list(x))
 
@@ -345,8 +345,48 @@ setMethod("performance", signature(x="FLombf"),
 
 setMethod("performance", signature(x="FLmse"),
   function(x, ...) {
-    performance(x@om, ...)
+
+    args <- list(...)
+
+    # IF no extra args, return 'performance' attribute ...
+    if(length(args) == 0) {
+
+      res <- attr(x, 'performance')
+
+      # ... ONLY if it exists
+      if(is.null(res))
+        stop("'performance' table has not yet been stored in object")
+    
+      return(res)
+    } else {
+      performance(x@om, ...)
+    }
   }
 )
+
+setMethod('performance<-', signature(x='FLmse', value="data.frame"),
+  function(x, value){
+    attr(x, "performance") <- value
+    return(x)
+})
+
+# }}}
+
+# performance(FLmses) {{{
+
+setMethod("performance", signature(x="FLmses"),
+  function(x, ...) {
+    if(length(list(...)) == 0)
+      return(slot(x, 'performance'))
+    else
+      callNextMethod()
+  } 
+)
+
+setMethod('performance<-', signature(x='FLmses', value="data.frame"),
+  function(x, value){
+    slot(x, 'performance') <- value
+    return(x)
+})
 
 # }}}

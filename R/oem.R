@@ -65,7 +65,7 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
       effort=fbar(stk), range=c(startf=0, endf=0)))
   } else {
     idx <- FLIndices(A=FLIndex(index=stock.n(stk) * 0.01,
-      catch.n=catch.n(stk), catch.wt=stock.wt(stk),
+      catch.n=areaSums(catch.n(stk)), catch.wt=areaMeans(stock.wt(stk)),
       sel.pattern=catch.sel(stk), index.q=stock.n(stk) %=% 1 / 0.01,
       effort=fbar(stk), range=c(startf=0, endf=0)))
   }

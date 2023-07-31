@@ -1022,7 +1022,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
 
       # CALL mp, parallel left to work along MPs
       run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
-         verbose=FALSE)
+         verbose=TRUE)
 
       p(message = sprintf(paste0("[", i, "]")))
 
