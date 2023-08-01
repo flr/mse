@@ -41,8 +41,8 @@
 #' plot(om, tes)
 
 mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
-  scenario="NA", tracking="missing", logfile=tempfile(), verbose=TRUE,
-  parallel=TRUE){
+  scenario="NA", tracking="missing", logfile=tempfile(),
+  verbose=!handlers(global = NA), progress=!verbose, parallel=TRUE) {
 
   # dims & dimnames
   if(is(om, 'list')) {
@@ -190,8 +190,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
     cat("logfile\n", file=logfile)
 
-    if(verbose)
-      message("Running on ", nbrOfWorkers(), " nodes.")
+    message("Running on ", nbrOfWorkers(), " nodes.")
 
     # LOOP and combine
     lst0 <- foreach(j=its, 
@@ -199,7 +198,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
       .options.future=list(globals=structure(TRUE, add=c("om", "oem",
-      "tracking", "fb", "iem", "ctrl", "args", "verbose", "logfile"),
+      "tracking", "fb", "iem", "ctrl", "args", "verbose", "progress",
+      "logfile"),
       seed=seed)),
       .inorder=TRUE) %dofuture% {
       
@@ -212,7 +212,9 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
           iem=iter(iem, j),
           ctrl= iter(ctrl, j),
           args=c(args[!names(args) %in% "it"], it=length(j)),
-          verbose=verbose, logfile=logfile)
+          verbose=verbose,
+          progress=progress,
+          logfile=logfile)
 
         out <- do.call(goFish, call0)
 
@@ -232,7 +234,9 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
         iem=iem,
         ctrl=ctrl,
         args=args,
-        verbose=verbose, logfile=logfile)
+        verbose=verbose,
+        progress=progress,
+        logfile=logfile)
 
       out <- do.call(goFish, call0)
 
@@ -268,7 +272,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
 setMethod("goFish", signature(om="FLom"),
   function(om, fb, projection, oem, iem, tracking, logfile, ctrl, args,
-    verbose) {
+    verbose, progress) {
 
   # ARGUMENTS
   it <- args$it     # number of iterations
@@ -292,7 +296,7 @@ setMethod("goFish", signature(om="FLom"),
   # COPY ctrl
   ctrl0 <- ctrl
   
-  p <- progressor(along=vy, offset=0)
+  p <- progressor(along=vy, offset=0L)
 
   # go fish!
 
@@ -303,7 +307,8 @@ setMethod("goFish", signature(om="FLom"),
     }
 
     # REPORT progress
-    p(message = sprintf(paste0("[", i, "]")))
+    if(progress)
+      p(message = sprintf("year: %s", i))
  
     # time (start)
     stim <- Sys.time()
@@ -613,7 +618,7 @@ setMethod("goFish", signature(om="FLom"),
 
 setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
-    verbose, logfile) {
+    verbose, progress, logfile) {
 
   it <- args$it     # number of iterations
   y0 <- args$y0     # initial data year
@@ -640,15 +645,21 @@ setMethod("goFish", signature(om="FLombf"),
   if(length(deviances(oem)) == 0)
     deviances(oem) <- rep(list(NULL), length(biols(om)))
 
+  p <- progressor(along=vy, offset=0L)
+
   for(i in vy) {
 
     if(verbose) {
       cat(i, " > ")
     }
     
+    # REPORT progress
+    if(progress)
+      p(message = sprintf("year: %s", i))
+    
     # time (start)
     stim <- Sys.time()
-    
+
     # args
     ay <- args$ay <- an(i)
     dy <- args$dy <- ay - dlag
@@ -680,8 +691,13 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$step <- "oem"
  
     # GET OM observation
-    # BUG: Warning messages: 1: In .local(x, i, ...) : Selected elements do not form a coherent 6D array
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
+
+    # TODO: GENERATE single observation from dual OM
+    # stks <- stk
+    # stk <- stk[1]
+    # stock.n(stk[[1]]) <- Reduce('+', lapply(stks, stock.n))
+    
     # APPLY oem
     o.out <- Map(function(stk, dev, obs, tra) {
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
@@ -692,8 +708,8 @@ setMethod("goFish", signature(om="FLombf"),
         range(obs$stk, c("minfbar", "maxfbar")) 
 
       return(obs.oem)
-      }, stk=stk, obs=observations(oem)[names(stk)], dev=deviances(oem),
-        tra=tracking)
+      }, stk=stk, obs=observations(oem)[names(stk)],
+        dev=deviances(oem)[names(stk)], tra=tracking[names(stk)])
     
     # EXTRACT oem observations
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
@@ -994,7 +1010,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
 
     message("Running on ", nbrOfWorkers(), " nodes.")
 
-    p <- progressor(along=seq(largs), offset=0)
+    p <- progressor(along=seq(largs), offset=0L)
 
     res <- foreach(i = seq(largs), .errorhandling="pass",
       .options.future=list(globals=structure(TRUE, add=c("ctrl", "module",
@@ -1005,15 +1021,15 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
 
       # CALL mp, parallel left to work along MPs
       run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
-         verbose=FALSE)
+         verbose=FALSE, progress=FALSE)
       
-      p(message = sprintf(paste0("[", i, "]")))
+      p(message = sprintf("MP: %s", i))
 
       return(run)
     }
   } else {
 
-    p <- progressor(along=seq(largs), offset=0)
+    p <- progressor(along=seq(largs), offset=0L)
 
     res <- lapply(seq(largs), function(i) {
 
@@ -1024,7 +1040,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
       run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
          verbose=TRUE)
 
-      p(message = sprintf(paste0("[", i, "]")))
+      p(message = sprintf("MP: %s", i))
 
       return(run)
     })

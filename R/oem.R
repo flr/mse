@@ -59,15 +59,9 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
   # SET perfect FLIndex per stock
   if(biomass) {
     abu <- catch(stk) / fbar(stk)
-    idx <- FLIndices(A=FLIndexBiomass(index=abu %/% abu[,1],
-      sel.pattern=catch.sel(stk), index.q=expand(abu[,1],
-        year=dimnames(abu)$year, fill=TRUE),
-      effort=fbar(stk), range=c(startf=0, endf=0)))
+    idx <- FLIndices(A=survey(stk, index.q=0.01, biomass=TRUE))
   } else {
-    idx <- FLIndices(A=FLIndex(index=stock.n(stk) * 0.01,
-      catch.n=areaSums(catch.n(stk)), catch.wt=areaMeans(stock.wt(stk)),
-      sel.pattern=catch.sel(stk), index.q=stock.n(stk) %=% 1 / 0.01,
-      effort=fbar(stk), range=c(startf=0, endf=0)))
+    idx <- FLIndices(A=survey(stk, index.q=0.01))
   }
 
   # STORE observations
