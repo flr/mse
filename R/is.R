@@ -92,6 +92,9 @@ tac.is <- function(stk, ctrl, args, output="catch",
   # ADD F deviances
   ftar <- ctrl$value * Fdevs[, ac(dy)]
 
+  # TRACK Ftarget
+  track(tracking, "fbar.isys", ay + management_lag) <- ftar
+
   # FORECAST for iyrs and my IF mlag > 0,
   if(management_lag > 0) {
  

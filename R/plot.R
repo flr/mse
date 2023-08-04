@@ -102,24 +102,35 @@ setMethod("plot", signature(x="FLombf", y="missing"),
     if(length(args) == 0) {
 
       # 1. SSB
-      ssbs <- lapply(ssb(x), unitSums)
-      p1 <- plot(ssbs) + ylim(c(0,NA)) +
-        ylab(paste0("SSB (", units(ssbs[[1]]) , ")"))
+      bs <- lapply(ssb(x), unitSums)
+      ubs <- units(bs[[1]])
+      bs <- lapply(bs, function(u) {units(u) <- ""; return(u)})
+      p1 <- plot(bs) + ylim(c(0,NA)) +
+        ylab(paste0("SSB (", ubs , ")"))
 
       # 2. F
       fs <- lapply(fbar(x), unitMeans)
+      fs <- lapply(fs, function(u) {units(u) <- ""; return(u)})
       p2 <- plot(fs) + ylim(c(0,NA)) +
         ylab(paste0("F"))
 
-      # 3. catch by fleet
+      # 3. F
+      rs <- lapply(rec(x), unitSums)
+      urs <- units(rs[[1]])
+      rs <- lapply(rs, function(u) {units(u) <- ""; return(u)})
+      p3 <- plot(rs) + ylim(c(0,NA)) +
+        ylab(paste0("Rec (", urs , ")"))
+
+      # 4. catch by fleet
       cas <- lapply(catch(fisheries(x)), unitSums)
 
-      p3 <- ggplot(cas, aes(x=date, y=data, group=qname, fill=qname,
+      p4 <- ggplot(cas, aes(x=date, y=data, group=qname, fill=qname,
           colour=qname)) +
         geom_flquantiles(probs=c(0.25, 0.50, 0.75), alpha=0.3) +
         geom_flquantiles(probs=c(0.05, 0.50, 0.95), alpha=0.3) +
         ylim(c(0, NA)) +
         ylab(paste0("Catch (", units(cas[[1]]), ")")) +
+        xlab("") +
         # TODO: WRITE geom_label_end
           geom_label_repel(data=as.data.frame(
           lapply(cas, function(x) window(iterMedians(x), start=-1)),
@@ -128,7 +139,7 @@ setMethod("plot", signature(x="FLombf", y="missing"),
         theme(legend.position="none")
 
       # COMBINE p1 + p2
-      return(wrap_plots(p1/p2,p3))
+      return(wrap_plots(p1/p2/p3, p4))
     
     } else {
 

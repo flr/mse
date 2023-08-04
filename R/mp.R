@@ -323,7 +323,7 @@ setMethod("goFish", signature(om="FLom"),
     
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
-    
+  
     # TRACK om
     track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
       start=dy0, end=dyf))
@@ -332,7 +332,7 @@ setMethod("goFish", signature(om="FLom"),
     track(tracking, "SB.om", dys) <- unitSums(window(ssb(om),
       start=dy0, end=dyf))
     track(tracking, "C.om", dys) <- unitSums(window(catch(om),
-      start=dy0, end=dy))
+      start=dy0, end=dyf))
     
     # --- OEM: Observation Error Model
     ctrl.oem <- args(oem)
