@@ -22,13 +22,14 @@ setMethod("plot", signature(x="FLo", y="missing"),
     plot(mets) + ylim(c(0, NA))
   }
 )
+
 setMethod("plot", signature(x="FLo", y="FLmse"),
-  function(x, y, ..., window=TRUE) {
+  function(x, y, metrics=NULL, ..., window=TRUE) {
 
     # MERGE all FLmse args
     y <- c(list(y), list(...))
 
-    plot(x, y, window=window)
+    plot(x, y, metrics=metrics, window=window)
   }
 )
 
