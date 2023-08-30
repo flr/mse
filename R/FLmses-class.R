@@ -9,7 +9,7 @@
 
 # FLmses CLASS {{{
 setClass("FLmses",
-  representation("FLlst", performance="data.frame"))
+  representation("FLlst", performance="data.table"))
 
 # }}}
 
@@ -27,7 +27,7 @@ setMethod("FLmses", signature(object="FLmse", performance="ANY"),
 
     args <- c(object, list(...))
 
-    return(FLmses(args, performance=performance))
+    return(FLmses(args, performance=data.table(performance)))
 
   }
 )
@@ -36,7 +36,7 @@ setMethod("FLmses", signature(object="list", performance="data.frame"),
   function(object, performance) {
 
     res <- FLmses(object)
-    performance(res) <- performance
+    performance(res) <- data.table(performance)
 
     return(res)
   }
@@ -59,7 +59,7 @@ setMethod("FLmses", signature(object="list", performance="missing"),
         return(x)
       })
     } else {
-      perf <- data.frame()
+      perf <- data.table()
     }
     
     res <- new("FLmses", .Data=object, performance=perf,
@@ -80,7 +80,6 @@ setMethod("FLmses", signature(object="list", performance="missing"),
   }
 )
 # }}}
-
 
 # plot
 
