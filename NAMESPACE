@@ -23,6 +23,9 @@ importFrom("stats",
   "setNames",
   "rf")
 
+importFrom("ggrepel",
+  "geom_label_repel")
+
 export(
   "bisect",
   "catchSSB.hcr",
@@ -69,6 +72,7 @@ export(
   "sampling.oem",
   "seasonal.is",
   "shortcut_devs",
+  "shortcut.oem",
   "shortcut.sa",
   "simulator",
   "sp.is",

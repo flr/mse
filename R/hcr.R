@@ -127,6 +127,9 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
   )
 
   # TRACK decision
+  # - 1 if met <= lim
+  # - 2 if lim < met < trigger
+  # - 3 if met >= trigger 
   track(tracking, "decision.hcr", ay) <- ifelse(met <= lim, 1,
     ifelse(met < trigger, 2, 3))
 
@@ -950,4 +953,4 @@ indicator.hcr <- function (stk, hcrpars, args, tracking) {
   
   list(ctrl = ctrl, tracking = tracking)
 }
-# }}}
+# 

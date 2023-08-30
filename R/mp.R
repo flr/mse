@@ -652,7 +652,7 @@ setMethod("goFish", signature(om="FLombf"),
     if(verbose) {
       cat(i, " > ")
     }
-    
+
     # REPORT progress
     if(progress)
       p(message = sprintf("year: %s", i))
@@ -693,11 +693,6 @@ setMethod("goFish", signature(om="FLombf"),
     # GET OM observation
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
 
-    # TODO: GENERATE single observation from dual OM
-    # stks <- stk
-    # stk <- stk[1]
-    # stock.n(stk[[1]]) <- Reduce('+', lapply(stks, stock.n))
-    
     # APPLY oem
     o.out <- Map(function(stk, dev, obs, tra) {
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
@@ -708,12 +703,17 @@ setMethod("goFish", signature(om="FLombf"),
         range(obs$stk, c("minfbar", "maxfbar")) 
 
       return(obs.oem)
-      }, stk=stk, obs=observations(oem)[names(stk)],
-        dev=deviances(oem)[names(stk)], tra=tracking[names(stk)])
+    }, stk=stk, obs=observations(oem)[names(stk)],
+      dev=deviances(oem)[names(stk)], tra=tracking[names(stk)])
     
     # EXTRACT oem observations
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
+
+    # TODO: GENERATE single observation from dual OM
+    # stks <- stk
+    # stk <- stk[1]
+    # stock.n(stk[[1]]) <- Reduce('+', lapply(stks, stock.n))
     
     observations(oem) <- lapply(o.out, "[[", "observations")
     
