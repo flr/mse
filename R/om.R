@@ -104,7 +104,7 @@ initiate <- function(biol, B0, h=0.75) {
   init <- B0
 
   # RUN for iters
-  res <- foreach(i=seq(its), .combine=c) %dofuture% {
+  res <- foreach(i=seq(its), .combine=c) %do% {
 
     # EXTRACT to vectors
     m <- c(iter(m(biol)[, 1], i))
@@ -112,6 +112,7 @@ initiate <- function(biol, B0, h=0.75) {
     n <- c(iter(n(biol)[, 1], i))
 
     res <- uniroot(foo, c(1, 1e12), n=n, m=m, wt=wt, b0=B0[i])
+    print(i)
     res$root
   }
 
@@ -228,7 +229,7 @@ simulator <- function(biol, fisheries, history, B0, h, dep=0,
   nyr <- dims(biol)$year
   nfs <- length(fisheries)
   its <- length(c(B0))
-  bls <- split(seq(its), ceiling(seq_along(seq(its)) / 500))
+  bls <- split(seq(its), ceiling(seq_along(seq(its)) / 250))
 
   # CHECK match history and first year with N
   
