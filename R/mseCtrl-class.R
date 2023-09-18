@@ -42,7 +42,10 @@ setMethod("initialize", "mseCtrl",
     function(.Object,
              ...,
              method, args) {
-      if (!missing(method)) .Object@method <- method
+      if (!missing(method))
+        .Object@method <- switch(class(method),
+          "function"=method,
+          "character"=get(method))
       if (!missing(args)) .Object@args <- args
       .Object <- callNextMethod(.Object, ...)
       .Object
