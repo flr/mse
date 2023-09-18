@@ -720,24 +720,28 @@ pid.hcr <- function(stk, ind, kp=0, ki=0, kd=0, nyears=5,
 
 #' @examples
 #' data(sol274)
+#' # Compute length-based indicators: leman and lbar
 #' control <- mpCtrl(list(
 #'   est = mseCtrl(method=len.ind, args=list(indicator=c('lmean', 'lbar'),
 #'    params=FLPar(linf=35, k=0.352, t0=-0.26), cv=0.2, nyears=5)),
+#' # Apply trend.hcr to each indicator, return mean advice value
 #' hcr = mseCtrl(method=meta.hcr,
 #'    args=list(list(method="trend.hcr", k1=1, k2=2, metric="lmean"),
 #'    list(method="trend.hcr", k1=2, k2=3, metric="lbar")))))
-#' run01 <- mp(om, oem=oem, ctrl=control, args=list(iy=2020, fy=2023))
+#' run01 <- mp(om, oem=oem, ctrl=control, args=list(iy=2020, fy=2030))
 #' #
 #' control <- mpCtrl(list(
 #'   est = mseCtrl(method=len.ind, args=list(indicator=c('lmean', 'lbar'),
 #'    params=FLPar(linf=35, k=0.352, t0=-0.26), cv=0.2, nyears=5)),
-#' hcr = mseCtrl(method=meta.hcr,
-#'    args=list(list(method="trend.hcr", k1=1, k2=2, metric="lmean"),
-#'    list(method="trend.hcr", k1=2, k2=3, metric="lbar"),
-#'    combination=function(x, y) x + 0.10 * y))))
-#' run02 <- mp(om, oem=oem, ctrl=control, args=list(iy=2020, fy=2023))
 #' #
-#' plot(window(om, start=2000), R01=run01, R02=run02)
+#'   hcr = mseCtrl(method=meta.hcr,
+#'    args=list(list(method="trend.hcr", k1=1, k2=2, metric="lmean"),
+#'    list(method="trend.hcr", k1=1, k2=1, metric="lbar"),
+#'    combination=function(x, y) x + 0.40 * y))))
+#' #
+#' run02 <- mp(om, oem=oem, ctrl=control, args=list(iy=2020, fy=2030))
+#' #
+#' plot(window(om, start=2000), list(R01=run01, R02=run02))
 
 meta.hcr <- function(stk, ind, ..., args, tracking,
   combination=function(x, y) (x + y) / 2) {
@@ -768,8 +772,8 @@ meta.hcr <- function(stk, ind, ..., args, tracking,
   ctrl <- decs[[1]]$ctrl
   iters(ctrl) <- Reduce(combination, lapply(decs, function(i) iters(i$ctrl)))
 
-  # MERGE tracking
-  tracking <- Reduce(merge, lapply(decs, function(x) x$tracking))
+  # TODO: MERGE tracking
+  # BUG: tracking <- Reduce(merge, lapply(decs, function(x) x$tracking))
 
 	# return
 	list(ctrl=ctrl, tracking=tracking)
