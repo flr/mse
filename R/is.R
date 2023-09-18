@@ -52,7 +52,7 @@
 #' plot(om, TAC.IS=run)
 
 tac.is <- function(stk, ctrl, args, output="catch",
-  recyrs=c(dims(stk)$year, 2), Fdevs=fbar(stk) %=% 1,
+  recyrs=-2, Fdevs=fbar(stk) %=% 1,
   dtaclow=NA, dtacupp=NA, fmin=0, initac=metrics(stk, output)[, ac(iy - 1)],
   tracking) {
 
@@ -63,20 +63,29 @@ tac.is <- function(stk, ctrl, args, output="catch",
   fut <- fwdWindow(stk, end=ay + management_lag, nsq=nsqy)
   
   # PARSE recyrs if numeric
-  if(is.numeric(recyrs)) {
-    if(length(recyrs) == 1) {
-      if(recyrs < 0) {
-        recyrs <- c(dims(stk)$year, recyrs)
-      } else {
-        recyrs <- c(recyrs, 0)
-      }
-    }
-  
-  id <- seq(max(1, dim(stk)[2] - recyrs[1] + recyrs[2] + 1),
-    dim(stk)[2] + recyrs[2])
- 
-  recyrs <- dimnames(stk)$year[id]
+
+  id <- dimnames(stk)$year
+
+  # COERCE to list
+  if(!is.list(recyrs)) {
+    recyrs <- list(recyrs)
   }
+
+  # PARSE list
+  for(i in recyrs) {
+    if(is(i, 'character'))
+      id <- id[!id %in% i]
+    else if(all(i < 0))
+      if(length(i) == 1)
+        id <- rev(rev(id)[-seq(abs(i))])
+      else
+        id <- rev(rev(id)[i])
+    else if(all(i > 0))
+      id <- id[i]
+  }
+
+  # SET years to use
+  recyrs <- id
 
   # CHECK recyrs
   if(!all(recyrs %in% dimnames(stk)$year))
@@ -88,6 +97,10 @@ tac.is <- function(stk, ctrl, args, output="catch",
   gmnrec <- exp(yearMeans(log(rec(stk)[, recyrs])))
 
   srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
+
+  # STORE geomeanrec value
+
+  track(tracking, "gmrec.isys", ay + management_lag) <- gmnrec
 
   # ADD F deviances
   ftar <- ctrl$value * Fdevs[, ac(dy)]
