@@ -25,7 +25,7 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   # SUBSET last nyears from ay - mlag
   met <- biomass(idx[[index]])[1, dyrs]
 
-  # WEIGHTED average index of last ayears
+  # WEIGHTED average index of last ayears: 0.50 for last year, 0.50 others
   ywts <- c(0.50 * seq(1, ayears - 1) / sum(seq(1, ayears - 1)), 0.50)
   wmean <- expand(yearSums(tail(met, ayears) * ywts), year=ay - dlag)
   

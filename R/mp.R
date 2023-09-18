@@ -375,7 +375,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl.est$tracking <- tracking
       ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))
       ctrl.est$step <- "est"
-      
+
       # DISPATCH
       out.assess <- tryCatch(do.call("mpDispatch", ctrl.est),
         # ERROR in whole set of iters
@@ -732,7 +732,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), 
         ov=list(t1=flsval))
       ctrl.est$step <- "est"
-
+      
       out.assess <- Map(function(x, y, z)
         do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z))),
         x=stk0, y=idx0, z=tracking)
@@ -813,7 +813,7 @@ setMethod("goFish", signature(om="FLombf"),
       if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
       ctrl.hcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flfval))
       ctrl.hcr$step <- "hcr"
-
+      
       out <- do.call("mpDispatch", ctrl.hcr)
       ctrl <- out$ctrl
 
