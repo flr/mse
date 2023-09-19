@@ -35,9 +35,6 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   # SLOPE by iter
   dat <- data.table(as.data.frame(met))
   slope <- dat[, .(data=coef(lm(log(data) ~ year))[2]), by=iter]
-  if(any(is.na(slope$data)))
-    browser()
-  sum(is.na(slope$data))
   slope <- FLQuant(slope$data, dimnames=dimnames(mean), units="")
 
   # OUTPUT
