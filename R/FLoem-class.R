@@ -225,16 +225,17 @@ setMethod("show", signature(object = "FLoem"),
 setMethod("iter", signature(obj = "FLoem"),
   function(obj, iter){
 
-    # DEVIANCES, nested lapply (idx/stk - (slot) - element)
-	  deviances(obj) <- lapply(deviances(obj),
-      function(x) lapply(x, FLCore::iter, iter))
+    # deviances
+    deviances(obj) <- rapply(deviances(obj), FLCore::iter,
+      classes = "FLQuant", how = "replace", iter=iter)
 
-    # OBSERVATIONS
+    # observations
     if(any(c("stk", "idx") %in% names(observations(obj))))
-  	  observations(obj) <- lapply(observations(obj), FLCore::iter, iter)
+  	  observations(obj) <- lapply(observations(obj),
+        FLCore::iter, iter)
 	  else
-      observations(obj) <- lapply(setNames(nm=names(observations(obj))), function(i)
-           lapply(observations(obj)[[i]], "iter", iter))
+      observations(obj) <- lapply(setNames(nm=names(observations(obj))), 
+        function(i) lapply(observations(obj)[[i]], "iter", iter))
 
     return(obj)
 })
