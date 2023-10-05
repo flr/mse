@@ -9,7 +9,11 @@
 
 # noise.iem {{{
 
-noise.iem <- function(ctrl, noise, multiplicative=TRUE, args, tracking){
+noise.iem <- function(ctrl, noise, multiplicative=TRUE, fishery=NULL,
+  args, tracking){
+
+  # GET implementation years
+  cyrs <- unique(ctrl$year)
 
   # MISSING noise
   if(missing(noise)) {
@@ -17,11 +21,18 @@ noise.iem <- function(ctrl, noise, multiplicative=TRUE, args, tracking){
 	  return(list(ctrl=ctrl, tracking=tracking)) 
   }
 
+  # PARSE noise
+  if(is(noise, 'numeric'))
+    noise <- FLQuant(noise, dimnames=list(year=cyrs,
+      iter=seq(dim(iters(ctrl))[3])))
+
   # APPLY noise
   if(multiplicative) {
-    iters(ctrl)[, 'value',]  <- iters(ctrl)[, 'value',] * noise[, ac(args$ay)]
+    iters(ctrl)[, 'value',]  <- c(iters(ctrl)[, 'value',]) *
+      c(noise[, ac(cyrs)])
   } else {
-    iters(ctrl)[, 'value',]  <- iters(ctrl)[, 'value',] + noise[, ac(args$ay)]
+    iters(ctrl)[, 'value',]  <- c(iters(ctrl)[, 'value',]) +
+      c(noise[, ac(cyrs)])
   }
   
 	return(list(ctrl=ctrl, tracking=tracking)) 
