@@ -54,8 +54,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     message(paste0("[1] ", names(tune), ": ",
       unlist(cmin$hcr@args[names(tune)])))
 
-  rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
-    verbose=FALSE, ...)
+  rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"), ...)
 
   pmin <- performance(rmin, metrics=metrics, 
     statistics=statistic, refpts=refpts(om), probs=NULL, years=years)
@@ -79,8 +78,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     message(paste0("[2] ", names(tune), ": ",
       unlist(cmax$hcr@args[names(tune)])))
 
-  rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
-    verbose=FALSE, ...)
+  rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"), ...)
   
   pmax <- performance(rmax, metrics=metrics,
     statistic=statistic, refpts=refpts(om), probs=NULL, years=years)
@@ -116,8 +114,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
       message(paste0("[", count + 2, "] ", names(tune), ": ",
         format(unlist(cmid$hcr@args[names(tune)]), digits=3)))
 
-    rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
-      verbose=FALSE, ...)
+    rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"), ...)
     pmid <- performance(rmid, metrics=metrics, 
       statistics=statistic, refpts=refpts(om), probs=NULL, years=years)
     obmid <- mean(pmid$data, na.rm=TRUE) - prob
