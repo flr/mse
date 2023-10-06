@@ -10,6 +10,20 @@
 
 #' 
 #' @examples
+#' # dataset contains both OM (FLom) and OEM (FLoem)
+#' data(sol274)
+#' # choose sa and hcr
+#' control <- mpCtrl(list(
+#'   est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+#'   trigger=41500, target=0.27))))
+#' # load statistics
+#' data(statistics)
+#' tun <- tunebisect(om, oem=oem, control=control, args=list(iy=2021, fy=2035),
+#' tune=list(target=c(0.15, 0.35)),
+#' metrics=list(SB=ssb), statistic=statistics['PSBMSY'], years=2025:2034)
+#' # Plot tuned MP
+#' plot(om, tun)
 
 tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   args, prob=0.5, tol=0.01, maxit=12, verbose=TRUE,
@@ -54,7 +68,8 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     message(paste0("[1] ", names(tune), ": ",
       unlist(cmin$hcr@args[names(tune)])))
 
-  rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"), ...)
+  rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
+    verbose=FALSE, ...)
 
   pmin <- performance(rmin, metrics=metrics, 
     statistics=statistic, refpts=refpts(om), probs=NULL, years=years)
@@ -78,7 +93,8 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     message(paste0("[2] ", names(tune), ": ",
       unlist(cmax$hcr@args[names(tune)])))
 
-  rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"), ...)
+  rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
+    verbose=FALSE, ...)
   
   pmax <- performance(rmax, metrics=metrics,
     statistic=statistic, refpts=refpts(om), probs=NULL, years=years)
@@ -114,7 +130,9 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
       message(paste0("[", count + 2, "] ", names(tune), ": ",
         format(unlist(cmid$hcr@args[names(tune)]), digits=3)))
 
-    rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"), ...)
+    rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
+      verbose=FALSE, ...)
+
     pmid <- performance(rmid, metrics=metrics, 
       statistics=statistic, refpts=refpts(om), probs=NULL, years=years)
     obmid <- mean(pmid$data, na.rm=TRUE) - prob

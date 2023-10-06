@@ -34,10 +34,10 @@
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
 #'   trigger=41500, target=0.27))))
-#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017), parallel=TRUE)
+#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021))
 #' plot(om, tes)
 #' # 'perfect.oem' is used if none is given
-#' tes <- mp(om, ctrl=control, args=list(iy=2017))
+#' tes <- mp(om, ctrl=control, args=list(iy=2021, fy=2035))
 #' plot(om, tes)
 
 mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
@@ -301,8 +301,11 @@ setMethod("goFish", signature(om="FLom"),
   # go fish!
 
   for(i in vy) {
+
+    # time (start)
+    stim <- Sys.time()
   
-    if(verbose & !handlers(global = NA)){
+    if(verbose){
       cat(i, " - ")
     }
 
@@ -310,9 +313,6 @@ setMethod("goFish", signature(om="FLom"),
     if(progress)
       p(message = sprintf("year: %s", i))
  
-    # time (start)
-    stim <- Sys.time()
-    
     # args
     ay <- args$ay <- an(i)
     dy <- args$dy <- ay - dlag

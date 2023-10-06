@@ -712,6 +712,74 @@ pid.hcr <- function(stk, ind, kp=0, ki=0, kd=0, nyears=5,
 
 # }}}
 
+# hr.hcr {{{
+
+hr.hcr <- function(stk, ind, metric="mean", target, trigger,
+  lambda=1, dtaclow=NA, dtacupp=NA, args, tracking) {
+
+  # args
+  sty<- args$iy
+  ay <- args$ay
+  frq <- args$frq
+  data_lag <- args$data_lag
+  man_lag <- args$management_lag
+  dys <- ac(ay - data_lag)
+  mys <- ac(seq(ay + man_lag, length.out=frq))
+
+  # SELECT metric
+  met <- ind[[metric]]
+  
+  # CALCULATE biomass safeguard, min(1, I_{ay-dlag} / Itrigger)
+  bsg <- qmin(met / trigger, 1)
+  
+  # SET new TAC
+  tac <- met * target * bsg * lambda
+
+  # TRACK initial tac
+  track(tracking, paste0("tac.hcr"), seq(ay + man_lag, ay + frq)) <- c(tac)
+
+  # GET previous TAC | catch
+  pre <- tracking[[1]]["hcr", dys]
+  nas <- c(is.na(pre))
+  if(any(nas)) {
+    iter(pre, nas) <- iter(catch(stk)[, ac(ay - frq)], nas)
+  }
+
+  # TODO: PA buffer
+
+  # APPLY limits if advice years is not the first simulation year
+  if (ay != (sty + 1))
+  {
+      if(!is.na(dtacupp))
+        tac[tac > pre * dtacupp] <- pre[tac > pre * dtacupp] * dtacupp
+      if(!is.na(dtaclow))
+        tac[tac < pre * dtaclow] <- pre[tac < pre * dtaclow] * dtaclow
+  }
+  # CONSTRUCT fwd control
+  ctrl <- as(FLQuants(catch=expand(tac, year=mys)), "fwdControl")
+
+  list(ctrl=ctrl, tracking=tracking)
+}
+
+# }}}
+
+# hr.target {{{
+
+hr.target <- function(len, catch, index, lc, linf) {
+
+  # COMPUTE reference length
+  reflen <- 0.75 * lc + 0.25 * linf
+
+  # IDENTIFY years where mean length >= reflen
+  iyr <- dimnames(len)$year[len >= reflen]
+
+  # CALCULATE harvest rate for selected years only
+  hr <- catch[, iyr] / index[, iyr]
+
+  return(yearMeans(hr))
+} 
+# }}}
+
 # -- COMBINE
 
 # meta.hcr {{{
