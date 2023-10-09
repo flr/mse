@@ -29,12 +29,12 @@
 #' @examples
 #' # dataset contains both OM (FLom) and OEM (FLoem)
 #' data(sol274)
-#' # choose sa and hcr
+#' # Set control: sa and hcr
 #' control <- mpCtrl(list(
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
 #'   trigger=41500, target=0.27))))
-#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021))
+#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2024))
 #' plot(om, tes)
 #' # 'perfect.oem' is used if none is given
 #' tes <- mp(om, ctrl=control, args=list(iy=2021, fy=2035))
@@ -42,7 +42,7 @@
 
 mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   scenario="NA", tracking="missing", logfile=tempfile(),
-  verbose=!handlers(global = NA), progress=!verbose, parallel=TRUE) {
+  verbose=!handlers(global = NA), parallel=TRUE) {
 
   # dims & dimnames
   if(is(om, 'list')) {
@@ -198,7 +198,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
       .options.future=list(globals=structure(TRUE, add=c("om", "oem",
-      "tracking", "fb", "iem", "ctrl", "args", "verbose", "progress",
+      "tracking", "fb", "iem", "ctrl", "args", "verbose",
       "logfile"),
       seed=seed)),
       .inorder=TRUE) %dofuture% {
@@ -213,7 +213,6 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
           ctrl= iter(ctrl, j),
           args=c(args[!names(args) %in% "it"], it=length(j)),
           verbose=verbose,
-          progress=progress,
           logfile=logfile)
 
         out <- do.call(goFish, call0)
@@ -235,7 +234,6 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
         ctrl=ctrl,
         args=args,
         verbose=verbose,
-        progress=progress,
         logfile=logfile)
 
       out <- do.call(goFish, call0)
@@ -272,7 +270,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
 setMethod("goFish", signature(om="FLom"),
   function(om, fb, projection, oem, iem, tracking, logfile, ctrl, args,
-    verbose, progress) {
+    verbose) {
 
   # ARGUMENTS
   it <- args$it     # number of iterations
@@ -310,8 +308,7 @@ setMethod("goFish", signature(om="FLom"),
     }
 
     # REPORT progress
-    if(progress)
-      p(message = sprintf("year: %s", i))
+    p(message = sprintf("year: %s", i))
  
     # args
     ay <- args$ay <- an(i)
@@ -618,7 +615,7 @@ setMethod("goFish", signature(om="FLom"),
 
 setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
-    verbose, progress, logfile) {
+    verbose, logfile) {
 
   it <- args$it     # number of iterations
   y0 <- args$y0     # initial data year
@@ -654,8 +651,7 @@ setMethod("goFish", signature(om="FLombf"),
     }
 
     # REPORT progress
-    if(progress)
-      p(message = sprintf("year: %s", i))
+    p(message = sprintf("year: %s", i))
     
     # time (start)
     stim <- Sys.time()
@@ -1021,7 +1017,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
 
       # CALL mp, parallel left to work along MPs
       run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
-         verbose=FALSE, progress=FALSE)
+         verbose=FALSE)
       
       p(message = sprintf("MP: %s", i))
 
