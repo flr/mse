@@ -37,8 +37,8 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     stop("Years for statistic computation 'years' outside of 'args' year range (iy:fy).")
 
   # CHECK that tune names match args(control$hcr)
-  if(!names(tune) %in% names(args(control$hcr)))
-    stop("Element in tune must be a argument in args(control$hcr).")
+  if(!names(tune) %in% formalArgs(method(control$hcr)))
+    stop("Element in tune must be a argument of method(control$hcr).")
 
   # CHECK length(tune)  == 1
   if(length(tune) > 1)

@@ -218,7 +218,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
 
     # ENSURE no zeroes coming, maybe from high Fs
     if(sum(index(res)[, dyrs]) == 0)
-      index(res)[,dyrs] <- sqrt(.Machine$double.eps)
+      index(res)[, dyrs] <- sqrt(.Machine$double.eps)
 
     # SET 0s to min / 2
     index(res)[index(res) == 0] <- c(min(index(res)[index(res) > 0] / 2))
