@@ -85,6 +85,23 @@ setMethod("FLmses", signature(object="list", performance="missing"),
 
 # [, [[
 
+setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
+  function(x, i, drop=FALSE) {
+    
+    # GET 
+    if(is.numeric(i)) {
+      i <- names(x)[i]
+    }
+    
+    # SUBSET in list, need to unclass
+    x@.Data <- unclass(x)[i]
+    
+    performance(x) <- x@performance[mp %in% i,]
+
+    return(x)
+  }
+)
+
 # DROP mps from performance table
 
 # 
