@@ -154,8 +154,8 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
   dyrs <- ac(seq(args$dy - args$frq + 1, args$dy))
 
   # CHECK inputs
-  if(any(!c("stk", "idx") %in% names(deviances)))
-    stop("deviances(oem) must have elements 'stk' and 'idx'.")
+  # if(!any(!c("stk", "idx") %in% names(deviances)))
+  #  stop("deviances(oem) must have elements 'stk' or 'idx'.")
 
   if(any(!c("stk", "idx") %in% names(observations)))
     stop("observations(oem) must have elements 'stk' and 'idx'.")
@@ -163,8 +163,6 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
   # TODO: GENERATE length samples from OM: catch and indices, BUT needs selex
   # - invALK
   # - lenSamples
-
-  # AGGREGATE len samples over unit, 
 
   # SIMPLIFY stk to match dimensions of observations$stk
 

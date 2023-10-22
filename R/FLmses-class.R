@@ -83,7 +83,7 @@ setMethod("FLmses", signature(object="list", performance="missing"),
 
 # plot
 
-# [, [[
+# [, [[ {{{
 
 setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
   function(x, i, drop=FALSE) {
@@ -101,6 +101,8 @@ setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
     return(x)
   }
 )
+
+# }}}
 
 # DROP mps from performance table
 

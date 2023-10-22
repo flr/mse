@@ -163,9 +163,7 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
     count <- count + 1
   }
 
-  warning("Solution not found within 'maxit', check 'range', 'maxit' or 'tol'.")
-
-  return(rmid)
+  stop("Solution not found within 'maxit', check 'range', 'maxit' or 'tol'.")
 
 } # }}}
 

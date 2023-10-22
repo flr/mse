@@ -320,7 +320,7 @@ setMethod("goFish", signature(om="FLom"),
     
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
-  
+    
     # TRACK om
     track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
       start=dy0, end=dyf))
