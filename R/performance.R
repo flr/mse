@@ -131,11 +131,14 @@ setMethod("performance", signature(x="FLQuants"),
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over statistics
       data.table::rbindlist(lapply(statistics, function(j) {
+
         # EVAL statistic
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(FLCore::window(x, start=i[1], end=i[length(i)]),
+
             # REPEAT refpts by year because recycling goes year first
             lapply(as(refpts, 'list'), rep, each=length(i)))), drop=FALSE)
+
       }), idcol="statistic", fill=TRUE)[,c("statistic", "data", "iter")]
     }), idcol="year")
 
@@ -185,8 +188,10 @@ setMethod("performance", signature(x="FLStock"),
         flqs <- do.call(FLCore::metrics, list(object=x, metrics))
       else if(is.function(metrics))
         flqs <- do.call(metrics, list(x))
+      else
+        stop("metrics could not be computed")
 
-      return(performance(flqs, refpts=refpts,
+    return(performance(flqs, refpts=refpts,
       statistics=statistics, years=years, probs=probs, mp=mp))
   }
 )

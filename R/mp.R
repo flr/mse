@@ -307,9 +307,6 @@ setMethod("goFish", signature(om="FLom"),
       cat(i, " - ")
     }
 
-    # REPORT progress
-    p(message = sprintf("year: %s", i))
- 
     # args
     ay <- args$ay <- an(i)
     dy <- args$dy <- ay - dlag
@@ -590,6 +587,9 @@ setMethod("goFish", signature(om="FLom"),
       cat(id, x, c(iterMeans(tracking[[1]][, ac(x)])), "\n", sep="\t",
         file=logfile, append=TRUE))
     
+    # REPORT progress
+    p(message = sprintf("year: %s", i))
+ 
     cat(id, paste0("[", ay, "]"), c(iterMeans(tracking[[1]][, ac(ay)])),
       "\n", sep="\t", file=logfile, append=TRUE)
 
