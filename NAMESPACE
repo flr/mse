@@ -33,6 +33,7 @@ export(
   "computeFp05",
   "cpue.hcr",
   "cpue.ind",
+  "decisions",
   "default.oem",
   "deplete",
   "effort.is",

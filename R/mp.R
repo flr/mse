@@ -840,7 +840,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
     }
 
-    track(tracking, "hcr", seq(ay, ay+frq-1)) <- ctrl
+    track(tracking, "hcr", mys) <- ctrl
 
     #----------------------------------------------------------
     # Implementation system
@@ -869,7 +869,7 @@ setMethod("goFish", signature(om="FLombf"),
       tracking <- out$tracking
 
       # BUG: DEAL with multirow ctrl
-      track(tracking, "isys", seq(ay, ay+frq-1)) <- ctrl[1,]
+      track(tracking, "hcr", mys) <- ctrl[1,]
     }    
 
     #----------------------------------------------------------
