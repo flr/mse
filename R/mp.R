@@ -869,7 +869,7 @@ setMethod("goFish", signature(om="FLombf"),
       tracking <- out$tracking
 
       # BUG: DEAL with multirow ctrl
-      track(tracking, "hcr", mys) <- ctrl[1,]
+      track(tracking, "isys", mys) <- ctrl[1,]
     }    
 
     #----------------------------------------------------------

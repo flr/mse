@@ -604,6 +604,8 @@ cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
   # TAC_y-1 ~ TAC_y * 1 + ka * m + kb * (mcpue - target)
   tac <- tac * (1 + ka * slope + kb * (mcpue - target))
   
+  # TAC limits, not on 1st year
+
   # CONTROL
   ctrl <- fwdControl(
     # TARGET for frq years
