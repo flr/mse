@@ -175,8 +175,6 @@ setReplaceMethod("sr", signature("FLom", "FLQuant"), function(object, value){
   return(object)
 })
 
-
-
 # }}}
 
 # accessors to stock slots {{{
@@ -276,6 +274,178 @@ setMethod("stock.wt", signature(object="FLom"),
     return(stock.wt(stock(object)))
   }
 )
+
+setMethod("discards.ratio", signature(object="FLom"),
+  function(object) {
+    return(discards.ratio(stock(object)))
+  }
+)
+
+# ---
+
+setReplaceMethod("catch", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    catch(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("catch.n", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    catch.n(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("catch.wt", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    catch.wt(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("landings", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    landings(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("landings.n", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    landings.n(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("landings.wt", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    landings.wt(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("discards", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    discards(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("discards.n", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    discards.n(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("discards.wt", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    discards.wt(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("m", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    m(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("m.spwn", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    m.spwn(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("mat", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    mat(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("harvest", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    harvest(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("harvest.spwn", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    harvest.spwn(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("stock.n", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    stock.n(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("stock.wt", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    stock.wt(stock(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("discards.ratio", signature(object="FLom", value="FLQuant"),
+  function(object, value) {
+    discards.ratio(stock(object)) <- value
+    return(object)
+  }
+)
+
+# }}}
+
+# accessors to sr slots {{{
+
+setMethod("params", signature(object="FLom"),
+  function(object) {
+    return(params(sr(object)))
+  }
+)
+
+setReplaceMethod("params", signature(object="FLom", value="FLPar"),
+  function(object, value) {
+    params(sr(object)) <- value
+    return(object)
+  }
+)
+
+setMethod("model", signature(object="FLom"),
+  function(object) {
+    return(model(sr(object)))
+  }
+)
+
+setReplaceMethod("model", signature(object="FLom", value="formula"),
+  function(object, value) {
+    model(sr(object)) <- value
+    return(object)
+  }
+)
+
+setReplaceMethod("model", signature(object="FLom", value="list"),
+  function(object, value) {
+    model(sr(object)) <- value$model
+    return(object)
+  }
+)
+
+setReplaceMethod("model", signature(object="FLom", value="function"),
+  function(object, value) {
+    model(sr(object)) <- do.call(value, list())$model
+    return(object)
+  }
+)
+
 # }}}
 
 # ssb, tsb {{{
