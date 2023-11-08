@@ -9,7 +9,7 @@ tac.is(
   ctrl,
   args,
   output = "catch",
-  recyrs = c(dims(stk)$year, 2),
+  recyrs = -2,
   Fdevs = fbar(stk) \%=\% 1,
   dtaclow = NA,
   dtacupp = NA,

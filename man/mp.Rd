@@ -15,7 +15,6 @@ mp(
   tracking = "missing",
   logfile = tempfile(),
   verbose = !handlers(global = NA),
-  progress = !verbose,
   parallel = TRUE
 )
 }
@@ -46,14 +45,14 @@ on an operating model, observation error model, control and arguments.
 \examples{
 # dataset contains both OM (FLom) and OEM (FLoem)
 data(sol274)
-# choose sa and hcr
+# Set control: sa and hcr
 control <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
   trigger=41500, target=0.27))))
-tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017), parallel=TRUE)
+tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2024))
 plot(om, tes)
 # 'perfect.oem' is used if none is given
-tes <- mp(om, ctrl=control, args=list(iy=2017))
+tes <- mp(om, ctrl=control, args=list(iy=2021, fy=2035))
 plot(om, tes)
 }

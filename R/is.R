@@ -51,10 +51,9 @@
 #' # Plot run time series
 #' plot(om, TAC.IS=run)
 
-tac.is <- function(stk, ctrl, args, output="catch",
-  recyrs=-2, Fdevs=fbar(stk) %=% 1,
-  dtaclow=NA, dtacupp=NA, fmin=0, initac=metrics(stk, output)[, ac(iy - 1)],
-  tracking) {
+tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
+  Fdevs=fbar(stk) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0,
+  initac=metrics(stk, output)[, ac(iy - 1)], tracking) {
 
   # EXTRACT args
   spread(args)
