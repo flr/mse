@@ -98,8 +98,8 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #'   output="catch", dlow=0.85, dupp=1.15, args=args,
 #'   tracking=FLQuant(dimnames=list(metric="catch.hcr", year=2014:2016)))
 
-hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
-  output="fbar", dlow=NA, dupp=NA, all=TRUE, args, tracking) {
+hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
+  metric="ssb", output="fbar", dlow=NA, dupp=NA, all=TRUE, args, tracking) {
   
   # EXTRACT args
   ay <- args$ay
@@ -114,24 +114,26 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
   # TRACK metric
   track(tracking, "met.hcr", ay - data_lag) <- c(met)
   
-  # APPLY rule
+  # - APPLY rule
 
   # BELOW lim
-  out <- ifelse(met <= lim, min,
+  out <- c(ifelse(met <= lim, min,
     # BETWEEN lim and trigger
     ifelse(met < trigger,
       # diff(met - lim) * gradient + min
       (met - lim) * ((target - min) / (trigger - lim)) + min,
     # ABOVE trigger
-    target)
-  )
+    target)))
+
+  # APPLY drop to min
+  out[c(met < drop)] <- min
 
   # TRACK decision
   # - 1 if met <= lim
   # - 2 if lim < met < trigger
   # - 3 if met >= trigger 
-  track(tracking, "decision.hcr", ay) <- ifelse(met <= lim, 1,
-    ifelse(met < trigger, 2, 3))
+  track(tracking, "decision.hcr", ay) <- ifelse(met < drop, 0,
+    ifelse(met <= lim, 1, ifelse(met < trigger, 2, 3)))
 
   # LIMITS over previous output
   pre <- unitSums(seasonSums(window(do.call(output, list(stk)),
@@ -182,7 +184,6 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, metric="ssb",
 
 	list(ctrl=ctrl, tracking=tracking)
 }
-
 # }}}
 
 # plot_hockeystick.hcr {{{
