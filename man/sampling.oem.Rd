@@ -4,7 +4,7 @@
 \alias{sampling.oem}
 \title{Samples from an operating model to obtain catch, biology and abundance data}
 \usage{
-sampling.oem(stk, deviances, observations, args, tracking)
+sampling.oem(stk, deviances, observations, stability = 1, args, tracking)
 }
 \arguments{
 \item{stk}{An FLStock object as obtained by the call to \emph{stock(om)}.}
