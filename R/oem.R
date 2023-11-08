@@ -146,7 +146,8 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
 #'   observations=observations(oem),
 #'   args=list(y0=2000, dy=2021, frq=1), tracking=FLQuant())
 
-sampling.oem <- function(stk, deviances, observations, args, tracking) {
+sampling.oem <- function(stk, deviances, observations, stability=1,
+  args, tracking) {
 
   # DIMENSIONS
   y0 <- ac(args$y0)
@@ -206,13 +207,13 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
 
   # APPLY survey() with deviances$idx on top of index.q
 
-  idx[upi] <- Map(function(x, y) {
+  idx[upi] <- Map(function(x, y, z) {
 
     dyrs <- intersect(dyrs, dimnames(y)$year)
 
     # CREATE survey obs
     res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
-      index.q=index.q(x)[, dyrs] * y[, dyrs])
+      index.q=index.q(x)[, dyrs] * y[, dyrs], stability=z)
 
     # ENSURE no zeroes coming, maybe from high Fs
     if(sum(index(res)[, dyrs]) == 0)
@@ -226,7 +227,7 @@ sampling.oem <- function(stk, deviances, observations, args, tracking) {
 
     return(window(x, end=dy))
 
-  }, x=idx[upi], y=deviances$idx[upi])
+  }, x=idx[upi], y=deviances$idx[upi], z=rep(stability, length(idx))[upi])
 
   for(i in seq(idx[upi])) {
     yrs <- intersect(dyrs, dimnames(idx[upi][[i]])$year)
