@@ -1059,6 +1059,6 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
       names(res) <- paste(module, seq(largs), sep='_')
   }
 
-  return(res[done])
+  return(FLmses(res[done]))
 }
 # }}}
