@@ -60,9 +60,8 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
   # PREPARE stk until ay + mlag, biology as in last nsqy years
   fut <- fwdWindow(stk, end=ay + management_lag, nsq=nsqy)
-  
-  # PARSE recyrs if numeric
 
+  # PARSE recyrs if numeric
   id <- dimnames(stk)$year
 
   # COERCE to list
@@ -91,8 +90,8 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     stop("'recyrs' cannot be found in input stk")
 
   # TODO: OTHER rec options
-  # SET GM recruitment
   
+  # SET GM recruitment
   gmnrec <- exp(yearMeans(log(rec(stk)[, recyrs])))
 
   srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))

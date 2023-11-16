@@ -643,7 +643,8 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
       return(mets[[1]])
 
     return(mets)
-}) # }}}
+})
+# }}}
 
 # stock {{{
 

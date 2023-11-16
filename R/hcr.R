@@ -172,7 +172,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
   # CONTROL
   ctrl <- fwdControl(
     # TARGET for frq years
-    c(lapply(seq(ay + man_lag, ay + frq), function(x)
+    c(lapply(seq(ay + man_lag, ay + man_lag + frq - 1), function(x)
       list(quant=output, value=c(out), year=x)))
   )
 

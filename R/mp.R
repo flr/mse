@@ -271,7 +271,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 setMethod("goFish", signature(om="FLom"),
   function(om, fb, projection, oem, iem, tracking, logfile, ctrl, args,
     verbose) {
-
+  
   # ARGUMENTS
   it <- args$it     # number of iterations
   y0 <- args$y0     # initial data year
