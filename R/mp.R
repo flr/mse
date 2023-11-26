@@ -464,7 +464,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl <- as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]), 
         year=mys)), "fwdControl")
     }
-
+    
     # tracking multiple targets/limits, one year
     track(tracking, "hcr", mys) <- ctrl
 

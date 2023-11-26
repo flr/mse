@@ -13,7 +13,9 @@ importFrom("FLBRP",
   "refpts",
   "refpts<-",
   "brp",
-  "FLBRP")
+  "FLBRP",
+  "remap",
+  "computeRefpts")
 
 importFrom("stats",
   "coef",
@@ -73,6 +75,7 @@ export(
   "response.fb",
   "sampling.oem",
   "seasonal.is",
+  "selectMetric",
   "shortcut_devs",
   "shortcut.oem",
   "shortcut.sa",

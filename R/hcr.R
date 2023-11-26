@@ -107,12 +107,16 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
   man_lag <- args$management_lag
   frq <- args$frq
 
+  # SET data year
+  dy <- ay - data_lag
+  # SET control years
+  cys <- seq(ay + man_lag, ay + man_lag + frq - 1)
+
   # COMPUTE metric
-  met <- window(selectMetric(metric, stk, ind), start=ay - data_lag,
-    end=ay - data_lag)
+  met <- window(selectMetric(metric, stk, ind), start=dy, end=dy)
 
   # TRACK metric
-  track(tracking, "met.hcr", ay - data_lag) <- c(met)
+  track(tracking, "met.hcr", dy) <- c(met)
   
   # - APPLY rule
 
@@ -137,7 +141,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
 
   # LIMITS over previous output
   pre <- unitSums(seasonSums(window(do.call(output, list(stk)),
-    start=ay - data_lag, end=ay - data_lag)))
+    start=ay - man_lag, end=ay - man_lag)))
   
   # IF NA, set to previous value
   if(any(is.na(out))) {
@@ -147,7 +151,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
   }
 
   # TRACK initial target
-  track(tracking, paste0(output, ".hcr"), seq(ay + man_lag, ay + frq)) <- c(out)
+  track(tracking, paste0(output, ".hcr"), cys) <- c(out)
 
   # APPLY limits, always or if met < trigger
 
@@ -172,8 +176,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
   # CONTROL
   ctrl <- fwdControl(
     # TARGET for frq years
-    c(lapply(seq(ay + man_lag, ay + man_lag + frq - 1), function(x)
-      list(quant=output, value=c(out), year=x)))
+    c(lapply(cys, function(x) list(quant=output, value=c(out), year=x)))
   )
 
   # SET fbar ages
@@ -192,6 +195,10 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
 #' args <- list(lim=1e5, trigger=4e5, target=0.25, min=0,
 #'   metric="ssb", output="fbar")
 #' # Plot hockeystick.hcr for given arguments
+#' plot_hockeystick.hcr(args)
+#' #
+#' args <- list(lim=0, trigger=4e5, target=0.25, min=0, drop=2e5,
+#'   metric="ssb", output="fbar")
 #' plot_hockeystick.hcr(args)
 #' # Add metric and output from FLStock
 #' plot_hockeystick.hcr(args, obs=ple4)
@@ -241,7 +248,7 @@ plot_hockeystick.hcr <- function(args, obs="missing",
   xlim <- trigger * 1.50
   ylim <- target * 1.50
   
-    # SET met values
+  # SET met values
   met <- seq(0, xlim, length=200)
 
   # BELOW lim
@@ -254,6 +261,9 @@ plot_hockeystick.hcr <- function(args, obs="missing",
     # ABOVE trigger
     target)
   )
+
+  # APPLY drop to min
+  out[c(met < drop)] <- min
 
   # LABELS as list
   labels <- as.list(labels)

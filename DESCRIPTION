@@ -1,6 +1,6 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.2.3.9240
+Version: 2.2.3.9242
 Authors@R: c(person(given = "Iago", family = "Mosqueira",
   role = c("aut", "cre"), email = "iago.mosqueira@wur.nl"), 
   person("Ernesto", "Jardim", email = "ernesto.jardim@msc.org",
@@ -16,14 +16,14 @@ Depends:
   ggplotFL(>= 2.6.10),
   FLFishery,
   FLasher(>= 0.6.7),
+  FLBRP(>= 2.5.8),
   doFuture,
   data.table,
   progressr
 Imports:
   parallelly,
   ggrepel,
-  patchwork,
-  FLBRP(>= 2.5.8)
+  patchwork
 Additional_repositories: http://flr-project.org/R
 Suggests:
   testthat,
