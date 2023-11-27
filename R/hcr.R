@@ -196,7 +196,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
 #'   metric="ssb", output="fbar")
 #' # Plot hockeystick.hcr for given arguments
 #' plot_hockeystick.hcr(args)
-#' #
+#' # Plot wheh 'drop' has been set
 #' args <- list(lim=0, trigger=4e5, target=0.25, min=0, drop=2e5,
 #'   metric="ssb", output="fbar")
 #' plot_hockeystick.hcr(args)
