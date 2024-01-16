@@ -590,8 +590,9 @@ target.hcr <- function(ind, lim, target, r=1, metric="mlc", output="catch",
 #'   tracking=FLQuants(sol174=FLQuant(1000, dimnames=list(metric="hcr",
 #'   year=2000))))
 
-cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
-  dtaclow=0.85, dtacupp=1.15, slope="slope", mean="mean", args, tracking) {
+cpue.hcr <- function(stk, ind, k1=0.2, k2=0.2, k3=0.2, k4=0.2, target=1,
+  dtaclow=0.85, dtacupp=1.15, initac=NULL, slope="slope", mean="mean",
+  args, tracking) {
 
   # args
   ay <- args$ay
@@ -606,16 +607,20 @@ cpue.hcr <- function(stk, ind, k1, k2, k3, k4, target=1,
   ka <- ifelse(slope > 0, k1, k2)
   kb <- ifelse(mcpue > target, k3, k4)
 
-  # GET previous TAC nfrom last hcr ...
-  tac <- tracking[[1]]['hcr', ac(ay)]
-  # ... OR catch
-  if(all(is.na(tac)))
-    tac <- seasonSums(catch(stk)[, ac(ay - args$data_lag)])
+  # GET previous TAC from last hcr ...
+  if(is.null(initac)) {
+    tac <- tracking[[1]]['hcr', ac(ay)]
+    # ... OR catch
+    if(all(is.na(tac)))
+      tac <- areaSums(seasonSums(catch(stk)[, ac(ay - args$data_lag)]))
+  } else {
+    tac <- initac
+  }
 
   # TAC_y-1 ~ TAC_y * 1 + ka * m + kb * (mcpue - target)
   tac <- tac * (1 + ka * slope + kb * (mcpue - target))
   
-  # TAC limits, not on 1st year
+  # TODO: TAC limits, not on 1st year(s)
 
   # CONTROL
   ctrl <- fwdControl(

@@ -20,7 +20,11 @@ setGeneric("FLmses", function(object, performance, ...)
 
 # TODO: COLLATE individual performance tables
 
-# FLmses(object=missing, ...)
+setMethod("FLmses", signature(object="missing", performance="missing"),
+  function(...) {
+    FLmses(FLlst())
+  }
+)
 
 setMethod("FLmses", signature(object="FLmse", performance="ANY"),
   function(object, performance, ...) {
@@ -64,8 +68,6 @@ setMethod("FLmses", signature(object="list", performance="missing"),
     
     res <- new("FLmses", .Data=object, performance=perf,
       names=names(object))
-  
-    return(res)
 
     # TODO: COMPUTE performance IF statistics
     if(!missing(statistics)) {
@@ -76,12 +78,31 @@ setMethod("FLmses", signature(object="list", performance="missing"),
       }
       perf <- performance(object, statistics=statistics, years=years,
         metrics=metrics)
+
+      performance(res) <- perf
     }
+
+    return(res)
   }
 )
 # }}}
 
 # plot
+
+# $<- {{{
+setReplaceMethod("$", signature(x="FLmses", value="FLmse"),
+	function(x, name, value) {
+
+    nms <- names(x)
+    
+    x@.Data[[as.character(name)]] <- value
+
+    names(x@.Data) <- c(nms, name)
+
+    return(x)
+  }
+)
+# }}}
 
 # [, [[ {{{
 
@@ -104,6 +125,4 @@ setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
 
 # }}}
 
-# DROP mps from performance table
-
-# 
+# TODO: DROP mps from performance table

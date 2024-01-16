@@ -35,6 +35,7 @@
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
 #'   trigger=41500, target=0.27))))
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2024))
+#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2024))
 #' plot(om, tes)
 #' # 'perfect.oem' is used if none is given
 #' tes <- mp(om, ctrl=control, args=list(iy=2021, fy=2035))
@@ -968,6 +969,8 @@ setMethod("goFish", signature(om="FLombf"),
 ) # }}}
 
 # mps {{{
+
+# TODO: mps(FLmse, oem=oem(), crtrl=control(), args=args(), ...)
 
 mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   ...) {
