@@ -246,21 +246,12 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if(!is(lst0$om, "FLo"))
     stop("goFish returned no results")
 
-  # GET objects back from loop, up to last projected year
-  om <- window(lst0$om, end=vy[length(vy)])
-
-  if(missingoem)
-    oem <- FLoem()
-  else
-    oem <- window(lst0$oem, end=vy[length(vy)])
-
-  tracking <- window(lst0$tracking, end=vy[length(vy)])
 
   if(verbose) cat("\n")
 
   # --- RETURN
-  res <- new("FLmse", om=om, args=args, oem=oem, control=ctrl,
-    tracking = tracking)
+  res <- new("FLmse", om=lst0$om, args=args, oem=lst0$oem, control=ctrl,
+    tracking = lst0$tracking)
   
   return(res)
 }
@@ -607,7 +598,7 @@ setMethod("goFish", signature(om="FLom"),
 
   # RETURN
   list(om=window(om, start=iy, end=fy), tracking=window(tracking, end=fy),
-    oem=oem, args=args)
+    oem=window(oem, end=fy), args=args)
   } 
 )
 # }}}
@@ -963,7 +954,7 @@ setMethod("goFish", signature(om="FLombf"),
 
   # RETURN
   list(om=window(om, start=iy, end=fy), tracking=window(tracking, end=fy),
-    oem=oem, args=args)
+       oem=window(oem, end=fy), args=args)
 
   }
 ) # }}}
