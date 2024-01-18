@@ -235,9 +235,11 @@ plot_hockeystick.hcr <- function(args, obs="missing",
   if(is(args, "mseCtrl"))
     args <- args(args)
 
-  # ASSIGN min if missing
+  # ASSIGN args if missing
   if(!"min" %in% names(args))
     args$min <- 0
+  if(!"drop" %in% names(args))
+    args$drop <- 0
   if(!"metric" %in% names(args))
     metric <- "ssb"
   if(!"output" %in% names(args))
