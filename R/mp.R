@@ -89,9 +89,9 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # vector of years to be projected
   vy <- args$vy <- ac(seq(iy, fy - management_lag, by=frq))
-
-  # CHECK proj years do not extend beyond fy
-  if(an(vy[length(vy)]) + frq > fy) {
+  
+  # CHECK proj years do not extend beyond maxyear
+  if(an(vy[length(vy)]) + frq > dis$maxyear) {
     args$vy <- vy <- vy[-length(vy)]
   }
 
@@ -247,14 +247,14 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     stop("goFish returned no results")
 
   # GET objects back from loop, up to last projected year
-  om <- window(lst0$om, end=vy[length(vy)])
+  om <- window(lst0$om, end=an(vy[length(vy)]) + frq)
 
   if(missingoem)
     oem <- FLoem()
   else
-    oem <- window(lst0$oem, end=vy[length(vy)])
+    oem <- window(lst0$oem, end=an(vy[length(vy)]) + frq)
 
-  tracking <- window(lst0$tracking, end=vy[length(vy)])
+  tracking <- window(lst0$tracking, end=an(vy[length(vy)]) + frq)
 
   if(verbose) cat("\n")
 
@@ -606,8 +606,7 @@ setMethod("goFish", signature(om="FLom"),
   track(tracking, "C.om", fys) <- unitSums(catch(om))[, ac(fys)]
 
   # RETURN
-  list(om=window(om, start=iy, end=fy), tracking=window(tracking, end=fy),
-    oem=oem, args=args)
+  list(om=om, tracking=tracking, oem=oem, args=args)
   } 
 )
 # }}}
@@ -961,10 +960,8 @@ setMethod("goFish", signature(om="FLombf"),
     invisible(gc())
   }
 
-  # RETURN
-  list(om=window(om, start=iy, end=fy), tracking=window(tracking, end=fy),
-    oem=oem, args=args)
-
+    # RETURN
+    list(om=om, tracking=tracking, oem=oem, args=args)
   }
 ) # }}}
 
