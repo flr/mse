@@ -68,18 +68,19 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   if(!is.list(recyrs)) {
     recyrs <- list(recyrs)
   }
-
+  
   # PARSE list
   for(i in recyrs) {
-    if(is(i, 'character'))
+    if(is(i, 'character')) {
       id <- id[!id %in% i]
-    else if(all(i < 0))
+    } else if(all(i < 0)) {
       if(length(i) == 1)
         id <- rev(rev(id)[-seq(abs(i))])
       else
         id <- rev(rev(id)[i])
-    else if(all(i > 0))
-      id <- id[i]
+    } else if(all(i > 0)) {
+      id <- rev(rev(id)[seq(abs(i))])
+    }
   }
 
   # SET years to use
