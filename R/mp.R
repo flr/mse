@@ -34,9 +34,9 @@
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
 #'   trigger=41500, target=0.27))))
-#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2024))
-#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2024))
-#' plot(om, tes)
+#' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034))
+#' tes3 <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034, frq=3))
+#' plot(om, tes, tes3)
 #' # 'perfect.oem' is used if none is given
 #' tes <- mp(om, ctrl=control, args=list(iy=2021, fy=2035))
 #' plot(om, tes)
@@ -128,7 +128,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # SETUP tracking FLQs
   tracking <- FLQuant(NA, dimnames=list(
     metric=c(metric, steps[steps %in% names(ctrl)], "fb", "fwd", "time", "pid"),
-    year=ac(seq(iy - data_lag - frq + 1, fy + management_lag)),
+    year=ac(seq(iy - data_lag - frq + 1, fy - management_lag + frq)),
     unit="unique",
     season=dmns$season,
     iter=1:args$it))
@@ -246,7 +246,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if(!is(lst0$om, "FLo"))
     stop("goFish returned no results")
 
-  # GET objects back from loop, up to last projected year
+  # GET objects back from loop, for iy up to last projected year
 
   om <- window(lst0$om, start=iy, end=an(vy[length(vy)]) + frq)
 
