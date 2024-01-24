@@ -103,6 +103,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
   
   # EXTRACT args
   ay <- args$ay
+  iy <- args$iy
   data_lag <- args$data_lag
   man_lag <- args$management_lag
   frq <- args$frq
@@ -139,10 +140,13 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
   track(tracking, "decision.hcr", ay) <- ifelse(met < drop, 0,
     ifelse(met <= lim, 1, ifelse(met < trigger, 2, 3)))
 
-  # LIMITS over previous output
-  pre <- unitSums(seasonSums(window(do.call(output, list(stk)),
-    start=ay - man_lag, end=ay - man_lag)))
-  
+  # GET TAC dy / ay - 1
+  if(ay == iy)
+    pre <- areaSums(unitSums(seasonSums(window(do.call(output, list(stk)),
+      start=ay - man_lag, end=ay - man_lag))))
+  else
+    pre <- c(tracking[[1]]["hcr", ac(ay)])
+
   # IF NA, set to previous value
   if(any(is.na(out))) {
     out[is.na(out)] <- pre[is.na(out)]

@@ -839,7 +839,7 @@ setMethod("goFish", signature(om="FLombf"),
       # BUG: DROP getCtrl
       ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
     }
-
+    
     track(tracking, "hcr", mys) <- ctrl
 
     #----------------------------------------------------------
