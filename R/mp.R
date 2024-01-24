@@ -247,15 +247,18 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     stop("goFish returned no results")
 
   # GET objects back from loop, up to last projected year
-  om <- window(lst0$om, end=an(vy[length(vy)]) + frq)
+
+  om <- window(lst0$om, start=iy, end=an(vy[length(vy)]) + frq)
 
   if(missingoem)
     oem <- FLoem()
   else
-    oem <- window(lst0$oem, end=an(vy[length(vy)]) + frq)
+    oem <- window(lst0$oem, start=iy, end=an(vy[length(vy)]) + frq)
 
-  tracking <- window(lst0$tracking, end=an(vy[length(vy)]) + frq)
+  tracking <- window(lst0$tracking, start=an(iy) - data_lag,
+    end=an(vy[length(vy)]) + frq)
 
+  # END year print
   if(verbose) cat("\n")
 
   # --- RETURN
