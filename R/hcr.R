@@ -269,7 +269,7 @@ plot_hockeystick.hcr <- function(args, obs="missing",
   )
 
   # APPLY drop to min
-  out[c(met < drop)] <- min
+  out[c(met < args$drop)] <- min
 
   # LABELS as list
   labels <- as.list(labels)

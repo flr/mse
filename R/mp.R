@@ -823,7 +823,7 @@ setMethod("goFish", signature(om="FLombf"),
       # COUNT targets with 'f' or 'fbar', need minAge, maxAge
       fbis <- target(ctrl)[ctrl$quant %in% c("f", "fbar"),]
 
-      # SET fbar ages if missing
+      # BUG: SET fbar ages if missing
       if(nrow(fbis) > 0) {
         
         # GET fbar ranges
@@ -837,14 +837,14 @@ setMethod("goFish", signature(om="FLombf"),
         target(ctrl)[ctrl$quant %in% c("f", "fbar"),] <- fbis
       }
 
-      tracking <- out$tracking
+     tracking <- out$tracking
     } else {
       # BUG: DROP getCtrl
       ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
     }
     
     track(tracking, "hcr", mys) <- ctrl
-
+    
     #----------------------------------------------------------
     # Implementation system
     #----------------------------------------------------------
