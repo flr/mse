@@ -22,7 +22,8 @@ setGeneric("FLmses", function(object, performance, ...)
 
 setMethod("FLmses", signature(object="missing", performance="missing"),
   function(...) {
-    FLmses(FLlst())
+    args <- list(...)
+    FLmses(FLlst(args))
   }
 )
 

@@ -1060,6 +1060,8 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
       names(res) <- paste(module, names(mopts)[1], round(mopts[[1]]), sep='_')
     else
       names(res) <- paste(module, seq(largs), sep='_')
+  } else {
+    names(res) <- names
   }
 
   return(FLmses(res[done]))
