@@ -54,9 +54,4 @@ ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
 # Test for year when SSB < bsafe
 ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
-#
-hockeystick.hcr(ple4, ind=FLQuant(), lim=2e5, trigger=3e5, target=0.15,
-  min=0.05, metric="ssb", output="fbar",
-  args=list(iy=2018, ay=2018, data_lag=1, management_lag=1, frq=1),
-  tracking=FLQuant(dimnames=list(metric="fbar.hcr", year=2017:2019)))
 }

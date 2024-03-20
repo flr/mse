@@ -36,7 +36,7 @@
 #'   trigger=41500, target=0.27))))
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034))
 #' tes3 <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034, frq=3))
-#' plot(om, tes, tes3)
+#' plot(om, list(annual=tes, triannual=tes3))
 #' # 'perfect.oem' is used if none is given
 #' tes <- mp(om, ctrl=control, args=list(iy=2021, fy=2035))
 #' plot(om, tes)

@@ -8,10 +8,9 @@
 
 # FLo {{{
 setMethod("plot", signature(x="FLo", y="missing"),
-  function(x, ...) {
+  function(x, ..., metrics=NULL) {
 
     args <- list(...)
-    metrics <- args$metrics
 
     # COMPUTE metrics
     if(is.null(metrics))
@@ -27,7 +26,7 @@ setMethod("plot", signature(x="FLo", y="missing"),
 # FLo, FLmse {{{
 
 setMethod("plot", signature(x="FLo", y="FLmse"),
-  function(x, y, metrics=NULL, ..., window=TRUE) {
+  function(x, y, ..., metrics=NULL, window=TRUE) {
 
     # MERGE all FLmse args
     y <- c(list(y), list(...))
@@ -62,7 +61,7 @@ setMethod("plot", signature(x="FLo", y="fwdControl"),
 # FLom, list {{{
 
 setMethod("plot", signature(x="FLom", y="list"),
-  function(x, y, window=TRUE, ...) {
+  function(x, y, ..., window=TRUE, metrics=NULL) {
 
     # WINDOW om
     if(isTRUE(window))
@@ -74,7 +73,6 @@ setMethod("plot", signature(x="FLom", y="list"),
 
     # PARSE args
     args <- list(...)
-    metrics <- args$metrics
 
     # COMPUTE metrics
     if(is.null(metrics))
