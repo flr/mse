@@ -32,7 +32,7 @@ method(object, ...)
 
 method(object, ...) <- value
 
-\S4method{method}{mseCtrl,`function`}(object) <- value
+\S4method{method}{mseCtrl,function}(object) <- value
 
 args(name)
 

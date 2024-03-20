@@ -1,8 +1,7 @@
 Makefile
 docs
-appveyor.yml
+paper
 .github
-.travis.yml
 ^.*\.Rproj$
 ^\.Rproj\.user$
 data-raw

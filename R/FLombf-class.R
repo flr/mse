@@ -103,7 +103,7 @@ setMethod("biol", signature(object="FLombf"),
 setGeneric("biol<-", function(object, ..., value) standardGeneric("biol<-"))
 
 setReplaceMethod("biol", signature(object="FLombf", value="FLBiol"),
-  function(object, value, stock="missing") {
+  function(object, stock="missing", value) {
 
     if (!missing(stock)) {
       object@biols[[stock]] <- value
@@ -112,7 +112,7 @@ setReplaceMethod("biol", signature(object="FLombf", value="FLBiol"),
       object@biols[[1]] <- value
       return(object)
     } else
-      stop("FLombf object contains mora than one biol, but none was selected.")
+      stop("FLombf object contains more than one biol, but none was selected.")
   })
 
 setGeneric("biols", function(object, ...) standardGeneric("biols"))

@@ -55,7 +55,7 @@ est(object, ...)
 
 est(object) <- value
 
-\S4method{est}{mpCtrl,`function`}(object) <- value
+\S4method{est}{mpCtrl,function}(object) <- value
 
 phcr(object, ...)
 
@@ -63,7 +63,7 @@ phcr(object, ...)
 
 phcr(object) <- value
 
-\S4method{phcr}{mpCtrl,`function`}(object) <- value
+\S4method{phcr}{mpCtrl,function}(object) <- value
 
 hcr(object, ...)
 
@@ -71,7 +71,7 @@ hcr(object, ...)
 
 hcr(object) <- value
 
-\S4method{hcr}{mpCtrl,`function`}(object) <- value
+\S4method{hcr}{mpCtrl,function}(object) <- value
 
 isys(object, ...)
 
@@ -79,7 +79,7 @@ isys(object, ...)
 
 isys(object) <- value
 
-\S4method{isys}{mpCtrl,`function`}(object) <- value
+\S4method{isys}{mpCtrl,function}(object) <- value
 
 tm(object, ...)
 
@@ -87,7 +87,7 @@ tm(object, ...)
 
 tm(object) <- value
 
-\S4method{tm}{mpCtrl,`function`}(object) <- value
+\S4method{tm}{mpCtrl,function}(object) <- value
 
 \S4method{show}{mpCtrl}(object)
 
@@ -97,9 +97,9 @@ tm(object) <- value
 
 \S4method{method}{mpCtrl}(object, element)
 
-\S4method{method}{mpCtrl,`function`}(object, element) <- value
+\S4method{method}{mpCtrl,function}(object, element) <- value
 
-\S4method{args}{mpCtrl,`function`}(object, element) <- value
+\S4method{args}{mpCtrl,function}(object, element) <- value
 
 \S4method{debug}{mpCtrl,character}(fun, text)
 }
