@@ -1,6 +1,6 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.2.3.9255
+Version: 2.2.3.9256
 Authors@R: c(person(given = "Iago", family = "Mosqueira",
   role = c("aut", "cre"), email = "iago.mosqueira@wur.nl"), 
   person("Ernesto", "Jardim", email = "ernesto.jardim@msc.org",
@@ -24,7 +24,7 @@ Imports:
   parallelly,
   ggrepel,
   patchwork
-Additional_repositories: http://flr-project.org/R
+Additional_repositories: https://flr.r-universe.dev
 Suggests:
   testthat,
   knitr,
