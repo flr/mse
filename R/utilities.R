@@ -91,14 +91,14 @@ combinations <- function(...) {
 #' data(sol274)
 #' 
 
-decisions <- function(x, year=1, iter=NULL) {
+decisions <- function(x, years=dimnames(tracking(x))$year, iter=NULL) {
 
   # EXTRACT tracking and args
   trac <- tracking(x)
   args <- args(x)
 
   # USE year as numeric
-  year <- as.numeric(year)
+  years <- as.numeric(years)
 
   # SET iters if not given
   if(is.null(iter))
@@ -121,8 +121,8 @@ decisions <- function(x, year=1, iter=NULL) {
   }
 
   # COMPUTE tables
-  res <- lapply(year, function(y) {
-  
+  res <- lapply(years, function(y) {
+
     # GET advice, data and management years
     ay  <-  y
     dy <- ay - args$data_lag
@@ -132,10 +132,13 @@ decisions <- function(x, year=1, iter=NULL) {
 
     # data
     dmet <- c("SB.om", "SB.obs", "SB.est", "met.hcr")
+    dmet <- dmet[dmet %in% dimnames(trac)$metric]
 
     # advice
     amet <- c("decision.hcr", "fbar.hcr", "hcr", "fbar.isys", "isys",
       "fwd", "C.om")
+
+    amet <- amet[amet %in% dimnames(trac)$metric]
 
     # SUBSET metrics from tracking
     dout <- trac[dmet, ac(dy),,,, iter]

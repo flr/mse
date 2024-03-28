@@ -681,7 +681,7 @@ setMethod("goFish", signature(om="FLombf"),
       start=dy, end=dy))
     
     # --- OEM: Observation Error Model
- 
+
     # COMMON elements
     ctrl.oem <- args(oem)
     ctrl.oem$method <- method(oem)
@@ -697,9 +697,9 @@ setMethod("goFish", signature(om="FLombf"),
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
 
-      # PICK UP fbar range from observations
-      range(obs.oem$stk, c("minfbar", "maxfbar")) <- 
-        range(obs$stk, c("minfbar", "maxfbar")) 
+      # TODO: PICK UP fbar range from observations
+      # range(obs.oem$stk, c("minfbar", "maxfbar")) <- 
+      #  range(obs$stk, c("minfbar", "maxfbar")) 
 
       return(obs.oem)
     }, stk=stk, obs=observations(oem)[names(stk)],
