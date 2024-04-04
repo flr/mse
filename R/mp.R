@@ -636,7 +636,8 @@ setMethod("goFish", signature(om="FLombf"),
   byfishery <- isTRUE(args(oem)$byfishery)
 
   # TODO LOOP every module over stock
-  args$stock <- if(is.null(args$stock)) seq(length(biols(om))) else args$stock
+  if(is.null(args$stock))
+    args$stock <- seq(length(biols(om)))
 
   # COPY ctrl
   ctrl0 <- ctrl
@@ -709,15 +710,8 @@ setMethod("goFish", signature(om="FLombf"),
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
 
-    # TODO: GENERATE single observation from dual OM
-    # stks <- stk
-    # stk <- stk[1]
-    # stock.n(stk[[1]]) <- Reduce('+', lapply(stks, stock.n))
-    
     observations(oem) <- lapply(o.out, "[[", "observations")
     
-    # tracking <- FLQuants(o.out[[1]]$tracking[[1]], o.out[[2]]$tracking[[2]])
-
     # DEBUG
     # track(tracking, "C.obs", seq(ay, ay+frq-1)) <- unitSums(window(catch(om),
     #  start=dy, end=dy + frq - 1))
@@ -767,7 +761,7 @@ setMethod("goFish", signature(om="FLombf"),
     # --- phcr: HCR parameterization
     
     if (!is.null(ctrl0$phcr)){
-      
+
       ctrl.phcr <- args(ctrl0$phcr)
       ctrl.phcr$method <- method(ctrl0$phcr) 
       ctrl.phcr$stk <- stk0
@@ -778,7 +772,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.phcr$step <- "phcr"
       
       out <- do.call("mpDispatch", ctrl.phcr)
-      
+
       hcrpars <- out$hcrpars
       tracking <- out$tracking
     }
@@ -792,10 +786,9 @@ setMethod("goFish", signature(om="FLombf"),
     # --- hcr: Harvest Control Rule
     
     if (!is.null(ctrl0$hcr)){
+
       ctrl.hcr <- args(ctrl0$hcr) 
       ctrl.hcr$method <- method(ctrl0$hcr)
-
-    # MAP
 
       # SELECT stock for hcr
       if(!is.null(args$stock)) {
@@ -804,8 +797,10 @@ setMethod("goFish", signature(om="FLombf"),
       } else {
       # TODO: ADD extra checks
         ctrl.hcr$stk <- stk0
-        ctrl.hcr$stk <- ind
+        ctrl.hcr$ind <- ind
       }
+
+      # TODO:
 
       ctrl.hcr$args <- args
       ctrl.hcr$tracking <- tracking
@@ -1054,16 +1049,26 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   if(sum(done) < largs)
     warning(paste("Some calls to mp() did not run:"), seq(largs)[!done])
 
+  # CREATE standard names 
+  onms <- paste(module, names(mopts)[1], round(mopts[[1]]), sep='_')
+
   # RENAME list elements
   if(is.null(names)) {
+    # NO names and one element changed? USE standard
     if(length(mopts) == 1)
-      names(res) <- paste(module, names(mopts)[1], round(mopts[[1]]), sep='_')
+      names(res) <- onms
+    # OR sequence if more than one element
     else
       names(res) <- paste(module, seq(largs), sep='_')
+  # IF names given
   } else {
-    names(res) <- names
+    # PASTE to standard if one
+    if(length(names) == 1)
+      names(res) <- paste(names, onms, sep="-")
+    # USE as supplied
+    else
+      names(res) <- names
   }
-
   return(FLmses(res[done]))
 }
 # }}}
