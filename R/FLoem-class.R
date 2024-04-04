@@ -230,12 +230,17 @@ setMethod("iter", signature(obj = "FLoem"),
       classes = "FLQuant", how = "replace", iter=iter)
 
     # observations
-    if(any(c("stk", "idx") %in% names(observations(obj))))
-  	  observations(obj) <- lapply(observations(obj),
-        FLCore::iter, iter)
-	  else
-      observations(obj) <- lapply(setNames(nm=names(observations(obj))), 
-        function(i) lapply(observations(obj)[[i]], "iter", iter))
+    observations(obj) <- rapply(observations(obj), FLCore::iter,
+      classes = c("FLStock", "FLIndex", "FLIndexBiomass"),
+      how = "replace", iter=iter)
+
+    # PARSE non-FLR objects (lists) in observations (e.g. SA files)
+    id <- names(observations(obj)) %in% c("stk", "idx") |
+      unlist(lapply(observations(obj), function(x)
+        any(c("stk", "idx") %in% names(x))))
+
+    observations(obj)[!id] <- lapply(observations(obj)[!id],
+      '[', iter=iter)
 
     return(obj)
 })
