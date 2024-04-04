@@ -107,17 +107,26 @@ setMethod("performance", signature(x="FLQuants"),
     
     # CREATE years list
     if(!is.list(years))
-      years <- setNames(as.list(years), as.character(years))
+      years <- setNames(as.list(years), nm=as.character(years))
 
-    # CHECK years
+    # ADD names if NULL
+    if(is.null(names(years))) {
+      names(years) <- as.character(unlist(lapply(years, tail, 1)))
+    } else {
+      # ADD name by element on missing, use last year
+      names(years)[names(years) == ""] <- as.character(unlist(lapply(years,
+        tail, 1)))[names(years) == ""]
+    }
+
+    # CHECK years names are unique
+    if(length(names(years)) > length(unique(names(years))))
+      stop(paste0("Names in 'years' are not unique: ",
+        paste(names(years)[duplicated(names(years))], collapse=',')))
+
+    # CHECK years are present
     if(any(unlist(lapply(years,
       function(y) !all(as.character(y) %in% dimnames(x[[1]])$year)))))
       stop("years must be present in input object 'x' dimensions.")
-
-    # SET names if not present
-    if(is.null(names(years)))
-      names(years) <- as.character(unlist(lapply(years,
-        function(x) x[length(x)])))
 
     # CHECK dimensions
     if(any(unlist(lapply(x, function(y) any(dim(y)[c(1,3,4,5)] != 1)))))
