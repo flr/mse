@@ -278,18 +278,19 @@ plot_hockeystick.hcr <- function(args, obs="missing",
     coord_cartesian(ylim = c(0, ylim), clip="off") +
     # DROP xlab(toupper(metric)) + ylab(toupper(output)) +
     # TARGET
-    geom_segment(aes(x=0, xend=trigger * 1.25, y=target, yend=target), 
+    annotate("segment", x=0, xend=trigger * 1.25, y=target, yend=target,
       linetype=2) +
     annotate("text", x=0, y=target + ylim / 30, label=labels$target, 
       hjust="left") +
     # MIN
     annotate("text", x=0, y=min + ylim / 30, label=labels$min, hjust="left") +
     # TRIGGER
-    geom_segment(aes(x=trigger, xend=trigger, y=0, yend=target), linetype=2) +
+    annotate("segment", x=trigger, xend=trigger, y=0, yend=target,
+      linetype=2) +
     annotate("text", x=trigger, y=-ylim / 40, label=labels$trigger, 
       vjust="bottom") +
     # LIMIT
-    geom_segment(aes(x=lim, xend=lim, y=0, yend=min), linetype=2) +
+    annotate("segment", x=lim, xend=lim, y=0, yend=min, linetype=2) +
     annotate("text", x=lim, y=-ylim / 40, label=labels$lim, vjust="bottom") +
     # HCR line
     geom_line()
