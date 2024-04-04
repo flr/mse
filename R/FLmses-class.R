@@ -88,6 +88,35 @@ setMethod("FLmses", signature(object="list", performance="missing"),
 )
 # }}}
 
+# c (FLmses) {{{
+
+setMethod("c", "FLmses",
+  function(x, ...) {
+
+    # PARSE args
+    args <- list(...)
+
+    # CHECK inputs are FLmses
+    if(!all(unlist(lapply(args, is, 'FLmses'))))
+      stop("Cannot combine objects not of calss 'FLmses'")
+
+    # .Data
+    data <- c(x@.Data, unlist(lapply(args, "slot", ".Data")))
+
+    # performance
+    perf <- rbindlist(c(list(performance(x)), lapply(args, performance)))
+
+    # names
+    nams <- c(names(x), unlist(lapply(args, names)))
+    names(data) <- nams
+
+    res <- FLmses(data, performance=perf)
+
+    return(res)
+  })
+
+# }}}
+
 # plot
 
 # $<- {{{
