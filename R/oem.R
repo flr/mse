@@ -149,6 +149,8 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
 sampling.oem <- function(stk, deviances, observations, stability=1,
   args, tracking) {
 
+  # - sampling.oem
+
   # DIMENSIONS
   y0 <- ac(args$y0)
   dy <- ac(args$dy)
