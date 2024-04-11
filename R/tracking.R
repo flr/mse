@@ -45,6 +45,32 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
 
 # }}}
 
+# track<- FLQuant, fwdControl{{{
+
+#' @rdname tracking
+#' @examples
+#' tracking <- FLQuant(dimnames=list(metric="hcr",
+#'   year=1990:1992, iter=1:10), units="")
+#' track(tracking, "hcr", 1990) <- fwdControl(year=1990, quant="fbar",
+#' value=0.15)
+#' tracking
+
+setReplaceMethod("track", signature(object="FLQuant", value="fwdControl"),
+  function(object, step, year=value$year, iter=seq(dim(object)[6]),
+    ..., value) {
+
+    # FIND target row(s)
+    target <- which(!is.na(apply(iters(value), 1:2, function(x)
+      sum(x))[,'value']))
+
+    object[step, ac(year),,,, iter] <- value@iters[target, 'value',]
+
+    return(object)
+  }
+)
+
+# }}}
+
 # track<- FLQuants, FLQuant {{{
 
 #' @rdname tracking
@@ -117,15 +143,56 @@ setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
 #' tracking
 
 setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
-  function(object, step, year=dimnames(value)$year, ..., value) {
+  function(object, step, year=dimnames(value)$year, stock=seq(length(object)),
+  ..., value) {
     
     # CHECK step exists
     if(!step %in% dimnames(object[[1]])[[1]])
       object <- lapply(object, function(x)
         expand(x, metric=c(dimnames(x)$metric, step)))
     
-    for(i in names(object))
+    for(i in stock)
       object[[i]][step, ac(year)] <- value[[i]]
+
+    return(object)
+  }
+)
+
+# }}}
+
+# track<- FLQuants, lists{{{
+
+#' @rdname tracking
+#' @examples
+#' # When tracking multiple stocks
+#' tracking <- FLQuants(
+#'   A=FLQuant(dimnames=list(metric="conv.est", year=1990:1992), units=""),
+#'   B=FLQuant(dimnames=list(metric="conv.est", year=1990:1992), units=""))
+#' # FLQuants
+#' track(tracking, "conv.est", 1990) <- FLQuants(A=FLQuant(0), B=FLQuant(1))
+#' tracking
+#' # numeric
+#' track(tracking, "conv.est", 1990) <- 3
+#' tracking
+#' track(tracking, "conv.est", 1990) <- c(1,2)
+#' tracking
+#' # fwdControl
+#' track(tracking, "conv.est", 1990) <- fwdControl(
+#'   list(year=1990, biol=1, quant="fbar", value=0.20),
+#'   list(year=1990, biol=2, quant="fbar", value=0.18))
+#' tracking
+
+setReplaceMethod("track", signature(object="FLQuants", value="list"),
+  function(object, step, year=dimnames(value)$year, stock=seq(length(object)),
+    ..., value) {
+    
+    # CHECK step exists
+    if(!step %in% dimnames(object[[1]])[[1]])
+      object <- lapply(object, function(x)
+        expand(x, metric=c(dimnames(x)$metric, step)))
+    
+    for(i in stock)
+      track(object[[i]], step=step, year=year) <- value[[i]]
 
     return(object)
   }
