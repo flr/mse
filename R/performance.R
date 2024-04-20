@@ -143,8 +143,7 @@ setMethod("performance", signature(x="FLQuants"),
 
         # EVAL statistic
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
-          c(FLCore::window(x, start=i[1], end=i[length(i)]),
-
+          c(lapply(x, '[' , j=ac(i)),
             # REPEAT refpts by year because recycling goes year first
             lapply(as(refpts, 'list'), rep, each=length(i)))), drop=FALSE)
 
