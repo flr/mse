@@ -263,7 +263,7 @@ splitcatch.is <- function(stk, ctrl, split, args, tracking) {
   yrs <- ctrl$year
 
   # SET as proportions
-  split <- split / sum(split)
+  split <- unlist(split / sum(split))
 
   # CHECK quant in fwdControl is catch
   if(unique(ctrl$quant) != "catch")
