@@ -10,63 +10,6 @@
 
 # -- ABSOLUTE
 
-# ices.hcr {{{
-
-#' The typical HCR used by ICES
-#'
-#' The typical HCR used by ICES which sets a target F based on the SSB based on 4 parameters: sblim, sbsafe, fmin and ftrg.
-#' F increases linearly between SSB = blim and SSB = bsafe, from F = fmin to F = ftrg.
-#' If:
-#' - B < Blim, F = Fbycatch;
-#' - B > trigger, F = Fmsy;
-#' - B > Blim & B < trigger, F linear between Fbycatch and Fmsy;
-#' - F = ftrg is the maximum F, F = fmin is the minimum F.
-#' F is set in year ay, based on SSB in year ay - data_lag
-#'
-#' @param stk The perceived FLStock.
-#' @param fmin Minimum fishing mortality.
-#' @param ftrg [TODO:description]
-#' @param sblim [TODO:description]
-#' @param sbsafe [TODO:description]
-#' @param args MSE arguments, class *list*.
-#' @param tracking Structure for tracking modules outputs.
-#'
-#' @return A *list* with elements *ctrl*, of class *fwdControl*, and *tracking*.
-#' @examples
-#' data(ple4)
-#' # Test for year when SSB > bsafe
-#' ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
-#'   args=list(ay=2018, data_lag=1, management_lag=1), tracking=FLQuant())
-#' # Test for year when SSB < bsafe
-#' ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
-#'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
-
-ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
-  minfbar=range(stk, "minfbar"), maxfbar=range(stk, "maxfbar"), args, tracking){
-
-  # args
-	ay <- args$ay
-	data_lag <- args$data_lag
-	man_lag <- args$management_lag
-
-  # GET ssb metric
-	ssb <- unitSums(ssb(stk)[, ac(ay - data_lag)])
-
-	# APPLY rule
-
-	fout <- FLQuant(fmin, dimnames=list(iter=dimnames(ssb)$iter))
-	fout[ssb >= sbsafe] <- ftrg
-	inbetween <- (ssb < sbsafe) & (ssb > sblim)
-	gradient <- (ftrg - fmin) / (sbsafe - sblim)
-	fout[inbetween] <- (ssb[inbetween] - sblim) * gradient + fmin
-	
-  # CREATE control file
-  ctrl <- fwdControl(year=ay + man_lag, quant="fbar", value=c(fout),
-    minAge=minfbar, maxAge=maxfbar)
-
-	list(ctrl=ctrl, tracking=tracking)
-} # }}}
-
 # hockeystick.hcr {{{
 
 #' @param stk
@@ -361,6 +304,63 @@ plot_hockeystick.hcr <- function(args, obs="missing",
 }
 
 # }}}
+
+# ices.hcr {{{
+
+#' The typical HCR used by ICES
+#'
+#' The typical HCR used by ICES which sets a target F based on the SSB based on 4 parameters: sblim, sbsafe, fmin and ftrg.
+#' F increases linearly between SSB = blim and SSB = bsafe, from F = fmin to F = ftrg.
+#' If:
+#' - B < Blim, F = Fbycatch;
+#' - B > trigger, F = Fmsy;
+#' - B > Blim & B < trigger, F linear between Fbycatch and Fmsy;
+#' - F = ftrg is the maximum F, F = fmin is the minimum F.
+#' F is set in year ay, based on SSB in year ay - data_lag
+#'
+#' @param stk The perceived FLStock.
+#' @param fmin Minimum fishing mortality.
+#' @param ftrg [TODO:description]
+#' @param sblim [TODO:description]
+#' @param sbsafe [TODO:description]
+#' @param args MSE arguments, class *list*.
+#' @param tracking Structure for tracking modules outputs.
+#'
+#' @return A *list* with elements *ctrl*, of class *fwdControl*, and *tracking*.
+#' @examples
+#' data(ple4)
+#' # Test for year when SSB > bsafe
+#' ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+#'   args=list(ay=2018, data_lag=1, management_lag=1), tracking=FLQuant())
+#' # Test for year when SSB < bsafe
+#' ices.hcr(ple4, fmin=0.05, ftrg=0.15, sblim=200000, sbsafe=300000,
+#'   args=list(ay=1995, data_lag=1, management_lag=1), tracking=FLQuant())
+
+ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
+  minfbar=range(stk, "minfbar"), maxfbar=range(stk, "maxfbar"), args, tracking){
+
+  # args
+	ay <- args$ay
+	data_lag <- args$data_lag
+	man_lag <- args$management_lag
+
+  # GET ssb metric
+	ssb <- unitSums(ssb(stk)[, ac(ay - data_lag)])
+
+	# APPLY rule
+
+	fout <- FLQuant(fmin, dimnames=list(iter=dimnames(ssb)$iter))
+	fout[ssb >= sbsafe] <- ftrg
+	inbetween <- (ssb < sbsafe) & (ssb > sblim)
+	gradient <- (ftrg - fmin) / (sbsafe - sblim)
+	fout[inbetween] <- (ssb[inbetween] - sblim) * gradient + fmin
+	
+  # CREATE control file
+  ctrl <- fwdControl(year=ay + man_lag, quant="fbar", value=c(fout),
+    minAge=minfbar, maxAge=maxfbar)
+
+	list(ctrl=ctrl, tracking=tracking)
+} # }}}
 
 # TODO: fixed.hcr
 
