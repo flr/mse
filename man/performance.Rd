@@ -106,7 +106,7 @@ statistics <- list(
     desc="Variance in fishing mortality"))
 # COMPUTE performance
 performance(run, statistics, refpts=FLPar(MSY=110000),
-  metrics=list(C=catch, F=fbar), years=list(2016:2021))
+  metrics=list(C=catch, F=fbar), years=list(short=2016:2018, long=2016:2021))
 # Minimum statistic, named list with formula and name
 performance(run, statistics=list(CMSY=list(~yearMeans(C/MSY), name="CMSY")),
   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),

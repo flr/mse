@@ -71,7 +71,6 @@ export(
   "perfect.sa",
   "pid.hcr",
   "plot_hockeystick.hcr",
-  "relative",
   "response.fb",
   "sampling.oem",
   "seasonal.is",
@@ -84,7 +83,6 @@ export(
   "splitcatch.is",
   "tac.is",
   "target.hcr",
-  "total",
   "trend.hcr",
   "tunebisect",
   "tunegrid")
