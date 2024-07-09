@@ -117,7 +117,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
     # CONSTRUCT fwd control
     fctrl <- fwdControl(
-      # ay as intermediate with Fsq
+      # ay as intermediate with Fsq TODO: Other options
       list(year=seq(ay - data_lag + 1, length=management_lag), quant="fbar",
         value=rep(c(fsq), management_lag)),
       # target

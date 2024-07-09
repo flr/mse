@@ -152,7 +152,7 @@ fwd.om <- function(om, ctrl, ...){
 	args$control <- ctrl
 
   # CALL using tryCatch
-  om <- tryCatch(do.call("fwd", args),
+  om <- tryCatch(do.call(fwd, args),
     # error, STOP
     error = function(e) {
       stop("fwd() could not be run, check args and ctrl, use debug(om)")
@@ -163,22 +163,11 @@ fwd.om <- function(om, ctrl, ...){
 }
 # }}}
 
-# relative (metrics) {{{
+# setdeviances {{{
+setdeviances <- function(x, deviances) {
 
-relative <- list(
-  `SB/SB[MSY]`=function(x) setunits(unitSums(ssb(x)) %/% refpts(x)$SBMSY, ""),
-  `SB/SB[0]`=function(x) setunits(unitSums(ssb(x)) %/% refpts(x)$SB0, ""),
-  `B/B[0]`=function(x) setunits(unitSums(tsb(x)) %/% refpts(x)$B0, ""),
-  `F/F[MSY]`=function(x) setunits(unitMeans(fbar(x)) %/% refpts(x)$FMSY, "")) 
+  deviances(x) <- deviances
 
-# }}}
-
-# total (metrics) {{{
-
-total <- list(
-  R = function(x) areaSums(unitSums(rec(x))),
-  SB = function(x) areaSums(unitSums(ssb(x))),
-  C = function(x) areaSums(unitSums(catch(x))),
-  F = function(x) areaMeans(unitMeans(fbar(x))))
-
+  return(x)
+}
 # }}}
