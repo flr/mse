@@ -45,14 +45,31 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   scenario="NA", tracking="missing", logfile=tempfile(),
   verbose=!handlers(global = NA), parallel=TRUE) {
 
-  # dims & dimnames
-  if(is(om, 'list')) {
-    dis <- dims(om[[1]])
-    dmns <- dimnames(om[[1]])
-  } else {
-    dis <- dims(om)
-    dmns <- dimnames(om)
+  # PARSE parallel options
+  cores <- 1
+
+  # parallel tells number of workers, needed for doFuture
+  if(is.numeric(parallel)) {
+    cores <- parallel
+    parallel <- TRUE
+  # TAKEN from doPar
+  } else if(getDoParRegistered()) {
+    cores <- nbrOfWorkers()
   }
+
+  # APPLY recursively to om list
+  if(is(om, 'list')) {
+    res <- foreach(i=seq(length(om)), .combine="c") %dofuture% {
+      mp(om[[i]], oem=oem, iem=iem,     
+        control=control, args=args, scenario=scenario, tracking=tracking, 
+        logfile=logfile, verbose=verbose, parallel=parallel)
+    }
+    return(res)
+  }
+
+  # dims & dimnames
+  dis <- dims(om)
+  dmns <- dimnames(om)
 
   # --- EXTRACT args
 
@@ -169,20 +186,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     missingoem <- FALSE
   }
   
-  # PARSE parallel options
-  
-  cores <- 1
-
-  # parallel tells number of workers, needed for doFuture
-  if(is.numeric(parallel)) {
-    cores <- parallel
-    parallel <- TRUE
-  # TAKEN from doPar
-  } else if(getDoParRegistered()) {
-    cores <- nbrOfWorkers()
-  }
-  
-  # RUN goFish
+    # RUN goFish
 
   if(isTRUE(parallel) & cores > 1) {
 
@@ -200,8 +204,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .errorhandling = "remove", 
       .options.future=list(globals=structure(TRUE, add=c("om", "oem",
       "tracking", "fb", "iem", "ctrl", "args", "verbose",
-      "logfile"),
-      seed=seed)),
+      "logfile", "dims", "fwdControl", "fwd", "iter<-", "ac"), seed=seed)),
       .inorder=TRUE) %dofuture% {
       
         call0 <- list(
@@ -689,12 +692,13 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$args <- args
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
- 
+
     # GET OM observation
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
 
     # APPLY oem
     o.out <- Map(function(stk, dev, obs, tra) {
+
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
         observations=obs, tracking=FLQuants(tra))))
 
