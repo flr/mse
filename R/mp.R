@@ -202,8 +202,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .combine=.combinegoFish,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
-      .options.future=list(globals=structure(TRUE,
-      packages=c("FLCore", "FLasher"), seed=seed)),
+      .options.future=list(globals=structure(TRUE, seed=seed)),
       .inorder=TRUE) %dofuture% {
       
         call0 <- list(

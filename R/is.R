@@ -52,14 +52,17 @@
 #' plot(om, TAC.IS=run)
 
 tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
-  Fdevs=fbar(stk) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0,
+  Fdevs=fbar(stk) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0, reuse=TRUE,
   initac=metrics(stk, output)[, ac(iy - 1)], tracking) {
 
   # EXTRACT args
   spread(args)
 
-  # PREPARE stk until ay + mlag, biology as in last nsqy years
-  fut <- fwdWindow(stk, end=ay + management_lag, nsq=nsqy)
+  # SET control years
+  cys <- seq(ay + management_lag, ay + management_lag + frq - 1)
+
+  # PREPARE stk for cys, biology as in last nsqy years
+  fut <- fwdWindow(stk, end=cys[length(cys)], nsq=nsqy)
 
   # PARSE recyrs if numeric
   id <- dimnames(stk)$year
@@ -87,25 +90,33 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   recyrs <- id
 
   # CHECK recyrs
-  if(!all(recyrs %in% dimnames(stk)$year))
+  if(!all(recyrs %in% dimnames(stk)$year)) {
     stop("'recyrs' cannot be found in input stk")
+  }
 
   # TODO: OTHER rec options
-  # SET GM recruitment
   
+  # SET GM recruitment from past
+
   gmnrec <- exp(yearMeans(log(rec(stk)[, recyrs])))
 
   srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
 
   # STORE geomeanrec value
-
   track(tracking, "gmrec.isys", ay + management_lag) <- gmnrec
 
-  # ADD F deviances
-  ftar <- ctrl$value * Fdevs[, ac(dy)]
+  # ADD F deviances for 1 year
+  
+  # reuse = TRUE
+  if(isTRUE(reuse) | toupper(reuse) == 'F') {
+    ftar <- rep(c(ctrl[1,]$value * Fdevs[, ac(cys[1])]), length(cys))
+  # reuse = FALSE
+  } else {
+    ftar <- c(ctrl$value * Fdevs[, ac(cys)])
+  }
 
   # TRACK Ftarget
-  track(tracking, "fbar.isys", ay + management_lag) <- ftar
+  track(tracking, "fbar.isys", cys) <- ftar
 
   # FORECAST for iyrs and my IF mlag > 0,
   if(management_lag > 0) {
@@ -121,7 +132,9 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
       list(year=seq(ay - data_lag + 1, length=management_lag), quant="fbar",
         value=rep(c(fsq), management_lag)),
       # target
-      list(year=ay + management_lag, quant="fbar", value=ftar))
+                        # TODO: 2025 and 2026 same
+      list(year=cys, quant="fbar", value=c(ftar))
+    )
 
   # else only for my
   } else {
@@ -132,12 +145,16 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   # RUN STF ffwd
   fut <- ffwd(fut, sr=srr, control=fctrl)
 
-  # EXTRACT catches
-  TAC <- c(catch(fut)[, ac(ay + management_lag)])
-
   # ID iters where hcr set met trigger and F > fmin
   id <- c(tracking[[1]]["decision.hcr", ac(ay)] > 2) &
     c(fbar(fut)[, ac(ay + management_lag)] > fmin)
+
+  # EXTRACT catches
+  if(isTRUE(reuse) | toupper(reuse) == "C") {
+    TAC <- expand(catch(fut)[, ac(cys)[1]], year=seq(length(cys)))
+  } else {
+    TAC <- catch(fut)[, ac(cys)]
+  }
 
   # GET TAC dy / ay - 1
   if(ay == iy)
@@ -147,15 +164,16 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
   # APPLY upper and lower TAC limit, if not NA and only for id iters
   if(!is.na(dtacupp)) {
-    TAC[id] <- pmin(TAC[id], c(prev_tac)[id] * dtacupp)
+    iter(TAC, id) <- pmin(c(iter(TAC, id)), prev_tac[id] * dtacupp)
   }
   if(!is.na(dtaclow)) {
-    TAC[id] <- pmax(TAC[id], c(prev_tac)[id] * dtaclow)
+    iter(TAC, id) <- pmax(c(iter(TAC, id)), prev_tac[id] * dtaclow)
   }
 
   # CONSTRUCT fwdControl
-  ctrl <- fwdControl(list(year=ay + management_lag, quant=output, value=TAC))
-
+  ctrl <- fwdControl(lapply(seq(length(cys)), function(x)
+    list(year=cys[x], quant=output, value=TAC[,x])))
+    
   return(list(ctrl=ctrl, tracking=tracking))
 }
 
