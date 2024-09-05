@@ -10,10 +10,11 @@ tac.is(
   args,
   output = "catch",
   recyrs = -2,
-  Fdevs = fbar(stk) \%=\% 1,
+  Fdevs = fbar(fut) \%=\% 1,
   dtaclow = NA,
   dtacupp = NA,
   fmin = 0,
+  reuse = TRUE,
   initac = metrics(stk, output)[, ac(iy - 1)],
   tracking
 )
@@ -67,7 +68,7 @@ control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
     args=list(lim=0, trigger=4.3e5, target=0.21)),
   isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
 # Run MP until 2025
-run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2024))
+run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))
 # Plot run time series
 plot(om, TAC.IS=run)
 }

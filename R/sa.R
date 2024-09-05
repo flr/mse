@@ -80,4 +80,3 @@ shortcut_devs <- function(om, Fcv=0.212, Fphi=0.423, SSBcv=0, SSBphi=0) {
   return(devs)
 }
 # }}}
-

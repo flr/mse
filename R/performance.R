@@ -140,7 +140,6 @@ setMethod("performance", signature(x="FLQuants"),
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over statistics
       data.table::rbindlist(lapply(statistics, function(j) {
-
         # EVAL statistic
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(lapply(x, '[' , j=ac(i)),

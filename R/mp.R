@@ -671,7 +671,7 @@ setMethod("goFish", signature(om="FLombf"),
     
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
-    
+
     # TRACK om TODO GAP? TODO dimensionality
     track(tracking, "F.om", ay) <- unitMeans(window(fbar(om),
       start=dy, end=dy))

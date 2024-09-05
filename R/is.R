@@ -47,12 +47,12 @@
 #'     args=list(lim=0, trigger=4.3e5, target=0.21)),
 #'   isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
 #' # Run MP until 2025
-#' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2024))
+#' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))
 #' # Plot run time series
 #' plot(om, TAC.IS=run)
 
 tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
-  Fdevs=fbar(stk) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0, reuse=TRUE,
+  Fdevs=fbar(fut) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0, reuse=TRUE,
   initac=metrics(stk, output)[, ac(iy - 1)], tracking) {
 
   # EXTRACT args
@@ -106,7 +106,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   track(tracking, "gmrec.isys", ay + management_lag) <- gmnrec
 
   # ADD F deviances for 1 year
-  
+
   # reuse = TRUE
   if(isTRUE(reuse) | toupper(reuse) == 'F') {
     ftar <- rep(c(ctrl[1,]$value * Fdevs[, ac(cys[1])]), length(cys))
