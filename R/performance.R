@@ -124,8 +124,7 @@ setMethod("performance", signature(x="FLQuants"),
         paste(names(years)[duplicated(names(years))], collapse=',')))
 
     # CHECK years are present
-    if(any(unlist(lapply(years,
-      function(y) !all(as.character(y) %in% dimnames(x[[1]])$year)))))
+    if(!all(as.character(unlist(years)) %in% dimnames(x[[1]])$year))
       stop("years must be present in input object 'x' dimensions.")
 
     # CHECK dimensions
@@ -135,7 +134,7 @@ setMethod("performance", signature(x="FLQuants"),
     # CHECK statistics are unique
     if(length(names(statistics)) != length(unique(names(statistics))))
       stop("'statistics' must have unique names.")
-    
+
     # LOOP over years
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over statistics
