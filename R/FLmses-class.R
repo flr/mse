@@ -96,9 +96,11 @@ setMethod("c", "FLmses",
     # PARSE args
     args <- list(...)
 
-    # CHECK inputs are FLmses
-    if(!all(unlist(lapply(args, is, 'FLmses'))))
-      stop("Cannot combine objects not of calss 'FLmses'")
+    # IF args not all FLmse, RETURN list
+    cls <- unlist(lapply(args, is, 'FLmse'))
+    if(!all(cls)) {
+      return(c(unclass(x), args))
+    }
 
     # .Data
     data <- c(x@.Data, unlist(lapply(args, "slot", ".Data")))
