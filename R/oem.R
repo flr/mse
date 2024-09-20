@@ -209,7 +209,6 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   }
 
   # APPLY survey() with deviances$idx on top of index.q
-
   idx[upi] <- Map(function(x, y, z) {
 
     dyrs <- intersect(dyrs, dimnames(y)$year)
