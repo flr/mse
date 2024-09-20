@@ -637,7 +637,7 @@ cpue.hcr <- function(stk, ind, k1=0.2, k2=0.2, k3=0.2, k4=0.2, target=1,
 # pid.hcr {{{
 
 # T_{y+1} = T_{y} * 1 - k1 * |lambda| ^ gamma, lambda < 0
-#                   1 + k2 * lambda, lambda >= 0
+#   1 + k2 * lambda, lambda >= 0
 
 #' @param stk
 #' @param ind
@@ -659,7 +659,7 @@ cpue.hcr <- function(stk, ind, k1=0.2, k2=0.2, k3=0.2, k4=0.2, target=1,
 #' control <- mpCtrl(list(
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=pid.hcr,
-#'     args=list(metric=ssb, ref=yearMeans(ssb(om)), kp=0.5, ki=0.01, kd=0.7))))
+#'     args=list(metric=ssb, ref=refpts(om)$SBMSY, kp=0.5, ki=0.01, kd=0.7))))
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
 #' plot(om, PID=tes)
 
@@ -949,7 +949,7 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
 
-# catchSSB.hcr {{{
+#catchSSB.hcr {{{
 
 #' A HCR to set total catch based on SSB depletion level
 #'
@@ -1046,3 +1046,104 @@ indicator.hcr <- function (stk, hcrpars, args, tracking) {
   list(ctrl = ctrl, tracking = tracking)
 }
 # 
+
+# buffer.hcr {{{
+
+#' A buffered and non-linear hockeystick HCR
+#'
+#' A Harvest Control Rule (HCR) that extends the traditional hockeystick shape
+#' by allowing for increasing output when stock status rises above a buffer set
+#' around the target.
+#' @param lim Point at which the HCR response moves from linear to quadratic in terms of reducing HCR multiplier, numeric.
+#' @param bufflow Lower point of "buffer zone" where HCR response is fixed at 1.
+#' @param buffupp Upper point of "buffer zone" where HCR response is fixed at 1.
+#' @param sloperatio fractional difference
+#'
+#' so the response of the HCR in this case would be as follows:
+#' if(muI > Ilim & muI <= buffl) HCRmult <- (0.5*(1+(muI-Ilim)/(buffl-Ilim)))
+#' if(muI > buffl & muI < buffh) HCRmult <- 1
+#' if(muI >= buffh) HCRmult <- 1+sloperatio*gr*(muI-buffh) 
+#' if(muI <= Ilim) HCRmult <- (muI/Ilim)^2/2
+#'
+#' @author Original design by R. Hillary (CSIRO). Implemented by I. Mosqueira (WMR).
+#' @references
+#' Hillary, R. 2020. *Management Strategy Evaluation of the Broadbill Swordfish ETBF harvest strategies*. Working document.
+#' @examples
+#' 
+
+buffer.hcr <- function(stk, ind, target, metric='depletion', lim=0.10,
+  bufflow=0.30, buffupp=0.50, sloperatio=0.20, initac=NULL, dupp=NULL, dlow=NULL,
+  all=TRUE, ..., args, tracking) {
+
+  # EXTRACT args
+  ay <- args$ay
+  iy <- args$iy
+  data_lag <- args$data_lag
+  man_lag <- args$management_lag
+  frq <- args$frq
+
+  # SET data year
+  dy <- ay - data_lag
+  # SET control years
+  cys <- seq(ay + man_lag, ay + man_lag + frq - 1)
+
+  # COMPUTE metric
+  met <- window(selectMetric(metric, stk, ind), start=dy, end=dy)
+  
+  # COMPUTE HCR multiplier if ...
+  # BELOW lim
+  hcrm <- ifelse(met <= lim, ((met / lim) ^ 2) / 2,
+    # BETWEEN lim and bufflow
+    ifelse(met < bufflow,
+      (0.5 * (1 + (met - lim) / (bufflow - lim))),
+    # BETWEEN bufflow and buffupp
+    ifelse(met < buffupp, 1, 
+    # ABOVE buffupp
+      1 + sloperatio * 1 / (2 * (bufflow - lim)) * (met - buffupp))))
+
+  # GET previous TAC from last hcr ...
+  if(is.null(initac)) {
+    pre <- tracking[[1]]['hcr', ac(ay)]
+    # ... OR catch
+    if(all(is.na(pre)))
+      pre <- unitSums(areaSums(seasonSums(catch(stk)[, ac(ay - args$data_lag)])))
+  } else {
+    pre <- initac
+  }
+
+  # SET TAC as tac = B * (1 - exp(-fm * hcrm * (F / FMSY))
+  out <- target * hcrm
+
+  # TRACK initial target
+  track(tracking, "tac.hcr", cys) <- out
+
+  # APPLY limits, always or if met < trigger
+  if(!is.null(dupp)) {
+    if(all) {
+    out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
+    } else {
+    out[out > pre * dupp & met < bufflow] <- pre[out > pre * dupp & met <
+      bufflow] * dupp
+    }
+  }
+
+  if(!is.null(dlow)) {
+    if(all) {
+    out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
+    } else {
+    out[out < pre * dlow & met < bufflow] <- pre[out < pre * dlow & met <
+      bufflow] * dlow
+    }
+  }
+
+  # CONTROL
+  ctrl <- fwdControl(
+    # TARGET for frq years
+    c(lapply(cys, function(x) list(quant="catch", value=c(out), year=x)))
+  )
+	
+  list(ctrl=ctrl, tracking=tracking)
+}
+# }}}
+
+
