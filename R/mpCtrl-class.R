@@ -222,6 +222,7 @@ setMethod("iter", signature(obj = "mpCtrl"), function(obj, iter){
 # exists {{{
 
 #' @rdname mseCtrl-class
+setGeneric("exists", useAsDefault = base::exists)
 setMethod("exists", "mpCtrl", function(x) length(x) != 0)
 # }}}
 
