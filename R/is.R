@@ -97,9 +97,9 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   # TODO: OTHER rec options
   
   # SET GM recruitment from past
-
   gmnrec <- exp(yearMeans(log(rec(stk)[, recyrs])))
 
+  # SETUP SRR
   srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
 
   # STORE geomeanrec value
@@ -129,10 +129,9 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     # CONSTRUCT fwd control
     fctrl <- fwdControl(
       # ay as intermediate with Fsq TODO: Other options
-      list(year=seq(ay - data_lag + 1, length=management_lag), quant="fbar",
-        value=rep(c(fsq), management_lag)),
+      list(year=seq(ay - data_lag + 1, length=management_lag + frq),
+        quant="fbar", value=rep(c(fsq), management_lag)),
       # target
-                        # TODO: 2025 and 2026 same
       list(year=cys, quant="fbar", value=c(ftar))
     )
 

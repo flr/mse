@@ -598,9 +598,11 @@ setMethod("fwdWindow", signature(x="FLom", y="missing"),
 #' data(ple4om)
 #' res <- fwd(om, control=fwdControl(year=2018:2030, quant="f",
 #'   value=rep(c(refpts(om)$FMSY), 13)))
+#' res2 <- fwd(om, control=fwdControl(year=2018:2030, quant="f",
+#'   value=rep(c(refpts(om)$FMSY), 13)), deviances=deviances(om))
 
 setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl"),
-  function(object, control, sr=object@sr, deviances=residuals(sr(object)),
+  function(object, control, sr=object@sr, deviances=deviances(object),
     maxF=4, ...) {
 
     stock(object) <- fwd(stock(object), sr=sr, control=control,
@@ -610,7 +612,7 @@ setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl
   })
 
 setMethod("fwd", signature(object="FLom", fishery="ANY", control="missing"),
-  function(object, fishery=NULL, sr=object@sr, deviances=residuals(sr(object)),
+  function(object, fishery=NULL, sr=object@sr, deviances=deviances(object),
     maxF=4, ...) {
     
     stock(object) <- fwd(stock(object), sr=sr, maxF=maxF,
