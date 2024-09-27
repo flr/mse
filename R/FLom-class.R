@@ -602,8 +602,12 @@ setMethod("fwdWindow", signature(x="FLom", y="missing"),
 #'   value=rep(c(refpts(om)$FMSY), 13)), deviances=deviances(om))
 
 setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl"),
-  function(object, control, sr=object@sr, deviances=deviances(object),
+  function(object, control, sr=object@sr, deviances=NULL,
     maxF=4, ...) {
+
+    # HACK for default deviances
+    if(is.null(deviances))
+      deviances <- deviances(object)
 
     stock(object) <- fwd(stock(object), sr=sr, control=control,
       maxF=maxF, deviances=deviances, ...)
@@ -612,8 +616,12 @@ setMethod("fwd", signature(object="FLom", fishery="missing", control="fwdControl
   })
 
 setMethod("fwd", signature(object="FLom", fishery="ANY", control="missing"),
-  function(object, fishery=NULL, sr=object@sr, deviances=deviances(object),
+  function(object, fishery=NULL, sr=object@sr, deviances=NULL,
     maxF=4, ...) {
+
+    # HACK for default deviances
+    if(is.null(deviances))
+      deviances <- deviances(object)
     
     stock(object) <- fwd(stock(object), sr=sr, maxF=maxF,
       deviances=deviances, ...)
@@ -713,13 +721,4 @@ setReplaceMethod("deviances", signature(object="FLom", value="FLQuant"),
 
     return(object)
   })
-# }}}
-
-# relative (metrics) {{{
-
-relative <- list(
-  `SB/SB[MSY]`=function(x) setunits(unitSums(ssb(x)) %/% refpts(x)$SBMSY, ""),
-  `SB/SB[0]`=function(x) setunits(unitSums(ssb(x)) %/% refpts(x)$SB0, ""),
-  `B/B[0]`=function(x) setunits(unitSums(tsb(x)) %/% refpts(x)$B0, ""),
-  `F/F[MSY]`=function(x) setunits(unitMeans(fbar(x)) %/% refpts(x)$FMSY, "")) 
 # }}}
