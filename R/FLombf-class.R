@@ -357,7 +357,7 @@ setMethod("harvest", signature(object="FLombf", catch="missing"),
   function(object, biol=seq(biols(object))) {
 
     # GET partial Fs by biol - fishery
-    harvest(biols(object)[biol], fisheries(object))
+    FLQuants(harvest(biols(object)[biol], fisheries(object)))
   }
 )
 
@@ -428,9 +428,9 @@ setMethod("fbar", signature(object="FLombf"),
         range[[i]]["max"] <- rep(maxfbar, i)[i]
     }
 
-    res <- FLQuants(mapply(function(x, y) quantMeans(x[ac(seq(y[1], y[2])),]),
-      x=har, y=range, SIMPLIFY=FALSE))
- 
+    res <- FLQuants(Map(function(x, y) quantMeans(x[ac(seq(y[1], y[2])),]),
+      x=har, y=range))
+
     if(!is.null(biol))
       if(length(biol) == 1)
         return(res[[biol]])
