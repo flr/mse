@@ -411,9 +411,11 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
 	ay <- args$ay
   mlag <- args$management_lag
   frq <- args$frq
+  yrs <- seq(ay + mlag, ay + frq)
 
 	# create control object
-  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="catch", value=c(ctrg))
+  ctrl <- fwdControl(year=yrs, quant="catch", value=rep(c(ctrg), 
+    each=length(yrs)))
 
 	# return
 	list(ctrl=ctrl, tracking=tracking)
@@ -611,7 +613,7 @@ cpue.hcr <- function(stk, ind, k1=0.2, k2=0.2, k3=0.2, k4=0.2, target=1,
 
   # GET previous TAC from last hcr ...
   if(is.null(initac)) {
-    tac <- tracking[[1]]['hcr', ac(ay)]
+    tac <- areaSums(seasonSums(tracking[[1]]['hcr', ac(ay)]))
     # ... OR catch
     if(all(is.na(tac)))
       tac <- areaSums(seasonSums(catch(stk)[, ac(ay - args$data_lag)]))
