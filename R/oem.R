@@ -237,7 +237,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
  
   # UPDATE observations
   slots <- c("landings", "discards", "catch", "landings.n", "discards.n", 
-    "catch.n", "landings.wt", "discards.wt", "catch.wt")
+    "catch.n", "landings.wt", "discards.wt", "catch.wt", "stock.wt")
   
   if(!wts) slots <- slots[1:6]
   
