@@ -27,16 +27,15 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
 
   # WEIGHTED average index of last ayears: 0.50 for last year, 0.50 others
   ywts <- c(0.50 * seq(1, ayears - 1) / sum(seq(1, ayears - 1)), 0.50)
-  wmean <- expand(yearSums(tail(met, ayears) * ywts), year=ay - dlag)
+  wmean <- expand(seasonMeans(yearSums(tail(met, ayears) * ywts)), year=ay - dlag)
   
   # AVERAGE index
-  mean <- expand(yearMeans(tail(met, ayears)), year=ay - dlag)
+  mean <- expand(seasonMeans(yearMeans(tail(met, ayears))), year=ay - dlag)
   
   # SLOPE by iter
   dat <- data.table(as.data.frame(met))
-  
   slope <- dat[, .(data=coef(lm(log(data + 1e-22) ~ year))[2]), by=iter]
-  slope <- FLQuant(slope$data, dimnames=dimnames(mean), units="")
+  slope <- FLQuant(slope$data, dimnames=dimnames(mean)[-4], units="")
 
   # OUTPUT
   ind <- FLQuants(wmean=wmean, slope=slope, mean=mean)
