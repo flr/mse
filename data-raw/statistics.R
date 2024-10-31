@@ -55,10 +55,10 @@ statistics <- list(
   # C/MSY
   CMSY = list(~yearMeans(C/MSY), name = "C/MSY", desc = "Mean proportion of MSY"),
   # AAV
-  AAVC = list(~yearMeans(abs(C[, -1] - C[, -dim(C)[2]]) / C[, -1]), name = "AAV(C)",
-    desc = "Average annual variability in catch"),
+  AAVC = list(~yearMeans(abs(C[, -1] - C[, -dim(C)[2]]) / C[, -dim(C)[2]]),
+    name = "AAV(C)", desc = "Average annual variability in catch"),
   # IACC
-  IACC = list(~100 * yearSums(abs(C[, -1] - C[, -dim(C)[2]])) / yearSums(C),
+  IACC = list(~100 * yearSums(abs(C[, -1] - C[, -dim(C)[2]])) / yearSums(C[, -dim(C)[2]]),
   name="IAC(C)", desc="Percentage inter-annual change in catch"),
   # PC0
   PC0 = list(~yearSums(C < 0.01 * MSY) / dim(C)[2], name = "P(shutdown)", 
