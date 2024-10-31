@@ -147,9 +147,7 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
 #'   args=list(y0=2000, dy=2021, frq=1), tracking=FLQuant())
 
 sampling.oem <- function(stk, deviances, observations, stability=1,
-  args, tracking) {
-
-  # - sampling.oem
+  wts=TRUE, args, tracking) {
 
   # DIMENSIONS
   y0 <- ac(args$y0)
@@ -167,16 +165,9 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   # - invALK
   # - lenSamples
 
-  # CHECK dimensions to simplify, on catch.n for multi-fleet FLStock
-  simp <- (dim(catch.n(observations$stk))[c(3,4,5)] == 1) +
-    (dim(catch.n(stk))[c(3,4,5)] == 1) < 2
-
-  # SIMPLIFY stk to match dimensions of observations$stk
-  if(any(simp))
-    stk <- simplify(stk, c("unit", "season", "area")[simp], harvest=FALSE)
-  
   # SUBSET year range
-	stk <- window(stk, start=y0, end=dy, extend=FALSE)
+  stk <- window(stk, start=y0, end=dy, extend=FALSE)
+  obs <- window(observations$stk, start=y0, end=dy, extend=FALSE)
  
   # --- STK
 
@@ -185,19 +176,18 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
     # APPLY deviances and ASSIGN to stk slots in dyrs
     for(i in names(deviances$stk)) {
       slot(stk, i)[, dyrs] <-
-      do.call(i, list(object=stk))[, dyrs] * deviances$stk[[i]][, dyrs] + 0.001
+      do.call(i, list(object=stk))[, dyrs] %*% deviances$stk[[i]][, dyrs] + 1e-8
     }
 
     # COMPUTE aggregated slots
     landings(stk)[, dyrs] <- computeLandings(stk[, dyrs])
     discards(stk)[, dyrs] <- computeDiscards(stk[, dyrs])
     catch(stk)[, dyrs] <- computeCatch(stk[, dyrs])
-
-  # STORE for shortcut 
-  observations$stk[, dyrs] <- stk[, dyrs]
-
   }
 
+  # STORE for shortcut 
+  # observations$stk[, dyrs] <- stk[, dyrs]
+  
   # --- IDX
   idx <- observations$idx
 
@@ -215,7 +205,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
 
     # CREATE survey obs
     res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
-      index.q=index.q(x)[, dyrs] * y[, dyrs], stability=z)
+      index.q=index.q(x)[, dyrs] %*% y[, dyrs], stability=z)
 
     # ENSURE no zeroes coming, maybe from high Fs
     if(sum(index(res)[, dyrs]) == 0)
@@ -225,6 +215,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
     index(res)[index(res) == 0] <- c(min(index(res)[index(res) > 0] / 2))
     
     # ASSIGN index observation
+    # TODO: ONLY if not available
     index(x)[, dyrs] <- index(res)
 
     return(window(x, end=dy))
@@ -233,10 +224,27 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
 
   for(i in seq(idx[upi])) {
     yrs <- intersect(dyrs, dimnames(idx[upi][[i]])$year)
-    observations$idx[upi][[i]][, dyrs]<- idx[upi][[i]][, dyrs]
+    observations$idx[upi][[i]][, dyrs] <- idx[upi][[i]][, dyrs]
   }
+  
+  # CHECK dimensions to simplify, on catch.n for multi-fleet FLStock
+  simp <- (dim(catch.n(observations$stk))[c(3,4,5)] == 1) +
+    (dim(catch.n(stk))[c(3,4,5)] == 1) < 2
 
-  list(stk=stk, idx=idx, observations=observations, tracking=tracking)
+  # SIMPLIFY stk to match dimensions of observations$stk
+  if(any(simp))
+    stk <- simplify(stk, c("unit", "season", "area")[simp], harvest=FALSE)
+ 
+  # UPDATE observations
+  slots <- c("landings", "discards", "catch", "landings.n", "discards.n", 
+    "catch.n", "landings.wt", "discards.wt", "catch.wt")
+  
+  if(!wts) slots <- slots[1:6]
+  
+  for(i in slots)
+    slot(obs, i)[, dyrs] <- slot(stk, i)[, dyrs]
+
+  list(stk=obs, idx=idx, observations=observations, tracking=tracking)
 
 } # }}}
 
