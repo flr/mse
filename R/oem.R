@@ -239,6 +239,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   slots <- c("landings", "discards", "catch", "landings.n", "discards.n", 
     "catch.n", "landings.wt", "discards.wt", "catch.wt", "stock.wt")
   
+  # UPDATE wts or only catches?
   if(!wts) slots <- slots[1:6]
   
   for(i in slots)
