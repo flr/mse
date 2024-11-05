@@ -55,6 +55,7 @@ export(
   "indicator.is",
   "initiate",
   "len.ind",
+  "loadlist",
   "meta.est",
   "meta.hcr",
   "mlc.ind",

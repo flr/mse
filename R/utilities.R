@@ -6,6 +6,8 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
+options(future.globals.maxSize=995*1024^2)
+
 # merge (FLQuant, data.table) {{{
 
 setMethod("merge", signature(x="FLQuant", y="data.table"),
@@ -153,5 +155,11 @@ decisions <- function(x, years=dimnames(tracking(x))$year, iter=NULL) {
   })
 
   do.call(cbind, res)
+}
+# }}}
+
+# loadlist {{{
+loadlist <- function(file) {
+  mget(load(file, verbose=FALSE, envir=(.NE <- new.env())), envir=.NE)
 }
 # }}}
