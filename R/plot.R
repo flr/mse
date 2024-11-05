@@ -23,6 +23,27 @@ setMethod("plot", signature(x="FLo", y="missing"),
 )
 # }}}
 
+# FLo, FLo {{{
+setMethod("plot", signature(x="FLo", y="FLo"),
+  function(x, y, ..., metrics=NULL) {
+
+    # GET all args
+    args <- c(list(x, y), list(...))
+
+    # ID FLo objects
+    idx <- unlist(lapply(args, is, "FLo"))
+
+    # CALL metrics
+    if(is.null(metrics))
+      fqs <- lapply(args[idx], function(x) metrics(stock(x)))
+    else
+      fqs <- lapply(args[idx], function(x) metrics(stock(x), metrics=metrics))
+
+    plotListFLQuants(fqs)
+  }
+)
+# }}}
+
 # FLo, FLmse {{{
 
 setMethod("plot", signature(x="FLo", y="FLmse"),
@@ -208,4 +229,3 @@ setMethod("plot", signature(x="FLmse", y="missing"),
 
 }
 # }}}
-
