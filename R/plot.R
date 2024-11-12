@@ -179,13 +179,19 @@ setMethod("plot", signature(x="FLombf", y="FLmse"),
 
 # FLombf, list, ... {{{
 setMethod("plot", signature(x="FLombf", y="list"),
-  function(x, y, window=TRUE) {
+  function(x, y, window=TRUE, ...) {
 
     # EXTRACT stock(om) as FLStocks
     oms <- stock(x)
 
     # EXTRACT FLStocks from each FLmse
     mses <- lapply(y, stock)
+
+    # BUG: LIMIT F
+    mses <- lapply(mses, function(x) {
+      harvest(x[[1]])[harvest(x[[1]]) > 4]  <- 4
+      return(x)
+    })
 
     # COMBINE by biol
     stks <- lapply(seq(oms), function(i)

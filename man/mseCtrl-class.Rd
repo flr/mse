@@ -21,7 +21,6 @@
 \alias{show,mseCtrl-method}
 \alias{exists}
 \alias{exists,mseCtrl-method}
-\alias{exists,mpCtrl-method}
 \title{S4 class \code{mseCtrl}}
 \usage{
 \S4method{initialize}{mseCtrl}(.Object, ..., method, args)
@@ -55,7 +54,14 @@ exists(
 
 \S4method{exists}{mseCtrl}(x)
 
-\S4method{exists}{mpCtrl}(x)
+exists(
+  x,
+  where = -1,
+  envir = if (missing(frame)) as.environment(where) else sys.frame(frame),
+  frame,
+  mode = "any",
+  inherits = TRUE
+)
 }
 \arguments{
 \item{...}{additional argument list that might never be used}

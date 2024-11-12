@@ -48,6 +48,12 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # PARSE parallel options
   cores <- 1
 
+  # SET future.globals.maxSize if not set already
+  if(is.null(options('future.globals.maxSize')[[1]])) {
+    oldopt <- options(future.globals.maxSize=1500 * 1024 ^ 2)
+    on.exit(options(oldopt))
+  }
+
   # parallel tells number of workers, needed for doFuture
   if(is.numeric(parallel)) {
     cores <- parallel
@@ -599,7 +605,7 @@ setMethod("goFish", signature(om="FLom"),
       "\n", sep="\t", file=logfile, append=TRUE)
 
     # CLEAR memory
-    gc()
+    # gc()
   }
   
   # TRACK om in final years
@@ -672,15 +678,15 @@ setMethod("goFish", signature(om="FLombf"),
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
 
-    # TRACK om TODO GAP? TODO dimensionality
-    track(tracking, "F.om", ay) <- unitMeans(window(fbar(om),
-      start=dy, end=dy))
-    track(tracking, "B.om", ay) <- unitSums(window(tsb(om),
-      start=dy, end=dy))
-    track(tracking, "SB.om", ay) <- unitSums(window(ssb(om),
-      start=dy, end=dy))
-    track(tracking, "C.om", ay) <- unitSums(window(catch(om),
-      start=dy, end=dy))
+    # BUG: TRACK om TODO GAP? TODO dimensionality
+#    track(tracking, "F.om", ay) <- unitMeans(window(fbar(om),
+#      start=dy, end=dy))
+#    track(tracking, "B.om", ay) <- unitSums(window(tsb(om),
+#      start=dy, end=dy))
+#    track(tracking, "SB.om", ay) <- unitSums(window(ssb(om),
+#      start=dy, end=dy))
+#    track(tracking, "C.om", ay) <- unitSums(window(catch(om),
+#      start=dy, end=dy))
     
     # --- OEM: Observation Error Model
 
@@ -707,7 +713,7 @@ setMethod("goFish", signature(om="FLombf"),
       return(obs.oem)
     }, stk=stk, obs=observations(oem)[names(stk)],
       dev=deviances(oem)[names(stk)], tra=tracking[names(stk)])
-    
+
     # EXTRACT oem observations
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
@@ -751,14 +757,14 @@ setMethod("goFish", signature(om="FLombf"),
 
     # TRACK est
     track(tracking, "F.est", seq(ay, ay + frq - 1)) <- 
-      window(lapply(stk0, fbar), start=dy, end=dy + frq - 1)
+      lapply(window(lapply(stk0, fbar), start=dy, end=dy + frq - 1), unitMeans)
     track(tracking, "B.est", seq(ay, ay + frq - 1)) <- 
-      window(lapply(stk0, stock), start=dy, end=dy + frq - 1)
+      lapply(window(lapply(stk0, stock), start=dy, end=dy + frq - 1), unitSums)
     track(tracking, "SB.est", seq(ay, ay + frq - 1)) <- 
-      window(lapply(stk0, ssb), start=dy, end=dy + frq - 1)
+      lapply(window(lapply(stk0, ssb), start=dy, end=dy + frq - 1), unitSums)
     track(tracking, "C.est", seq(ay, ay + frq - 1)) <- 
       lapply(window(lapply(stk0, catch), start=dy, end=dy + frq - 1),
-        areaSums)
+        function(x) areaSums(unitSums(x)))
 
     # --- phcr: HCR parameterization
     
@@ -952,10 +958,11 @@ setMethod("goFish", signature(om="FLombf"),
     
     om <- do.call("mpDispatch", ctrl.om)$om
 
-    # time (end)   
     # BUG:
     # track(tracking, "fwd", seq(ay, ay+frq-1)) <- ctrl
-    track(tracking, "time", ay) <- as.numeric(Sys.time()) - tracking[[1]]["time", i]
+    # time (end)   
+    track(tracking, "time", ay) <- as.numeric(Sys.time()) -     
+      tracking[[1]]["time", i]
 
     invisible(gc())
   }

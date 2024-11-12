@@ -129,7 +129,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     # CONSTRUCT fwd control
     fctrl <- fwdControl(
       # ay as intermediate with Fsq TODO: Other options
-      list(year=seq(ay - data_lag + 1, length=management_lag + frq),
+      list(year=seq(ay - data_lag + 1, length=management_lag),
         quant="fbar", value=rep(c(fsq), management_lag)),
       # target
       list(year=cys, quant="fbar", value=c(ftar))
@@ -170,6 +170,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   }
 
   # CONSTRUCT fwdControl
+  # TODO: USE frq here
   ctrl <- fwdControl(lapply(seq(length(cys)), function(x)
     list(year=cys[x], quant=output, value=TAC[,x])))
     

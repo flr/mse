@@ -7,6 +7,9 @@
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
 statistics <- list(
+  # SB
+  SB = list(~yearMeans(SB), name = "SB",
+    desc = "Mean spawner biomass"),
   # SB0
   SB0 = list(~yearMeans(SB/SB0), name = "SB/SB[0]",
     desc = "Mean spawner biomass relative to unfished"),
@@ -16,6 +19,9 @@ statistics <- list(
   # SBMSY
   SBMSY = list(~yearMeans(SB/SBMSY), name = "SB/SB[MSY]",
     desc = "Mean spawnwer biomass relative to SBMSY"),
+  # F
+  F = list(~yearMeans(F), name = "F",
+    desc = "Mean fishing mortality"),
   # Ftarget
   Ftarget = list(~yearMeans(F/Ftarget), name = "F/F[target]",
     desc = "Mean fishing mortality relative to target"),

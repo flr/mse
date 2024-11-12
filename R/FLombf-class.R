@@ -261,9 +261,7 @@ setMethod("sr", signature(object="FLombf"),
 )
 # }}}
 
-# biol metrics
-
-# fishery metrics
+# -- fishery metrics
 
 # catch, landings, discards {{{
 
@@ -286,15 +284,20 @@ setMethod("discards", signature(object="FLombf"),
 )
 # }}}
 
+# -- biol metrics
+
 # ssb, tsb {{{
 
 setMethod("ssb", signature(object="FLombf"),
   function(object, biol=NULL) {
-    
-    res <- FLQuants(Map(ssb, object=biols(object),
-      harvest=harvest(object)))
+    return(FLQuants(Map(ssb, object=biols(object),
+      harvest=harvest(object))))
 
-    return(res)
+    if(length(biols(object)) == 1)
+      return(ssb(biol(object), harvest=harvest(object)))
+    else
+      return(FLQuants(Map(ssb, object=biols(object),
+        harvest=harvest(object))))
   }
 )
 
@@ -357,7 +360,8 @@ setMethod("harvest", signature(object="FLombf", catch="missing"),
   function(object, biol=seq(biols(object))) {
 
     # GET partial Fs by biol - fishery
-    FLQuants(harvest(biols(object)[biol], fisheries(object)))
+    res <- FLQuants(harvest(biols(object)[biol], fisheries(object)))
+    return(res)
   }
 )
 
@@ -540,8 +544,9 @@ setMethod("dimnames", signature(x="FLombf"),
 
 # fwd (FLombf) {{{
 
-setMethod("fwd", signature(object="FLombf", fishery="missing", control="fwdControl"), 
-  function(object, control, deviances="missing", ...) {
+setMethod("fwd", signature(object="FLombf", fishery="missing", 
+  control="fwdControl"), 
+  function(object, control, deviances="missing", window=TRUE, ...) {
     
     # ADD object FCB if missing
     if(all(is.na(FCB(control))))
@@ -569,6 +574,9 @@ setMethod("fwd", signature(object="FLombf", fishery="missing", control="fwdContr
     # EXTRACT results
     object@biols <- res$biols
     object@fisheries <- res$fisheries
+
+    if(window)
+      object <- window(object, start=min(control$year) - 1)
 
     return(object)
   })
