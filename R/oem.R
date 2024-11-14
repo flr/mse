@@ -244,6 +244,9 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   
   for(i in slots)
     slot(obs, i)[, dyrs] <- slot(stk, i)[, dyrs]
+  
+  # STORE in OEM observations
+  observations$stk[,dyrs] <- obs[,dyrs]
 
   list(stk=obs, idx=idx, observations=observations, tracking=tracking)
 
