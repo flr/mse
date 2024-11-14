@@ -248,6 +248,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   # STORE in OEM observations
   observations$stk[,dyrs] <- obs[,dyrs]
 
+  # RETURN stk from obs, only update observed 'slots'
   list(stk=obs, idx=idx, observations=observations, tracking=tracking)
 
 } # }}}
