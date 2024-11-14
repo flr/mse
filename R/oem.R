@@ -101,7 +101,7 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
     # APPLY deviances and ASSIGN to stk slots in dyrs
     for(i in names(deviances$stk)) {
       slot(stk, i)[, dyrs] <-
-      do.call(i, list(object=stk))[, dyrs] * deviances$stk[[i]][, dyrs] + 0.001
+      do.call(i, list(object=stk))[, dyrs] %*% deviances$stk[[i]][, dyrs] + 0.001
     }
 
     # COMPUTE aggregated slots
