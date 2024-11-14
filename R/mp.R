@@ -678,15 +678,15 @@ setMethod("goFish", signature(om="FLombf"),
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
 
-    # BUG: TRACK om TODO GAP? TODO dimensionality
-#    track(tracking, "F.om", ay) <- unitMeans(window(fbar(om),
-#      start=dy, end=dy))
-#    track(tracking, "B.om", ay) <- unitSums(window(tsb(om),
-#      start=dy, end=dy))
-#    track(tracking, "SB.om", ay) <- unitSums(window(ssb(om),
-#      start=dy, end=dy))
-#    track(tracking, "C.om", ay) <- unitSums(window(catch(om),
-#      start=dy, end=dy))
+    # TRACK om
+    track(tracking, "F.om", ay) <- unitMeans(window(fbar(om),
+      start=dy, end=dy))
+    track(tracking, "B.om", ay) <- unitSums(window(tsb(om),
+      start=dy, end=dy))
+    track(tracking, "SB.om", ay) <- unitSums(window(ssb(om),
+      start=dy, end=dy))
+    track(tracking, "C.om", ay) <- unitSums(window(catch(om),
+      start=dy, end=dy))
     
     # --- OEM: Observation Error Model
 
@@ -720,9 +720,10 @@ setMethod("goFish", signature(om="FLombf"),
 
     observations(oem) <- lapply(o.out, "[[", "observations")
     
-    # DEBUG
-    # track(tracking, "C.obs", seq(ay, ay+frq-1)) <- unitSums(window(catch(om),
-    #  start=dy, end=dy + frq - 1))
+    # TRACK oem catch
+    track(tracking, "C.obs", seq(ay, ay+frq-1)) <- 
+    lapply(observations(oem), function(x) unitSums(window(catch(x$stk),
+      start=dy, end=dy + frq - 1)))
 
     # --- est: Estimator of stock statistics
 
