@@ -149,11 +149,9 @@ setMethod("iter", signature(obj = "mseCtrl"),
   function(obj, iter) {
   
   args(obj) <- lapply(obj@args, function(x) {
-			if(is(x, "FLQuant")) FLCore::iter(x, iter) else x
+			if(is(x, "FLQuant") | is(x, "FLQuants")) FLCore::iter(x, iter) else x
 		})
 
 	do.call(class(obj), list(obj))
 })
 # }}}
-
-

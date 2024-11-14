@@ -203,20 +203,8 @@ setMethod("iters", signature(object = "mpCtrl"), function(object, iter){
 
 #' @rdname mpCtrl-class
 setMethod("iter", signature(obj = "mpCtrl"), function(obj, iter){
-	
-  ctrl <- lapply(obj, function(x) {
-		lst0 <- lapply(x@args, function(y){
-      if(is(y, "numeric") & !is(y, "array"))
-        return(y)
-      if(is(y, "FLArray") | is(y, "FLPar"))
-        return(FLCore::iter(y, iter))
-      else
-        return(y)
-		})
-		args(x) <- lst0
-		x
-	})
-	mpCtrl(ctrl)
+  ctrl <- lapply(obj, iter, iter=iter)
+  return(mpCtrl(ctrl))
 }) # }}}
 
 # exists {{{
