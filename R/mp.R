@@ -677,16 +677,16 @@ setMethod("goFish", signature(om="FLombf"),
     
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
-
+    
     # TRACK om
-    track(tracking, "F.om", ay) <- unitMeans(window(fbar(om),
-      start=dy, end=dy))
-    track(tracking, "B.om", ay) <- unitSums(window(tsb(om),
-      start=dy, end=dy))
-    track(tracking, "SB.om", ay) <- unitSums(window(ssb(om),
-      start=dy, end=dy))
-    track(tracking, "C.om", ay) <- unitSums(window(catch(om),
-      start=dy, end=dy))
+    track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
+      start=dy0, end=dyf))
+    track(tracking, "B.om", dys) <- unitSums(window(tsb(om),
+      start=dy0, end=dyf))
+    track(tracking, "SB.om", dys) <- unitSums(window(ssb(om),
+      start=dy0, end=dyf))
+    track(tracking, "C.om", dys) <- unitSums(window(catch(om),
+      start=dy0, end=dyf))
     
     # --- OEM: Observation Error Model
 
@@ -714,19 +714,21 @@ setMethod("goFish", signature(om="FLombf"),
     }, stk=stk, obs=observations(oem)[names(stk)],
       dev=deviances(oem)[names(stk)], tra=tracking[names(stk)])
 
-    # EXTRACT oem observations
+    # EXTRACT oem observations TODO: CLEAN & ADD methods
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
-
+    tracking <- FLQuants(lapply(o.out, function(x) x$tracking[[1]]))
     observations(oem) <- lapply(o.out, "[[", "observations")
     
     # TRACK oem catch
-    track(tracking, "C.obs", seq(ay, ay+frq-1)) <- 
-    lapply(observations(oem), function(x) unitSums(window(catch(x$stk),
-      start=dy, end=dy + frq - 1)))
+    track(tracking, "B.obs", dys) <- lapply(window(stk0, start=dy0, end=dyf),
+      function(x) areaSums(unitSums(stock(x))))
+    track(tracking, "SB.obs", dys) <- lapply(window(stk0, start=dy0, end=dyf),
+      function(x) areaSums(unitSums(ssb(x))))
+    track(tracking, "C.obs", dys) <- lapply(window(stk0, start=dy0, end=dyf),
+      function(x) areaSums(unitSums(catch(x))))
 
     # --- est: Estimator of stock statistics
-
     if (!is.null(ctrl0$est)) {
       ctrl.est <- args(ctrl0$est)
       ctrl.est$method <- method(ctrl0$est)
@@ -756,11 +758,12 @@ setMethod("goFish", signature(om="FLombf"),
       tracking <- FLQuants(lapply(out.assess, "[[", "tracking"))
     }
 
-    # TRACK est
-    track(tracking, "F.est", seq(ay, ay + frq - 1)) <- 
-      lapply(window(lapply(stk0, fbar), start=dy, end=dy + frq - 1), unitMeans)
+    # TRACK est TODO:
+#    track(tracking, "F.est", seq(ay, ay + frq - 1)) <- 
+#      lapply(window(lapply(stk0, fbar), start=dy, end=dy + frq - 1), unitMeans)
     track(tracking, "B.est", seq(ay, ay + frq - 1)) <- 
       lapply(window(lapply(stk0, stock), start=dy, end=dy + frq - 1), unitSums)
+#      lapply(window(lapply(stk0, stock), start=dy - frq + 1, end=dy), unitMeans)
     track(tracking, "SB.est", seq(ay, ay + frq - 1)) <- 
       lapply(window(lapply(stk0, ssb), start=dy, end=dy + frq - 1), unitSums)
     track(tracking, "C.est", seq(ay, ay + frq - 1)) <- 
