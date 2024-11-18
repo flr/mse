@@ -29,7 +29,7 @@ system.time(
   mcfit <- aap(stock, indices, control=control, verbose=TRUE)
 )
 
-save(mcfit, file="sol274/mcfit.RData", compress="xz")
+save(mcfit, file="sol274/mcfit.rda", compress="xz")
 
 # --- SETUP om & oem
 
@@ -72,7 +72,7 @@ residuals(srr)[, ac(2022:fy)] <- exp(residuals(srr)[, sample(ac(2000:2021),
 # CONSTRUCT om
 
 om <- FLom(stock=fwdWindow(runmc, end=fy), refpts=refpts, sr=srr,
-  projection=mseCtrl(method=fwd.om))
+  projection=mseCtrl(method=fwd.om), name="sol274")
 
 # - CONSTRUCT oem
 
@@ -115,11 +115,10 @@ control <- mpCtrl(list(
   # hockeystick.hcr(refpts)
   hcr=mseCtrl(method=hockeystick.hcr,
     args=list(lim=c(refpts$Blim)[1], trigger=c(refpts$Btrigger)[1],
-      target=c(refpts$Fmsy)[1])),
-  # TAC fwd
-  isys=mseCtrl(method=tac.is, args=list(dtaclow=0.85, dtacupp=1.15))
+      target=c(refpts$Fmsy)[1]))
 ))
 
+# TODO: GET default args for labels
 plot_hockeystick.hcr(control$hcr)
 
 tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021))

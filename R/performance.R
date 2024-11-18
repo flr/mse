@@ -387,8 +387,10 @@ setMethod('performance<-', signature(x='FLmse', value="data.frame"),
 
 setMethod("performance", signature(x="FLmses"),
   function(x, ...) {
+    # RETURN slot if no other args
     if(length(list(...)) == 0)
       return(slot(x, 'performance'))
+    # CALL performance(list)
     else
       callNextMethod()
   } 

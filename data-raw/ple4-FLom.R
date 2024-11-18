@@ -93,4 +93,4 @@ sel.pattern(observations(oem)$idx[[1]]) <- window(catch.sel(stk), start=1996)
 
 # SAVE
 
-save(om, oem, file="../data/ple4om.RData", compress="xz")
+save(om, oem, file="../data/ple4om.rda", compress="xz")
