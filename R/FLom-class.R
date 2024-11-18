@@ -77,10 +77,12 @@ setGeneric("FLom")
 
 setMethod("initialize", "FLom",
     function(.Object, ...,
-             stock, sr, refpts, fleetBehaviour, projection) {
+             stock, sr, refpts, fleetBehaviour, projection, name) {
       # slots
       if (!missing(stock))
         .Object@stock <- stock 
+      if (!missing(name))
+        .Object@name <- name 
       if (!missing(sr))
         .Object@sr <- sr
       else if(missing(sr) & !missing(stock))
