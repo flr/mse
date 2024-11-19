@@ -76,6 +76,7 @@ export(
   "sampling.oem",
   "seasonal.is",
   "selectMetric",
+  "setdeviances",
   "shortcut_devs",
   "shortcut.oem",
   "shortcut.sa",
