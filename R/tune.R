@@ -111,8 +111,8 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
   # CHECK range includes 0
   # TODO: PROPOSE wider range, min * 0.5, max * 1.5, and restart (recursive?).
   if((obmin * obmax) > 0) {
-    warning("Range of hcr param(s) cannot achieve requested tuning objective probability")
-    return(list(min=rmin, max=rmax))
+    warning(paste("Range of hcr param(s) cannot achieve requested tuning objective probability: min =", round(obmin, 3), ", max=", round(obmax, 3)))
+    return(FLmses(list(min=rmin, max=rmax)))
   }
 
   # --- LOOP bisecting
