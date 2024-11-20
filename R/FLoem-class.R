@@ -273,15 +273,15 @@ setMethod("combine", signature(x="FLoem", y="FLoem"),
     Map(function(i, j) FLQuants(Map(function(m, n) combine(m, n), i, j)),
       x, y)
     }
-
+    
     # REDUCE
-    if(names(devs[[1]]) %in% c('stk', 'idx'))
+    if(any(names(devs[[1]]) %in% c('stk', 'idx')))
       deviances(x) <- Reduce(.combinedevs, devs)
     else if(length(names(devs[[1]])) == 1)
       deviances(x)[[1]] <- Reduce(.combinedevs, lapply(devs, '[[', 1))
     else
-      Reduce(.combinedevs, lapply(names(devs[[1]]), function(s)
-        lapply(devs, '[[', s)))
+      deviances(x) <- lapply(setNames(nm=names(devs[[1]])),
+        function(s) Reduce(.combinedevs, lapply(devs, '[[', s)))
  
     # -- OBSERVATIONS
     obs <- lapply(args, slot, "observations")
