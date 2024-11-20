@@ -232,21 +232,25 @@ setMethod("iter", signature(obj = "FLoem"),
   function(obj, iter){
 
     # deviances
-    deviances(obj) <- rapply(deviances(obj), FLCore::iter,
-      classes = "FLQuant", how = "replace", iter=iter)
+    if(length(deviances(obj)) > 0) {
+      deviances(obj) <- rapply(deviances(obj), FLCore::iter,
+        classes = "FLQuant", how = "replace", iter=iter)
+    }
 
     # observations
-    observations(obj) <- rapply(observations(obj), FLCore::iter,
-      classes = c("FLStock", "FLIndex", "FLIndexBiomass"),
-      how = "replace", iter=iter)
+    if(length(observations(obj)) > 0) {
+      observations(obj) <- rapply(observations(obj), FLCore::iter,
+        classes = c("FLStock", "FLIndex", "FLIndexBiomass"),
+        how = "replace", iter=iter)
 
-    # PARSE non-FLR objects (lists) in observations (e.g. SA files)
-    id <- names(observations(obj)) %in% c("stk", "idx") |
-      unlist(lapply(observations(obj), function(x)
-        any(c("stk", "idx") %in% names(x))))
+      # PARSE non-FLR objects (lists) in observations (e.g. SA files)
+      id <- names(observations(obj)) %in% c("stk", "idx") |
+        unlist(lapply(observations(obj), function(x)
+          any(c("stk", "idx") %in% names(x))))
 
-    observations(obj)[!id] <- lapply(observations(obj)[!id],
-      '[', iter=iter)
+      observations(obj)[!id] <- lapply(observations(obj)[!id],
+        '[', iter=iter)
+    }
 
     return(obj)
 })
@@ -273,15 +277,21 @@ setMethod("combine", signature(x="FLoem", y="FLoem"),
     Map(function(i, j) FLQuants(Map(function(m, n) combine(m, n), i, j)),
       x, y)
     }
-    
-    # REDUCE
-    if(any(names(devs[[1]]) %in% c('stk', 'idx')))
+
+    # IF empty
+    if(length(devs[[1]]) == 0) {
+       deviances(x) <- list()
+    # IF it goes with FLom
+    } else if(any(names(devs[[1]]) %in% c('stk', 'idx'))) {
       deviances(x) <- Reduce(.combinedevs, devs)
-    else if(length(names(devs[[1]])) == 1)
+    # IF for FLombf but 1 biol
+    } else if(length(names(devs[[1]])) == 1) {
       deviances(x)[[1]] <- Reduce(.combinedevs, lapply(devs, '[[', 1))
-    else
+    # IF multiple biols
+    } else {
       deviances(x) <- lapply(setNames(nm=names(devs[[1]])),
         function(s) Reduce(.combinedevs, lapply(devs, '[[', s)))
+    }
  
     # -- OBSERVATIONS
     obs <- lapply(args, slot, "observations")
@@ -311,12 +321,18 @@ setMethod("combine", signature(x="FLoem", y="FLoem"),
         # EXTRACT biol observations
         bios <- lapply(obs, "[[", s)
 
-        # FIND elements in observations
-        elems <- setNames(nm=names(bios[[1]]))
+        # IDENTIFY if FLR
+        if(is(bios[[1]][[1]], 'list'))
+          return(Reduce('c', bios))
+        else {
+
+          # FIND elements in observations
+          elems <- setNames(nm=names(bios[[1]]))
         
-        # COMBINE across elements
-        lapply(elems, function(e)
-          Reduce(combine, lapply(bios, "[[", e)))
+          # COMBINE across elements
+          lapply(elems, function(e)
+            Reduce(combine, lapply(bios, "[[", e)))
+        }
       })
     }
 
