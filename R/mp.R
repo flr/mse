@@ -65,8 +65,11 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # APPLY recursively to om list
   if(is(om, 'list')) {
+    if(!is(oem, 'list')) {
+      oem <- lapply(setNames(nm=names(om)), function(x) oem)
+    }
     res <- foreach(i=seq(length(om)), .combine="c") %dofuture% {
-      mp(om[[i]], oem=oem, iem=iem,     
+      mp(om[[i]], oem=oem[[i]], iem=iem,     
         control=control, args=args, scenario=scenario, tracking=tracking, 
         logfile=logfile, verbose=verbose, parallel=parallel)
     }
@@ -813,7 +816,6 @@ setMethod("goFish", signature(om="FLombf"),
       }
 
       # TODO:
-
       ctrl.hcr$args <- args
       ctrl.hcr$tracking <- tracking
       if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
