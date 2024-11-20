@@ -221,6 +221,12 @@ setMethod("show", signature(object = "FLoem"),
 # iter {{{
 
 #' @rdname FLoem-class
+#' @examples
+#' data(sol274)
+#' x <- iter(oem, 1:50)
+#' dims(observations(x)$stk)$iter
+#' dims(deviances(x)$stk$catch.n)$iter
+#' dims(deviances(x)$idx[[1]])$iter
 
 setMethod("iter", signature(obj = "FLoem"),
   function(obj, iter){
@@ -250,18 +256,30 @@ setMethod("iter", signature(obj = "FLoem"),
 # combine {{{
 
 #' @rdname FLoem-class
+#' @examples
+#' data(sol274)
+#' iter(oem, 1:50)
 
 setMethod("combine", signature(x="FLoem", y="FLoem"),
   function(x, y, ..., check=FALSE) {
 
     args <- c(list(x=x, y=y), list(...))
     
-    # OBSERVATIONS
-    obs <- lapply(args, slot, "observations")
-    
-    # DEVIANCES
+    # -- DEVIANCES
     devs <- lapply(args, slot, "deviances")
 
+    # FUNCTION to combine
+    .combinedevs <- function(x, y) {
+    Map(function(i, j) FLQuants(Map(function(m, n) combine(m, n), i, j)),
+      x, y)
+    }
+
+    # REDUCE
+    ndevs <- Reduce(.combinedevs, devs)
+
+    # -- OBSERVATIONS
+    obs <- lapply(args, slot, "observations")
+    
     # IF no observations
     if(length(obs) < 1)
       return(x)
@@ -296,10 +314,9 @@ setMethod("combine", signature(x="FLoem", y="FLoem"),
       })
     }
 
-    # DEVIANCES
-
     # ASSIGN to x
     observations(x) <- obs
+    deviances(x) <- ndevs
 
     return(x)
   }
