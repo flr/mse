@@ -275,8 +275,14 @@ setMethod("combine", signature(x="FLoem", y="FLoem"),
     }
 
     # REDUCE
-    ndevs <- Reduce(.combinedevs, devs)
-
+    if(names(devs[[1]]) %in% c('stk', 'idx'))
+      deviances(x) <- Reduce(.combinedevs, devs)
+    else if(length(names(devs[[1]])) == 1)
+      deviances(x)[[1]] <- Reduce(.combinedevs, lapply(devs, '[[', 1))
+    else
+      Reduce(.combinedevs, lapply(names(devs[[1]]), function(s)
+        lapply(devs, '[[', s)))
+ 
     # -- OBSERVATIONS
     obs <- lapply(args, slot, "observations")
     
@@ -316,7 +322,6 @@ setMethod("combine", signature(x="FLoem", y="FLoem"),
 
     # ASSIGN to x
     observations(x) <- obs
-    deviances(x) <- ndevs
 
     return(x)
   }
