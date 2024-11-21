@@ -45,25 +45,29 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
 
 # shortcut.sa {{{
 
-shortcut.sa <- function(stk, idx, SSBdevs=ssb(stk) %=% 1, args, tracking, ...) {
- 
+shortcut.sa <- function(stk, idx, metric="ssb", SSBdevs=ind %=% 1, devs=SSBdevs,
+  args, tracking, ...) {
+
   # DIMS
   y0 <- args$y0
   dy <- args$dy
   ay <- args$ay
-  it <- args$it
 
   # SUBSET oem stock
   stk <- window(stk, end=dy)
 
-  ind <- FLQuants(
-    # SSB + devs
-    ssb=ssb(stk) * window(SSBdevs, start=y0, end=dy))
+  # COMPUTE 'metric'
+  ind <- do.call(metric, list(stk))
+  ind <- FLQuants(ind * window(devs, start=y0, end=dy))
+  
+  names(ind) <- metric
 
+  # TRACK 'convergence'
   track(tracking, "conv.est", ac(ay)) <- 1
 
   list(stk=stk, ind=ind, tracking=tracking)
 }
+
 # }}}
 
 # shortcut_devs {{{

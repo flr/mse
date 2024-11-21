@@ -11,7 +11,6 @@
 library("doFuture")
 
 plan(list(
-  tweak(multisession, workers = 2L),
   tweak(multisession, workers = 3L)
 ))
 

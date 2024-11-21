@@ -31,7 +31,7 @@
 #' data(sol274)
 #' # Set control: sa and hcr
 #' control <- mpCtrl(list(
-#'   est = mseCtrl(method=perfect.sa),
+#'   est = mseCtrl(method=shortcut.sa),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
 #'   trigger=41500, target=0.27))))
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034))
@@ -703,7 +703,7 @@ setMethod("goFish", signature(om="FLombf"),
     # GET OM observation
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
 
-    # APPLY oem
+    # APPLY oem across stocks
     o.out <- Map(function(stk, dev, obs, tra) {
 
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
@@ -720,7 +720,9 @@ setMethod("goFish", signature(om="FLombf"),
     # EXTRACT oem observations TODO: CLEAN & ADD methods
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
+
     tracking <- FLQuants(lapply(o.out, function(x) x$tracking[[1]]))
+    
     observations(oem) <- lapply(o.out, "[[", "observations")
     
     # TRACK oem catch
@@ -733,32 +735,63 @@ setMethod("goFish", signature(om="FLombf"),
 
     # --- est: Estimator of stock statistics
     if (!is.null(ctrl0$est)) {
+
       ctrl.est <- args(ctrl0$est)
       ctrl.est$method <- method(ctrl0$est)
       ctrl.est$args <- args
-      ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), 
-        ov=list(t1=flsval))
       ctrl.est$step <- "est"
-      
-      out.assess <- Map(function(x, y, z)
-        do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z))),
-        x=stk0, y=idx0, z=tracking)
 
-      stk0 <- FLStocks(lapply(out.assess, "[[", "stk"))
+      # SET empty, to be replaced
+      ind <- lapply(setNames(nm=bns), function(x) FLQuants())
 
-      # EXTRACT ind(icators) if returned
-      if(!is.null(out.assess[[1]]$ind)) {
-        ind <- lapply(out.assess, "[[", "ind")
-      } else {
-        ind <- lapply(setNames(nm=bns), function(x) FLQuants())
+      # SET stocks to est on
+      if(is.null(args$stock)) {
+        args$stock <- seq(length(stk0))
       }
+
+      # CALL est with multiple stocks
+      if(args$stock == 'all') {
+
+        # SET dispatch rules
+        ctrl.est$ioval <- list(iv=list(t1=flssval, t2=flival), 
+          ov=list(t1=flssval))
+        
+        # DISPATCH
+        out.assess <- do.call("mpDispatch", c(ctrl.est,
+          list(stk=stk0, idx=idx0[[1]], tracking=tracking)))
+
+        # EXTRACT FLStocks
+        stk0 <- out.assess$stk
+
+        # EXTRACT indicators
+        ind <- out.assess$ind
+
+        # EXTRACT tracking
+        tracking <- out.assess$tracking
+
+      # OR stock by stock
+      } else {
+
+        ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), 
+          ov=list(t1=flsval))
+
+        out.assess <- Map(function(x, y, z)
+          do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z))),
+          x=stk0[args$stock], y=idx0[args$stock], z=tracking)
       
+        stk0 <- FLStocks(lapply(out.assess, "[[", "stk"))
+      
+        if(!is.null(out.assess[[1]]$ind))
+          ind <- lapply(out.assess, "[[", "ind")
+        
+        tracking <- FLQuants(lapply(out.assess, "[[", "tracking"))
+      }
+
       # TODO: PASS args generated at est to ctrl
       if (!is.null(out.assess$args)) {
         args(ctrl0$est)[names(out.assess$args)] <-
           out.assess$args
       }
-      tracking <- FLQuants(lapply(out.assess, "[[", "tracking"))
     }
 
     # TRACK est TODO:
@@ -766,7 +799,6 @@ setMethod("goFish", signature(om="FLombf"),
 #      lapply(window(lapply(stk0, fbar), start=dy, end=dy + frq - 1), unitMeans)
     track(tracking, "B.est", seq(ay, ay + frq - 1)) <- 
       lapply(window(lapply(stk0, stock), start=dy, end=dy + frq - 1), unitSums)
-#      lapply(window(lapply(stk0, stock), start=dy - frq + 1, end=dy), unitMeans)
     track(tracking, "SB.est", seq(ay, ay + frq - 1)) <- 
       lapply(window(lapply(stk0, ssb), start=dy, end=dy + frq - 1), unitSums)
     track(tracking, "C.est", seq(ay, ay + frq - 1)) <- 
@@ -806,26 +838,30 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.hcr$method <- method(ctrl0$hcr)
 
       # SELECT stock for hcr
-      if(!is.null(args$stock)) {
+      if(args$stock == 'all') {
+        ctrl.hcr$stk <- stk0[[1]]
+        ctrl.hcr$ind <- ind
+      } else if(length(args$stock) == 1) {
         ctrl.hcr$stk <- stk0[[args$stock]]
         ctrl.hcr$ind <- ind[[args$stock]]
       } else {
-      # TODO: ADD extra checks
         ctrl.hcr$stk <- stk0
         ctrl.hcr$ind <- ind
       }
 
-      # TODO:
       ctrl.hcr$args <- args
       ctrl.hcr$tracking <- tracking
+
       if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
+      
       ctrl.hcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flfval))
       ctrl.hcr$step <- "hcr"
       
       out <- do.call("mpDispatch", ctrl.hcr)
+
       ctrl <- out$ctrl
 
-      # BUG: ASSIGN biol
+      # ASSIGN biol BUG: FIX for stock='all', SET as I(1:2)?
       if(all(is.na(ctrl$biol)))
        ctrl$biol <- args$stock
       
@@ -864,14 +900,23 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.is$ctrl <- ctrl
 
       # SELECT stock for hcr
-      if(!is.null(args$stock))
+      if(args$stock == 'all')
+        ctrl.is$stk <- stk0
+      else if(length(args$stock) == 1)
         ctrl.is$stk <- stk0[[args$stock]]
       else
         ctrl.is$stk <- stk0
 
       ctrl.is$args <- args #ay <- ay
       ctrl.is$tracking <- tracking
-      ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval), ov=list(t1=flfval))
+      #
+      if(length(stk0) == 1)
+        ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval),
+          ov=list(t1=flfval))
+      else
+        ctrl.is$ioval <- list(iv=list(t1=flssval, t2=flfval), 
+          ov=list(t1=flfval))
+      
       ctrl.is$step <- "isys"
 
       out <- do.call("mpDispatch", ctrl.is)

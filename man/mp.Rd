@@ -47,7 +47,7 @@ on an operating model, observation error model, control and arguments.
 data(sol274)
 # Set control: sa and hcr
 control <- mpCtrl(list(
-  est = mseCtrl(method=perfect.sa),
+  est = mseCtrl(method=shortcut.sa),
   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
   trigger=41500, target=0.27))))
 tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034))

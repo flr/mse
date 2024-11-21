@@ -280,6 +280,8 @@ splitcatch.is <- function(stk, ctrl, split, args, tracking) {
   frq <- args$frq
   yrs <- ctrl$year
 
+  # IS split a vector? SET as FLQuant
+
   # SET as proportions
   split <- unlist(split / sum(split))
 
