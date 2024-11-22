@@ -8,8 +8,6 @@
 
 globalVariables("statistic")
 
-setGeneric("performance", function(x, ...) standardGeneric("performance"))
-
 # performance(FLQuants) {{{
 
 #' Compute performance statistics
@@ -100,7 +98,7 @@ setMethod("performance", signature(x="FLQuants"),
     # GET names in refpts and metrics, plus FLQuant dimnames
     valid.names <- c(dimnames(refpts)$params, names(x),
       c("age", "year", "unit", "season", "area"))
-
+    
     if(!all(stats.names %in% valid.names))
       stop("Name of metric, refpt or function in statistics not found: ",
         paste(stats.names[!stats.names %in% valid.names], collapse=", "))
@@ -139,6 +137,9 @@ setMethod("performance", signature(x="FLQuants"),
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over statistics
       data.table::rbindlist(lapply(statistics, function(j) {
+        # ADD previous year when 1 used and stats is for change
+        if(grepl("change|variability", j$desc) & length(i) == 1)
+          i <- seq(i - 1, i)
         # EVAL statistic
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(lapply(x, '[' , j=ac(i)),

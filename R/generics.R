@@ -43,6 +43,8 @@ setGeneric("goFish", function(om, ...) standardGeneric("goFish"))
 setGeneric("track<-", function(object, ..., value)
   standardGeneric("track<-"))
 
+setGeneric("performance", function(x, ...) standardGeneric("performance"))
+
 setGeneric("performance<-", function(x, ..., value)
   standardGeneric("performance<-"))
 
