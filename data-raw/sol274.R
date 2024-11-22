@@ -61,6 +61,13 @@ brp <-  brp(FLBRP(runmc, sr=srr))
 
 # MERGE biological & ICES refpts
 refpts <- rbind(remap(refpts(brp)), propagate(refpts, 100))
+refpts <- refpts[-7,]
+
+# ADD refpts for mse::statistics
+refpts$Ftarget <- refpts$FMSY
+refpts$SBlim <- refpts$Blim
+refpts$MSY <- refpts$Blim
+refpts$MSY[] <- c(msy(brp))
 
 # EXTEND srr into future
 srr <- window(srr, end=fy)
@@ -70,7 +77,6 @@ residuals(srr)[, ac(2022:fy)] <- exp(residuals(srr)[, sample(ac(2000:2021),
   21)])
 
 # CONSTRUCT om
-
 om <- FLom(stock=fwdWindow(runmc, end=fy), refpts=refpts, sr=srr,
   projection=mseCtrl(method=fwd.om), name="sol274")
 
