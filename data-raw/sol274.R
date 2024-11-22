@@ -101,7 +101,7 @@ oem <- FLoem(observations=obs, deviances=devs, method=sampling.oem)
 
 # SAVE
 
-save(om, oem, file="../data/sol274.RData", compress="xz")
+save(om, oem, file="../data/sol274.rda", compress="xz")
 
 
 # --- TEST
