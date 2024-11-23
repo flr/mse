@@ -3,7 +3,7 @@ Title: Tools for Running Management Strategy Evaluations using FLR
 Version: 2.2.3.9351
 Authors@R: c(person(given = "Iago", family = "Mosqueira",
   role = c("aut", "cre"), email = "iago.mosqueira@wur.nl"), 
-  person("Ernesto", "Jardim", email = "ernesto.jardim@msc.org",
+  person("Ernesto", "Jardim", email = "ernesto.jardim@gmail.com",
   role = c("aut")))
 Description: A set of functions and methods to enable the development and
   running of Management Strategy Evaluation (MSE) analyses, using the FLR 

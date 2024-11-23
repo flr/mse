@@ -133,6 +133,12 @@ setMethod("performance", signature(x="FLQuants"),
     if(length(names(statistics)) != length(unique(names(statistics))))
       stop("'statistics' must have unique names.")
 
+    # ADD name as desc if missing
+    statistics <- lapply(statistics, function(x) {
+      if(is.null(x$desc)) x$desc <- x$name
+      return(x)
+    })
+
     # LOOP over years
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over statistics
