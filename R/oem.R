@@ -228,8 +228,8 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   }
   
   # CHECK dimensions to simplify, on catch.n for multi-fleet FLStock
-  simp <- (dim(catch.n(observations$stk))[c(3,4,5)] == 1) +
-    (dim(catch.n(stk))[c(3,4,5)] == 1) < 2
+  simp <- dim(catch.n(observations$stk))[c(3, 4, 5)] !=
+    dim(catch.n(stk))[c(3, 4, 5)]
 
   # SIMPLIFY stk to match dimensions of observations$stk
   if(any(simp))
