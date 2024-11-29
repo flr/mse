@@ -71,7 +71,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     res <- foreach(i=seq(length(om)), .combine="c") %dofuture% {
       mp(om[[i]], oem=oem[[i]], iem=iem,     
         control=control, args=args, scenario=scenario, tracking=tracking, 
-        logfile=logfile, verbose=verbose, parallel=parallel)
+        logfile=logfile, verbose=verbose, parallel=FALSE)
     }
     return(res)
   }
@@ -750,7 +750,7 @@ setMethod("goFish", signature(om="FLombf"),
       }
 
       # CALL est with multiple stocks
-      if(args$stock == 'all') {
+      if(identical(args$stock, 'all')) {
 
         # SET dispatch rules
         ctrl.est$ioval <- list(iv=list(t1=flssval, t2=flival), 
