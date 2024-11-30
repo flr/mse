@@ -93,4 +93,11 @@ data(sol274)
 deviances(oem)
 deviances(oem, "stk")
 deviances(oem, "stk", "catch.n")
+data(sol274)
+x <- iter(oem, 1:50)
+dims(observations(x)$stk)$iter
+dims(deviances(x)$stk$catch.n)$iter
+dims(deviances(x)$idx[[1]])$iter
+data(sol274)
+iter(oem, 1:50)
 }
