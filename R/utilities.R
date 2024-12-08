@@ -22,6 +22,13 @@ setMethod("merge", signature(x="FLQuant", y="data.table"),
 
 # }}}
 
+# combine(list) {{{
+setMethod('combine', signature(x='list', y='list'),
+  function(x, y, ...) 
+    c(x, y, list(...))
+)
+# }}}
+
 # .combinegoFish {{{
 .combinegoFish <- function(...) {
  
@@ -60,12 +67,6 @@ find.original.name <- function(fun) {
     }
   }
   return("NULL")
-}
-# }}}
-
-# onAttach {{{
-.onAttach <- function(lib,pkg) {
-  registerDoSEQ()
 }
 # }}}
 
