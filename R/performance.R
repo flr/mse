@@ -144,8 +144,9 @@ setMethod("performance", signature(x="FLQuants"),
       # LOOP over statistics
       data.table::rbindlist(lapply(statistics, function(j) {
         # ADD previous year when 1 used and stats is for change
-        if(grepl("change|variability", j$desc) & length(i) == 1)
+        if(grepl("change|variability", j$desc) & length(i) == 1) {
           i <- seq(i - 1, i)
+        }
         # EVAL statistic
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(lapply(x, '[' , j=ac(i)),
