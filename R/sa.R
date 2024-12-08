@@ -57,7 +57,7 @@ shortcut.sa <- function(stk, idx, metric="ssb", SSBdevs=ind %=% 1, devs=SSBdevs,
   stk <- window(stk, end=dy)
 
   # COMPUTE 'metric'
-  ind <- do.call(metric, list(stk))
+  ind <- do.call(metric, c(list(stk), list(...)))
   ind <- FLQuants(ind * window(devs, start=y0, end=dy))
   
   names(ind) <- metric
