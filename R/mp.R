@@ -46,23 +46,31 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   verbose=!handlers(global = NA), parallel=TRUE) {
 
   # PARSE parallel options
-  cores <- 1
+  cores <- nbrOfWorkers()
+
+  # USE parallel is set as numeric
+  if(is.numeric(parallel)) {
+    cores <- parallel
+    parallel <- TRUE
+  }
 
   # SET future.globals.maxSize if not set already
   if(is.null(options('future.globals.maxSize')[[1]])) {
     oldopt <- options(future.globals.maxSize=1500 * 1024 ^ 2)
     on.exit(options(oldopt))
   }
-
-  # parallel tells number of workers, needed for doFuture
-  if(is.numeric(parallel)) {
-    cores <- parallel
-    parallel <- TRUE
-  # TAKEN from doPar
-  } else if(getDoParRegistered()) {
-    cores <- nbrOfWorkers()
+   
+  # SETUP default oem
+  if(is.null(oem)){
+    oem <- default.oem(om)
+    missingoem <- TRUE
+  } else if(is(oem, "function")){
+    oem <- FLoem(method=oem)
+    missingoem <- TRUE
+  } else {
+    missingoem <- FALSE
   }
-
+ 
   # APPLY recursively to om list
   if(is(om, 'list')) {
     if(!is(oem, 'list')) {
@@ -189,7 +197,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # SETUP default oem
   if(is.null(oem)){
-    oem <- default.oem(om)
+    oem <- perfect.oem(om)
     missingoem <- TRUE
   } else {
     missingoem <- FALSE
@@ -201,9 +209,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
     # SPLIT iters along cores
     its <- split(seq(it), sort(seq(it) %% cores))
-
-    cat("logfile\n", file=logfile)
-
+    
     message("Running on ", nbrOfWorkers(), " nodes.")
 
     # LOOP and combine
@@ -213,7 +219,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .errorhandling = "remove", 
       .options.future=list(globals=structure(TRUE, seed=seed)),
       .inorder=TRUE) %dofuture% {
-      
+
         call0 <- list(
           om = iter(om, j),
           oem = iter(oem, j),
@@ -1014,6 +1020,8 @@ setMethod("goFish", signature(om="FLombf"),
     # time (end)   
     track(tracking, "time", ay) <- as.numeric(Sys.time()) -     
       tracking[[1]]["time", i]
+    id <- Sys.getpid()
+    track(tracking, "pid", ay) <- id
 
     invisible(gc())
   }
