@@ -82,7 +82,7 @@ export(
   "shortcut.sa",
   "simulator",
   "sp.is",
-  "splitcatch.is",
+  "split.is",
   "tac.is",
   "target.hcr",
   "trend.hcr",

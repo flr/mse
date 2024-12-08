@@ -269,36 +269,29 @@ sp.is <- function(stk, ctrl, Ftarget=refpts(stk)$Ftarget,
 
 # }}}
 
-# splitcatch.is {{{
+# split.is {{{
 
+#' Split a target across fleets by setting relative 'quant' proportions
+#'
 #' @examples
 #' data(ple4)
 
-splitcatch.is <- function(stk, ctrl, split, args, tracking) {
+split.is <- function(stk, ctrl, split, quant="catch", args, tracking) {
 
   # DIMS
   frq <- args$frq
   yrs <- ctrl$year
 
-  # IS split a vector? SET as FLQuant
-
   # SET as proportions
-  split <- unlist(split / sum(split))
+  split <- unlist(split / max(split))
 
-  # CHECK quant in fwdControl is catch
-  if(unique(ctrl$quant) != "catch")
-    stop("splitcatch.is expects a catch-based fwdControl")
+  fis <- seq(length(split))
+  maxfis <- unname(which.max(split))
 
-  ctrl <- fwdControl(
-    Map(function(yr, fi) {
-        list(year=yr, fishery=fi, catch=1, biol=an(NA),
-    quant="catch", value=ctrl[ctrl$year==yr,]$value * split[fi])
-      },
-    yr=rep(yrs, length(split)),
-    fi=rep(seq(length(split)), each=length(yrs)))
-  )
-
-
+  ctrl <- merge(ctrl, fwdControl(lapply(fis[-maxfis], function(x)
+    list(fishery=x, relFishery=maxfis, catch=1, relCatch=1,
+      year=ctrl$year, relYear=ctrl$year, quant=quant, value=split[x]))))
+  
   return(list(ctrl=ctrl, tracking=tracking))
 }
 
