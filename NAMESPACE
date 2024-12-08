@@ -59,7 +59,6 @@ export(
   "meta.est",
   "meta.hcr",
   "mlc.ind",
-  "movingF.hcr",
   "movingF.phcr",
   "mp",
   "mpCtrl",
