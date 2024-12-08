@@ -384,6 +384,10 @@ fixedF.hcr <- function(stk, ftrg, args, tracking){
   mlag <- args$management_lag
   frq <- args$frq
 
+  # PARSE FLQuant
+  if(is(ftrg, 'FLQuant'))
+    ftrg <- c(ftrg[, ac(ay + mlag)])
+
 	# create control object
   ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="fbar", value=c(ftrg))
 
@@ -922,34 +926,6 @@ selectMetric <- function(metric="missing", stk, ind) {
 # }}}
 
 # ---
-
-# movingF.hcr {{{
-
-#' [TODO:description]
-#'
-#' @param stk [TODO:description]
-#' @param hcrpars [TODO:description]
-#' @param args [TODO:description]
-#' @param tracking [TODO:description]
-#'
-#' @return [TODO:description]
-#' @export
-#'
-#' @examples
-
-movingF.hcr <- function(stk, hcrpars, args, tracking){
-
-	ay <- args$ay
-	# rule 
-	if(!is(hcrpars, "FLQuant"))
-    hcrpars <- FLQuant(c(hcrpars), dimnames=list(iter=dimnames(stk@catch)$iter))
-	
-  # create control file
-	ctrl <- getCtrl(c(hcrpars), "f", ay+args$management_lag, dim(hcrpars)[6])
-	
-  # return
-	list(ctrl=ctrl, tracking=tracking)
-} # }}}
 
 #catchSSB.hcr {{{
 
