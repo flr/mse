@@ -724,6 +724,9 @@ setMethod("iter", signature(obj="FLombf"),
     # refpts
     obj@refpts <- FLPars(lapply(obj@refpts, 'iter', iter))
 
+    # projection
+    projection(obj) <- iter(projection(obj), iter)
+
     return(obj)
   }
 ) 
