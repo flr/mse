@@ -271,7 +271,7 @@ sp.is <- function(stk, ctrl, Ftarget=refpts(stk)$Ftarget,
 
 # split.is {{{
 
-#' Split a target across fleets by setting relative 'quant' proportions
+#' Split a biol target across fleets by setting relative 'quant' proportions
 #'
 #' @examples
 #' data(ple4)
@@ -288,7 +288,8 @@ split.is <- function(stk, ctrl, split, quant="catch", args, tracking) {
   fis <- seq(length(split))
   maxfis <- unname(which.max(split))
 
-  ctrl <- merge(ctrl, fwdControl(lapply(fis[-maxfis], function(x)
+  ctrl <- merge(ctrl, 
+      fwdControl(lapply(fis[-maxfis], function(x)
     list(fishery=x, relFishery=maxfis, catch=1, relCatch=1,
       year=ctrl$year, relYear=ctrl$year, quant=quant, value=split[x]))))
   
