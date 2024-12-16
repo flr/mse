@@ -76,10 +76,10 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     if(!is(oem, 'list')) {
       oem <- lapply(setNames(nm=names(om)), function(x) oem)
     }
-    res <- foreach(i=seq(length(om)), .combine="c") %dofuture% {
+    res <- foreach(i=seq(length(om)), .combine="c") %do% {
       mp(om[[i]], oem=oem[[i]], iem=iem,     
         control=control, args=args, scenario=scenario, tracking=tracking, 
-        logfile=logfile, verbose=verbose, parallel=FALSE)
+        logfile=logfile, verbose=verbose, parallel=parallel)
     }
     return(res)
   }
@@ -264,13 +264,16 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # GET objects back from loop, for iy up to last projected year
 
+  # om
   om <- window(lst0$om, start=iy, end=an(vy[length(vy)]) + frq)
 
+  # oem
   if(missingoem)
     oem <- FLoem()
   else
     oem <- window(lst0$oem, start=iy, end=an(vy[length(vy)]) + frq)
 
+  # tracking
   tracking <- window(lst0$tracking, start=an(iy) - data_lag,
     end=an(vy[length(vy)]) + frq)
 
