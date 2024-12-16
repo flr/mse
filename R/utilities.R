@@ -22,13 +22,6 @@ setMethod("merge", signature(x="FLQuant", y="data.table"),
 
 # }}}
 
-# combine(list) {{{
-setMethod('combine', signature(x='list', y='list'),
-  function(x, y, ...) 
-    c(x, y, list(...))
-)
-# }}}
-
 # .combinegoFish {{{
 .combinegoFish <- function(...) {
  
