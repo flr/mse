@@ -362,8 +362,6 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
 
-# TODO: fixed.hcr
-
 # fixedF.hcr {{{
 
 #' A fixed target f
@@ -439,7 +437,7 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
 #' @param nyears Number of years used in regression of log(stock).
 #' @examples
 #' data(sol274)
-#' trend.hcr(stock(om), ind=FLQuants(), args=list(ay=2003, data_lag=1,
+#' trend.hcr(stock(om), ind=FLQuants(), args=list(ay=2003, iy=2003, data_lag=1,
 #'   management_lag=1, frq=1, it=1),
 #'   tracking=FLQuant(dimnames=list(metric='tac.hcr', year=2003)),
 #'   k1=1.5, k2=3, gamma=1, nyears=5, metric=ssb)
