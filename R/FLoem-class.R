@@ -321,18 +321,12 @@ setMethod("combine", signature(x="FLoem", y="FLoem"),
         # EXTRACT biol observations
         bios <- lapply(obs, "[[", s)
 
-        # IDENTIFY if FLR
-        if(is(bios[[1]][[1]], 'list'))
-          return(Reduce('c', bios))
-        else {
-
-          # FIND elements in observations
-          elems <- setNames(nm=names(bios[[1]]))
+        # FIND elements in observations
+        elems <- setNames(nm=names(bios[[1]]))
         
-          # COMBINE across elements
-          lapply(elems, function(e)
-            Reduce(combine, lapply(bios, "[[", e)))
-        }
+        # COMBINE across elements
+        lapply(elems, function(e)
+          Reduce(combine, lapply(bios, "[[", e)))
       })
     }
 
