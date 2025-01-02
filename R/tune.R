@@ -171,8 +171,12 @@ tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
 
 #' @examples
 #' data(sol274)
-#' # tes <- tunegrid(om, oem, control, metric=list(SB=ssb), statistic=stats['S8'],
-#' #  grid=grid, args=mseargs, years=list(2030:2039), iters=1:100)
+#' control <- mpCtrl(list(
+#'   est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+#'   trigger=41500, target=0.27))))
+#' # tes <- tunegrid(om, control, metric=list(SB=ssb), statistic=stats['S8'],
+#' # grid=grid, args=mseargs, years=list(2030:2034), iters=1:100)
 
 tunegrid <- function(om, oem="missing", control, metric, statistic, grid, args,
   years=ac(seq(args$iy + 1, args$fy)), parallel=FALSE, verbose=FALSE, 

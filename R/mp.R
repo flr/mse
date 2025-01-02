@@ -320,7 +320,7 @@ setMethod("goFish", signature(om="FLom"),
     if(verbose){
       cat(i, " - ")
     }
-
+    
     # args
     ay <- args$ay <- an(i)
     dy <- args$dy <- ay - dlag
@@ -491,7 +491,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl.is$method <- method(ctrl0$isys)
       ctrl.is$ctrl <- ctrl
       ctrl.is$stk <- stk0
-      ctrl.is$args <- args #ay <- ay
+      ctrl.is$args <- args
       ctrl.is$tracking <- tracking
       ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval), ov=list(t1=flfval))
       ctrl.is$step <- "isys"
@@ -981,6 +981,17 @@ setMethod("goFish", signature(om="FLombf"),
 # mps {{{
 
 # TODO: mps(FLmse, oem=oem(), crtrl=control(), args=args(), ...)
+
+#' mps
+#' @examples
+#' data(sol274)
+#' # Set control: sa and hcr
+#' control <- mpCtrl(list(
+#'   est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+#'   trigger=41500, target=0.27))))
+#' #
+#' runs <- mps(om, ctrl=ctrl, args=list(iy=2021, fy=2026), hcr=list(target=seq(0.15, 0.50, length=10)))
 
 mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   ...) {
