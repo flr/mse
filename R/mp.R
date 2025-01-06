@@ -7,7 +7,6 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-
 # mp {{{
 
 #' mp executes a single run of a Management Procedure
@@ -1069,7 +1068,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
     rep(i, length=largs)
   })
 
-  # LOOP over values
+  # LOOP oVer values
 
   if(parallel) {
 

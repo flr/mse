@@ -2,12 +2,12 @@
 % Please edit documentation in R/is.R
 \name{split.is}
 \alias{split.is}
-\title{Split a target across fleets by setting relative 'quant' proportions}
+\title{Split a biol target across fleets by setting relative 'quant' proportions}
 \usage{
 split.is(stk, ctrl, split, quant = "catch", args, tracking)
 }
 \description{
-Split a target across fleets by setting relative 'quant' proportions
+Split a biol target across fleets by setting relative 'quant' proportions
 }
 \examples{
 data(ple4)
