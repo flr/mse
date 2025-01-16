@@ -1036,6 +1036,7 @@ setMethod("goFish", signature(om="FLombf"),
 # mps {{{
 
 # TODO: mps(FLmse, oem=oem(), crtrl=control(), args=args(), ...)
+# TODO: ADD performance calculation
 
 mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   ...) {
