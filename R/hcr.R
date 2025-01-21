@@ -742,7 +742,7 @@ hr.hcr <- function(stk, ind, metric="mean", target, trigger,
   lambda=1, dtaclow=NA, dtacupp=NA, args, tracking) {
 
   # args
-  sty<- args$iy
+  sty <- args$iy
   ay <- args$ay
   frq <- args$frq
   data_lag <- args$data_lag
@@ -766,14 +766,13 @@ hr.hcr <- function(stk, ind, metric="mean", target, trigger,
   pre <- tracking[[1]]["hcr", dys]
   nas <- c(is.na(pre))
   if(any(nas)) {
-    iter(pre, nas) <- iter(catch(stk)[, ac(ay - frq)], nas)
+    iter(pre, nas) <- areaSums(iter(catch(stk)[, ac(ay - frq)], nas))
   }
 
   # TODO: PA buffer
 
   # APPLY limits if advice years is not the first simulation year
-  if (ay != (sty + 1))
-  {
+  if (ay != (sty + 1)) {
       if(!is.na(dtacupp))
         tac[tac > pre * dtacupp] <- pre[tac > pre * dtacupp] * dtacupp
       if(!is.na(dtaclow))
