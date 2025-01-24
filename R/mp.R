@@ -7,6 +7,9 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
+
+# TODO: ADD performance calculation
+
 # mp {{{
 
 #' mp executes a single run of a Management Procedure
@@ -80,7 +83,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
         control=control, args=args, scenario=scenario, tracking=tracking, 
         logfile=logfile, verbose=verbose, parallel=parallel)
     }
-    return(res)
+    return(FLmses(res))
   }
 
   # dims & dimnames
@@ -742,6 +745,7 @@ setMethod("goFish", signature(om="FLombf"),
       function(x) areaSums(unitSums(catch(x))))
 
     # --- est: Estimator of stock statistics
+
     if (!is.null(ctrl0$est)) {
 
       ctrl.est <- args(ctrl0$est)
@@ -783,9 +787,9 @@ setMethod("goFish", signature(om="FLombf"),
         ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), 
           ov=list(t1=flsval))
 
-        out.assess <- Map(function(x, y, z)
-          do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z))),
-          x=stk0[args$stock], y=idx0[args$stock], z=tracking)
+        out.assess <- Map(function(x, y, z) {
+          do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z)))
+          }, x=stk0[args$stock], y=idx0[args$stock], z=tracking)
       
         stk0 <- FLStocks(lapply(out.assess, "[[", "stk"))
       
@@ -1036,7 +1040,6 @@ setMethod("goFish", signature(om="FLombf"),
 # mps {{{
 
 # TODO: mps(FLmse, oem=oem(), crtrl=control(), args=args(), ...)
-# TODO: ADD performance calculation
 
 mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   ...) {

@@ -45,6 +45,16 @@ perfect.sa <- function(stk, idx, args, tracking, ...) {
 
 # shortcut.sa {{{
 
+#' @examples
+#' data(sol274)
+#' #
+#' stk <- window(stock(om), end=2018)
+#' idx <- window(observations(oem)$idx, end=2018)
+#' #
+#' shortcut.sa(stk, idx, args=list(y0=1980, dy=2017, ay=2019, frq=1),
+#'   devs=rlnormar1(100, sdlog=0.2, rho=0.5, years=1980:2017),
+#'   tracking=FLQuant(dimnames=list(metric=c("conv.est"), year=2017:2019)))
+
 shortcut.sa <- function(stk, idx, metric="ssb", SSBdevs=ind %=% 1, devs=SSBdevs,
   args, tracking, ...) {
 
@@ -52,6 +62,7 @@ shortcut.sa <- function(stk, idx, metric="ssb", SSBdevs=ind %=% 1, devs=SSBdevs,
   y0 <- args$y0
   dy <- args$dy
   ay <- args$ay
+  frq <- args$frq
 
   # SUBSET oem stock
   stk <- window(stk, end=dy)
@@ -59,11 +70,14 @@ shortcut.sa <- function(stk, idx, metric="ssb", SSBdevs=ind %=% 1, devs=SSBdevs,
   # COMPUTE 'metric'
   ind <- do.call(metric, c(list(stk), list(...)))
   ind <- FLQuants(ind * window(devs, start=y0, end=dy))
-  
+
+  # OUTPUT metric as ind
   names(ind) <- metric
 
   # TRACK 'convergence'
   track(tracking, "conv.est", ac(ay)) <- 1
+ # track(tracking, "SB.ind", seq(ay, ay + frq - 1)) <-
+ #   ind[[1]][, ac(seq(ay, ay + frq - 1))]
 
   list(stk=stk, ind=ind, tracking=tracking)
 }

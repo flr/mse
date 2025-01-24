@@ -640,9 +640,9 @@ cpue.hcr <- function(stk, ind, k1=0.2, k2=0.2, k3=0.2, k4=0.2, target=1,
 
 # pid.hcr {{{
 
-# T_{y+1} = T_{y} * 1 - k1 * |lambda| ^ gamma, lambda < 0
-#   1 + k2 * lambda, lambda >= 0
-
+#' pid
+#' T_{y+1} = T_{y} * 1 - k1 * |lambda| ^ gamma, lambda < 0
+#'   1 + k2 * lambda, lambda >= 0
 #' @param stk
 #' @param ind
 #' @param kp
@@ -667,8 +667,8 @@ cpue.hcr <- function(stk, ind, k1=0.2, k2=0.2, k3=0.2, k4=0.2, target=1,
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
 #' plot(om, PID=tes)
 
-pid.hcr <- function(stk, ind, kp=0, ki=0, kd=0, nyears=5,
-  metric=ssb, ref, dlow=NA, dupp=NA, args, tracking) {
+pid.hcr <- function(stk, ind, ref, metric=ssb, kp=0, ki=0, kd=0, nyears=5,
+  dlow=NA, dupp=NA, args, tracking) {
   
   # args
   spread(args)
@@ -704,7 +704,7 @@ pid.hcr <- function(stk, ind, kp=0, ki=0, kd=0, nyears=5,
     pre <- seasonSums(unitSums(catch(stk)[, dy]))
 
   # CALCULATE divergence
-  e <- log(met %/% ref)
+  e <- log(met %/% FLQuant(ref))
 
   # COMPUTE control signal
   u <- kp * e[, dy] + ki * yearSums(e) + kd * (e[, dy] - e[,dy1])
@@ -713,7 +713,7 @@ pid.hcr <- function(stk, ind, kp=0, ki=0, kd=0, nyears=5,
   fac <- min(max(exp(u^1), exp(u^2)), exp(u^3))
 
   # TAC
-  tac <- fac * pre
+  tac <- fac * areaSums(pre)
 
   # TRACK initial TAC
   track(tracking, "tac.hcr", seq(ay + management_lag, ay + frq)) <- tac

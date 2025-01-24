@@ -38,7 +38,7 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   slope <- FLQuant(slope$data, dimnames=dimnames(mean)[-4], units="")
 
   # OUTPUT
-  ind <- FLQuants(wmean=wmean, slope=slope, mean=mean)
+  ind <- FLQuants(wmean=wmean, slope=slope, mean=mean, index=met)
 
   # TRACK
   track(tracking, "mean.ind", ac(ay)) <- mean
