@@ -283,16 +283,13 @@ split.is <- function(stk, ctrl, split, quant="catch", args, tracking) {
   yrs <- ctrl$year
 
   # SET as proportions
-  split <- unlist(split / max(split))
+  split <- unlist(split) / sum(unlist(split))
 
-  fis <- seq(length(split))
-  maxfis <- unname(which.max(split))
+  # SPLIT
+  ctrl <- fwdControl(lapply(seq(split), function(f)
+    list(fishery=f, catch=1, year=ctrl$year, quant=ac(ctrl$quant),
+      value=ctrl$value * split[f])))
 
-  ctrl <- merge(ctrl, 
-      fwdControl(lapply(fis[-maxfis], function(x)
-    list(fishery=x, relFishery=maxfis, catch=1, relCatch=1,
-      year=ctrl$year, relYear=ctrl$year, quant=quant, value=split[x]))))
-  
   return(list(ctrl=ctrl, tracking=tracking))
 }
 
