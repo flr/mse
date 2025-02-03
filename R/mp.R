@@ -264,10 +264,10 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if(!is(lst0$om, "FLo"))
     stop("goFish returned no results")
 
-  # GET objects back from loop, for iy up to last projected year
+  # GET objects back from loop, from iy - 1 up to last projected year
 
   # om
-  om <- window(lst0$om, start=iy, end=an(vy[length(vy)]) + frq)
+  om <- window(lst0$om, start=iy - 1, end=an(vy[length(vy)]) + frq)
 
   # oem
   if(missingoem)
@@ -714,6 +714,10 @@ setMethod("goFish", signature(om="FLombf"),
     # GET OM observation
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
 
+    # BUG:
+    # names(tracking) <- names(stk)
+    # names(observations(oem)) <- names(stk)
+
     # APPLY oem across stocks
     o.out <- Map(function(stk, dev, obs, tra) {
 
@@ -806,9 +810,9 @@ setMethod("goFish", signature(om="FLombf"),
       }
     }
 
-    # TRACK est TODO:
-#    track(tracking, "F.est", seq(ay, ay + frq - 1)) <- 
-#      lapply(window(lapply(stk0, fbar), start=dy, end=dy + frq - 1), unitMeans)
+    # TRACK est TODO: MAKE robust
+    track(tracking, "F.est", seq(ay, ay + frq - 1)) <- 
+      lapply(window(lapply(stk0, fbar), start=dy, end=dy + frq - 1), unitMeans)
     track(tracking, "B.est", seq(ay, ay + frq - 1)) <- 
       lapply(window(lapply(stk0, stock), start=dy, end=dy + frq - 1), unitSums)
     track(tracking, "SB.est", seq(ay, ay + frq - 1)) <- 
@@ -922,12 +926,13 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.is$args <- args #ay <- ay
       ctrl.is$tracking <- tracking
       #
-      if(length(stk0) == 1)
+      if(length(ctrl.is$stk) == 1) {
         ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval),
           ov=list(t1=flfval))
-      else
+      } else {
         ctrl.is$ioval <- list(iv=list(t1=flssval, t2=flfval), 
           ov=list(t1=flfval))
+      }
       
       ctrl.is$step <- "isys"
 
@@ -980,8 +985,8 @@ setMethod("goFish", signature(om="FLombf"),
       
       ctrl <- out$ctrl
       tracking <- out$tracking
-      
-      track(tracking, "iem", seq(ay, ay+frq-1)) <- ctrl
+      # TODO: ADD sum of ctrl      
+      track(tracking, "iem", seq(ay, ay+frq-1)) <- ctrl[1,]
     }
 
     #==========================================================

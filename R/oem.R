@@ -119,6 +119,8 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
 
 # sampling.oem {{{
 
+#' sampling.oem
+#'
 #' Samples from an operating model to obtain catch, biology and abundance data
 #'
 #' This observation error model (OEM) function mimics the most common data
@@ -198,7 +200,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
     deviances$idx <- lapply(observations$idx, function(x) index.q(x) %=% 1)
   }
 
-  # APPLY survey() with deviances$idx on top of index.q
+  # APPLY survey() to stk + index (x), devs.q (y), stability(z)
   idx[upi] <- Map(function(x, y, z) {
 
     dyrs <- intersect(dyrs, dimnames(y)$year)
@@ -217,7 +219,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
     # ASSIGN observations
     # TODO: ONLY if index not available
     x[, dyrs] <- res
-
+ 
     return(window(x, end=dy))
 
   }, x=idx[upi], y=deviances$idx[upi], z=rep(stability, length(idx))[upi])
