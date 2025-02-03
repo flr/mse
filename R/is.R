@@ -276,7 +276,8 @@ sp.is <- function(stk, ctrl, Ftarget=refpts(stk)$Ftarget,
 #' @examples
 #' data(ple4)
 
-split.is <- function(stk, ctrl, split, quant="catch", args, tracking) {
+split.is <- function(stk, ctrl, split, quant=unique(ctrl$quant)[1],
+  args, tracking) {
 
   # DIMS
   frq <- args$frq
@@ -289,6 +290,12 @@ split.is <- function(stk, ctrl, split, quant="catch", args, tracking) {
   ctrl <- fwdControl(lapply(seq(split), function(f)
     list(fishery=f, catch=1, year=ctrl$year, quant=ac(ctrl$quant),
       value=ctrl$value * split[f])))
+
+  if(quant %in% c("f", "fbar")) {
+    ctrl$biol <- args$stock
+    ctrl$minAge <- range(stk, 'minfbar')
+    ctrl$maxAge <- range(stk, 'maxfbar')
+  }
 
   return(list(ctrl=ctrl, tracking=tracking))
 }
