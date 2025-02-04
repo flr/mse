@@ -145,7 +145,7 @@ setMethod("performance", signature(x="FLQuants"),
       data.table::rbindlist(lapply(statistics, function(j) {
         # ADD previous year when 1 used and stats is for change
         if(grepl("change|variability", j$desc) & length(i) == 1) {
-          i <- seq(i - 1, i)
+          i <- seq(an(i) - 1, an(i))
         }
         # EVAL statistic
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
@@ -330,9 +330,9 @@ setMethod("performance", signature(x="FLom"),
 
 setMethod("performance", signature(x="FLombf"),
   function(x, statistics, refpts=x@refpts, metrics,
-    years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
+    years=as.character(seq(dims(x)$minyear + 1, dims(x)$maxyear)),
     probs=NULL, mp=NULL) {
-    
+
     # CALL for metrics by biol
     mets <- lapply(metrics, do.call, list(x))
 
@@ -342,7 +342,6 @@ setMethod("performance", signature(x="FLombf"),
 
     # DEBUG
     # mets <- list(SKJ=mets)
-
     res <- mapply(function(xx, rr) {
       performance(x=xx, statistics=statistics, refpts=rr, years=years,
         probs=probs, mp=mp)
