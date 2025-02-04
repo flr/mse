@@ -143,7 +143,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
 #' tracking
 
 setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
-  function(object, step, year=dimnames(value)$year, stock=seq(length(object)),
+  function(object, step, year=dimnames(value)$year, stock=names(value),
   ..., value) {
     
     # CHECK step exists
@@ -183,7 +183,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
 #' tracking
 
 setReplaceMethod("track", signature(object="FLQuants", value="list"),
-  function(object, step, year=dimnames(value)$year, stock=seq(length(object)),
+  function(object, step, year=dimnames(value)$year, stock=names(value),
     ..., value) {
     
     # CHECK step exists

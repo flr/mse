@@ -793,20 +793,19 @@ setMethod("goFish", signature(om="FLombf"),
 
         out.assess <- Map(function(x, y, z) {
           do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z)))
-          }, x=stk0[args$stock], y=idx0[args$stock], z=tracking)
+          }, x=stk0[args$stock], y=idx0[args$stock], z=tracking[args$stock])
       
         stk0 <- FLStocks(lapply(out.assess, "[[", "stk"))
       
         if(!is.null(out.assess[[1]]$ind))
           ind <- lapply(out.assess, "[[", "ind")
         
-        tracking <- FLQuants(lapply(out.assess, "[[", "tracking"))
+        tracking[args$stock] <- FLQuants(lapply(out.assess, "[[", "tracking"))
       }
 
       # TODO: PASS args generated at est to ctrl
       if (!is.null(out.assess$args)) {
-        args(ctrl0$est)[names(out.assess$args)] <-
-          out.assess$args
+        args(ctrl0$est)[names(out.assess$args)] <- out.assess$args
       }
     }
 
