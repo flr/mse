@@ -6,6 +6,8 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
+library(mse)
+
 statistics <- list(
   # SB
   SB = list(~yearMeans(SB), name = "SB",
@@ -31,6 +33,12 @@ statistics <- list(
   # green
   green = list(~yearSums(FLQuant((SB / SBMSY) > 1 & (F / FMSY) < 1)) / dim(SB)[2],
     name = "P(Green)", desc = "Probability of being in Kobe green quadrant"),
+  # orange
+  orange = list(~iterSums(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) >= 1)) / dim(SB)[6],
+    name = "P(Orange)", desc = "Probability of being in Kobe orange quadrant"),
+  # yellow
+  yellow = list(~iterSums(FLQuant((SB / SBMSY) < 1 & (F / FMSY) < 1)) / dim(SB)[6],
+    name = "P(Yellow)", desc = "Probability of being in Kobe yellow quadrant"),
   # red
   red = list(~yearSums(FLQuant((SB / SBMSY) < 1 & (F / FMSY) > 1)) / dim(SB)[2],
     name = "P(Red)", desc = "Probability of being in Kobe red quadrant"),
@@ -71,19 +79,4 @@ statistics <- list(
     desc = "Probability of fishery shutdown")
   )
 
-kobestatistics <- list(
-  # green
-  green = list(~iterSums(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) < 1)) / dim(SB)[6],
-    name = "P(Green)", desc = "Probability of being in Kobe green quadrant"),
-  # orange
-  orange = list(~iterSums(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) >= 1)) / dim(SB)[6],
-    name = "P(Orange)", desc = "Probability of being in Kobe orange quadrant"),
-  # yellow
-  yellow = list(~iterSums(FLQuant((SB / SBMSY) < 1 & (F / FMSY) < 1)) / dim(SB)[6],
-    name = "P(Yellow)", desc = "Probability of being in Kobe yellow quadrant"),
-  # red
-  red = list(~iterSums(FLQuant((SB / SBMSY) < 1 & (F / FMSY) >= 1)) / dim(SB)[6],
-    name = "P(Red)", desc = "Probability of being in Kobe red quadrant")
-)
-
-save(statistics, kobestatistics, file="../data/statistics.RData", compress="xz")
+save(statistics, file="../data/statistics.RData", compress="xz")
