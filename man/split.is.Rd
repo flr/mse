@@ -4,7 +4,7 @@
 \alias{split.is}
 \title{Split a biol target across fleets by setting relative 'quant' proportions}
 \usage{
-split.is(stk, ctrl, split, quant = "catch", args, tracking)
+split.is(stk, ctrl, split, quant = unique(ctrl$quant)[1], args, tracking)
 }
 \description{
 Split a biol target across fleets by setting relative 'quant' proportions

@@ -14,7 +14,8 @@
   refpts = FLPar(),
   years = setNames(list(dimnames(x[[1]])$year), nm = dims(x[[1]])$maxyear),
   probs = c(0.1, 0.25, 0.5, 0.75, 0.9),
-  mp = NULL
+  mp = NULL,
+  ...
 )
 
 \S4method{performance}{FLStock}(
@@ -24,7 +25,8 @@
   years = as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
   metrics = FLCore::metrics(x),
   probs = NULL,
-  mp = NULL
+  mp = NULL,
+  ...
 )
 
 \S4method{performance}{FLStocks}(
@@ -36,7 +38,8 @@
   probs = NULL,
   grid = missing,
   mp = NULL,
-  mc.cores = 1
+  mc.cores = 1,
+  ...
 )
 
 \S4method{performance}{list}(

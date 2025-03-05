@@ -2,7 +2,7 @@
 % Please edit documentation in R/oem.R
 \name{sampling.oem}
 \alias{sampling.oem}
-\title{Samples from an operating model to obtain catch, biology and abundance data}
+\title{sampling.oem}
 \usage{
 sampling.oem(
   stk,
@@ -29,12 +29,14 @@ sampling.oem(
 A named list with elements \emph{stk}, \emph{idx}, \emph{observations} and \emph{tracking}.
 }
 \description{
+Samples from an operating model to obtain catch, biology and abundance data
+}
+\details{
 This observation error model (OEM) function mimics the most common data
 collection regime, in which catch-at-age and biology is sampled from the
 population, and one or more indices of abundance are derived from surveys
 or CPUE data.
-}
-\details{
+
 The FLStock object passed to \emph{sampling.oem} by the \emph{mp} function is
 simplified to match the dimensions of that present in the \emph{observations}
 slot.
