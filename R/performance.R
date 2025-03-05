@@ -86,7 +86,7 @@ globalVariables("statistic")
 setMethod("performance", signature(x="FLQuants"),
   function(x, statistics, refpts=FLPar(),
     years=setNames(list(dimnames(x[[1]])$year), nm=dims(x[[1]])$maxyear),
-    probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL) {
+    probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL, ...) {
 
     # CHECK x /refpts names cover all required by statistics
     stats.names <- unique(unlist(lapply(statistics,
@@ -151,7 +151,7 @@ setMethod("performance", signature(x="FLQuants"),
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(lapply(x, '[' , j=ac(i)),
             # REPEAT refpts by year because recycling goes year first
-            lapply(as(refpts, 'list'), rep, each=length(i)))), drop=FALSE)
+            lapply(as(refpts, 'list'), rep, each=length(i)), list(...))), drop=FALSE)
 
       }), idcol="statistic", fill=TRUE)[,c("statistic", "data", "iter")]
     }), idcol="year")
@@ -193,7 +193,7 @@ setMethod("performance", signature(x="FLQuants"),
 setMethod("performance", signature(x="FLStock"),
   function(x, statistics, refpts=FLPar(),
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
-    metrics=FLCore::metrics(x), probs=NULL, mp=NULL) {
+    metrics=FLCore::metrics(x), probs=NULL, mp=NULL, ...) {
 
       # CREATE or PASS FLQuants
       if(is(metrics, "FLQuants"))
@@ -206,7 +206,7 @@ setMethod("performance", signature(x="FLStock"),
         stop("metrics could not be computed")
 
     return(performance(flqs, refpts=refpts,
-      statistics=statistics, years=years, probs=probs, mp=mp))
+      statistics=statistics, years=years, probs=probs, mp=mp, ...))
   }
 )
 # }}}
@@ -220,15 +220,15 @@ setMethod("performance", signature(x="FLStock"),
 
 setMethod("performance", signature(x="FLStocks"),
   function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,
-    metrics=FLCore::metrics, probs=NULL, grid=missing, mp=NULL, mc.cores=1) {
+    metrics=FLCore::metrics, probs=NULL, grid=missing, mp=NULL, mc.cores=1, ...) {
 
     if(mc.cores > 1) {
       res <- data.table::rbindlist(parallel::mclapply(x, performance,
         statistics, refpts, years, metrics=metrics, probs=probs, mp=mp,
-        mc.cores=mc.cores), idcol='run')
+        mc.cores=mc.cores, ...), idcol='run')
     } else {
       res <- data.table::rbindlist(lapply(x, performance,
-        statistics, refpts, years, metrics=metrics, probs=probs, mp=mp),
+        statistics, refpts, years, metrics=metrics, probs=probs, mp=mp, ...),
         idcol='run')
     }
     
@@ -331,7 +331,7 @@ setMethod("performance", signature(x="FLom"),
 setMethod("performance", signature(x="FLombf"),
   function(x, statistics, refpts=x@refpts, metrics,
     years=as.character(seq(dims(x)$minyear + 1, dims(x)$maxyear)),
-    probs=NULL, mp=NULL) {
+    probs=NULL, mp=NULL, ...) {
 
     # CALL for metrics by biol
     mets <- lapply(metrics, do.call, list(x))
@@ -344,7 +344,7 @@ setMethod("performance", signature(x="FLombf"),
     # mets <- list(SKJ=mets)
     res <- mapply(function(xx, rr) {
       performance(x=xx, statistics=statistics, refpts=rr, years=years,
-        probs=probs, mp=mp)
+        probs=probs, mp=mp, ...)
       }, xx=mets, rr=x@refpts, SIMPLIFY=FALSE)
 
     res <- rbindlist(res, idcol="biol")
@@ -377,7 +377,12 @@ setMethod("performance", signature(x="FLmse"),
     
       return(res)
     } else {
-      performance(x@om, ...)
+
+      # GET hcr args
+      control_args <- Filter(is.numeric, args(control(x)$hcr))
+
+      # COMPUTE on x@om
+      do.call(performance, c(list(x=x@om), list(...), control_args))
     }
   }
 )
