@@ -102,15 +102,17 @@ setMethod("c", "FLmses",
       return(c(unclass(x), args))
     }
 
+    # GET arg names
+    argnms <- sys.call()
+    nams <- as.character(argnms)[-1]
+
     # .Data
     data <- c(x@.Data, unlist(lapply(args, "slot", ".Data")))
 
-    # performance
-    perf <- rbindlist(c(list(performance(x)), lapply(args, performance)))
+    names(data) <- unlist(c(list(names(x)), lapply(args, names)))
 
-    # names
-    nams <- c(names(x), unlist(lapply(args, names)))
-    names(data) <- nams
+    # MERGE performance, ADD run and
+    perf <- rbindlist(c(list(performance(x)), lapply(args, performance)))
 
     res <- FLmses(data, performance=perf)
 
