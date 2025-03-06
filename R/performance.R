@@ -86,7 +86,8 @@ globalVariables("statistic")
 setMethod("performance", signature(x="FLQuants"),
   function(x, statistics, refpts=FLPar(),
     years=setNames(list(dimnames(x[[1]])$year), nm=dims(x[[1]])$maxyear),
-    probs=c(0.1, 0.25, 0.50, 0.75, 0.90), mp=NULL, ...) {
+    probs=c(0.1, 0.25, 0.50, 0.75, 0.90),
+    om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
 
     # CHECK x /refpts names cover all required by statistics
     stats.names <- unique(unlist(lapply(statistics,
@@ -176,10 +177,10 @@ setMethod("performance", signature(x="FLQuants"),
         by=.(statistic, year, name, desc)]
     }
     
-    # mp if not NULL
-    if(!is.null(mp))
-      res[, mp:=mp]
-	  
+    # ASSIGN names (om, type, run, mp)
+    res[ , `:=` (om = 'NA', type = 'NA', run = 'NA', mp = 'NA')]
+    set(res, j=c('om', 'type', 'run', 'mp'), value=list(om, type, run, mp))
+
     return(res[])
   }
 )
@@ -193,7 +194,7 @@ setMethod("performance", signature(x="FLQuants"),
 setMethod("performance", signature(x="FLStock"),
   function(x, statistics, refpts=FLPar(),
     years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
-    metrics=FLCore::metrics(x), probs=NULL, mp=NULL, ...) {
+    metrics=FLCore::metrics(x), probs=NULL, ...) {
 
       # CREATE or PASS FLQuants
       if(is(metrics, "FLQuants"))
@@ -206,7 +207,7 @@ setMethod("performance", signature(x="FLStock"),
         stop("metrics could not be computed")
 
     return(performance(flqs, refpts=refpts,
-      statistics=statistics, years=years, probs=probs, mp=mp, ...))
+      statistics=statistics, years=years, probs=probs, ...))
   }
 )
 # }}}
@@ -220,22 +221,17 @@ setMethod("performance", signature(x="FLStock"),
 
 setMethod("performance", signature(x="FLStocks"),
   function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,
-    metrics=FLCore::metrics, probs=NULL, grid=missing, mp=NULL, mc.cores=1, ...) {
+    metrics=FLCore::metrics, probs=NULL, grid=missing, mc.cores=1, ...) {
 
     if(mc.cores > 1) {
       res <- data.table::rbindlist(parallel::mclapply(x, performance,
-        statistics, refpts, years, metrics=metrics, probs=probs, mp=mp,
-        mc.cores=mc.cores, ...), idcol='run')
+        statistics, refpts, years, metrics=metrics, probs=probs,
+        mc.cores=mc.cores, ...), idcol='biol')
     } else {
       res <- data.table::rbindlist(lapply(x, performance,
-        statistics, refpts, years, metrics=metrics, probs=probs, mp=mp, ...),
-        idcol='run')
+        statistics, refpts, years, metrics=metrics, probs=probs, ...),
+        idcol='biol')
     }
-    
-    # mp=run if NULL
-    if(is.null(mp))
-      res[, mp:=run]
-    res[, mp:=factor(mp, levels=unique(mp))]
     
     # IF grid, ADD columns
     if(!missing(grid)) {
@@ -245,6 +241,7 @@ setMethod("performance", signature(x="FLStocks"),
           dgrid[, run:=paste0("R", seq(nrow(dgrid)))]
         res <- merge(res, dgrid, by="run")
       }
+
     return(res[])
   }
 )
@@ -329,27 +326,25 @@ setMethod("performance", signature(x="FLom"),
 # performance(FLombf) {{{
 
 setMethod("performance", signature(x="FLombf"),
-  function(x, statistics, refpts=x@refpts, metrics,
+  function(x, statistics, refpts=x@refpts, metrics=NULL,
     years=as.character(seq(dims(x)$minyear + 1, dims(x)$maxyear)),
-    probs=NULL, mp=NULL, ...) {
+    probs=NULL, ...) {
 
-    # CALL for metrics by biol
-    mets <- lapply(metrics, do.call, list(x))
+    # COMPUTE metrics
+    if(is.null(metrics))
+      mets <- do.call('metrics', list(object=x))
+    else
+      mets <- do.call('metrics', list(object=x, metrics=list(C=catch)))
 
-    # SET list with biols' metrics
-    mets <- lapply(setNames(nm=names(biols(x))),
-      function(i) FLQuants(lapply(X=mets, FUN="[[", i)))
-
-    # DEBUG
-    # mets <- list(SKJ=mets)
-    res <- mapply(function(xx, rr) {
-      performance(x=xx, statistics=statistics, refpts=rr, years=years,
-        probs=probs, mp=mp, ...)
-      }, xx=mets, rr=x@refpts, SIMPLIFY=FALSE)
+    # CALL performance by biol
+    res <- mapply(function(me, rp) {
+      performance(x=me, statistics=statistics, refpts=rp, years=years,
+        probs=probs, ...)
+      }, me=mets, rp=x@refpts, SIMPLIFY=FALSE)
 
     res <- rbindlist(res, idcol="biol")
 
-    return(res[])
+    return(res)
   }
 )
 
@@ -415,3 +410,11 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 })
 
 # }}}
+
+
+# performance
+# FLmses -- FLmse -- FLom   -- FLStock -- FLQuants
+#                  - FLombf -- FLQuants
+# FLStocks -- FLStock -- FLQuants
+
+# om type mp run
