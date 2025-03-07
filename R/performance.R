@@ -84,8 +84,8 @@ globalVariables("statistic")
 #' perf[, .(CMSY=mean(data))]
 
 setMethod("performance", signature(x="FLQuants"),
-  function(x, statistics, refpts=FLPar(),
-    years=setNames(list(dimnames(x[[1]])$year), nm=dims(x[[1]])$maxyear),
+  function(x, statistics=mse::statistics[c("C", "F", "SB", "AAVC")],
+    refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90),
     om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
 
@@ -192,9 +192,7 @@ setMethod("performance", signature(x="FLQuants"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLStock"),
-  function(x, statistics, refpts=FLPar(),
-    years=as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
-    metrics=FLCore::metrics(x), probs=NULL, ...) {
+  function(x, metrics=FLCore::metrics(x), ...) {
 
       # CREATE or PASS FLQuants
       if(is(metrics, "FLQuants"))
@@ -206,8 +204,7 @@ setMethod("performance", signature(x="FLStock"),
       else
         stop("metrics could not be computed")
 
-    return(performance(flqs, refpts=refpts,
-      statistics=statistics, years=years, probs=probs, ...))
+    return(performance(flqs, ...))
   }
 )
 # }}}
@@ -307,7 +304,7 @@ setMethod("performance", signature(x="list"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLom"),
-  function(x, refpts=x@refpts, metrics=NULL, statistics=NULL, ...) {
+  function(x, refpts=x@refpts, metrics=NULL, statistics=NULL, om=name(x), ...) {
 
     # BUG: metrics argument hides metrics method
     if(is.null(metrics))
@@ -315,10 +312,10 @@ setMethod("performance", signature(x="FLom"),
 
     # DEFAULT statistics
     if(is.null(statistics))
-      statistics <- mse::statistics[c("SB0", "SBMSY", "FMSY", "C", "AAVC")]
+      statistics <- mse:::statistics[c("C", "F", "SB", "SB0", "SBMSY", "FMSY", "AAVC")]
     
     return(performance(stock(x), refpts=refpts, metrics=metrics, 
-      statistics=statistics, ...))
+      statistics=statistics, om=om, ...))
   }
 )
 # }}}
@@ -361,16 +358,13 @@ setMethod("performance", signature(x="FLmse"),
 
     args <- list(...)
 
+    res <- attr(x, 'performance')
+
     # IF no extra args, return 'performance' attribute ...
-    if(length(args) == 0) {
+    if(length(args) == 0 & !is.null(res)) {
 
-      res <- attr(x, 'performance')
-
-      # ... ONLY if it exists
-      if(is.null(res))
-        stop("'performance' table has not yet been stored in object")
-    
       return(res)
+
     } else {
 
       # GET hcr args
@@ -410,11 +404,3 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 })
 
 # }}}
-
-
-# performance
-# FLmses -- FLmse -- FLom   -- FLStock -- FLQuants
-#                  - FLombf -- FLQuants
-# FLStocks -- FLStock -- FLQuants
-
-# om type mp run
