@@ -13,7 +13,6 @@ Depends:
   R(>= 4.0),
   methods,
   FLCore(>= 2.6.18),
-  mse,
   doFuture,
   data.table,
   progressr
