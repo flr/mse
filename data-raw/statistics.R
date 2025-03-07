@@ -79,4 +79,4 @@ statistics <- list(
     desc = "Probability of fishery shutdown")
   )
 
-save(statistics, file="../data/statistics.RData", compress="xz")
+save(statistics, file="../data/statistics.rda", compress="xz")

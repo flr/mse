@@ -638,20 +638,33 @@ setMethod("[", signature(x="FLombf"),
 
 # metrics {{{
 setMethod("metrics", signature(object="FLombf", metrics="missing"),
-  function(object) {
+  function(object, named=TRUE) {
     
     # CALL for metrics by biol
-    mets <- lapply(metrics, do.call, list(object))
+    mets <- lapply(biols(object), metrics)
 
-    # SET list with biols' metrics
-    mets <- lapply(setNames(nm=names(biols(x))),
-      function(i) FLQuants(lapply(X=mets, FUN="[[", i)))
+    # TODO: SET for hbar 
 
-    if(length(mets) == 1)
+    # ADD catch & SSB by biol
+    mets <- Map(function(me, ca, sb, fb) {
+
+      me[['C']] <- ca
+      me[['SB']] <- sb
+      me[['F']] <- fb
+
+      return(me)
+    }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object))
+
+    if(length(mets) == 1 & !named)
       return(mets[[1]])
 
     return(mets)
 })
+
+# metrics(FLombf, list)
+# - SPLIT metrics across Bs and Fs
+#    - metrics=list(biols=..., fisheries=...)
+
 # }}}
 
 # stock {{{
