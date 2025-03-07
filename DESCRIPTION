@@ -13,14 +13,14 @@ Depends:
   R(>= 4.0),
   methods,
   FLCore(>= 2.6.18),
-  doFuture,
-  data.table,
-  progressr
-Imports:
   ggplotFL(>= 2.6.10),
   FLFishery,
   FLasher(>= 0.6.7),
   FLBRP(>= 2.5.8),
+  doFuture,
+  data.table,
+  progressr
+Imports:
   parallelly,
   ggrepel,
   patchwork
