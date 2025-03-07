@@ -219,7 +219,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .combine=.combinegoFish,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
-      .options.future=list(globals=structure(TRUE, seed=seed)),
+      .options.future=list(seed=seed, globals=structure(TRUE))
       .inorder=TRUE) %dofuture% {
 
         call0 <- list(
@@ -1045,6 +1045,8 @@ setMethod("goFish", signature(om="FLombf"),
 
 # TODO: mps(FLmse, oem=oem(), crtrl=control(), args=args(), ...)
 
+# statistics, metrics, years - om=name(om), type, run=names,
+
 mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   ...) {
 
@@ -1076,7 +1078,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
     rep(i, length=largs)
   })
 
-  # LOOP oVer values
+  # LOOP over values
 
   if(parallel) {
 
@@ -1109,8 +1111,8 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
       args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
 
       # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
-         verbose=TRUE)
+      run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=TRUE,
+         verbose=FALSE)
 
       p(message = sprintf("MP: %s", i))
 
@@ -1147,6 +1149,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
     else
       names(res) <- names
   }
+
   return(FLmses(res[done]))
 }
 # }}}
