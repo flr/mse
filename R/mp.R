@@ -219,7 +219,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .combine=.combinegoFish,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
-      .options.future=list(seed=seed, globals=structure(TRUE))
+      .options.future=list(seed=seed, globals=structure(TRUE)),
       .inorder=TRUE) %dofuture% {
 
         call0 <- list(
