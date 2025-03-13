@@ -92,23 +92,6 @@ setMethod('show', signature('FLo'),
   }
 ) # }}}
 
-# metrics {{{
-setMethod("metrics", signature(object="FLo", metrics="list"),
-  function(object, metrics) {
-    return(FLQuants(lapply(metrics, function(x) {
-      # PARSE
-      if(is(x, 'formula')) {
-        do.call(eval(x[[2]]),
-          list(object)) / refpts(object)[as.character(x[[3]]),]
-      } else {
-        do.call(x, list(object))
-      }})))
-  }
-)
-
-
-# }}}
-
 # debug {{{
 
 #' @rdname debug-mse

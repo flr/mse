@@ -639,7 +639,7 @@ setMethod("[", signature(x="FLombf"),
 # metrics {{{
 setMethod("metrics", signature(object="FLombf", metrics="missing"),
   function(object, named=TRUE) {
-    
+ 
     # CALL for metrics by biol
     mets <- lapply(biols(object), metrics)
 
@@ -661,9 +661,25 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
     return(mets)
 })
 
-# metrics(FLombf, list)
-# - SPLIT metrics across Bs and Fs
+# TODO: SPLIT metrics across Bs and Fs
 #    - metrics=list(biols=..., fisheries=...)
+setMethod("metrics", signature(object="FLombf", metrics="list"),
+  function(object, metrics) {
+
+    # LAPPLY over metrics
+    res <- lapply(metrics, function(x) {
+      # TODO: HANDLE formulas
+      do.call(x, list(object))
+    })
+
+    # RESHAPE as biol$metric
+    res <- lapply(setNames(nm=names(res[[1]])), function(x)
+      FLQuants(lapply(res, function(y) y[[x]])))
+
+    return(res)
+
+})
+
 
 # }}}
 

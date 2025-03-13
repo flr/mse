@@ -48,7 +48,7 @@ setMethod("FLmses", signature(object="list", performance="data.frame"),
 )
 
 setMethod("FLmses", signature(object="list", performance="missing"),
-  function(object, statistics="missing", years="missing", metrics="missing") {
+ function(object, statistics="missing", years="missing", metrics="missing") {
 
     # CHECK performance tables
     perf <- lapply(object, attr, 'performance')

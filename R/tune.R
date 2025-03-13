@@ -25,9 +25,9 @@
 #' # Plot tuned MP
 #' plot(om, tun)
 
-tunebisect <- function(om, oem="missing", control, metrics, statistic, tune,
-  args, prob=0.5, tol=0.01, maxit=12, verbose=TRUE,
-  years=ac(seq(args$iy + 1, args$fy - 1)), ...) {
+tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
+  tune, prob=0.5, tol=0.01, maxit=12, years=ac(seq(args$iy + 1, args$fy - 1)),
+  verbose=TRUE, ...) {
   
   # args
   args$fy <- if(is.null(args$fy)) dims(om)$maxyear else args$fy

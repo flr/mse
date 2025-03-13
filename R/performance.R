@@ -88,7 +88,7 @@ setMethod("performance", signature(x="FLQuants"),
     refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90),
     om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
-
+    
     # CHECK x /refpts names cover all required by statistics
     stats.names <- unique(unlist(lapply(statistics,
       function(x) all.vars(x[[1]][[2]]))))
@@ -239,9 +239,8 @@ setMethod("performance", signature(x="FLStocks"),
         res <- merge(res, dgrid, by="run")
       }
 
-    return(res[])
-  }
-)
+    return(res) 
+  })
 # }}}
 
 # performance(list) FLmse / FLQuants {{{
@@ -260,11 +259,12 @@ setMethod("performance", signature(x="list"),
         return(i)
     })
 
-    # HANDLE list(mse)
+    # HANDLE list(mse) | FLmses
     if(all(unlist(lapply(x, is, 'FLmse')))) {
-      return(rbindlist(lapply(x, function(i) do.call(performance,
-        c(list(x=i, refpts=refpts(i), statistics=statistics, years=years,
-        probs=probs), list(...)))), idcol="mp"))
+      res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
+        refpts=refpts(i), statistics=statistics, years=years, probs=probs), 
+        om=name(om(i)), run=j, list(...))), i=x, j=names(x)))
+      return(res)
     }
 
     # ELSE assume list of FLQuants
@@ -331,7 +331,7 @@ setMethod("performance", signature(x="FLombf"),
     if(is.null(metrics))
       mets <- do.call('metrics', list(object=x))
     else
-      mets <- do.call('metrics', list(object=x, metrics=list(C=catch)))
+      mets <- do.call('metrics', list(object=x, metrics=metrics))
 
     # CALL performance by biol
     res <- mapply(function(me, rp) {

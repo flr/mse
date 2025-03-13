@@ -96,7 +96,6 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
   track(tracking, paste0(output, ".hcr"), cys) <- c(out)
 
   # APPLY limits, always or if met < trigger
-
   if(!is.na(dupp)) {
     if(all) {
     out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
