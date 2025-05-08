@@ -685,8 +685,14 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 # metrics {{{
 setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
-    FLQuants(metrics(object, list(R=rec, SB=ssb, C=catch, F=fbar)))
-}) # }}}
+    FLQuants(metrics(stock(object), list(R=rec, SB=ssb, C=catch, F=fbar)))
+})
+
+setMethod("metrics", signature(object="FLom", metrics="list"),
+  function(object, metrics) {
+    FLQuants(metrics(object, metrics))
+})
+# }}}
 
 # propagate {{{
 setMethod("propagate", signature(object="FLom"),

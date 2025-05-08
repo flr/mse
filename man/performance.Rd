@@ -10,24 +10,18 @@
 \usage{
 \S4method{performance}{FLQuants}(
   x,
-  statistics,
+  statistics = mse::statistics[c("C", "F", "SB", "AAVC")],
   refpts = FLPar(),
-  years = setNames(list(dimnames(x[[1]])$year), nm = dims(x[[1]])$maxyear),
+  years = setNames(nm = dimnames(x[[1]])$year[-1]),
   probs = c(0.1, 0.25, 0.5, 0.75, 0.9),
-  mp = NULL,
+  om = NULL,
+  type = NULL,
+  run = NULL,
+  mp = paste(c(om, type, run), collapse = "_"),
   ...
 )
 
-\S4method{performance}{FLStock}(
-  x,
-  statistics,
-  refpts = FLPar(),
-  years = as.character(seq(dims(x)$minyear, dims(x)$maxyear)),
-  metrics = FLCore::metrics(x),
-  probs = NULL,
-  mp = NULL,
-  ...
-)
+\S4method{performance}{FLStock}(x, metrics = FLCore::metrics(x), ...)
 
 \S4method{performance}{FLStocks}(
   x,
@@ -37,7 +31,6 @@
   metrics = FLCore::metrics,
   probs = NULL,
   grid = missing,
-  mp = NULL,
   mc.cores = 1,
   ...
 )
@@ -54,7 +47,14 @@
   ...
 )
 
-\S4method{performance}{FLom}(x, refpts = x@refpts, metrics = NULL, statistics = NULL, ...)
+\S4method{performance}{FLom}(
+  x,
+  refpts = x@refpts,
+  metrics = NULL,
+  statistics = NULL,
+  om = name(x),
+  ...
+)
 }
 \arguments{
 \item{statistics}{statistics to be computed, as formula, name and description, \code{list}}

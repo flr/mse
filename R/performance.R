@@ -1,5 +1,5 @@
 # performance.R - DESC
-# ioalbmse/R/performance.R
+# mse/R/performance.R
 
 # Copyright European Union, 2016-17
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
