@@ -991,7 +991,7 @@ setMethod("goFish", signature(om="FLombf"),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
 #'   trigger=41500, target=0.27))))
 #' #
-#' runs <- mps(om, ctrl=ctrl, args=list(iy=2021, fy=2026), hcr=list(target=seq(0.15, 0.50, length=10)))
+#' runs <- mps(om, ctrl=control, args=list(iy=2021, fy=2026), hcr=list(target=seq(0.15, 0.50, length=10)))
 
 mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   ...) {
