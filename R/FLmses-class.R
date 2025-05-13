@@ -48,7 +48,7 @@ setMethod("FLmses", signature(object="list", performance="data.frame"),
 )
 
 setMethod("FLmses", signature(object="list", performance="missing"),
- function(object, statistics="missing", years="missing", metrics="missing") {
+ function(object, statistics="missing", years="missing", metrics="missing", type="NA") {
 
     # CHECK performance tables
     perf <- lapply(object, attr, 'performance')
@@ -78,7 +78,7 @@ setMethod("FLmses", signature(object="list", performance="missing"),
           unname(dims(stock(object[[1]]))[c('minyear', 'maxyear')]))
       }
       perf <- performance(object, statistics=statistics, years=years,
-        metrics=metrics)
+        metrics=metrics, type=type)
 
       performance(res) <- perf
     }
@@ -88,7 +88,7 @@ setMethod("FLmses", signature(object="list", performance="missing"),
 )
 # }}}
 
-# c (FLmses) {{{
+# c(FLmses) {{{
 
 setMethod("c", "FLmses",
   function(x, ...) {
