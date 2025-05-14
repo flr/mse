@@ -30,6 +30,7 @@ importFrom("ggrepel",
 
 export(
   "bisect",
+  "buffer.hcr",
   "catchSSB.hcr",
   "combinations",
   "computeFp05",
@@ -71,6 +72,7 @@ export(
   "perfect.sa",
   "pid.hcr",
   "plot_hockeystick.hcr",
+  "readPerformance",
   "response.fb",
   "sampling.oem",
   "seasonal.is",
@@ -86,7 +88,8 @@ export(
   "target.hcr",
   "trend.hcr",
   "tunebisect",
-  "tunegrid")
+  "tunegrid",
+  "writePerformance")
 
 exportClasses(
   "FLiem",

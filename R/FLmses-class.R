@@ -121,8 +121,6 @@ setMethod("c", "FLmses",
 
 # }}}
 
-# plot
-
 # $<- {{{
 setReplaceMethod("$", signature(x="FLmses", value="FLmse"),
 	function(x, name, value) {
@@ -158,5 +156,3 @@ setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
 )
 
 # }}}
-
-# TODO: DROP mps from performance table

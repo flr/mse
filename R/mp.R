@@ -219,7 +219,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .combine=.combinegoFish,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
-      .options.future=list(seed=seed, globals=structure(TRUE)),
+      .options.future=list(seed=seed, globals=structure(TRUE,
+        add=c("ctrl", "module", "om", "oem", "iem", "args"), packages="mse")),
       .inorder=TRUE) %dofuture% {
 
         call0 <- list(
@@ -1059,6 +1060,11 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   else
     seed <- TRUE
   
+  # ARE opts being given?
+  if(length(opts) == 0)
+    return(FLmses(RUN=mp(om=om, oem=oem, iem=iem, ctrl=ctrl, args=args,
+      parallel=parallel)))
+
   # PARSING a single module
   if(length(opts) > 1)
     stop("mps() can only alter a single module, called for: ", names(opts))

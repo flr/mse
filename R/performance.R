@@ -404,3 +404,66 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 })
 
 # }}}
+
+# writePerformance {{{
+
+#' Write performance table to file
+#'
+#' @param dat data.table with performance statistics
+#' @param file file name to write to, defaults to 'model/performance.dat.gz'
+#' @return file name, invisibly
+#' @author Iago Mosqueira, WMR
+#' @keywords utilities
+
+writePerformance <- function(dat, file="model/performance.dat.gz") {
+
+  # SET correct column types
+  for (col in colnames(dat)[colnames(dat) != "data"])
+    set(dat, j = col, value = as.character(dat[[col]]))
+
+  if(!file.exists(file)) {
+
+    fwrite(dat, file=file)
+
+    invisible(file)
+
+  } else {
+
+    # CHECK dat exists in file
+    db <- fread(file)
+
+    # SET correct column types
+    for (col in colnames(db)[colnames(db) != "data"])
+      set(db, j = col, value = as.character(db[[col]]))
+
+    # RUN anti-join on biol, statistic, year, iter, om, type & run
+    db <- db[!dat, on=.(biol, statistic, year, iter, om, type, run)]
+
+    # ADD new rows
+    db <- rbind(db, dat)
+
+    # WRITE to file
+    fwrite(db, file=file)
+
+    invisible(file)
+  }
+
+}
+# }}}
+
+# readPerformance {{{
+
+readPerformance <- function(file="model/performance.dat.gz") {
+
+  # READ file
+  dat <- fread(file)
+
+  # SET correct column types
+  for (col in colnames(dat)[colnames(dat) != "data"])
+    set(dat, j = col, value = as.character(dat[[col]]))
+
+  # RETURN
+  return(dat)
+}
+
+# }}}
