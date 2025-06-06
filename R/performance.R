@@ -88,7 +88,7 @@ setMethod("performance", signature(x="FLQuants"),
     refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90),
     om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
-    
+
     # CHECK x /refpts names cover all required by statistics
     stats.names <- unique(unlist(lapply(statistics,
       function(x) all.vars(x[[1]][[2]]))))
@@ -249,24 +249,44 @@ setMethod("performance", signature(x="FLStocks"),
 
 setMethod("performance", signature(x="list"),
   function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,
-    probs=NULL, grid="missing", mp=NULL, mc.cores=1, ...) {
-    
+    probs=NULL, grid="missing", mc.cores=1, ...) {
+
+    # HANDLE list(FLom | FLombf)
+    if(all(unlist(lapply(x, is, 'FLo')))) {
+      if(missing(statistics))
+        statistics <- mse::statistics[c('C', 'F', 'SB')]
+
+      res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
+        refpts=refpts(i), statistics=statistics, years=years, probs=probs), 
+        list(...))), i=x, j=names(x)))
+
+      return(res[])
+    }
+ 
     # COERCE OMs added as reference
-    x <- lapply(x, function(i) {
-      if(is(i, 'FLo'))
-        return(FLmse(om=i))
-      else
-        return(i)
-    })
+    if(any(unlist(lapply(x, is, 'FLo')))) {
+      x <- lapply(x, function(i) {
+        if(is(i, 'FLo'))
+          return(FLmse(om=i))
+        else
+          return(i)
+
+      })
+    }
 
     # HANDLE list(mse) | FLmses
     if(all(unlist(lapply(x, is, 'FLmse')))) {
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
         refpts=refpts(i), statistics=statistics, years=years, probs=probs), 
-        om=name(om(i)), run=j, list(...))), i=x, j=names(x)))
-      return(res)
-    }
+        run=j, list(...))), i=x, j=names(x)))
 
+      # SET mp
+      if (is.null(res[["mp"]])) 
+        res[, mp := paste(om, type, run, sep="_")]
+
+      return(res[])
+    }
+         
     # ELSE assume list of FLQuants
     if(!all(unlist(lapply(x, is, 'FLQuants'))))
       stop("input list must contain objects of class FLQuants")
@@ -279,11 +299,6 @@ setMethod("performance", signature(x="list"),
       res <- data.table::rbindlist(lapply(x, performance,
         statistics, refpts, years, probs=probs, mp=mp), idcol='run')
     }
-    
-    # mp=run if NULL
-    if(is.null(mp))
-      res[, mp:=run]
-    res[, mp:=factor(mp, levels=unique(mp))]
     
     # IF grid, ADD columns
     if(!missing(grid)) {
@@ -304,16 +319,13 @@ setMethod("performance", signature(x="list"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLom"),
-  function(x, refpts=x@refpts, metrics=NULL, statistics=NULL, om=name(x), ...) {
+  function(x, refpts=x@refpts, statistics=mse::statistics[c('C', 'F', 'SB')],
+    metrics=NULL, om=name(x), ...) {
 
     # BUG: metrics argument hides metrics method
     if(is.null(metrics))
       metrics <- metrics(x)
 
-    # DEFAULT statistics
-    if(is.null(statistics))
-      statistics <- mse:::statistics[c("C", "F", "SB", "SB0", "SBMSY", "FMSY", "AAVC")]
-    
     return(performance(stock(x), refpts=refpts, metrics=metrics, 
       statistics=statistics, om=om, ...))
   }
@@ -323,9 +335,9 @@ setMethod("performance", signature(x="FLom"),
 # performance(FLombf) {{{
 
 setMethod("performance", signature(x="FLombf"),
-  function(x, statistics, refpts=x@refpts, metrics=NULL,
-    years=as.character(seq(dims(x)$minyear + 1, dims(x)$maxyear)),
-    probs=NULL, ...) {
+  function(x, statistics=mse::statistics[c('C', 'F', 'SB')], refpts=x@refpts,
+    metrics=NULL, years=as.character(seq(dims(x)$minyear + 1, dims(x)$maxyear)),
+    probs=NULL, om=name(x), ...) {
 
     # COMPUTE metrics
     if(is.null(metrics))
@@ -340,6 +352,10 @@ setMethod("performance", signature(x="FLombf"),
       }, me=mets, rp=x@refpts, SIMPLIFY=FALSE)
 
     res <- rbindlist(res, idcol="biol")
+
+    # ADD om and drop mp
+    res[, om:=om]
+    res[, mp:=NULL]
 
     return(res)
   }
@@ -371,7 +387,7 @@ setMethod("performance", signature(x="FLmse"),
       control_args <- Filter(is.numeric, args(control(x)$hcr))
 
       # COMPUTE on x@om
-      do.call(performance, c(list(x=x@om), list(...), control_args))
+      do.call(performance, c(list(x=x@om), list(...), control_args, om=name(x@om)))
     }
   }
 )
@@ -415,18 +431,24 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 #' @author Iago Mosqueira, WMR
 #' @keywords utilities
 
-writePerformance <- function(dat, file="model/performance.dat.gz") {
+writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FALSE) {
 
   # SET correct column types
   for (col in colnames(dat)[colnames(dat) != "data"])
     set(dat, j = col, value = as.character(dat[[col]]))
 
-  if(!file.exists(file)) {
+  # SET mp
+  if (is.null(dat[["mp"]])) 
+    dat[, mp := paste(om, type, run, sep="_")]
+
+  # CREATE
+  if(!file.exists(file) | overwrite) {
 
     fwrite(dat, file=file)
 
     invisible(file)
 
+  # ADD by substituting
   } else {
 
     # CHECK dat exists in file
@@ -447,7 +469,6 @@ writePerformance <- function(dat, file="model/performance.dat.gz") {
 
     invisible(file)
   }
-
 }
 # }}}
 
@@ -464,6 +485,41 @@ readPerformance <- function(file="model/performance.dat.gz") {
 
   # RETURN
   return(dat)
+}
+
+# }}}
+
+# summaryPerformance {{{
+
+summaryPerformance <- function(file="model/performance.dat.gz") {
+
+  if(!is(file, "data.table"))
+    file <- readPerformance(file)
+
+  # TABLE by mp: years, (frq), iter, BY om, type
+  res <- file[, .(
+    # year range
+    years=paste(min(year), max(year), sep="-"),
+    # frequency
+    frq=c(dist(sort(unique(as.numeric(year)))[1:2])),
+    # no. iters
+    iter=length(unique(iter))
+    # DO by om, type & run
+    ), by=.(om, type, run)]
+
+  setorder(res, om, type, run)
+
+  # GET summary row values
+  summ <- file[, lapply(.SD, function(x) length(unique(x))),
+    .SDcols = c("om", "type", "mp")] 
+
+  # PRINT it
+  cat(do.call(sprintf, c(list(fmt="- oms: %i, types: %i, mps: %i\n"), unlist(summ))))
+
+  # PRINMT table
+  print(as.data.frame(res))
+
+  invisible(TRUE)
 }
 
 # }}}
