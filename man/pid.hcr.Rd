@@ -42,6 +42,6 @@ control <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=pid.hcr,
     args=list(metric=ssb, ref=refpts(om)$SBMSY, kp=0.5, ki=0.01, kd=0.7))))
-tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
-plot(om, PID=tes)
+# tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2017))
+# plot(om, PID=tes)
 }

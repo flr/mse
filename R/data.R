@@ -72,7 +72,3 @@ NULL
 #' @name p4om
 #' @rdname p4om
 NULL
-
-.onLoad <- function(libname, pkgname) {
-  data("statistics", package="mse", envir=parent.env(environment()))
-}

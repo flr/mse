@@ -12,7 +12,7 @@ initiate(biol, B0, h = 0.75)
 \item{B0}{Initial or virgin biomass.}
 }
 \value{
-An updated \code{FLBiol} with abundances set in teh first year to match
+An updated \code{FLBiol} with abundances set in the first year to match
 the requested biomas.
 }
 \description{
@@ -25,6 +25,5 @@ already filled up for the mean weight-at-age (\code{wt}), natural mortality
 \examples{
 data(ple4.biol)
 initiate(ple4.biol, B0=450000)
-#
 initiate(propagate(ple4.biol, 100), B0=runif(100, 3e5, 5e5))
 }

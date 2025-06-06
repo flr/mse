@@ -42,7 +42,6 @@
   years = dims(x[[1]])$maxyear,
   probs = NULL,
   grid = "missing",
-  mp = NULL,
   mc.cores = 1,
   ...
 )
@@ -50,8 +49,8 @@
 \S4method{performance}{FLom}(
   x,
   refpts = x@refpts,
+  statistics = mse::statistics[c("C", "F", "SB")],
   metrics = NULL,
-  statistics = NULL,
   om = name(x),
   ...
 )
