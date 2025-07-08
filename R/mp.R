@@ -220,7 +220,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       .multicombine=TRUE, 
       .errorhandling = "remove", 
       .options.future=list(seed=seed, globals=structure(TRUE,
-        add=c("ctrl", "module", "om", "oem", "iem", "args"), packages="mse")),
+        add=c("ctrl", "module", "om", "oem", "iem", "args"),
+        packages=c("FLCore", "FLasher", "mse"))),
       .inorder=TRUE) %dofuture% {
 
         call0 <- list(
@@ -715,7 +716,7 @@ setMethod("goFish", signature(om="FLombf"),
     # GET OM observation
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
 
-    # BUG:
+    # TODO:
     # names(tracking) <- names(stk)
     # names(observations(oem)) <- names(stk)
 
@@ -791,7 +792,7 @@ setMethod("goFish", signature(om="FLombf"),
 
         ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), 
           ov=list(t1=flsval))
-
+# BUG:
         out.assess <- Map(function(x, y, z) {
           do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z)))
           }, x=stk0[args$stock], y=idx0[args$stock], z=tracking[args$stock])
@@ -1023,7 +1024,7 @@ setMethod("goFish", signature(om="FLombf"),
     # ctrl.om$deviances <- residuals(sr(om))
     ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
     ctrl.om$step <- "om"
-    
+
     om <- do.call("mpDispatch", ctrl.om)$om
 
     # BUG:
@@ -1136,7 +1137,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
     warning(paste("Some calls to mp() did not run:"), seq(largs)[!done])
 
   # CREATE standard names 
-  onms <- paste(module, names(mopts)[1], round(mopts[[1]]), sep='_')
+  onms <- paste(module, names(mopts)[1], round(mopts[[1]], 2), sep='_')
 
   # RENAME list elements
   if(is.null(names)) {

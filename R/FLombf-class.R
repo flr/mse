@@ -547,7 +547,7 @@ setMethod("dimnames", signature(x="FLombf"),
 setMethod("fwd", signature(object="FLombf", fishery="missing", 
   control="fwdControl"), 
   function(object, control, deviances="missing", window=FALSE, ...) {
-    
+
     # ADD object FCB if missing
     if(all(is.na(FCB(control))))
       FCB(control) <- FCB(object)

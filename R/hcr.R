@@ -801,7 +801,7 @@ pid.hcr <- function(stk, ind, ref, metric=ssb, kp=0, ki=0, kd=0, nyears=5,
     pre <- seasonSums(unitSums(catch(stk)[, dy]))
 
   # CALCULATE divergence
-  e <- log(met %/% FLQuant(ref))
+  e <- log(met %/% ref)
 
   # COMPUTE control signal
   u <- kp * e[, dy] + ki * yearSums(e) + kd * (e[, dy] - e[,dy1])

@@ -41,11 +41,26 @@ cpue.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
   ind <- FLQuants(wmean=wmean, slope=slope, mean=mean, index=met)
 
   # TRACK
+  track(tracking, "index.ind", ac(ay)) <- met[, ac(ay - dlag)]
   track(tracking, "mean.ind", ac(ay)) <- mean
   track(tracking, "wmean.ind", ac(ay)) <- wmean
   track(tracking, "slope.ind", ac(ay)) <- slope
 
   return(list(stk=stk, ind=ind, tracking=tracking, cpue=met))
+
+} # }}}
+
+# cpues.ind {{{
+
+cpues.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
+
+  # CALL cpue.ind
+  mets <- lapply(setNames(index, nm=names(idx[index])), function(x)
+    cpue.ind(stk, idx, nyears=nyears, ayears=ayears, index=x, args, tracking))
+
+  ind <- lapply(mets, function(x) x$ind$index)
+  
+  return(list(stk=stk, ind=ind, tracking=mets[[1]]$tracking))
 
 } # }}}
 

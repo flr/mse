@@ -36,6 +36,7 @@ export(
   "computeFp05",
   "cpue.hcr",
   "cpue.ind",
+  "cpues.ind",
   "decisions",
   "default.oem",
   "deplete",

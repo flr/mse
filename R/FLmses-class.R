@@ -149,7 +149,7 @@ setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
     # SUBSET in list, need to unclass
     x@.Data <- unclass(x)[i]
     
-    performance(x) <- x@performance[mp %in% i,]
+    performance(x) <- x@performance[run %in% i,]
 
     return(x)
   }

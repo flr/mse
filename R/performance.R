@@ -100,9 +100,9 @@ setMethod("performance", signature(x="FLQuants"),
     valid.names <- c(dimnames(refpts)$params, names(x),
       c("age", "year", "unit", "season", "area"))
     
-    if(!all(stats.names %in% valid.names))
-      stop("Name of metric, refpt or function in statistics not found: ",
-        paste(stats.names[!stats.names %in% valid.names], collapse=", "))
+    #if(!all(stats.names %in% valid.names))
+    #  stop("Name of metric, refpt or function in statistics not found: ",
+    #    paste(stats.names[!stats.names %in% valid.names], collapse=", "))
     
     # CREATE years list
     if(!is.list(years))
@@ -204,7 +204,7 @@ setMethod("performance", signature(x="FLStock"),
       else
         stop("metrics could not be computed")
 
-    return(performance(flqs, ...))
+    return(performance(flqs, ...)[])
   }
 )
 # }}}
@@ -217,7 +217,8 @@ setMethod("performance", signature(x="FLStock"),
 #'   refpts=FLPar(MSY=110000), metrics=list(C=catch), years=list(2012:2015))
 
 setMethod("performance", signature(x="FLStocks"),
-  function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,
+  function(x, statistics, refpts=FLPar(),
+    years=seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
     metrics=FLCore::metrics, probs=NULL, grid=missing, mc.cores=1, ...) {
 
     if(mc.cores > 1) {
@@ -239,7 +240,7 @@ setMethod("performance", signature(x="FLStocks"),
         res <- merge(res, dgrid, by="run")
       }
 
-    return(res) 
+    return(res[]) 
   })
 # }}}
 
@@ -248,7 +249,8 @@ setMethod("performance", signature(x="FLStocks"),
 #' @rdname performance
 
 setMethod("performance", signature(x="list"),
-  function(x, statistics, refpts=FLPar(), years=dims(x[[1]])$maxyear,
+  function(x, statistics, refpts=FLPar(),
+    years=seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
     probs=NULL, grid="missing", mc.cores=1, ...) {
 
     # HANDLE list(FLom | FLombf)
@@ -257,8 +259,8 @@ setMethod("performance", signature(x="list"),
         statistics <- mse::statistics[c('C', 'F', 'SB')]
 
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
-        refpts=refpts(i), statistics=statistics, years=years, probs=probs), 
-        list(...))), i=x, j=names(x)))
+        refpts=refpts(i), statistics=statistics, years=years, probs=probs,
+        run=j), list(...))), i=x, j=names(x)))
 
       return(res[])
     }
@@ -357,7 +359,7 @@ setMethod("performance", signature(x="FLombf"),
     res[, om:=om]
     res[, mp:=NULL]
 
-    return(res)
+    return(res[])
   }
 )
 
@@ -386,8 +388,11 @@ setMethod("performance", signature(x="FLmse"),
       # GET hcr args
       control_args <- Filter(is.numeric, args(control(x)$hcr))
 
+      # GET tracking elements as FLQuants
+      tracks <- divide(tracking(x), dim=1)
+
       # COMPUTE on x@om
-      do.call(performance, c(list(x=x@om), list(...), control_args, om=name(x@om)))
+      do.call(performance, c(list(x=x@om), args, control_args, tracks, om=name(x@om)))
     }
   }
 )
@@ -437,8 +442,8 @@ writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FAL
   for (col in colnames(dat)[colnames(dat) != "data"])
     set(dat, j = col, value = as.character(dat[[col]]))
 
-  # SET mp
-  if (is.null(dat[["mp"]])) 
+  # SET mp from type and run
+  if (is.null(dat[["mp"]]) & all(c("type", "run") %in% names(dat))) 
     dat[, mp := paste(om, type, run, sep="_")]
 
   # CREATE
@@ -480,8 +485,19 @@ readPerformance <- function(file="model/performance.dat.gz") {
   dat <- fread(file)
 
   # SET correct column types
-  for (col in colnames(dat)[colnames(dat) != "data"])
+  for (col in colnames(dat)[!colnames(dat) %in% c("data", "iter")])
     set(dat, j = col, value = as.character(dat[[col]]))
+
+  # SET key
+  setkey(dat, om, type, run, biol, mp, statistic, year)
+
+  # SET colorder
+  setcolorder(dat, c('om', 'type', 'run', 'biol', 'statistic', 'name', 'desc',
+    'year', 'iter', 'mp'))
+
+  # SET as factor
+  #asfactor <- c("om", "type", "run", "biol", "statistic", "mp")
+  #dat[, c(asfactor) := lapply(.SD, as.factor), .SDcols=asfactor]
 
   # RETURN
   return(dat)
@@ -493,6 +509,7 @@ readPerformance <- function(file="model/performance.dat.gz") {
 
 summaryPerformance <- function(file="model/performance.dat.gz") {
 
+  #
   if(!is(file, "data.table"))
     file <- readPerformance(file)
 
@@ -516,10 +533,40 @@ summaryPerformance <- function(file="model/performance.dat.gz") {
   # PRINT it
   cat(do.call(sprintf, c(list(fmt="- oms: %i, types: %i, mps: %i\n"), unlist(summ))))
 
-  # PRINMT table
-  print(as.data.frame(res))
+  # PRINT tree or summary table
+  # print(as.data.frame(res))
 
   invisible(TRUE)
 }
 
+# }}}
+
+# labelPerformance {{{
+
+labelPerformance <- function(dat, labels=NULL) {
+
+  # NO label, use mp
+  if(is.null(labels)) {
+    dat[, label := mp]
+    return(dat[])
+  # 'numeric', set as sequence in sort order
+  } else if(identical(labels, "numeric")) {
+    labels <- data.table(mp=sort(unique(dat$mp)), label=seq(unique(dat$mp)))
+  # VECTOR, assign names by sort(unique)
+  } else if(is.vector(labels)) {
+    labels <- data.table(mp=sort(unique(dat$mp)), label=labels)
+  # SET as data.table JIC
+  } else {
+    labels <- data.table(labels)
+  }
+
+  # CHECK dims
+  if(!all(unique(dat[, mp]) %in% unique(labels[, mp])))
+    stop("'mp' names in both tables do not match")
+
+  # MERGE by mp
+  dat <- merge(dat[, !"label"], labels[, .(mp, label)], by="mp")
+
+  return(dat[])
+}
 # }}}
