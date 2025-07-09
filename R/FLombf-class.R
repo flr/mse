@@ -697,11 +697,13 @@ setMethod("stock", signature(object="FLombf"),
     res <- FLStocks(
       # LAPPLY over biols
       lapply(setNames(nm=names(biols(object))), function(x) {
+
         # CHOOSE matching fisheries
         fisheries <- fisheries(object)[unlist(lapply(fbmap, function(i)
           x %in% i))]
         stk <- as.FLStock(biols(object)[[x]], fisheries=fisheries,
           catch=x, full=full)
+
         # ADD fisheries catch data as areas, if requested
         if(byfishery) {
           dat <- FLQuants(lapply(setNames(nm=c('landings.n', 'landings.wt',
