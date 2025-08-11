@@ -87,7 +87,7 @@ All these values can be simply overiden by including them in the *args* argument
 
 * You can submit bug reports, questions or suggestions on `mse` at the `mse` issue page ^[<https://github.com/flr/mse/issues>], or on the *FLR* mailing list.
 * Or send a pull request to <https://github.com/flr/mse/>
-* For more information on the FLR Project for Quantitative Fisheries Science in R, visit the FLR webpage ^[<http://flr-project.org>].
+* For more information on the FLR Project for Quantitative Fisheries Science in R, visit the FLR webpage ^[<http://flrproject.org>].
 * The latest version of `mse` can always be installed using the `devtools` package, by calling
 ```{r, devtools, echo=TRUE, eval=FALSE}
 	library(devtools)
