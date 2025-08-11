@@ -335,9 +335,9 @@ setMethod("performance", signature(x="FLom"),
 # }}}
 
 # performance(FLombf) {{{
-
+# TODO: DEFAULT statistics, mse::statistics[c('C', 'F', 'SB')]
 setMethod("performance", signature(x="FLombf"),
-  function(x, statistics=mse::statistics[c('C', 'F', 'SB')], refpts=x@refpts,
+  function(x, statistics, refpts=x@refpts,
     metrics=NULL, years=as.character(seq(dims(x)$minyear + 1, dims(x)$maxyear)),
     probs=NULL, om=name(x), ...) {
 
@@ -568,5 +568,33 @@ labelPerformance <- function(dat, labels=NULL) {
   dat <- merge(dat[, !"label"], labels[, .(mp, label)], by="mp")
 
   return(dat[])
+}
+# }}}
+
+# periodsPerformance {{{
+
+periodsPerformance <- function(x, periods) {
+
+  # COERCE tio list
+  periods <- as.list(periods)
+ 
+  years <- unlist(lapply(periods, function(x) {
+    if(length(x) > 1)
+      paste(x[1], substr(rev(x)[1], 3, 4), sep="-")
+    else
+      x
+  }))
+
+  # ASSIGN names if missing
+  if(is.null(names(periods))) {
+    names(periods) <- years
+  }
+
+  res <- rbindlist(Map(function(pe, na, ye) {
+    x[year %in% pe, .(data=mean(data, na.rm=TRUE), period=na, year=ye),
+    by=.(type, mp, statistic, name, desc, iter)]},
+    pe=periods, na=names(periods), ye=years))
+
+  return(res)
 }
 # }}}

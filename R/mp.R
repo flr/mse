@@ -8,8 +8,6 @@
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
 
-# TODO: ADD performance calculation
-
 # mp {{{
 
 #' mp executes a single run of a Management Procedure

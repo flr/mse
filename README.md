@@ -17,7 +17,7 @@ Tools for constructing, running and analyzing Management Strategy Evaluation sim
 To install this package, start R and enter:
 
 ```
-install.packages("mse", repos="http://flr-project.org/R")
+install.packages("mse", repos="http://flrproject.org/R")
 ```
 
 or directly from the github repository by using:
@@ -27,7 +27,7 @@ remotes::install_github("flr/mse")
 ```
 
 ## Documentation
-- [Help pages](http://flr-project.org/mse)
+- [Help pages](http://flrproject.org/mse)
 
 ## License
 Copyright (c) 2016-2022 European Union. European Commission Joint Research Centre D.02. Released under the [EUPL 1.1](https://joinup.ec.europa.eu/community/eupl/og_page/eupl).
