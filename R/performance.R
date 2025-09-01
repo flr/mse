@@ -409,12 +409,19 @@ setMethod('performance<-', signature(x='FLmse', value="data.frame"),
 
 setMethod("performance", signature(x="FLmses"),
   function(x, ...) {
+
+    args <- list(...)
+
     # RETURN slot if no other args
-    if(length(list(...)) == 0)
+    if(length(args) == 0)
       return(slot(x, 'performance'))
-    # CALL performance(list)
-    else
-      callNextMethod()
+    else {
+      if(all(unlist(lapply(args, is, "FLmses"))))
+        return(rbindlist(c(list(performance(x)), lapply(args, performance))))
+      else
+        # CALL performance(list)
+        callNextMethod()
+    }
   } 
 )
 
