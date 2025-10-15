@@ -199,7 +199,7 @@ setMethod("plot", signature(x="FLombf", y="list"),
     )
 
     if(length(stks) == 1)
-      .plotom(stks[[1]], window=window)
+      .plotom(stks[[1]], window=window, ...)
     else
       Reduce("|", lapply(stks, .plotom, window=window))
   })

@@ -361,17 +361,53 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 	list(ctrl=ctrl, tracking=tracking)
 } # }}}
 
-# fixedF.hcr {{{
+# fixedC.hcr {{{
 
-#' A fixed target f
+#' A fixed target C
 #'
-#' No matter what get F = Ftarget
+#' No matter what get C = Ctrg
 #' The control argument is a list of parameters used by the HCR.
 #' @param stk The perceived FLStock.
 #' @param control A list with the element ftrg (numeric).
 #' @examples
 #' data(sol274)
-#' fixedF.hcr(stock(om), ftrg=0.15, args=list(ay=2017, management_lag=1,
+#' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1,
+#'   frq=1), tracking=FLQuant())
+
+fixedC.hcr <- function(stk, ctrg, args, tracking){
+  
+  # args
+	ay <- args$ay
+  mlag <- args$management_lag
+  frq <- args$frq
+
+  # PARSE FLQuant
+  if(is(ctrg, 'FLQuant')) {
+    # EXPAND iters
+    ctrg <- propagate(ctrg, args$it)
+    # TODO: EXPAND years, if needed
+    ctrg <- c(ctrg[, ac(seq(ay + mlag, ay + frq))])
+  }
+
+	# create control object
+  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="catch", value=c(ctrg))
+
+	# return
+	list(ctrl=ctrl, tracking=tracking)
+
+} # }}}
+
+# fixedF.hcr {{{
+
+#' A fixed target F
+#'
+#' No matter what get F = ftrg
+#' The control argument is a list of parameters used by the HCR.
+#' @param stk The perceived FLStock.
+#' @param control A list with the element ftrg (numeric).
+#' @examples
+#' data(sol274)
+#' fixedC.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
 #'   frq=1), tracking=FLQuant())
 
 fixedF.hcr <- function(stk, ftrg, args, tracking){
@@ -382,8 +418,12 @@ fixedF.hcr <- function(stk, ftrg, args, tracking){
   frq <- args$frq
 
   # PARSE FLQuant
-  if(is(ftrg, 'FLQuant'))
-    ftrg <- c(ftrg[, ac(ay + mlag)])
+  if(is(ftrg, 'FLQuant')) {
+    # EXPAND iters
+    ftrg <- propagate(ftrg, args$it)
+    # TODO: EXPAND years, if needed
+    ftrg <- c(ftrg[, ac(seq(ay + mlag, ay + frq))])
+  }
 
 	# create control object
   ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="fbar", value=c(ftrg))
@@ -393,32 +433,31 @@ fixedF.hcr <- function(stk, ftrg, args, tracking){
 
 } # }}}
 
-# fixedC.hcr {{{
+# movingF.hcr {{{
 
-#' A fixed catch HCR
+#' [TODO:description]
 #'
-#' No matter what get C = ctrg
-#' The control argument is a list of parameters used by the HCR.
-#' @param stk The perceived FLStock.
-#' @param control A list with the element ctrg (numeric).
+#' @param stk [TODO:description]
+#' @param hcrpars [TODO:description]
+#' @param args [TODO:description]
+#' @param tracking [TODO:description]
+#'
+#' @return [TODO:description]
+#' @export
+#'
 #' @examples
-#' data(sol274)
-#' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1,
-#'   frq=1), tracking=FLQuant())
 
-fixedC.hcr <- function(stk, ctrg, args, tracking){
+movingF.hcr <- function(stk, hcrpars, args, tracking){
 
-  # args
 	ay <- args$ay
-  mlag <- args$management_lag
-  frq <- args$frq
-  yrs <- seq(ay + mlag, ay + frq)
-
-	# create control object
-  ctrl <- fwdControl(year=yrs, quant="catch", value=rep(c(ctrg), 
-    each=length(yrs)))
-
-	# return
+	# rule 
+	if(!is(hcrpars, "FLQuant"))
+    hcrpars <- FLQuant(c(hcrpars), dimnames=list(iter=dimnames(stk@catch)$iter))
+	
+  # create control file
+  ctrl <- as(FLQuants(fbar=hcrpars), 'fwdControl')
+	
+  # return
 	list(ctrl=ctrl, tracking=tracking)
 
 } # }}}
@@ -483,7 +522,7 @@ buffer.hcr <- function(stk, ind, target, metric='depletion', lim=0.10,
 
   # GET previous TAC from last hcr ...
   if(is.null(initac)) {
-    pre <- tracking[[1]]['hcr', ac(ay)]
+    pre <- tracking[[1]]['hcr', ac(ay),,1]
     # ... OR catch
     if(all(is.na(pre)))
       pre <- unitSums(areaSums(seasonSums(catch(stk)[, ac(ay - args$data_lag)])))

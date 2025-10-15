@@ -343,7 +343,7 @@ setMethod("goFish", signature(om="FLom"),
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
     
-    # TRACK om
+    # TRACK om, REDUCE dims
     track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
       start=dy0, end=dyf))
     track(tracking, "B.om", dys) <- unitSums(window(tsb(om),
@@ -691,7 +691,7 @@ setMethod("goFish", signature(om="FLombf"),
     
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
-    
+
     # TRACK om
     track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
       start=dy0, end=dyf))

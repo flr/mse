@@ -290,6 +290,7 @@ setMethod("discards", signature(object="FLombf"),
 
 setMethod("ssb", signature(object="FLombf"),
   function(object, biol=NULL) {
+
     return(FLQuants(Map(ssb, object=biols(object),
       harvest=harvest(object))))
 
