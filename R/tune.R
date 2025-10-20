@@ -117,7 +117,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
 
   # --- LOOP bisecting
 
-  count <- 0
+  count <- 1
   while(count <= maxit) {
 
     # RUN at mid

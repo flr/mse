@@ -527,7 +527,7 @@ buffer.hcr <- function(stk, ind, target, metric='depletion', lim=0.10,
     if(all(is.na(pre)))
       pre <- unitSums(areaSums(seasonSums(catch(stk)[, ac(ay - args$data_lag)])))
   } else {
-    pre <- initac
+    pre <- FLQuant(initac, iter=args$it)
   }
 
   # SET TAC as tac = B * (1 - exp(-fm * hcrm * (F / FMSY))

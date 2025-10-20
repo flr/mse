@@ -43,7 +43,7 @@
 
 mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   scenario="NA", tracking="missing", logfile=tempfile(),
-  verbose=!handlers(global = NA), parallel=TRUE) {
+  verbose=!handlers(global = NA), parallel=TRUE, window=TRUE, .DEBUG=FALSE) {
 
   # PARSE parallel options
   cores <- nbrOfWorkers()
@@ -232,7 +232,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
           ctrl= iter(ctrl, j),
           args=c(args[!names(args) %in% "it"], it=length(j)),
           verbose=verbose,
-          logfile=logfile)
+          logfile=logfile,
+          .DEBUG=.DEBUG)
 
         out <- do.call(goFish, call0)
 
@@ -253,7 +254,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
         ctrl=ctrl,
         args=args,
         verbose=verbose,
-        logfile=logfile)
+        logfile=logfile,
+        .DEBUG=.DEBUG)
 
       out <- do.call(goFish, call0)
 
@@ -267,13 +269,19 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # GET objects back from loop, from iy - 1 up to last projected year
 
   # om
-  om <- window(lst0$om, start=iy - 1, end=an(vy[length(vy)]) + frq)
+  if(window)
+    om <- window(lst0$om, start=iy - 1, end=an(vy[length(vy)]) + frq)
+  else
+    om <- lst0$om
 
   # oem
   if(missingoem)
     oem <- FLoem()
   else
-    oem <- window(lst0$oem, start=iy, end=an(vy[length(vy)]) + frq)
+    if(window)
+      oem <- window(lst0$oem, start=iy, end=an(vy[length(vy)]) + frq)
+    else
+      oem <- lst0$oem
 
   # tracking
   tracking <- window(lst0$tracking, start=an(iy) - data_lag,
@@ -639,7 +647,10 @@ setMethod("goFish", signature(om="FLom"),
 
 setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
-    verbose, logfile) {
+    verbose, logfile, .DEBUG) {
+
+  if(.DEBUG)
+    browser()
 
   it <- args$it     # number of iterations
   y0 <- args$y0     # initial data year
@@ -714,11 +725,14 @@ setMethod("goFish", signature(om="FLombf"),
     # GET OM observation
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
 
+    stk <- lapply(stk, nounit)
+
     # TODO:
     # names(tracking) <- names(stk)
     # names(observations(oem)) <- names(stk)
 
     # APPLY oem across stocks
+    # TODO: TIME and SPEED UP
     o.out <- Map(function(stk, dev, obs, tra) {
 
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,

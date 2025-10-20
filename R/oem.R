@@ -237,9 +237,9 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   if(any(simp))
     stk <- simplify(stk, c("unit", "season", "area")[simp], harvest=FALSE)
  
-  # UPDATE observations
+  # UPDATE observations, excludes @stock.n TODO: DELETE stock.n (?)
   slots <- c("landings", "discards", "catch", "landings.n", "discards.n", 
-    "catch.n", "landings.wt", "discards.wt", "catch.wt", "stock.wt")
+    "catch.n", "landings.wt", "discards.wt", "catch.wt", "stock.n", "stock.wt")
   
   # UPDATE wts or only catches?
   if(!wts) slots <- slots[1:6]

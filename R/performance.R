@@ -144,6 +144,8 @@ setMethod("performance", signature(x="FLQuants"),
     res <- data.table::rbindlist(lapply(years, function(i) {
       # LOOP over statistics
       data.table::rbindlist(lapply(statistics, function(j) {
+
+     
         # ADD previous year when 1 used and stats is for change
         if(grepl("change|variability", j$desc) & length(i) == 1) {
           i <- seq(an(i) - 1, an(i))
@@ -152,7 +154,8 @@ setMethod("performance", signature(x="FLQuants"),
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(lapply(x, '[' , j=ac(i)),
             # REPEAT refpts by year because recycling goes year first
-            lapply(as(refpts, 'list'), rep, each=length(i)), list(...))), drop=FALSE)
+            lapply(lapply(as(refpts, 'list'), function(x) x[!is.na(x)]),
+              rep, each=length(i)), list(...))), drop=FALSE)
 
       }), idcol="statistic", fill=TRUE)[,c("statistic", "data", "iter")]
     }), idcol="year")

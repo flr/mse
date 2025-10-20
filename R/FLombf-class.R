@@ -662,8 +662,6 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
     return(mets)
 })
 
-# TODO: SPLIT metrics across Bs and Fs
-#    - metrics=list(biols=..., fisheries=...)
 setMethod("metrics", signature(object="FLombf", metrics="list"),
   function(object, metrics) {
 
@@ -674,13 +672,13 @@ setMethod("metrics", signature(object="FLombf", metrics="list"),
     })
 
     # RESHAPE as biol$metric
-    res <- lapply(setNames(nm=names(res[[1]])), function(x)
-      FLQuants(lapply(res, function(y) y[[x]])))
+    #res <- lapply(setNames(nm=names(res[[1]])), function(x)
+    #  FLQuants(lapply(res, function(y) y[[x]])))
+
+    res <- list(FLQuants(res))
 
     return(res)
-
 })
-
 
 # }}}
 
