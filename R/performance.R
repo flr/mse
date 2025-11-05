@@ -89,6 +89,8 @@ setMethod("performance", signature(x="FLQuants"),
     probs=c(0.1, 0.25, 0.50, 0.75, 0.90),
     om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
 
+    # CHECK statistics are all valid
+
     # CHECK x /refpts names cover all required by statistics
     stats.names <- unique(unlist(lapply(statistics,
       function(x) all.vars(x[[1]][[2]]))))
@@ -145,7 +147,6 @@ setMethod("performance", signature(x="FLQuants"),
       # LOOP over statistics
       data.table::rbindlist(lapply(statistics, function(j) {
 
-     
         # ADD previous year when 1 used and stats is for change
         if(grepl("change|variability", j$desc) & length(i) == 1) {
           i <- seq(an(i) - 1, an(i))
@@ -261,9 +262,10 @@ setMethod("performance", signature(x="list"),
       if(missing(statistics))
         statistics <- mse::statistics[c('C', 'F', 'SB')]
 
+      # TODO: ADD om if missing, via idcol or :=, DROP Map
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
-        refpts=refpts(i), statistics=statistics, years=years, probs=probs,
-        run=j), list(...))), i=x, j=names(x)))
+        refpts=refpts(i), statistics=statistics, years=years, probs=probs),
+        list(...))), i=x, j=names(x)))
 
       return(res[])
     }
@@ -279,8 +281,15 @@ setMethod("performance", signature(x="list"),
       })
     }
 
+    # HANDLE list(FLmses), assumes performance is stored
+    if(all(unlist(lapply(x, is, 'FLmses')))) {
+      
+      return(rbindlist(lapply(x, function(i) performance(i))))
+    }
+
     # HANDLE list(mse) | FLmses
     if(all(unlist(lapply(x, is, 'FLmse')))) {
+     
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
         refpts=refpts(i), statistics=statistics, years=years, probs=probs), 
         run=j, list(...))), i=x, j=names(x)))
@@ -375,7 +384,7 @@ setMethod("performance", signature(x="FLombf"),
 #' data(statistics)
 
 setMethod("performance", signature(x="FLmse"),
-  function(x, ...) {
+  function(x, om=name(x@om), ...) {
 
     args <- list(...)
 
@@ -436,6 +445,8 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 
 # }}}
 
+# --- performance DB
+
 # writePerformance {{{
 
 #' Write performance table to file
@@ -449,12 +460,19 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FALSE) {
 
   # SET correct column types
-  for (col in colnames(dat)[colnames(dat) != "data"])
-    set(dat, j = col, value = as.character(dat[[col]]))
+  dat[, (colnames(dat)) := lapply(.SD, as.character), .SDcols = colnames(dat)]
+  dat[, (c("year", "data")) := lapply(.SD, as.numeric), .SDcols = c("year", "data")]
 
+  # ADD empty type and run if missing
+  if(all(!c("type", "run") %in% names(dat)))
+    dat[, `:=`(type=character(1), run=character(1), mp=character(1)), ] 
   # SET mp from type and run
-  if (is.null(dat[["mp"]]) & all(c("type", "run") %in% names(dat))) 
+  else if (is.null(dat[["mp"]]) & all(c("type", "run") %in% names(dat))) 
     dat[, mp := paste(om, type, run, sep="_")]
+
+  # SET column order
+  setcolorder(dat, neworder=c('om', 'type', 'run', 'mp', 'biol', 'statistic',
+    'name', 'desc', 'year', 'iter', 'data'))
 
   # CREATE
   if(!file.exists(file) | overwrite) {
@@ -467,11 +485,7 @@ writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FAL
   } else {
 
     # CHECK dat exists in file
-    db <- fread(file)
-
-    # SET correct column types
-    for (col in colnames(db)[colnames(db) != "data"])
-      set(db, j = col, value = as.character(db[[col]]))
+    db <- readPerformance(file)
 
     # RUN anti-join on biol, statistic, year, iter, om, type & run
     db <- db[!dat, on=.(biol, statistic, year, iter, om, type, run)]
@@ -492,18 +506,16 @@ writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FAL
 readPerformance <- function(file="model/performance.dat.gz") {
 
   # READ file
-  dat <- fread(file)
-
-  # SET correct column types
-  for (col in colnames(dat)[!colnames(dat) %in% c("data", "iter")])
-    set(dat, j = col, value = as.character(dat[[col]]))
+  dat <- fread(file, colClasses=c(type='character', run='character',
+    mp='character', biol='character', year='numeric', iter='character',
+    data='numeric'))
 
   # SET key
   setkey(dat, om, type, run, biol, mp, statistic, year)
 
-  # SET colorder
-  setcolorder(dat, c('om', 'type', 'run', 'biol', 'statistic', 'name', 'desc',
-    'year', 'iter', 'mp'))
+  # SET column order
+  setcolorder(dat, neworder=c('om', 'type', 'run', 'mp', 'biol', 'statistic',
+    'name', 'desc', 'year', 'iter', 'data'))
 
   # SET as factor
   #asfactor <- c("om", "type", "run", "biol", "statistic", "mp")
@@ -553,31 +565,95 @@ summaryPerformance <- function(file="model/performance.dat.gz") {
 
 # labelPerformance {{{
 
+#' @title labelPerformance
+#' @description Creates a label column in a performance table
+#' @param dat A performance statistics table, as returned by performance()
+#' @param labels Labels to be inserted, as vector or data.frame/data.table
+#' @return A labelled performance statistics data.table
+#' @details
+#' - 'numeric'
+#' - vector
+#' - data.frame or data.table
+#' - NULL
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname labelPerformance
+#' @alias setLabelPerformance
+
 labelPerformance <- function(dat, labels=NULL) {
+
+  # TODO: EXCLUDE mp=character(1)
 
   # NO label, use mp
   if(is.null(labels)) {
-    dat[, label := mp]
-    return(dat[])
-  # 'numeric', set as sequence in sort order
+    labels <- data.table(mp=sort(unique(dat[mp != character(1), mp])),
+      label=sort(unique(dat[mp != character(1), mp])))
+
+  # 'numeric', set as sequence in unique order
   } else if(identical(labels, "numeric")) {
-    labels <- data.table(mp=sort(unique(dat$mp)), label=seq(unique(dat$mp)))
-  # VECTOR, assign names by sort(unique)
+    labels <- data.table(mp=unique(dat[mp != character(1), mp]), 
+      label=paste0("MP", seq(unique(dat[mp != character(1), mp]))))
+  
+  # VECTOR, assign names by unique()
   } else if(is.vector(labels)) {
-    labels <- data.table(mp=sort(unique(dat$mp)), label=labels)
+    labels <- data.table(mp=dat[mp != character(1), unique(mp)], label=labels)
+  
   # SET as data.table JIC
   } else {
     labels <- data.table(labels)
   }
 
-  # CHECK dims
-  if(!all(unique(dat[, mp]) %in% unique(labels[, mp])))
+  # CHECK mp matches for non-empty
+  if(!all(unique(dat[mp != character(1), mp]) %in% unique(labels[, mp]))) {
     stop("'mp' names in both tables do not match")
+  }
 
-  # MERGE by mp
-  dat <- merge(dat[, !"label"], labels[, .(mp, label)], by="mp")
+  # ADD om if missing mp
+  dat[mp == character(1), label:=om]
 
+  # MERGE by mp on rows with mp
+  # dat <- merge(dat[, !"label"], labels[, .(mp, label)], by="mp")
+  omdat <- dat[mp == character(1), ]
+  mpdat <- merge(dat[mp != character(1), !"label"], labels[, .(mp, label)], by="mp")
+  dat <- rbind(omdat, mpdat)
+
+  # SET as factor, OM labels (no mp) first
+  levs <- c(dat[mp == character(1),
+    unique(label)], sort(dat[mp != character(1), unique(label)]))
+ 
+  dat[, label := factor(label, levels=levs)]
+
+  # END
   return(dat[])
+}
+# }}}
+
+# setLabelPerformance {{{
+
+#' @title setLabelPerofrmance
+#' @description FUNCTION_DESCRIPTION
+#' @param file File where performance table is stored, default: 'model/performance.dat.gz'
+#' @return Invisible updates the table in file
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname labelPerformance
+
+setLabelPerformance <- function(file="model/performance.dat.gz", labels) {
+
+  dat <- readPerformance(file)
+
+  dat <- labelPerformance(dat, labels)
+
+  writePerformance(dat, file=file, overwrite=TRUE)
 }
 # }}}
 
@@ -585,7 +661,7 @@ labelPerformance <- function(dat, labels=NULL) {
 
 periodsPerformance <- function(x, periods) {
 
-  # COERCE tio list
+  # COERCE to list
   periods <- as.list(periods)
  
   years <- unlist(lapply(periods, function(x) {

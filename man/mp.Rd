@@ -15,7 +15,9 @@ mp(
   tracking = "missing",
   logfile = tempfile(),
   verbose = !handlers(global = NA),
-  parallel = TRUE
+  parallel = TRUE,
+  window = TRUE,
+  .DEBUG = FALSE
 )
 }
 \arguments{

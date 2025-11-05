@@ -21,24 +21,6 @@ buffer.hcr(
   args,
   tracking
 )
-
-buffer.hcr(
-  stk,
-  ind,
-  target,
-  metric = "depletion",
-  lim = 0.1,
-  bufflow = 0.3,
-  buffupp = 0.5,
-  sloperatio = 0.2,
-  initac = NULL,
-  dupp = NULL,
-  dlow = NULL,
-  all = TRUE,
-  ...,
-  args,
-  tracking
-)
 }
 \arguments{
 \item{lim}{Point at which the HCR response moves from linear to quadratic in terms of reducing HCR multiplier, numeric.}
@@ -59,14 +41,8 @@ if(muI <= Ilim) HCRmult <- (muI/Ilim)^2/2}
 A Harvest Control Rule (HCR) that extends the traditional hockeystick shape
 by allowing for increasing output when stock status rises above a buffer set
 around the target.
-
-A Harvest Control Rule (HCR) that extends the traditional hockeystick shape
-by allowing for increasing output when stock status rises above a buffer set
-around the target.
 }
 \references{
-Hillary, R. 2020. \emph{Management Strategy Evaluation of the Broadbill Swordfish ETBF harvest strategies}. Working document.
-
 Hillary, R. 2020. \emph{Management Strategy Evaluation of the Broadbill Swordfish ETBF harvest strategies}. Working document.
 }
 \author{

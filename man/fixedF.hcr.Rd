@@ -2,7 +2,7 @@
 % Please edit documentation in R/hcr.R
 \name{fixedF.hcr}
 \alias{fixedF.hcr}
-\title{A fixed target f}
+\title{A fixed target F}
 \usage{
 fixedF.hcr(stk, ftrg, args, tracking)
 }
@@ -12,11 +12,11 @@ fixedF.hcr(stk, ftrg, args, tracking)
 \item{control}{A list with the element ftrg (numeric).}
 }
 \description{
-No matter what get F = Ftarget
+No matter what get F = ftrg
 The control argument is a list of parameters used by the HCR.
 }
 \examples{
 data(sol274)
-fixedF.hcr(stock(om), ftrg=0.15, args=list(ay=2017, management_lag=1,
+fixedC.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
   frq=1), tracking=FLQuant())
 }

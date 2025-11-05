@@ -643,7 +643,7 @@ setMethod("goFish", signature(om="FLom"),
 )
 # }}}
 
-# goFish FLombf {{{
+# goFish(FLombf) {{{
 
 setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
@@ -725,7 +725,7 @@ setMethod("goFish", signature(om="FLombf"),
     # GET OM observation
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
 
-    stk <- lapply(stk, nounit)
+    # stk <- lapply(stk, nounit)
 
     # TODO:
     # names(tracking) <- names(stk)

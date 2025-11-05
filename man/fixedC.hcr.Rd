@@ -2,17 +2,17 @@
 % Please edit documentation in R/hcr.R
 \name{fixedC.hcr}
 \alias{fixedC.hcr}
-\title{A fixed catch HCR}
+\title{A fixed target C}
 \usage{
 fixedC.hcr(stk, ctrg, args, tracking)
 }
 \arguments{
 \item{stk}{The perceived FLStock.}
 
-\item{control}{A list with the element ctrg (numeric).}
+\item{control}{A list with the element ftrg (numeric).}
 }
 \description{
-No matter what get C = ctrg
+No matter what get C = Ctrg
 The control argument is a list of parameters used by the HCR.
 }
 \examples{
