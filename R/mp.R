@@ -327,7 +327,7 @@ setMethod("goFish", signature(om="FLom"),
   # COPY ctrl
   ctrl0 <- ctrl
   
-  p <- progressor(along=vy, offset=0L)
+  p <- progressor(along=vy, offset=1L)
 
   # go fish!
 
@@ -678,7 +678,7 @@ setMethod("goFish", signature(om="FLombf"),
   if(length(deviances(oem)) == 0)
     deviances(oem) <- rep(list(NULL), length(biols(om)))
 
-  p <- progressor(along=vy, offset=0L)
+  p <- progressor(along=vy, offset=1L)
 
   for(i in vy) {
 
@@ -1103,7 +1103,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
 
     message("Running on ", nbrOfWorkers(), " nodes.")
 
-    p <- progressor(along=seq(largs), offset=0L)
+    p <- progressor(along=seq(largs), offset=1L)
 
     res <- foreach(i = seq(largs), .errorhandling="pass",
       .options.future=list(globals=structure(TRUE, add=c("ctrl", "module",
@@ -1122,7 +1122,7 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
     }
   } else {
 
-    p <- progressor(along=seq(largs), offset=0L)
+    p <- progressor(along=seq(largs), offset=1L)
 
     res <- lapply(seq(largs), function(i) {
 

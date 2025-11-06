@@ -470,6 +470,9 @@ writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FAL
   else if (is.null(dat[["mp"]]) & all(c("type", "run") %in% names(dat))) 
     dat[, mp := paste(om, type, run, sep="_")]
 
+  # SET label
+  dat[, label := ifelse(mp == character(1), om, mp)]
+
   # SET column order
   setcolorder(dat, neworder=c('om', 'type', 'run', 'mp', 'biol', 'statistic',
     'name', 'desc', 'year', 'iter', 'data'))
