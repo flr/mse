@@ -1050,6 +1050,8 @@ setMethod("goFish", signature(om="FLombf"),
     invisible(gc())
   }
 
+    # SET NAs in unobserved oem years
+
     # RETURN
     list(om=om, tracking=tracking, oem=oem, args=args)
   }
@@ -1097,13 +1099,17 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
     rep(i, length=largs)
   })
 
+  message("Running mps() over module '", module, "' with ", largs,
+    " argument sets.")
+
   # LOOP over values
 
   if(parallel) {
 
     message("Running on ", nbrOfWorkers(), " nodes.")
 
-    p <- progressor(along=seq(largs), offset=1L)
+    if(largs > nbrOfWorkers())
+      p <- progressor(along=seq(largs), offset=1L)
 
     res <- foreach(i = seq(largs), .errorhandling="pass",
       .options.future=list(globals=structure(TRUE, add=c("ctrl", "module",
@@ -1116,7 +1122,8 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
       run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
          verbose=FALSE)
       
-      p(message = sprintf("MP: %s", i))
+      if(largs > nbrOfWorkers())
+        p(message = sprintf("MP: %s", i))
 
       return(run)
     }

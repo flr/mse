@@ -294,9 +294,9 @@ setMethod("performance", signature(x="list"),
         refpts=refpts(i), statistics=statistics, years=years, probs=probs), 
         run=j, list(...))), i=x, j=names(x)))
 
-      # SET mp
-      if (is.null(res[["mp"]])) 
-        res[, mp := paste(om, type, run, sep="_")]
+      # SET mp if possible
+      if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
+        res[, mp:=paste(om, type, run, sep="_")]
 
       return(res[])
     }
@@ -404,7 +404,14 @@ setMethod("performance", signature(x="FLmse"),
       tracks <- divide(tracking(x), dim=1)
 
       # COMPUTE on x@om
-      do.call(performance, c(list(x=x@om), args, control_args, tracks, om=name(x@om)))
+      res <- do.call(performance, c(list(x=x@om), args, control_args,
+        tracks, om=name(x@om)))
+
+      # NAME mp if possible
+      if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
+        res[, mp:=paste(om, type, run, sep="_")]
+
+      return(res[])
     }
   }
 )

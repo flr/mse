@@ -77,7 +77,8 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
 
   # PRINT result
   if(verbose)
-    message(paste0("[1] diff: ", format(obmin, digits=2)))
+    message(paste0("[1] diff: ", format(obmin, digits=2), ", prob: ",
+      format(mean(pmin$data, na.rm=TRUE), digits=2)))
 
   # CHECK cmin result
   if(isTRUE(all.equal(obmin, 0, tolerance=tol)))
@@ -102,7 +103,8 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
 
   # PRINT result
   if(verbose)
-    message(paste0("[2] diff: ", format(obmax, digits=2)))
+    message(paste0("[2] diff: ", format(obmax, digits=2), ", prob: ",
+      format(mean(pmax$data, na.rm=TRUE), digits=2)))
   
   # CHECK cmax result
   if(isTRUE(all.equal(obmax, 0, tolerance=tol)))
@@ -139,7 +141,8 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
 
     # PRINT result
     if(verbose)
-      message(paste0("[", count + 2, "] diff: ", format(obmid, digits=2)))
+      message(paste0("[", count + 2, "] diff: ", format(obmid, digits=2),
+        ", prob: ", format(mean(pmid$data, na.rm=TRUE), digits=2)))
   
     # CHECK and RETURN cmid result
     if(isTRUE(all.equal(obmid, 0, tolerance=tol))) {
