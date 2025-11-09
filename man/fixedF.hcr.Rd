@@ -17,6 +17,6 @@ The control argument is a list of parameters used by the HCR.
 }
 \examples{
 data(sol274)
-fixedC.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
+fixedF.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
   frq=1), tracking=FLQuant())
 }

@@ -303,7 +303,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
 setMethod("goFish", signature(om="FLom"),
   function(om, fb, projection, oem, iem, tracking, logfile, ctrl, args,
-    verbose) {
+    verbose, .DEBUG) {
   
   # ARGUMENTS
   it <- args$it     # number of iterations

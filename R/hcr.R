@@ -407,7 +407,7 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
 #' @param control A list with the element ftrg (numeric).
 #' @examples
 #' data(sol274)
-#' fixedC.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
+#' fixedF.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
 #'   frq=1), tracking=FLQuant())
 
 fixedF.hcr <- function(stk, ftrg, args, tracking){
