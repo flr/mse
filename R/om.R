@@ -130,7 +130,6 @@ initiate <- function(biol, B0, h=0.75) {
   
   # ADD R0 param
   params(sr(biol))$R0 <- res
-  browser()
   params(sr(biol))$v <- ssb(biol)[,1]
 
   # RETURN FLBiol
