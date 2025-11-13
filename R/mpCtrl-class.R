@@ -214,7 +214,7 @@ setGeneric("exists", useAsDefault = base::exists)
 setMethod("exists", "mpCtrl", function(x) length(x) != 0)
 # }}}
 
-# Element accessors {{{
+# accessors {{{
 
 #' @rdname mpCtrl-class
 #' @aliases method,mpCtrl-method

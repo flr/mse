@@ -647,13 +647,14 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
     # TODO: SET for hbar 
 
     # ADD catch & SSB by biol
-    mets <- Map(function(me, ca, sb, fb) {
+    mets <- Map(function(me, ca, sb, fb, rb) {
 
-      me[['C']] <- ca
       me[['SB']] <- sb
+      me[['C']] <- ca
       me[['F']] <- fb
 
       return(me)
+
     }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object))
 
     if(length(mets) == 1 & !named)
