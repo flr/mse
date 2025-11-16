@@ -73,6 +73,7 @@ export(
   "perfect.sa",
   "pid.hcr",
   "plot_hockeystick.hcr",
+  "plot_buffer.hcr",
   "readPerformance",
   "response.fb",
   "sampling.oem",

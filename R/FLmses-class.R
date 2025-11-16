@@ -50,38 +50,38 @@ setMethod("FLmses", signature(object="list", performance="data.frame"),
 setMethod("FLmses", signature(object="list", performance="missing"),
  function(object, statistics="missing", years="missing", metrics="missing", type="NA") {
 
-    # CHECK performance tables
-    perf <- lapply(object, attr, 'performance')
-
-    # IF all elements have 'performance' attr
-    if(!all(unlist(lapply(perf, is.null)))) {
-
-      perf <- rbindlist(perf, idcol="mp")
-
-      # EMPTY individual tables
-      object <- lapply(object, function(x) {
-        attr(x, "performance") <- NULL
-        return(x)
-      })
+    # TODO: COMPUTE performance IF statistics
+    if(!missing(statistics)) {
+      # AND for years
+      if(!missing(years)) {
+        perf <- performance(object, statistics=statistics, years=years,
+          metrics=metrics, type=type)
+      } else {
+        perf <- performance(object, statistics=statistics,
+          metrics=metrics, type=type)
+      }
     } else {
-      perf <- data.table()
+
+      # CHECK performance tables
+      perf <- lapply(object, attr, 'performance')
+
+      # IF all elements have 'performance' attr
+      if(!all(unlist(lapply(perf, is.null)))) {
+
+        perf <- rbindlist(perf, idcol="mp")
+
+        # EMPTY individual tables
+        object <- lapply(object, function(x) {
+          attr(x, "performance") <- NULL
+          return(x)
+        })
+      } else {
+        perf <- data.table()
+      }
     }
     
     res <- new("FLmses", .Data=object, performance=perf,
       names=names(object))
-
-    # TODO: COMPUTE performance IF statistics
-    if(!missing(statistics)) {
-      # AND for years
-      if(missing(years)) {
-        years <- do.call(seq,
-          unname(dims(stock(object[[1]]))[c('minyear', 'maxyear')]))
-      }
-      perf <- performance(object, statistics=statistics, years=years,
-        metrics=metrics, type=type)
-
-      performance(res) <- perf
-    }
 
     return(res)
   }

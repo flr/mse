@@ -466,6 +466,11 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 
 writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FALSE) {
 
+  # HACK to avoid method, for now
+  if(is(tune) %in% c('FLmse', 'FLmses')) {
+    dat <- performance(dat)
+  }
+
   # SET correct column types
   dat[, (colnames(dat)) := lapply(.SD, as.character), .SDcols = colnames(dat)]
   dat[, (c("year", "data")) := lapply(.SD, as.numeric), .SDcols = c("year", "data")]
@@ -473,12 +478,15 @@ writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FAL
   # ADD empty type and run if missing
   if(all(!c("type", "run") %in% names(dat)))
     dat[, `:=`(type=character(1), run=character(1), mp=character(1)), ] 
-  # SET mp from type and run
+
+  # SET mp from om, type and run
   else if (is.null(dat[["mp"]]) & all(c("type", "run") %in% names(dat))) 
     dat[, mp := paste(om, type, run, sep="_")]
 
   # SET label
-  dat[, label := ifelse(mp == character(1), om, mp)]
+  if(!"label" %in% colnames(dat)) {
+    dat[, label := ifelse(mp == character(1), om, mp)]
+  }
 
   # SET column order
   setcolorder(dat, neworder=c('om', 'type', 'run', 'mp', 'biol', 'statistic',
@@ -489,7 +497,7 @@ writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FAL
 
     fwrite(dat, file=file)
 
-    invisible(file)
+    invisible(TRUE)
 
   # ADD by substituting
   } else {
@@ -506,7 +514,7 @@ writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FAL
     # WRITE to file
     fwrite(db, file=file)
 
-    invisible(file)
+    invisible(TRUE)
   }
 }
 # }}}
@@ -528,11 +536,11 @@ readPerformance <- function(file="model/performance.dat.gz") {
     'name', 'desc', 'year', 'iter', 'data'))
 
   # SET as factor
-  #asfactor <- c("om", "type", "run", "biol", "statistic", "mp")
-  #dat[, c(asfactor) := lapply(.SD, as.factor), .SDcols=asfactor]
+  cols <- c('om', 'type', 'run', 'mp', 'biol', 'statistic', 'label')
+  dat[, (cols) := lapply(.SD, factor), .SDcols = cols]
 
   # RETURN
-  return(dat)
+  return(dat[])
 }
 
 # }}}
@@ -596,41 +604,37 @@ summaryPerformance <- function(file="model/performance.dat.gz") {
 
 labelPerformance <- function(dat, labels=NULL) {
 
-  # TODO: EXCLUDE mp=character(1)
-
-  # NO label, use mp
+  # NO label, use mp | om
   if(is.null(labels)) {
-    labels <- data.table(mp=sort(unique(dat[mp != character(1), mp])),
-      label=sort(unique(dat[mp != character(1), mp])))
+    dat[, label:=ifelse(mp == character(1), om, mp)]
+    return(dat[])
 
-  # 'numeric', set as sequence in unique order
+  # 'numeric', set as sequence in unique order for mp
   } else if(identical(labels, "numeric")) {
     labels <- data.table(mp=unique(dat[mp != character(1), mp]), 
       label=paste0("MP", seq(unique(dat[mp != character(1), mp]))))
   
-  # VECTOR, assign names by unique()
-  } else if(is.vector(labels)) {
-    labels <- data.table(mp=dat[mp != character(1), unique(mp)], label=labels)
-  
+  # LIST, convert to data.table
+  } else if(is.list(labels)) {
+    labels <- data.table(element=names(labels), label=unlist(labels))
+
   # SET as data.table JIC
   } else {
     labels <- data.table(labels)
   }
 
-  # CHECK mp matches for non-empty
-  if(!all(unique(dat[mp != character(1), mp]) %in% unique(labels[, mp]))) {
-    stop("'mp' names in both tables do not match")
-  }
+  # CREATE tmp column to match mp | om
+  dat[, element:=ifelse(mp == character(1), om, mp)]
 
-  # ADD om if missing mp
-  dat[mp == character(1), label:=om]
+  # MERGE labels on matching rows only
+  dat <- merge(dat[, !"label"], labels, by="element", all=TRUE)
 
-  # MERGE by mp on rows with mp
-  # dat <- merge(dat[, !"label"], labels[, .(mp, label)], by="mp")
-  omdat <- dat[mp == character(1), ]
-  mpdat <- merge(dat[mp != character(1), !"label"], labels[, .(mp, label)], by="mp")
-  dat <- rbind(omdat, mpdat)
+  # SET NA to empty string
+  dat[, label:=ifelse(is.na(label), element, label)]
 
+  # DROP tmp column
+  dat[, element:=NULL]
+  
   # SET as factor, OM labels (no mp) first
   levs <- c(dat[mp == character(1),
     unique(label)], sort(dat[mp != character(1), unique(label)]))
@@ -688,7 +692,7 @@ periodsPerformance <- function(x, periods) {
 
   res <- rbindlist(Map(function(pe, na, ye) {
     x[year %in% pe, .(data=mean(data, na.rm=TRUE), period=na, year=ye),
-    by=.(type, mp, statistic, name, desc, iter)]},
+    by=.(type, label, statistic, name, desc, iter)]},
     pe=periods, na=names(periods), ye=years))
 
   return(res)
