@@ -467,7 +467,7 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FALSE) {
 
   # HACK to avoid method, for now
-  if(is(tune) %in% c('FLmse', 'FLmses')) {
+  if(is(dat) %in% c('FLmse', 'FLmses')) {
     dat <- performance(dat)
   }
 
