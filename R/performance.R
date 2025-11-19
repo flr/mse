@@ -467,7 +467,7 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FALSE) {
 
   # HACK to avoid method, for now
-  if(is(dat) %in% c('FLmse', 'FLmses')) {
+  if(is(dat, 'FLmse') | is(dat, 'FLmses')) {
     dat <- performance(dat)
   }
 
@@ -476,12 +476,13 @@ writePerformance <- function(dat, file="model/performance.dat.gz", overwrite=FAL
   dat[, (c("year", "data")) := lapply(.SD, as.numeric), .SDcols = c("year", "data")]
 
   # ADD empty type and run if missing
-  if(all(!c("type", "run") %in% names(dat)))
+  if(all(!c("type", "run") %in% names(dat))) {
     dat[, `:=`(type=character(1), run=character(1), mp=character(1)), ] 
 
   # SET mp from om, type and run
-  else if (is.null(dat[["mp"]]) & all(c("type", "run") %in% names(dat))) 
+  } else if (is.null(dat[["mp"]]) & all(c("type", "run") %in% names(dat))) {
     dat[, mp := paste(om, type, run, sep="_")]
+  }
 
   # SET label
   if(!"label" %in% colnames(dat)) {
@@ -624,7 +625,7 @@ labelPerformance <- function(dat, labels=NULL) {
   }
 
   # CREATE tmp column to match mp | om
-  dat[, element:=ifelse(mp == character(1), om, mp)]
+  dat[, element:=ifelse(mp == "", as.character(om), as.character(mp))]
 
   # MERGE labels on matching rows only
   dat <- merge(dat[, !"label"], labels, by="element", all=TRUE)
