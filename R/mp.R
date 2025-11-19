@@ -1059,12 +1059,11 @@ setMethod("goFish", signature(om="FLombf"),
 
 # mps {{{
 
-# TODO: mps(FLmse, oem=oem(), crtrl=control(), args=args(), ...)
+# TODO: mps(FLmse, oem=oem(), ctrl=control(), args=args(), ...)
 
 # statistics, metrics, years - om=name(om), type, run=names,
 
-mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
-  ...) {
+mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args, names=NULL, parallel=TRUE, ...) {
 
   # GET ... arguments
   opts <- list(...)
@@ -1077,16 +1076,16 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
   
   # ARE opts being given?
   if(length(opts) == 0)
-    return(FLmses(RUN=mp(om=om, oem=oem, iem=iem, ctrl=ctrl, args=args,
+    return(FLmses(RUN=mp(om=om, oem=oem, iem=iem, control=control, args=args,
       parallel=parallel)))
 
   # PARSING a single module
   if(length(opts) > 1)
     stop("mps() can only alter a single module, called for: ", names(opts))
   
-  # DO options refer to ctrl elements?
-  if(!names(opts) %in% names(ctrl))
-    stop("options refer to modules not present in ctrl")
+  # DO options refer to control elements?
+  if(!names(opts) %in% names(control))
+    stop("options refer to modules not present in control")
 
   # PARSE options on first element (module)
   module <- names(opts)[[1]]
@@ -1112,14 +1111,14 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
       p <- progressor(along=seq(largs), offset=1L)
 
     res <- foreach(i = seq(largs), .errorhandling="pass",
-      .options.future=list(globals=structure(TRUE, add=c("ctrl", "module",
+      .options.future=list(globals=structure(TRUE, add=c("control", "module",
       "mopts", "om", "oem", "iem", "args"), seed=seed))) %dofuture% {
 
       # MODIFY module args
-      args(ctrl[[module]])[names(mopts)] <- lapply(mopts, "[", i)
+      args(control[[module]])[names(mopts)] <- lapply(mopts, "[", i)
 
       # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=FALSE,
+      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
          verbose=FALSE)
       
       if(largs > nbrOfWorkers())
@@ -1134,10 +1133,10 @@ mps <- function(om, oem=NULL, iem=NULL, ctrl, args, names=NULL, parallel=TRUE,
     res <- lapply(seq(largs), function(i) {
 
       # MODIFY module args
-      args(ctrl[[module]])[names(mopts)] <- lapply(mopts, '[', i)
+      args(control[[module]])[names(mopts)] <- lapply(mopts, '[', i)
 
       # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, ctrl=ctrl, args=args, parallel=TRUE,
+      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=TRUE,
          verbose=FALSE)
 
       p(message = sprintf("MP: %s", i))

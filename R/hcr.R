@@ -464,29 +464,18 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 
 # buffer.hcr {{{
 
-#' A buffered and non-linear hockeystick HCR
-#'
-#' A Harvest Control Rule (HCR) that extends the traditional hockeystick shape
-#' by allowing for increasing output when stock status rises above a buffer set
-#' around the target.
-#' @param lim Point at which the HCR response moves from linear to quadratic in terms of reducing HCR multiplier, numeric.
-#' @param bufflow Lower point of "buffer zone" where HCR response is fixed at 1.
-#' @param buffupp Upper point of "buffer zone" where HCR response is fixed at 1.
-#' @param sloperatio fractional difference
-#'
-#' so the response of the HCR in this case would be as follows:
-#' if(muI > Ilim & muI <= buffl) HCRmult <- (0.5*(1+(muI-Ilim)/(buffl-Ilim)))
-#' if(muI > buffl & muI < buffh) HCRmult <- 1
-#' if(muI >= buffh) HCRmult <- 1+sloperatio*gr*(muI-buffh) 
-#' if(muI <= Ilim) HCRmult <- (muI/Ilim)^2/2
-#'
-#' @author Original design by R. Hillary (CSIRO). Implemented by I. Mosqueira (WMR).
-#' @references
-#' Hillary, R. 2020. *Management Strategy Evaluation of the Broadbill Swordfish ETBF harvest strategies*. Working document.
+timeMeans <- function(x)
+  seasonMeans(yearMeans(x))
 
-buffer.hcr <- function(stk, ind, target, metric='depletion', lim=0.10,
-  bufflow=0.30, buffupp=0.50, sloperatio=0.20, initac=NULL, dupp=NULL, dlow=NULL,
-  all=TRUE, ..., args, tracking) {
+zscore <- function(x, mean=yearMeans(x), sd=sqrt(yearVars(x)))
+  exp((x %-% mean) %/% sd)
+
+
+buffer.hcr <- function(stk, ind, metric='zscore',
+  target=1, width=0.5, lim=max(target * 0.10, target - 2 * width), 
+  bufflow=max(lim * 1.50, target - width), buffupp=target + width,
+  sloperatio=0.15, scale=lastcatch,
+  initac=NULL, dupp=NULL, dlow=NULL, all=TRUE, ..., args, tracking) {
 
   # EXTRACT args
   ay <- args$ay
@@ -500,38 +489,45 @@ buffer.hcr <- function(stk, ind, target, metric='depletion', lim=0.10,
   # SET control years
   cys <- seq(ay + man_lag, ay + man_lag + frq - 1)
 
-  # COMPUTE metric
+  # COMPUTE and window metric
   met <- mse::selectMetric(metric, stk, ind)
   met <- window(met, start=dy, end=dy)
 
-  # TRACK metric & status (HCR segment)
-  track(tracking, "metric.hcr", dy) <- met
-  track(tracking, "status.hcr", dy) <- cut(c(met),
-    breaks=c(-1e-08, lim, bufflow, buffupp, Inf), c(1, 2, 3, 4))
-
+  # COMPUTE gradient of decrease
+  dgradient <- (1 - 2^(-1))/(bufflow - lim)
+  
   # COMPUTE HCR multiplier if ...
   # BELOW lim
   hcrm <- ifelse(met <= lim, ((met / lim) ^ 2) / 2,
     # BETWEEN lim and bufflow
-    ifelse(met < bufflow,
+    ifelse(met <= bufflow,
       (0.5 * (1 + (met - lim) / (bufflow - lim))),
     # BETWEEN bufflow and buffupp
     ifelse(met < buffupp, 1, 
-    # ABOVE buffupp
-      1 + sloperatio * 1 / (2 * (bufflow - lim)) * (met - buffupp))))
+    # ABOVE buffupp, as proportion of dgradient
+      1 + sloperatio * dgradient * (met - buffupp))))
 
-  # GET previous TAC from last hcr ...
-  if(is.null(initac)) {
-    pre <- tracking[[1]]['hcr', ac(ay),,1]
-    # ... OR catch
-    if(all(is.na(pre)))
-      pre <- unitSums(areaSums(seasonSums(catch(stk)[, ac(ay - args$data_lag)])))
+  # TRACK decision
+  dec <- ifelse(met <= lim, 1,
+   ifelse(met < bufflow, 2,
+    ifelse(met < buffupp, 3, 4)))
+
+  # track(tracking, "decision.hcr", cys) <- dec
+
+  # GET initial TAC,
+  if(!is.null(initac) & ay == iy) {
+    lastcatch <- FLQuant(initac, iter=args$it)
+  # previous TAC, or
   } else {
-    pre <- FLQuant(initac, iter=args$it)
+    # DEBUG: tracking has copies by season, TURN annual?
+    lastcatch <- tracking[[1]]['hcr', ac(ay),,1]
+    # previous catch
+    if(all(is.na(lastcatch)))
+      lastcatch <- unitSums(areaSums(seasonSums(catch(stk)[, ac(ay - args$data_lag)])))
   }
 
-  # SET TAC as tac = B * (1 - exp(-fm * hcrm * (F / FMSY))
-  out <- target * hcrm
+  # SET TAC
+  out <- scale * hcrm
 
   # TRACK initial target
   track(tracking, "tac.hcr", cys) <- out
@@ -539,19 +535,19 @@ buffer.hcr <- function(stk, ind, target, metric='depletion', lim=0.10,
   # APPLY limits, always or if met < trigger
   if(!is.null(dupp)) {
     if(all) {
-    out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
+      out[out > lastcatch * dupp] <- lastcatch[out > lastcatch * dupp] * dupp
     } else {
-    out[out > pre * dupp & met < bufflow] <- pre[out > pre * dupp & met <
-      bufflow] * dupp
+      out[out > lastcatch * dupp & met < bufflow] <- lastcatch[out > lastcatch * dupp & met <
+        bufflow] * dupp
     }
   }
 
   if(!is.null(dlow)) {
     if(all) {
-    out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
+      out[out < lastcatch * dlow] <- lastcatch[out < lastcatch * dlow] * dlow
     } else {
-    out[out < pre * dlow & met < bufflow] <- pre[out < pre * dlow & met <
-      bufflow] * dlow
+      out[out < lastcatch * dlow & met < bufflow] <- lastcatch[out < lastcatch * dlow & met <
+        bufflow] * dlow
     }
   }
 
@@ -563,6 +559,118 @@ buffer.hcr <- function(stk, ind, target, metric='depletion', lim=0.10,
 	
   list(ctrl=ctrl, tracking=tracking)
 }
+# }}}
+
+# plot_buffer.hcr {{{
+
+plot_buffer.hcr <- function(args, obs="missing", alpha=0.3,
+  labels=c(lim="limit", bufflow="Lower~buffer", buffupp="Upper~buffer",
+    metric=metric, output=output), metric=args$metric, output='multiplier',
+    xlim=buffupp * 1.50, ylim=scale * 1.50) {
+
+  # EXTRACT args from mpCtrl
+  if(is(args, "mseCtrl"))
+    args <- args(args)
+
+  # GET args
+  spread(lapply(args, c), FORCE=TRUE)
+
+  # PARSE labels
+  alllabels <- formals()$labels
+  alllabels[names(labels)] <- labels
+  labels <- as.list(alllabels)
+
+  # SET met values
+  met <- seq(0, xlim, length=200)
+
+  # COMPUTE gradient of decrease
+  dgradient <- (1 - 2^(-1))/(bufflow - lim)
+
+  # COMPUTE HCR multiplier if ...
+
+  # BELOW lim
+  out <- ifelse(met <= lim, ((met / lim) ^ 2) / 2,
+    # BETWEEN lim and bufflow
+    ifelse(met <= bufflow,
+      (0.5 * (1 + (met - lim) / (bufflow - lim))),
+    # BETWEEN bufflow and buffupp
+    ifelse(met < buffupp, 1, 
+    # ABOVE buffupp, as proportion of dgradient
+      1 + sloperatio * dgradient * (met - buffupp))))
+
+  # DATA
+  # TODO: ADD 'set'
+  dat <- data.frame(met=met, out=out)
+  
+  # TODO:
+  scale <- 1
+  
+  # TODO: ADD aes(group='set')
+  p <- ggplot(dat, aes(x=met, y=out)) +
+    coord_cartesian(ylim = c(0, ylim), clip="off") +
+    # HCR line
+    geom_line() +
+    # TODO: TARGET & WIDTH
+    # BUFFER UPP
+    annotate("segment", x=buffupp, xend=buffupp, y=0, yend=scale, linetype=2) +
+    annotate("point", x=buffupp, y=scale, size=3) +
+    annotate("text", x=buffupp, y=-ylim / 40, label=labels$buffupp,
+      vjust="bottom", parse=TRUE) +
+    # BUFFER LOW
+    annotate("segment", x=bufflow, xend=bufflow, y=0, yend=scale, linetype=2) +
+    annotate("point", x=bufflow, y=scale, size=3) +
+    annotate("text", x=bufflow, y=-ylim / 40, label=labels$bufflow,
+      vjust="bottom", parse=TRUE) +
+    # LIMIT
+    annotate("segment", x=lim, xend=lim, y=0, yend=out[which.min(abs(met - lim))], 
+      linetype=2) +
+    annotate("point", x=lim, y=out[which.min(abs(met - lim))], size=3) +
+    annotate("text", x=lim, y=-ylim / 40, label=labels$lim, vjust="bottom",
+      parse=TRUE) +
+    # SLOPE
+    annotate("segment", x=buffupp, xend=xlim, y=1, yend=1, linetype=2) +
+    annotate("text", x=buffupp + (xlim - buffupp) / 3, y=1, label="slope", 
+      vjust="bottom", parse=TRUE)
+
+  # AXIS labels
+  if(!is.null(labels$metric))
+    p <- p + xlab(parse(text=labels$metric))
+  if(!is.null(labels$output))
+    p <- p + ylab(parse(text=labels$output))
+
+  # OBS
+  if(!missing(obs)) {
+    # FLStock
+    if(is.FLStock(obs)) {
+      obs <- model.frame(metrics(obs, list(met=get(metric), out=get(output))))
+      xlim <- max(obs$met, na.rm=TRUE) * 1.05
+      ylim <- max(obs$out, na.rm=TRUE) * 1.05
+
+      # PLOT line if 1 iter
+      if(length(unique(obs$iter)) == 1)
+        p <- p + geom_point(data=obs, alpha=alpha) +
+          geom_path(data=obs, alpha=alpha) +
+          geom_label(data=subset(obs, year %in% c(min(year), max(year))),
+            aes(label=year), fill=c('gray', 'white'), alpha=1)
+      # PLOT with alpha if multiple
+      else
+        p <- p + geom_point(data=obs, alpha=alpha)
+    }
+    # NUMERIC
+    else if(is.numeric(obs)) {
+      obs <- data.frame(met=obs, out=out[which.min(abs(met - obs))])
+      p <- p + geom_point(data=obs, colour="red", size=3)
+    }
+
+  }
+  return(p)
+}
+
+# args <- list(lim=0.4, bufflow=1, buffupp=2,
+#   sloperatio=0.2)
+
+# plot_buffer.hcr(args, labels=list(metric='CPUE', output='C~mult'))
+
 # }}}
 
 # -- RELATIVE
