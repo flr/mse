@@ -630,8 +630,11 @@ labelPerformance <- function(dat, labels=NULL) {
   # CREATE tmp column to match mp | om
   dat[, element:=ifelse(mp == "", as.character(om), as.character(mp))]
 
-  # MERGE labels on matching rows only
-  dat <- merge(dat[, !"label"], labels, by="element", all=TRUE)
+  # MERGE new labels on matching element
+  dat <- merge(dat[, !"label"], labels[element %in% unique(dat$element)],
+    by="element", all=TRUE)
+
+  # TODO dat <- dat[, !"label"][labels, on = .(element = element), roll = TRUE, nomatch=0]
 
   # SET NA to empty string
   dat[, label:=ifelse(is.na(label), element, label)]
