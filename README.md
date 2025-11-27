@@ -8,6 +8,7 @@ updated: 2023-02-16T09:52:55+01:00
 [![License](https://eddelbuettel.github.io/badges/GPL2+.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![Codecov test coverage](https://codecov.io/gh/flr/mse/branch/master/graph/badge.svg)](https://codecov.io/gh/flr/mse?branch=master)
 ![r-universe](https://flr.r-universe.dev/badges/mse)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/flr/mse)
 
 ## Overview
 
@@ -28,6 +29,7 @@ remotes::install_github("flr/mse")
 
 ## Documentation
 - [Help pages](http://flrproject.org/mse)
+- [AI-generated description of package](https://deepwiki.com/flr/mse)
 
 ## License
 Copyright (c) 2016-2022 European Union. European Commission Joint Research Centre D.02. Released under the [EUPL 1.1](https://joinup.ec.europa.eu/community/eupl/og_page/eupl).
