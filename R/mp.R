@@ -43,12 +43,13 @@
 
 mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   scenario="NA", tracking="missing", logfile=tempfile(),
-  verbose=!handlers(global = NA), parallel=TRUE, window=TRUE, .DEBUG=FALSE) {
+  verbose=!handlers(global = NA), progress=handlers(global = NA), parallel=TRUE, 
+  window=TRUE, .DEBUG=FALSE) {
 
-  # PARSE parallel options
+  # GET do.future workers
   cores <- nbrOfWorkers()
 
-  # USE parallel is set as numeric
+  # USE parallel if set as numeric
   if(is.numeric(parallel)) {
     cores <- parallel
     parallel <- TRUE
@@ -232,6 +233,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
           ctrl= iter(ctrl, j),
           args=c(args[!names(args) %in% "it"], it=length(j)),
           verbose=verbose,
+          progress=progress,
           logfile=logfile,
           .DEBUG=.DEBUG)
 
@@ -254,6 +256,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
         ctrl=ctrl,
         args=args,
         verbose=verbose,
+        progress=progress,
         logfile=logfile,
         .DEBUG=.DEBUG)
 
@@ -303,7 +306,10 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
 setMethod("goFish", signature(om="FLom"),
   function(om, fb, projection, oem, iem, tracking, logfile, ctrl, args,
-    verbose, .DEBUG) {
+    verbose, progress, .DEBUG) {
+
+  if(.DEBUG)
+    browser()
   
   # ARGUMENTS
   it <- args$it     # number of iterations
@@ -327,7 +333,8 @@ setMethod("goFish", signature(om="FLom"),
   # COPY ctrl
   ctrl0 <- ctrl
   
-  p <- progressor(along=vy, offset=1L)
+  if(progress)
+    p <- progressor(along=vy, offset=0L)
 
   # go fish!
 
@@ -520,7 +527,8 @@ setMethod("goFish", signature(om="FLom"),
       ctrl <- out$ctrl
       tracking <- out$tracking
 
-      track(tracking, "isys", mys) <- ctrl
+      # TODO: DEAL with ctrl rows in tracking
+      track(tracking, "isys", mys) <- ctrl[1,]
     }    
 
     #----------------------------------------------------------
@@ -621,7 +629,8 @@ setMethod("goFish", signature(om="FLom"),
         file=logfile, append=TRUE))
     
     # REPORT progress
-    p(message = sprintf("year: %s", i))
+    if(progress)
+      p(message = sprintf("year: %s", i))
  
     cat(id, paste0("[", ay, "]"), c(iterMeans(tracking[[1]][, ac(ay)])),
       "\n", sep="\t", file=logfile, append=TRUE)
@@ -630,8 +639,10 @@ setMethod("goFish", signature(om="FLom"),
     # gc()
   }
   
-  # TRACK om in final years
+  # TRACK om in final years (after last ay)
+
   fys <- seq(dyf, ay + mlag + frq - 1)
+  
   track(tracking, "F.om", fys) <- unitMeans(fbar(om))[, ac(fys)]
   track(tracking, "B.om", fys) <- unitSums(tsb(om))[, ac(fys)]
   track(tracking, "SB.om", fys) <- unitSums(ssb(om))[, ac(fys)]
@@ -647,7 +658,7 @@ setMethod("goFish", signature(om="FLom"),
 
 setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
-    verbose, logfile, .DEBUG) {
+    verbose, progress, logfile, .DEBUG) {
 
   if(.DEBUG)
     browser()
@@ -678,7 +689,9 @@ setMethod("goFish", signature(om="FLombf"),
   if(length(deviances(oem)) == 0)
     deviances(oem) <- rep(list(NULL), length(biols(om)))
 
-  p <- progressor(along=vy, offset=1L)
+  # SET progressor
+  if(progress)
+    p <- progressor(along=vy, offset=0L)
 
   for(i in vy) {
 
@@ -687,8 +700,9 @@ setMethod("goFish", signature(om="FLombf"),
     }
 
     # REPORT progress
-    p(message = sprintf("year: %s", i))
-    
+    if(progress)
+      p(message = sprintf("year: %s", i))
+   
     # time (start)
     stim <- Sys.time()
 
@@ -1063,21 +1077,31 @@ setMethod("goFish", signature(om="FLombf"),
 
 # statistics, metrics, years - om=name(om), type, run=names,
 
-mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args, names=NULL, parallel=TRUE, ...) {
+mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
+  statistics=NULL, metrics=NULL, type=character(1), names=NULL, parallel=TRUE, ...) {
 
   # GET ... arguments
   opts <- list(...)
+
+  # SET return object
+  if(!is.null(statistics) & !is.null(metrics)) {
+    perf <- TRUE
+  } else {
+    perf <- FALSE
+  }
   
   # SET seed
-  if (!is.null(args$seed))
+  if (!is.null(args$seed)) {
     seed <- args$seed
-  else
+  } else {
     seed <- TRUE
+  }
   
   # ARE opts being given?
-  if(length(opts) == 0)
+  if(length(opts) == 0) {
     return(FLmses(RUN=mp(om=om, oem=oem, iem=iem, control=control, args=args,
       parallel=parallel)))
+  }
 
   # PARSING a single module
   if(length(opts) > 1)
@@ -1107,8 +1131,13 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args, names=
 
     message("Running on ", nbrOfWorkers(), " nodes.")
 
-    if(largs > nbrOfWorkers())
-      p <- progressor(along=seq(largs), offset=1L)
+    # IF cores for all runs, progress by MP
+    if(largs > nbrOfWorkers()) {
+      p <- progressor(along=seq(largs), offset=0L)
+      progress <- FALSE
+    } else {
+      progress <- TRUE
+    }
 
     res <- foreach(i = seq(largs), .errorhandling="pass",
       .options.future=list(globals=structure(TRUE, add=c("control", "module",
@@ -1119,34 +1148,43 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args, names=
 
       # CALL mp, parallel left to work along MPs
       run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
-         verbose=FALSE)
-      
-      if(largs > nbrOfWorkers())
+         progress=progress)
+
+      # PROGRESS
+      if(!progress)
         p(message = sprintf("MP: %s", i))
 
+      # RETURN performance
+      if(perf)
+        run <- performance(run, statistics=statistics, metrics=metrics, type=type,
+          run=names[i])
+      
       return(run)
     }
   } else {
 
-    p <- progressor(along=seq(largs), offset=1L)
-
     res <- lapply(seq(largs), function(i) {
+
+      message(paste("MP:", i))
 
       # MODIFY module args
       args(control[[module]])[names(mopts)] <- lapply(mopts, '[', i)
 
       # CALL mp, parallel left to work along MPs
       run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=TRUE,
-         verbose=FALSE)
+         verbose=FALSE, progress=TRUE)
 
-      p(message = sprintf("MP: %s", i))
+      # RETURN performance
+      if(perf)
+        run <- performance(run, statistics=statistics, metrics=metrics, type=type,
+          run=names[i])
 
       return(run)
     })
   }
 
   # STOP or WARN if missing runs
-  done <- unlist(lapply(res, is, "FLmse"))
+  done <- unlist(lapply(res, function(x) any(c("FLmse", "data.table") %in% is(x))))
 
   if(sum(done) == 0)
     stop("None of the calls to mp() returned results, check inputs")
@@ -1154,8 +1192,9 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args, names=
   if(sum(done) < largs)
     warning(paste("Some calls to mp() did not run:"), seq(largs)[!done])
 
-  # CREATE standard names 
-  onms <- paste(module, names(mopts)[1], round(mopts[[1]], 2), sep='_')
+  # CREATE standard names for single argument
+  if(length(mopts) == 1)
+    onms <- paste(module, names(mopts)[1], round(mopts[[1]], 2), sep='_')
 
   # RENAME list elements
   if(is.null(names)) {
@@ -1175,6 +1214,19 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args, names=
       names(res) <- names
   }
 
+  # RETURN performance
+  if(perf) {
+
+    # ASSEMBLE single performance table
+    res <- rbindlist(res[done], idcol="run")
+
+    # ADD mp
+    res[, mp := paste(om, type, run, sep="_")]
+    
+    return(res[])
+  }
+
+  # RETURN FLmses
   return(FLmses(res[done]))
 }
 # }}}

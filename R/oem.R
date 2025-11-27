@@ -191,6 +191,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   # observations$stk[, dyrs] <- stk[, dyrs]
   
   # --- IDX
+
   idx <- observations$idx
 
   # CHOOSE indices to be updated (maxyear >= dy)
@@ -228,6 +229,8 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
     yrs <- intersect(dyrs, dimnames(idx[upi][[i]])$year)
     observations$idx[upi][[i]][, dyrs] <- idx[upi][[i]][, dyrs]
   }
+
+  # -- POST-PROCESS
   
   # CHECK dimensions to simplify, on catch.n for multi-fleet FLStock
   simp <- dim(catch.n(observations$stk))[c(3, 4, 5)] !=
@@ -238,9 +241,9 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
     stk <- simplify(stk, c("unit", "season", "area")[simp], harvest=FALSE)
  
   # UPDATE observations, excludes @stock.n TODO: DELETE stock.n (?)
-  slots <- c("landings", "discards", "catch", "landings.n", "discards.n", 
+  slots <- c("landings", "discards", "catch", "landings.n", "discards.n",
     "catch.n", "landings.wt", "discards.wt", "catch.wt", "stock.n", "stock.wt")
-  
+
   # UPDATE wts or only catches?
   if(!wts) slots <- slots[1:6]
   

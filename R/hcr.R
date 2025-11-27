@@ -175,6 +175,8 @@ plot_hockeystick.hcr <- function(args, obs="missing",
   # EXTRACT args from mpCtrl
   if(is(args, "mseCtrl"))
     args <- args(args)
+  else if(is(args, "mpCtrl"))
+    args <- args(args$hcr)
 
   # ASSIGN args if missing
   if(!"min" %in% names(args))
@@ -464,14 +466,7 @@ movingF.hcr <- function(stk, hcrpars, args, tracking){
 
 # buffer.hcr {{{
 
-timeMeans <- function(x)
-  seasonMeans(yearMeans(x))
-
-zscore <- function(x, mean=yearMeans(x), sd=sqrt(yearVars(x)))
-  exp((x %-% mean) %/% sd)
-
-
-buffer.hcr <- function(stk, ind, metric='zscore',
+buffer.hcr <- function(stk, ind, metric='wmean',
   target=1, width=0.5, lim=max(target * 0.10, target - 2 * width), 
   bufflow=max(lim * 1.50, target - width), buffupp=target + width,
   sloperatio=0.15, scale=lastcatch,
@@ -489,7 +484,7 @@ buffer.hcr <- function(stk, ind, metric='zscore',
   # SET control years
   cys <- seq(ay + man_lag, ay + man_lag + frq - 1)
 
-  # COMPUTE and window metric
+  # COMPUE and window metric
   met <- mse::selectMetric(metric, stk, ind)
   met <- window(met, start=dy, end=dy)
 
@@ -508,11 +503,9 @@ buffer.hcr <- function(stk, ind, metric='zscore',
       1 + sloperatio * dgradient * (met - buffupp))))
 
   # TRACK decision
-  dec <- ifelse(met <= lim, 1,
-   ifelse(met < bufflow, 2,
-    ifelse(met < buffupp, 3, 4)))
-
-  # track(tracking, "decision.hcr", cys) <- dec
+  dec <- cut(met, c(0, lim, bufflow, buffupp, Inf), labels=seq(1,4))
+  
+  track(tracking, "decision.hcr", ay) <- as.numeric(dec)
 
   # GET initial TAC,
   if(!is.null(initac) & ay == iy) {
@@ -529,33 +522,38 @@ buffer.hcr <- function(stk, ind, metric='zscore',
   # SET TAC
   out <- scale * hcrm
 
-  # TRACK initial target
-  track(tracking, "tac.hcr", cys) <- out
+  # TRACK first decision
+  track(tracking, "rule.hcr", cys) <- out
 
   # APPLY limits, always or if met < trigger
   if(!is.null(dupp)) {
     if(all) {
-      out[out > lastcatch * dupp] <- lastcatch[out > lastcatch * dupp] * dupp
+      out[out > lastcatch * dupp] <-
+        lastcatch[out > lastcatch * dupp] * dupp
     } else {
-      out[out > lastcatch * dupp & met < bufflow] <- lastcatch[out > lastcatch * dupp & met <
-        bufflow] * dupp
+      out[out > lastcatch * dupp & met < bufflow] <-
+        lastcatch[out > lastcatch * dupp & met < bufflow] * dupp
     }
   }
 
   if(!is.null(dlow)) {
     if(all) {
-      out[out < lastcatch * dlow] <- lastcatch[out < lastcatch * dlow] * dlow
+      out[out < lastcatch * dlow] <-
+        lastcatch[out < lastcatch * dlow] * dlow
     } else {
-      out[out < lastcatch * dlow & met < bufflow] <- lastcatch[out < lastcatch * dlow & met <
-        bufflow] * dlow
+      out[out < lastcatch * dlow & met < bufflow] <-
+        lastcatch[out < lastcatch * dlow & met < bufflow] * dlow
     }
   }
+
+  # TRACK TAC limited
+  # sum(old > out)
+  # sum(old < out)
 
   # CONTROL
   ctrl <- fwdControl(
     # TARGET for frq years
-    c(lapply(cys, function(x) list(quant="catch", value=c(out), year=x)))
-  )
+    c(lapply(cys, function(x) list(quant="catch", value=c(out), year=x))))
 	
   list(ctrl=ctrl, tracking=tracking)
 }

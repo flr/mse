@@ -26,7 +26,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
 
     # SINGLE stock, tracks first row only
     if(length(unique(value$biol)) == 1) {
-      object[[1]][step, ac(year),,,, iter] <- value@iters[target, 'value',]
+      object[[1]][step, ac(year),,1,, iter] <- value@iters[target, 'value',]
 
     # MULTIPLE stocks
     } else {
@@ -35,7 +35,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
       ids <- unique(value$biol)
 
       for(i in ids[!is.na(ids)]) {
-        object[[i]][step, ac(year),,,, iter] <- value@iters[value$biol == i & !is.na(value$value), 'value', ]
+        object[[i]][step, ac(year),,1,, iter] <- value@iters[value$biol == i & !is.na(value$value), 'value', ]
       }
     }
 
@@ -63,7 +63,7 @@ setReplaceMethod("track", signature(object="FLQuant", value="fwdControl"),
     target <- which(!is.na(apply(iters(value), 1:2, function(x)
       sum(x))[,'value']))
 
-    object[step, ac(year),,,, iter] <- value@iters[target, 'value',]
+    object[step, ac(year),,1,, iter] <- value@iters[target, 'value',]
 
     return(object)
   }
@@ -89,6 +89,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
       object <- lapply(object, function(x)
         expand(x, metric=c(dimnames(x)$metric, step)))
 
+    # TODO: USE season of value (1) object[[1]][step, ac(year),,dim(value)[4]] <- c(value)
     object[[1]][step, ac(year)] <- c(value)
 
     return(object)

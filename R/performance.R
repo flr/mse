@@ -182,7 +182,6 @@ setMethod("performance", signature(x="FLQuants"),
     }
     
     # ASSIGN names (om, type, run, mp)
-    res[ , `:=` (om = 'NA', type = 'NA', run = 'NA', mp = 'NA')]
     set(res, j=c('om', 'type', 'run', 'mp'), value=list(om, type, run, mp))
 
     return(res[])
@@ -401,7 +400,11 @@ setMethod("performance", signature(x="FLmse"),
       control_args <- Filter(is.numeric, args(control(x)$hcr))
 
       # GET tracking elements as FLQuants
-      tracks <- divide(tracking(x), dim=1)
+      if(length(tracking(x) > 0)) {
+        tracks <- divide(tracking(x), dim=1)
+      } else {
+        tracks <- NULL
+      }
 
       # COMPUTE on x@om
       res <- do.call(performance, c(list(x=x@om), args, control_args,
@@ -687,14 +690,21 @@ periodsPerformance <- function(x, periods) {
   }))
 
   # ASSIGN names if missing
-  if(is.null(names(periods))) {
-    names(periods) <- years
-  }
+  names(periods)[names(periods) == character(1)] <-
+    years[names(periods) == character(1)]
 
-  res <- rbindlist(Map(function(pe, na, ye) {
-    x[year %in% pe, .(data=mean(data, na.rm=TRUE), period=na, year=ye),
-    by=.(type, label, statistic, name, desc, iter)]},
-    pe=periods, na=names(periods), ye=years))
+  # COMPUTE means per period by label or mp
+  if("label" %in% colnames(x)) {
+    res <- rbindlist(Map(function(pe, na, ye) {
+      x[year %in% pe, .(data=mean(data, na.rm=TRUE), period=na, year=ye),
+      by=.(type, mp, label, statistic, name, desc, iter)]},
+      pe=periods, na=names(periods), ye=years))
+  } else {
+    res <- rbindlist(Map(function(pe, na, ye) {
+      x[year %in% pe, .(data=mean(data, na.rm=TRUE), period=na, year=ye),
+      by=.(type, mp, statistic, name, desc, iter)]},
+      pe=periods, na=names(periods), ye=years))
+  }
 
   return(res)
 }

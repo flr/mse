@@ -62,7 +62,11 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   cys <- seq(ay + management_lag, ay + management_lag + frq - 1)
 
   # PREPARE stk for cys, biology as in last nsqy years
-  fut <- fwdWindow(stk, end=cys[length(cys)], nsq=nsqy)
+  if(management_lag == 0) {
+    fut <- stk
+  } else {
+    fut <- fwdWindow(stk, end=cys[length(cys)], nsq=nsqy)
+  }
 
   # PARSE recyrs if numeric
   id <- dimnames(stk)$year
@@ -74,6 +78,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   
   # PARSE list
   for(i in recyrs) {
+    #
     if(is(i, 'character')) {
       id <- id[!id %in% i]
     } else if(all(i < 0)) {
@@ -97,7 +102,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   # TODO: OTHER rec options
   
   # SET GM recruitment from past
-  gmnrec <- exp(yearMeans(log(rec(stk)[, recyrs])))
+  gmnrec <- unitSums(exp(yearMeans(log(rec(stk)[, recyrs]))))
 
   # SETUP SRR
   srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
@@ -127,13 +132,18 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     # TODO: ADD TAC option
 
     # CONSTRUCT fwd control
-    fctrl <- fwdControl(
-      # ay as intermediate with Fsq TODO: Other options
-      list(year=seq(ay - data_lag + 1, length=management_lag),
-        quant="fbar", value=rep(c(fsq), management_lag)),
-      # target
-      list(year=cys, quant="fbar", value=c(ftar))
-    )
+    if(data_lag == 0) {
+      fctrl <- fwdControl(
+        # target
+        list(year=cys, quant="fbar", value=c(ftar)))
+    } else {
+      fctrl <- fwdControl(
+        # ay as intermediate with Fsq TODO: Other options
+        list(year=seq(ay - data_lag + 1, length=management_lag),
+          quant="fbar", value=rep(c(fsq), management_lag)),
+        # target
+        list(year=cys, quant="fbar", value=c(ftar)))
+    }
 
   # else only for my
   } else {
@@ -169,10 +179,15 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     iter(TAC, id) <- pmax(c(iter(TAC, id)), prev_tac[id] * dtaclow)
   }
 
-  # CONSTRUCT fwdControl
-  # TODO: USE frq here
+  # CONSTRUCT fwdControl  TODO: USE frq here
   ctrl <- fwdControl(lapply(seq(length(cys)), function(x)
     list(year=cys[x], quant=output, value=TAC[,x])))
+
+  # PROJECT survivors if man_lag = 0
+  if(management_lag == 0) {
+    ctrl <- merge(ctrl,
+      fwdControl(list(year=cys[length(cys)] + 1, quant="catch", value=0)))
+  }
     
   return(list(ctrl=ctrl, tracking=tracking))
 }
