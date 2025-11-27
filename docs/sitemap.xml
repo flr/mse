@@ -1,126 +1,47 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/CHANGES.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/mse-manual.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/FLiem-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/FLmse-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/FLoem-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/FLom-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/bisect.html</loc>
-  </url>
-  <url>
-    <loc>/reference/catchSSB.hcr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/computeFp05.html</loc>
-  </url>
-  <url>
-    <loc>/reference/cpue.hcr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/db.html</loc>
-  </url>
-  <url>
-    <loc>/reference/debug-mse.html</loc>
-  </url>
-  <url>
-    <loc>/reference/effort.is.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fixedC.hcr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fixedF.hcr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fwd.om.html</loc>
-  </url>
-  <url>
-    <loc>/reference/grid.html</loc>
-  </url>
-  <url>
-    <loc>/reference/ices.hcr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.hat-FLIndexBiomass-FLStock-method.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/indicator.hcr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/indicator.is.html</loc>
-  </url>
-  <url>
-    <loc>/reference/kobestatistics.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mcN.html</loc>
-  </url>
-  <url>
-    <loc>/reference/movingF.hcr.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mp.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mpCtrl-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/mseCtrl-class.html</loc>
-  </url>
-  <url>
-    <loc>/reference/p4om.html</loc>
-  </url>
-  <url>
-    <loc>/reference/perfect.oem.html</loc>
-  </url>
-  <url>
-    <loc>/reference/perfect.sa.html</loc>
-  </url>
-  <url>
-    <loc>/reference/performance.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sampling.oem.html</loc>
-  </url>
-  <url>
-    <loc>/reference/statistics.html</loc>
-  </url>
-  <url>
-    <loc>/reference/tac.is.html</loc>
-  </url>
-  <url>
-    <loc>/reference/tune.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/mse-manual.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/FLiem-class.html</loc></url>
+<url><loc>/reference/FLmse-class.html</loc></url>
+<url><loc>/reference/FLoem-class.html</loc></url>
+<url><loc>/reference/FLom-class.html</loc></url>
+<url><loc>/reference/bisect.html</loc></url>
+<url><loc>/reference/buffer.hcr.html</loc></url>
+<url><loc>/reference/catchSSB.hcr.html</loc></url>
+<url><loc>/reference/computeFp05.html</loc></url>
+<url><loc>/reference/cpue.hcr.html</loc></url>
+<url><loc>/reference/db.html</loc></url>
+<url><loc>/reference/debug-mse.html</loc></url>
+<url><loc>/reference/effort.is.html</loc></url>
+<url><loc>/reference/fixedC.hcr.html</loc></url>
+<url><loc>/reference/fixedF.hcr.html</loc></url>
+<url><loc>/reference/fwd.om.html</loc></url>
+<url><loc>/reference/grid.html</loc></url>
+<url><loc>/reference/ices.hcr.html</loc></url>
+<url><loc>/reference/index.hat-FLIndexBiomass-FLStock-method.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/indicator.hcr.html</loc></url>
+<url><loc>/reference/indicator.is.html</loc></url>
+<url><loc>/reference/initiate.html</loc></url>
+<url><loc>/reference/kobestatistics.html</loc></url>
+<url><loc>/reference/mcN.html</loc></url>
+<url><loc>/reference/movingF.hcr.html</loc></url>
+<url><loc>/reference/mp.html</loc></url>
+<url><loc>/reference/mpCtrl-class.html</loc></url>
+<url><loc>/reference/mps.html</loc></url>
+<url><loc>/reference/mseCtrl-class.html</loc></url>
+<url><loc>/reference/p4om.html</loc></url>
+<url><loc>/reference/perfect.oem.html</loc></url>
+<url><loc>/reference/perfect.sa.html</loc></url>
+<url><loc>/reference/performance.html</loc></url>
+<url><loc>/reference/sampling.oem.html</loc></url>
+<url><loc>/reference/statistics.html</loc></url>
+<url><loc>/reference/tac.is.html</loc></url>
+<url><loc>/reference/target.hcr.html</loc></url>
+<url><loc>/reference/tune.html</loc></url>
 </urlset>
+
