@@ -82,6 +82,7 @@ export(
   "selectMetric",
   "setdeviances",
   "setLabelPerformance",
+  "summaryPerformance",
   "shortcut_devs",
   "shortcut.oem",
   "shortcut.sa",
