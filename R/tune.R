@@ -237,15 +237,15 @@ tunegrid <- function(om, oem="missing", control, statistic, matrics=NULL, args,
 #' @examples
 #' data(ple4)
 #' stock <- propagate(stf(ple4, end=2118), 100)
-#' srr <- predictModel(model=rec~a*ssb*exp(-b*ssb), params=FLPar(a=5.20, b=1.65e-6))
-#' # GENERATE SRR deviances
+#' srr <- predictmodel(model=rec~a*ssb*exp(-b*ssb), params=flpar(a=5.20, b=1.65e-6))
+#' # generate srr deviances
 #' devs <- ar1rlnorm(rho=0.4, 2018:2118, iters=100, meanlog=0, sdlog=0.5)
-#' # DEFINE Fp05 statistic
-#' statistic <- list(FP05=list(~yearMeans((SB/SBlim) < 1), name="P.05",
-#'   desc="ICES P.05"))
-#' # CALL bisect over 100 years, Fp.05 calculated over last 50.
-#' fp05fwd <- bisect(stock, sr=srr, deviances=devs, metrics=list(SB=ssb), 
-#'   refpts=FLPar(SBlim=150000), statistic=statistic, years=2018:2118,
+#' # define fp05 statistic
+#' statistic <- list(fp05=list(~yearmeans((sb/sblim) < 1), name="p.05",
+#'   desc="ices p.05"))
+#' # call bisect over 100 years, fp.05 calculated over last 50.
+#' fp05fwd <- bisect(stock, sr=srr, deviances=devs, metrics=list(sb=ssb), 
+#'   refpts=flpar(sblim=150000), statistic=statistic, years=2018:2118,
 #'   pyears=2069:2118, tune=list(fbar=c(0.1, 1)), prob=0.05)
 
 bisect <- function(stock, sr, deviances=rec(stock) %=% 1, metrics, refpts,
