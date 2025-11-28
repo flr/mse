@@ -6,30 +6,30 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-library(mse)
+library(FLCore)
 
 statistics <- list(
   # SB
-  SB = list(~yearMeans(SB), name = "SB",
-    desc = "Mean spawner biomass"),
+  SB = list(~yearMeans(SB), name = "SB (t)",
+    desc = "Spawner biomass"),
   # SB0
   SB0 = list(~yearMeans(SB/SB0), name = "SB/SB[0]",
-    desc = "Mean spawner biomass relative to unfished"),
+    desc = "Spawner biomass relative to unfished"),
   # minSB0
   minSB0 = list(~apply(SB/SB0, c(1, 3:6), min), name = "min(SB/SB[0])",
     desc = "Minimum spawner biomass relative to unfished"),
   # SBMSY
   SBMSY = list(~yearMeans(SB/SBMSY), name = "SB/SB[MSY]",
-    desc = "Mean spawnwer biomass relative to SBMSY"),
+    desc = "Spawnwer biomass relative to SBMSY"),
   # F
   F = list(~yearMeans(F), name = "F",
-    desc = "Mean fishing mortality"),
+    desc = "Fishing mortality"),
   # Ftarget
   Ftarget = list(~yearMeans(F/Ftarget), name = "F/F[target]",
-    desc = "Mean fishing mortality relative to target"),
+    desc = "Fishing mortality relative to target"),
   # FMSY
   FMSY = list(~yearMeans(F/FMSY), name = "F/F[MSY]",
-    desc = "Mean fishing mortality relative to FMSY"),
+    desc = "Fishing mortality relative to FMSY"),
   # green
   green = list(~yearSums(FLQuant((SB / SBMSY) > 1 & (F / FMSY) < 1)) / dim(SB)[2],
     name = "P(Green)", desc = "Probability of being in Kobe green quadrant"),
@@ -65,12 +65,12 @@ statistics <- list(
     name = "max(P(SB>B[limit]))", 
     desc = "ICES Risk 3, max probability that spawner biomass is above Blim"),
   # C
-  C = list(~yearMeans(C), name = "mean(C)", desc = "Mean catch over years"),
+  C = list(~yearMeans(C), name = "C (t)", desc = "Catch"),
   # C/MSY
-  CMSY = list(~yearMeans(C/MSY), name = "C/MSY", desc = "Mean proportion of MSY"),
+  CMSY = list(~yearMeans(C/MSY), name = "C/MSY", desc = "Proportion of MSY"),
   # AAV
   AAVC = list(~yearMeans(abs(C[, -1] - C[, -dim(C)[2]]) / C[, -dim(C)[2]]),
-    name = "AAV(C)", desc = "Average annual variability in catch"),
+    name = "AAV(C)", desc = "Annual variability in catch"),
   # IACC
   IACC = list(~100 * yearSums(abs(C[, -1] - C[, -dim(C)[2]])) / yearSums(C[, -dim(C)[2]]),
   name="IAC(C)", desc="Percentage inter-annual change in catch"),
