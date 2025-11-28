@@ -627,6 +627,9 @@ labelPerformance <- function(dat, labels=NULL) {
     labels <- data.table(labels)
   }
 
+  # GET dims
+  dimdat <- dim(dat)
+
   # CREATE tmp column to match mp | om
   dat[, element:=ifelse(mp == "", as.character(om), as.character(mp))]
 
@@ -647,6 +650,10 @@ labelPerformance <- function(dat, labels=NULL) {
     unique(label)], sort(dat[mp != character(1), unique(label)]))
  
   dat[, label := factor(label, levels=levs)]
+
+  # CHECK dims
+  if(!identical(dim(dat), dimdat))
+    warning("Missmatch in dimensions of tables, check output.")
 
   # END
   return(dat[])
