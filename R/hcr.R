@@ -489,7 +489,7 @@ buffer.hcr <- function(stk, ind, metric='wmean',
   met <- window(met, start=dy, end=dy)
 
   # COMPUTE gradient of decrease
-  dgradient <- (1 - 2^(-1))/(bufflow - lim)
+  dgradient <- (1 - 2^(-1)) / (bufflow - lim)
   
   # COMPUTE HCR multiplier if ...
   # BELOW lim

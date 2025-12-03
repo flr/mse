@@ -9,6 +9,35 @@
 
 # FLmse {{{
 
+#' FLmse class
+#' 
+#' Representation of a single Management Strategy Evaluation (MSE) projection.
+#'
+#' @description FLmse stores the operating model, tracking object, control (mpCtrl),
+#' and oem as used during an MSE run as well as miscellaneous args. Accessors
+#' are provided for om, tracking, control and oem.
+#'
+#' @section Slots:
+#' \describe{
+#' \item{om}{FLo. The operating model used by the simulation.}
+#' \item{tracking}{FLQuants. Tracking structure used to record decisions and diagnostics.}
+#' \item{control}{mpCtrl. Management procedure control used for the run.}
+#' \item{oem}{FLoem. Observation error model configuration.}
+#' \item{args}{list. Miscellaneous MSE arguments (iy, fy, ay, dy, data_lag, management_lag, etc.).}
+#' }
+#'
+#' @details Methods provided on FLmse dispatch to slots in the contained OM and OEM
+#' (e.g. stock(), catch(), ssb(), fbar(), metrics()). Use iter() to change
+#' iteration slices for contained objects.
+#'
+#' @examples
+#' \dontrun{
+#' # construct minimal FLmse
+#' fm <- methods::new("FLmse")
+#' om(fm) <- methods::new("FLo")
+#' }
+
+
 #' @title S4 class \code{FLmse}
 #'
 #' @description The \code{FLmse} class stores information relative to the MSE's management procedure'.

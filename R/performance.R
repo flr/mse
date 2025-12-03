@@ -719,3 +719,16 @@ periodsPerformance <- function(x, periods) {
   return(res)
 }
 # }}}
+
+# extractPerformance {{{
+extractPerformance <- function(dat, mp) {
+
+  # ASSIGN to avoid column match 
+  smp <- mp
+
+  # FIND om
+  som <- dat[, .SD[mp %in% ..mp,]][, unique(om)]
+
+  return(dat[om %in% som & mp %in% c("", smp)])
+}
+# }}}
