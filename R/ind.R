@@ -33,17 +33,17 @@ cpue.ind <- function(stk, idx, index=1, nyears=5, mean=yearMeans(index(idx)[[ind
   slope <- FLQuant(slope$data, dimnames=dimnames(imean)[-4], units="")
 
   # 4. EXP zscore
-  score <- expand(yearMeans(seasonMeans(zscore(met, mean=FLQuant(mean),
-    sd=FLQuant(sd)))), year=ay - dlag)
+  #score <- expand(yearMeans(seasonMeans(zscore(met, mean=FLQuant(mean),
+  #  sd=FLQuant(sd)))), year=ay - dlag)
   
   # OUTPUT
-  ind <- FLQuants(index=met, mean=imean, wmean=wmean, slope=slope, zscore=score)
+  ind <- FLQuants(index=met, mean=imean, wmean=wmean, slope=slope)#, zscore=score)
 
   # TRACK
   track(tracking, "mean.ind", ac(ay)) <- mean
   track(tracking, "wmean.ind", ac(ay)) <- wmean
   track(tracking, "slope.ind", ac(ay)) <- slope
-  track(tracking, "zscore.ind", ac(ay)) <- score
+  #track(tracking, "zscore.ind", ac(ay)) <- score
 
   return(list(stk=stk, ind=ind, tracking=tracking, cpue=met))
 

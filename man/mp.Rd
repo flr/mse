@@ -15,6 +15,7 @@ mp(
   tracking = "missing",
   logfile = tempfile(),
   verbose = !handlers(global = NA),
+  progress = handlers(global = NA),
   parallel = TRUE,
   window = TRUE,
   .DEBUG = FALSE

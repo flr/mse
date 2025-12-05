@@ -61,9 +61,31 @@ oem(object) <- value
 \item{value}{the new object}
 }
 \description{
+FLmse stores the operating model, tracking object, control (mpCtrl),
+and oem as used during an MSE run as well as miscellaneous args. Accessors
+are provided for om, tracking, control and oem.
+
 The \code{FLmse} class stores information relative to the MSE's management procedure'.
 }
+\details{
+FLmse class
+
+Representation of a single Management Strategy Evaluation (MSE) projection.
+
+Methods provided on FLmse dispatch to slots in the contained OM and OEM
+(e.g. stock(), catch(), ssb(), fbar(), metrics()). Use iter() to change
+iteration slices for contained objects.
+}
 \section{Slots}{
+
+\describe{
+\item{om}{FLo. The operating model used by the simulation.}
+\item{tracking}{FLQuants. Tracking structure used to record decisions and diagnostics.}
+\item{control}{mpCtrl. Management procedure control used for the run.}
+\item{oem}{FLoem. Observation error model configuration.}
+\item{args}{list. Miscellaneous MSE arguments (iy, fy, ay, dy, data_lag, management_lag, etc.).}
+}
+
 
 \describe{
 \item{om}{\code{FLom} with the operating model.}
@@ -91,3 +113,10 @@ class validity. If an unnamed \code{FLQuant} object is provided, this is used
 for sizing, but not for populating any slot.
 }
 
+\examples{
+\dontrun{
+# construct minimal FLmse
+fm <- methods::new("FLmse")
+om(fm) <- methods::new("FLo")
+}
+}

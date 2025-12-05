@@ -151,6 +151,7 @@ setMethod("performance", signature(x="FLQuants"),
         if(grepl("change|variability", j$desc) & length(i) == 1) {
           i <- seq(an(i) - 1, an(i))
         }
+
         # EVAL statistic
         as.data.frame(eval(j[names(j) == ""][[1]][[2]],
           c(lapply(x, '[' , j=ac(i)),
@@ -406,7 +407,7 @@ setMethod("performance", signature(x="FLmse"),
         tracks <- NULL
       }
 
-      # COMPUTE on x@om
+      # COMPUTE on x@om      
       res <- do.call(performance, c(list(x=x@om), args, control_args,
         tracks, om=name(x@om)))
 
