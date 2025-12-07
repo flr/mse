@@ -28,6 +28,26 @@
 tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
   tune, prob=0.5, tol=0.01, maxit=12, years=ac(seq(args$iy + 1, args$fy - 1)),
   verbose=TRUE, ...) {
+
+  # CALL recursively if multiple prob
+  if(length(prob) > 1) {
+
+    res <- (lapply(setNames(prob, nm=paste0("prob_", prob)), function(p) {
+      message(paste0("Tuning for prob=", p))
+      tunebisect(om=om, oem=oem, control=control, statistic=statistic, metrics=metrics,
+      args=args, tune=tune, prob=p, tol=tol, maxit=maxit, years=years, verbose=verbose, ...)
+    }))
+
+    # WARN if not tuned
+    if(any(unlist(lapply(res, is, 'FLmses')))) {
+      warning("Some tuning(s) did not converge, check individual results.")
+
+      return(res)
+
+    } else {
+      return(FLmses(res))
+    }
+  }
   
   # args
   args$fy <- if(is.null(args$fy)) dims(om)$maxyear else args$fy
