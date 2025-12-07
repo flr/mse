@@ -1061,7 +1061,7 @@ setMethod("goFish", signature(om="FLombf"),
     id <- Sys.getpid()
     track(tracking, "pid", ay) <- id
 
-    invisible(gc())
+    # invisible(gc())
   }
 
     # SET NAs in unobserved oem years

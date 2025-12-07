@@ -18,8 +18,6 @@ setClass("FLmses",
 setGeneric("FLmses", function(object, performance, ...)
   standardGeneric("FLmses"))
 
-# TODO: COLLATE individual performance tables
-
 setMethod("FLmses", signature(object="missing", performance="missing"),
   function(...) {
     args <- list(...)
@@ -50,7 +48,7 @@ setMethod("FLmses", signature(object="list", performance="data.frame"),
 setMethod("FLmses", signature(object="list", performance="missing"),
  function(object, statistics="missing", years="missing", metrics="missing", type="NA") {
 
-    # TODO: COMPUTE performance IF statistics
+    # COMPUTE performance IF statistics
     if(!missing(statistics)) {
       # AND for years
       if(!missing(years)) {
@@ -66,7 +64,7 @@ setMethod("FLmses", signature(object="list", performance="missing"),
       perf <- lapply(object, attr, 'performance')
 
       # IF all elements have 'performance' attr
-      if(!all(unlist(lapply(perf, is.null)))) {
+      if(!any(unlist(lapply(perf, is.null)))) {
 
         perf <- rbindlist(perf, idcol="mp")
 
