@@ -389,6 +389,9 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
     ctrg <- propagate(ctrg, args$it)
     # TODO: EXPAND years, if needed
     ctrg <- c(ctrg[, ac(seq(ay + mlag, ay + frq))])
+  } else {
+    # REPLICATE
+    ctrg <- rep(ctrg, args$it)[1:args$it]
   }
 
 	# create control object
