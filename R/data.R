@@ -43,20 +43,12 @@
 #' @rdname statistics
 NULL
 
-#' Kobe statistics
-#' 
-#' Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa, 
-#' vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in 
-#' mi. Sed sodales mollis arcu, sit amet venenatis lorem fringilla vel. Vivamus vitae 
-#' ipsum sem. Donec malesuada purus at libero bibendum accumsan. Donec ipsum sapien, 
-#' feugiat blandit arcu in, dapibus dictum felis. 
-#' 
-#' @docType data
-#' @keywords datasets
-#' @format An object of class list.
-#' @name kobestatistics
-#' @rdname kobestatistics
-NULL
+#' @rdname mse_statistics
+mse_statistics <- function() {
+  env <- new.env()
+  do.call("data", list('statistics', package='mse', envir=env))
+  return(get('statistics', envir=env))
+}
 
 #' FLom object for North sea plaice
 #' 

@@ -70,6 +70,7 @@ export(
   "mpa.tm",
   "mps",
   "mseCtrl",
+  "mse_statistics",
   "noise.iem",
   "perfect.oem",
   "perfect.sa",
