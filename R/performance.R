@@ -152,24 +152,38 @@ setMethod("performance", signature(x="FLQuants"),
           i <- seq(an(i) - 1, an(i))
         }
 
-        # EVAL statistic
-        as.data.frame(eval(j[names(j) == ""][[1]][[2]],
-          c(lapply(x, '[' , j=ac(i)),
-            # REPEAT refpts by year because recycling goes year first
-            lapply(lapply(as(refpts, 'list'), function(x) x[!is.na(x)]),
-              rep, each=length(i)), list(...))), drop=FALSE)
+        # ASSEMBLE inputs
+        inp <- c(lapply(x, '[' , j=ac(i)),
+          # REPEAT refpts by year because recycling goes year first
+          lapply(lapply(as(refpts, 'list'), function(x)
+            x[!is.na(x)]), rep, each=length(i)), list(...))
 
+        # EVAL statistic if names match
+        if(all(all.vars(j[names(j) == ""][[1]][[2]]) %in% names(inp))) {
+
+          return(as.data.frame(eval(j[names(j) == ""][[1]][[2]], inp), drop=FALSE))     
+
+        } else {
+
+          # WARN and return empty
+          warning(paste0("statistic '", j$name, "' could not be computed, check metrics or tracking."))
+
+          return(NULL)
+        }
       }), idcol="statistic", fill=TRUE)[,c("statistic", "data", "iter")]
     }), idcol="year")
+
+    # SET year as numeric, TODO:combine with periods
+    res[, year := as.numeric(year)]
 
     # Set DT keys
     setkey(res, statistic, year)
     
-    # ADD statistic name(s)
+    # ADD statistic name(s) & description(s)
     inds <- lapply(statistics, '[[', 'name')
     descs <- lapply(statistics, '[[', 'desc')
-    inds <- data.table(statistic=names(inds), name=unlist(inds),
-      desc=unlist(descs))
+
+    inds <- data.table(statistic=names(inds), name=unlist(inds), desc=unlist(descs))
     setkey(inds, statistic)
 
     # MERGE
@@ -183,6 +197,9 @@ setMethod("performance", signature(x="FLQuants"),
     }
     
     # ASSIGN names (om, type, run, mp)
+    # DEBUG: FIND why om is not being passed
+    if(is.null(om))
+      om <- ""
     set(res, j=c('om', 'type', 'run', 'mp'), value=list(om, type, run, mp))
 
     return(res[])
@@ -349,7 +366,7 @@ setMethod("performance", signature(x="FLom"),
 # performance(FLombf) {{{
 # TODO: DEFAULT statistics, mse::statistics[c('C', 'F', 'SB')]
 setMethod("performance", signature(x="FLombf"),
-  function(x, statistics, refpts=x@refpts,
+  function(x, statistics=NULL, refpts=x@refpts,
     metrics=NULL, years=as.character(seq(dims(x)$minyear + 1, dims(x)$maxyear)),
     probs=NULL, om=name(x), ...) {
 
@@ -358,6 +375,9 @@ setMethod("performance", signature(x="FLombf"),
       mets <- do.call('metrics', list(object=x))
     else
       mets <- do.call('metrics', list(object=x, metrics=metrics))
+
+    if(is.null(statistics))
+      statistics <- mse_statistics()[c("C", "SB", "F")]
 
     # CALL performance by biol
     res <- mapply(function(me, rp) {
@@ -462,9 +482,9 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 
 #' Write performance table to file
 #'
-#' @param dat data.table with performance statistics
-#' @param file file name to write to, defaults to 'model/performance.dat.gz'
-#' @return file name, invisibly
+#' @param dat data.table with performance statistics.
+#' @param file file to write to, defaults to 'model/performance.dat.gz' a compressed text file.
+#' @return file name, invisibly.
 #' @author Iago Mosqueira, WMR
 #' @keywords utilities
 
@@ -722,14 +742,21 @@ periodsPerformance <- function(x, periods) {
 # }}}
 
 # extractPerformance {{{
+
+#' Extracts performance time series for an MP including the corresponding historical OM
+#'
+
 extractPerformance <- function(dat, mp) {
 
   # ASSIGN to avoid column match 
   smp <- mp
 
+  # TODO: PARSE multiple MPs and match each OM
+
   # FIND om
   som <- dat[, .SD[mp %in% ..mp,]][, unique(om)]
 
+  # RETURN subset, om + mp
   return(dat[om %in% som & mp %in% c("", smp)])
 }
 # }}}
