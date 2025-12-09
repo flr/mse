@@ -68,13 +68,14 @@ shortcut.sa <- function(stk, idx, SSBdevs=ssb(stk) %=% 1, args, tracking, ...) {
 
 # shortcut_devs {{{
 
-# GET new Fphi, Fcv values.
+shortcut_devs <- function(om, Fcv=0.212, Fphi=0.423, SSBcv=0, SSBphi=0,
+  bias.correct=FALSE) {
 
-shortcut_devs <- function(om, Fcv=0.212, Fphi=0.423, SSBcv=0, SSBphi=0) {
-  
   devs <- FLQuants(
-    F=ar1rlnorm(Fphi, dimnames(om)$year, dims(om)$iter, 0, Fcv),
-    SSB=ar1rlnorm(0, dimnames(om)$year, dims(om)$iter, 0, SSBcv)
+    F=rlnormar1(n=dims(om)$iter, meanlog=0, sdlog=Fcv, rho=Fphi, 
+      years=dimnames(om)$year, bias.correct=bias.correct),
+    SSB=rlnormar1(n=dims(om)$iter, meanlog=0, sdlog=SSBcv, rho=0,
+      years=dimnames(om)$year, bias.correct=bias.correct)
   )
 
   return(devs)
