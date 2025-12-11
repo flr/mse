@@ -306,10 +306,10 @@ setMethod("performance", signature(x="list"),
 
     # HANDLE list(mse) | FLmses
     if(all(unlist(lapply(x, is, 'FLmse')))) {
-     
+
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
-        refpts=refpts(i), statistics=statistics, years=years, probs=probs), 
-        run=j, list(...))), i=x, j=names(x)))
+        refpts=refpts(i), statistics=statistics, years=years, probs=probs, 
+        run=j, om=name(om(i))), list(...))), i=x, j=names(x)))
 
       # SET mp if possible
       if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
@@ -364,7 +364,6 @@ setMethod("performance", signature(x="FLom"),
 # }}}
 
 # performance(FLombf) {{{
-# TODO: DEFAULT statistics, mse::statistics[c('C', 'F', 'SB')]
 setMethod("performance", signature(x="FLombf"),
   function(x, statistics=NULL, refpts=x@refpts,
     metrics=NULL, years=as.character(seq(dims(x)$minyear + 1, dims(x)$maxyear)),
@@ -387,8 +386,10 @@ setMethod("performance", signature(x="FLombf"),
 
     res <- rbindlist(res, idcol="biol")
 
+    # FIX: Why need to drop om?
+    res[, om:=NULL]
     # ADD om and drop mp
-    res[, om:=om]
+    res[, om:=get('om')]
     res[, mp:=NULL]
 
     return(res[])
@@ -760,3 +761,18 @@ extractPerformance <- function(dat, mp) {
   return(dat[om %in% som & mp %in% c("", smp)])
 }
 # }}}
+
+# getPerformance
+
+getOMPerformance <- function(path, pattern="*.rds", fy, ...) {
+  return(rbindlist(lapply(list.files(path, pattern, full=TRUE), function(i)
+    suppressWarnings(performance(window(readRDS(i)$om, end=fy), ...)[,
+      om:=sub('.rds', '', basename(i))])[])))
+}
+
+getMSEPerformance <- function(path, pattern="*.rds") {
+  return(rbindlist(lapply(list.files(path, pattern, full=TRUE), function(i) {
+    dat <- readRDS(i)
+    if(is(dat, "data.table")) return(dat) else return(performance(dat))
+  }), fill=TRUE))
+}
