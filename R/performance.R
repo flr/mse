@@ -158,8 +158,9 @@ setMethod("performance", signature(x="FLQuants"),
           lapply(lapply(as(refpts, 'list'), function(x)
             x[!is.na(x)]), rep, each=length(i)), list(...))
 
-        # EVAL statistic if names match
-        if(all(all.vars(j[names(j) == ""][[1]][[2]]) %in% names(inp))) {
+        # EVAL statistic if names match with existing object (function) or in inp
+        if(all(unlist(lapply(all.vars(j[names(j) == ""][[1]][[2]]), function(x)
+          exists(x) | x %in% names(inp))))) {
 
           return(as.data.frame(eval(j[names(j) == ""][[1]][[2]], inp), drop=FALSE))     
 
