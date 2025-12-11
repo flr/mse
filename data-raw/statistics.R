@@ -21,6 +21,9 @@ statistics <- list(
   # SBMSY
   SBMSY = list(~yearMeans(SB/SBMSY), name = "SB/SB[MSY]",
     desc = "Spawnwer biomass relative to SBMSY"),
+  # R
+  R = list(~yearMeans(R), name = "Recruits",
+    desc = "Recruitment"),
   # F
   F = list(~yearMeans(F), name = "F",
     desc = "Fishing mortality"),
