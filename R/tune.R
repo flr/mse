@@ -413,7 +413,7 @@ computeFp05 <- function(stock, sr, SBlim, range=c(0.01, 0.75), nyears=3,
   pyears <- years[51:100]
 
   # GENERATE SRR deviances
-  devs <- ar1rlnorm(rho=rho, years=years, iters=its, meanlog=0, sdlog=sigmaR)
+  devs <- rlnormar1(its, rho=rho, years=years, meanlog=0, sdlog=sigmaR)
 
   # EXTEND & PROPAGATE
   
