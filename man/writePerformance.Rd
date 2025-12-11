@@ -7,12 +7,12 @@
 writePerformance(dat, file = "model/performance.dat.gz", overwrite = FALSE)
 }
 \arguments{
-\item{dat}{data.table with performance statistics}
+\item{dat}{data.table with performance statistics.}
 
-\item{file}{file name to write to, defaults to 'model/performance.dat.gz'}
+\item{file}{file to write to, defaults to 'model/performance.dat.gz' a compressed text file.}
 }
 \value{
-file name, invisibly
+file name, invisibly.
 }
 \description{
 Write performance table to file

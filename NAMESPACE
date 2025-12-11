@@ -20,10 +20,13 @@ importFrom("FLBRP",
 importFrom("stats",
   "coef",
   "coefficients",
+  "dist",
   "lm",
+  "mad",
   "na.exclude",
   "setNames",
-  "rf")
+  "rf",
+  "uniroot")
 
 importFrom("ggrepel",
   "geom_label_repel")
