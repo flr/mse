@@ -374,7 +374,7 @@ ices.hcr <- function(stk, ftrg, sblim, sbsafe, fmin=0,
 #' @examples
 #' data(sol274)
 #' fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1,
-#'   frq=1), tracking=FLQuant())
+#'   frq=1, it=100), tracking=FLQuant())
 
 fixedC.hcr <- function(stk, ctrg, args, tracking){
   
@@ -391,7 +391,7 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
     ctrg <- c(ctrg[, ac(seq(ay + mlag, ay + frq))])
   } else {
     # REPLICATE
-    ctrg <- rep(ctrg, args$it)[1:args$it]
+    ctrg <- rep(ctrg, args$it)[seq(args$it)]
   }
 
 	# create control object
