@@ -141,7 +141,7 @@ setValidity("FLom",
 })
 # }}}
 
-#  accessor methods {{{
+# accessors to FLom slots {{{
 
 #' @rdname FLom-class
 
@@ -685,7 +685,7 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 # metrics {{{
 setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
-    FLQuants(metrics(stock(object), list(R=rec, SB=ssb, C=catch, F=fbar)))
+    FLQuants(metrics(stock(object), list(SB=ssb, R=rec, C=catch, F=fbar)))
 })
 
 setMethod("metrics", signature(object="FLom", metrics="list"),

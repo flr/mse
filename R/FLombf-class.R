@@ -650,12 +650,13 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
     mets <- Map(function(me, ca, sb, fb, rb) {
 
       me[['SB']] <- sb
+      me[['R']] <- rb
       me[['C']] <- ca
       me[['F']] <- fb
 
       return(me)
 
-    }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object))
+    }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object), rb=rec(object))
 
     if(length(mets) == 1 & !named)
       return(mets[[1]])
