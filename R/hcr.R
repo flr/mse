@@ -534,8 +534,8 @@ buffer.hcr <- function(stk, ind, metric='wmean',
       out[out > lastcatch * dupp] <-
         lastcatch[out > lastcatch * dupp] * dupp
     } else {
-      out[out > lastcatch * dupp & met < bufflow] <-
-        lastcatch[out > lastcatch * dupp & met < bufflow] * dupp
+      out[out > lastcatch * dupp & met > bufflow] <-
+        lastcatch[out > lastcatch * dupp & met > bufflow] * dupp
     }
   }
 
@@ -544,8 +544,8 @@ buffer.hcr <- function(stk, ind, metric='wmean',
       out[out < lastcatch * dlow] <-
         lastcatch[out < lastcatch * dlow] * dlow
     } else {
-      out[out < lastcatch * dlow & met < bufflow] <-
-        lastcatch[out < lastcatch * dlow & met < bufflow] * dlow
+      out[out < lastcatch * dlow & met > bufflow] <-
+        lastcatch[out < lastcatch * dlow & met > bufflow] * dlow
     }
   }
 
@@ -672,6 +672,84 @@ plot_buffer.hcr <- function(args, obs="missing", alpha=0.3,
 
 # plot_buffer.hcr(args, labels=list(metric='CPUE', output='C~mult'))
 
+# }}}
+
+# depletion.hcr {{{
+
+depletion.hcr <- function(stk, ind, metric='ssb', mult=1, hrmsy, K,
+  trigger=0.4, lim=0.1, min=0.00001, dupp=NULL, dlow=NULL, all=TRUE,
+  ..., args, tracking) {
+
+  # EXTRACT args
+  ay <- args$ay
+  iy <- args$iy
+  data_lag <- args$data_lag
+  man_lag <- args$management_lag
+  frq <- args$frq
+
+  # SET data year
+  dy <- ay - data_lag
+  # SET control years
+  cys <- seq(ay + man_lag, ay + man_lag + frq - 1)
+
+  # COMPUTE and window metric
+  met <- mse::selectMetric(metric, stk, ind)
+  met <- window(met, start=dy, end=dy)
+
+  # COMPUTE HCR multiplier if ...
+  hcrm <- ifelse((met / K) >= trigger, 1,
+    # metric betwween lim and trigger, and above
+    ifelse((met / K) >= lim,      
+      ((met / K) - lim) / (trigger - lim), min))
+
+  # TRACK decision
+  dec <- cut((met / K), c(0, lim, trigger, Inf), labels=seq(1, 3))
+  # track(tracking, "decision.hcr", ay) <- as.numeric(dec)
+
+  # SET HR target
+  hrtarget <- hrmsy * hcrm * mult
+
+  # SET TAC
+  out <- met * hrtarget
+
+  # TRACK first decision
+  track(tracking, "rule.hcr", cys) <- out
+
+  # TODO: ADD initac and TAC from tracking
+  lastcatch <- unitSums(seasonSums(window(catch(stk), start=dy, end=dy)))
+
+  # APPLY limits, always or if met < trigger
+  if(!is.null(dupp)) {
+    if(all) {
+      out[out > lastcatch * dupp] <-
+        lastcatch[out > lastcatch * dupp] * dupp
+    } else {
+      out[out > lastcatch * dupp & met < bufflow] <-
+        lastcatch[out > lastcatch * dupp & met < bufflow] * dupp
+    }
+  }
+
+  if(!is.null(dlow)) {
+    if(all) {
+      out[out < lastcatch * dlow] <-
+        lastcatch[out < lastcatch * dlow] * dlow
+    } else {
+      out[out < lastcatch * dlow & met < bufflow] <-
+        lastcatch[out < lastcatch * dlow & met < bufflow] * dlow
+    }
+  }
+
+  # TRACK TAC limited
+  # sum(old > out)
+  # sum(old < out)
+
+  # CONTROL
+  ctrl <- fwdControl(
+    # TARGET for frq years
+    c(lapply(cys, function(x) list(quant="catch", value=c(out), year=x))))
+	
+  list(ctrl=ctrl, tracking=tracking)
+}
 # }}}
 
 # -- RELATIVE
