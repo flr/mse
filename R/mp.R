@@ -1078,18 +1078,12 @@ setMethod("goFish", signature(om="FLombf"),
 # statistics, metrics, years - om=name(om), type, run=names,
 
 mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
-  statistics=NULL, metrics=NULL, type=character(1), names=NULL, parallel=TRUE, ...) {
+  statistics=NULL, metrics=NULL, type=character(1), names=NULL, parallel=TRUE,
+  perf=!is.null(statistics), ...) {
 
   # GET ... arguments
   opts <- list(...)
 
-  # SET return object
-  if(!is.null(statistics) & !is.null(metrics)) {
-    perf <- TRUE
-  } else {
-    perf <- FALSE
-  }
-  
   # SET seed
   if (!is.null(args$seed)) {
     seed <- args$seed

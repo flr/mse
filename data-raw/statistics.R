@@ -37,10 +37,10 @@ statistics <- list(
   green = list(~yearSums(FLQuant((SB / SBMSY) > 1 & (F / FMSY) < 1)) / dim(SB)[2],
     name = "P(Green)", desc = "Probability of being in Kobe green quadrant"),
   # orange
-  orange = list(~iterSums(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) >= 1)) / dim(SB)[6],
+  orange = list(~yearSums(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) >= 1)) / dim(SB)[2],
     name = "P(Orange)", desc = "Probability of being in Kobe orange quadrant"),
   # yellow
-  yellow = list(~iterSums(FLQuant((SB / SBMSY) < 1 & (F / FMSY) < 1)) / dim(SB)[6],
+  yellow = list(~yearSums(FLQuant((SB / SBMSY) < 1 & (F / FMSY) < 1)) / dim(SB)[2],
     name = "P(Yellow)", desc = "Probability of being in Kobe yellow quadrant"),
   # red
   red = list(~yearSums(FLQuant((SB / SBMSY) < 1 & (F / FMSY) > 1)) / dim(SB)[2],
