@@ -406,7 +406,7 @@ setMethod("performance", signature(x="FLombf"),
 #' data(statistics)
 
 setMethod("performance", signature(x="FLmse"),
-  function(x, om=name(x@om), ...) {
+  function(x, om=name(x@om), control=FALSE, ...) {
 
     args <- list(...)
 
@@ -436,6 +436,33 @@ setMethod("performance", signature(x="FLmse"),
       # NAME mp if possible
       if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
         res[, mp:=paste(om, type, run, sep="_")]
+
+      # ADD control$hcr@args
+      if(control) {
+          
+        hcrargs <- args(control(x, 'hcr'))
+
+        # USE only numeric or FLQuant/FLPar with single dims but 'iter', and that 1 | iter(om)
+        hcrargs <- lapply(hcrargs, function(i) {
+        
+          if(is(i, "FLQuant")) {
+            if(any(dim(i)[-6] > 1) | !dim(i)[6] %in% c(1, dims(x)$iter))
+              return(NULL)
+            else
+              return(c(i))
+          } else if (is(i, "FLPar")) {
+            if(any(dim(i)[-length(dim(i))] > 1 |
+              !dim(i)[length(dim(i))] %in% c(1, dims(x)$iter)))
+              return(NULL)
+          else
+              return(c(i))
+          } else {
+            return(i)
+          }
+        })
+
+        res <- cbind(res, as.data.table(hcrargs))
+      }
 
       return(res[])
     }
@@ -750,16 +777,18 @@ periodsPerformance <- function(x, periods) {
 
 extractPerformance <- function(dat, mp) {
 
+  # TODO: PARSE multiple MPs and match each OM
+
   # ASSIGN to avoid column match 
   smp <- mp
 
-  # TODO: PARSE multiple MPs and match each OM
-
-  # FIND om
-  som <- dat[, .SD[mp %in% ..mp,]][, unique(om)]
+  # FIND mps & om
+  sub <- dat[, .SD[like(mp, smp),]]
+  mps <- sub[, as.character(unique(mp))]
+  oms <- sub[, as.character(unique(om))]
 
   # RETURN subset, om + mp
-  return(dat[om %in% som & mp %in% c("", smp)])
+  return(dat[om %in% oms & mp %in% c("", mps)])
 }
 # }}}
 

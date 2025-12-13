@@ -115,7 +115,7 @@ setMethod("plot", signature(x="FLombf", y="missing"),
     # GET extra args
     args <- list(...)
 
-    # DISPATCH if args are FLmse
+    # DISPATCH if args are not FLmse
     if(length(args) == 0) {
 
       # 1. SSB
