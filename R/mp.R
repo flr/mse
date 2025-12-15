@@ -334,7 +334,7 @@ setMethod("goFish", signature(om="FLom"),
   ctrl0 <- ctrl
   
   if(progress)
-    p <- progressor(along=vy, offset=0L)
+    p <- progressor(steps=length(vy))
 
   # go fish!
 
@@ -691,7 +691,7 @@ setMethod("goFish", signature(om="FLombf"),
 
   # SET progressor
   if(progress)
-    p <- progressor(along=vy, offset=0L)
+    p <- progressor(steps=length(vy))
 
   for(i in vy) {
 
@@ -1127,7 +1127,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
     # IF cores for all runs, progress by MP
     if(largs > nbrOfWorkers()) {
-      p <- progressor(along=seq(largs), offset=0L)
+      p <- progressor(steps=largs)
       progress <- FALSE
     } else {
       progress <- TRUE
