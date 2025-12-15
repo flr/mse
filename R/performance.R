@@ -180,7 +180,7 @@ setMethod("performance", signature(x="FLQuants"),
     # Set DT keys
     setkey(res, statistic, year)
     
-    # ADD statistic name(s) & description(s)
+    # ADD statistic name(s) &description(s)
     inds <- lapply(statistics, '[[', 'name')
     descs <- lapply(statistics, '[[', 'desc')
 
@@ -197,10 +197,10 @@ setMethod("performance", signature(x="FLQuants"),
         by=.(statistic, year, name, desc)]
     }
     
+    # CREATE empty cols
+    set(res, j=c('om', 'type', 'run', 'mp'), value=as.list(rep(character(1), 4)))
+
     # ASSIGN names (om, type, run, mp)
-    # DEBUG: FIND why om is not being passed
-    if(is.null(om))
-      om <- ""
     set(res, j=c('om', 'type', 'run', 'mp'), value=list(om, type, run, mp))
 
     return(res[])
