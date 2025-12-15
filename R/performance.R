@@ -5,8 +5,8 @@
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
-
-globalVariables("statistic")
+ 
+globalVariables(c(".", "data", "element", "label", "mp", "om", "run", "statistic"))
 
 # performance(FLQuants) {{{
 
@@ -783,7 +783,7 @@ extractPerformance <- function(dat, mp) {
   smp <- mp
 
   # FIND mps & om
-  sub <- dat[, .SD[like(mp, smp),]]
+  sub <- dat[mp %like% smp]
   mps <- sub[, as.character(unique(mp))]
   oms <- sub[, as.character(unique(om))]
 
@@ -795,14 +795,18 @@ extractPerformance <- function(dat, mp) {
 # getPerformance
 
 getOMPerformance <- function(path, pattern="*.rds", fy, ...) {
-  return(rbindlist(lapply(list.files(path, pattern, full=TRUE), function(i)
+  return(rbindlist(lapply(list.files(path, pattern, full.names=TRUE), function(i)
     suppressWarnings(performance(window(readRDS(i)$om, end=fy), ...)[,
       om:=sub('.rds', '', basename(i))])[])))
 }
 
 getMSEPerformance <- function(path, pattern="*.rds") {
-  return(rbindlist(lapply(list.files(path, pattern, full=TRUE), function(i) {
+  return(rbindlist(lapply(list.files(path, pattern, full.names=TRUE), function(i) {
     dat <- readRDS(i)
-    if(is(dat, "data.table")) return(dat) else return(performance(dat))
-  }), fill=TRUE))
+    if(is(dat, "data.table"))
+      return(dat)
+    else 
+      return(performance(dat))
+    }
+  ), fill=TRUE))
 }

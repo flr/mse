@@ -7,6 +7,8 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
+globalVariables(c("ay", "bufflow", "buffup", "data_lag", "dy", "frq", "fy", "lim",
+  "management_lag", "min", "sloperatio"))
 
 # -- ABSOLUTE
 
@@ -724,8 +726,8 @@ depletion.hcr <- function(stk, ind, metric='ssb', mult=1, hrmsy, K,
       out[out > lastcatch * dupp] <-
         lastcatch[out > lastcatch * dupp] * dupp
     } else {
-      out[out > lastcatch * dupp & met < bufflow] <-
-        lastcatch[out > lastcatch * dupp & met < bufflow] * dupp
+      out[out > lastcatch * dupp & met < trigger] <-
+        lastcatch[out > lastcatch * dupp & met < trigger] * dupp
     }
   }
 
@@ -734,8 +736,8 @@ depletion.hcr <- function(stk, ind, metric='ssb', mult=1, hrmsy, K,
       out[out < lastcatch * dlow] <-
         lastcatch[out < lastcatch * dlow] * dlow
     } else {
-      out[out < lastcatch * dlow & met < bufflow] <-
-        lastcatch[out < lastcatch * dlow & met < bufflow] * dlow
+      out[out < lastcatch * dlow & met < trigger] <-
+        lastcatch[out < lastcatch * dlow & met < trigger] * dlow
     }
   }
 

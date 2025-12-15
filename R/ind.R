@@ -6,6 +6,7 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
+globalVariables(".")
 
 # cpue.ind {{{
 
