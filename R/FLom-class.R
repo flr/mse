@@ -685,7 +685,8 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 # metrics {{{
 setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
-    FLQuants(metrics(stock(object), list(SB=ssb, R=rec, C=catch, F=fbar)))
+    FLQuants(metrics(stock(object), list(SB=ssb, R=rec, C=catch,
+      L=landings, D=discards,F=fbar)))
 })
 
 setMethod("metrics", signature(object="FLom", metrics="list"),
