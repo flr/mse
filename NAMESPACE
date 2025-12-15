@@ -1,21 +1,32 @@
 import("methods")
 import("data.table")
-import("parallelly")
-import("doFuture")
-import("progressr")
-import("patchwork")
 import("FLCore")
-import("ggplotFL")
 import("FLFishery")
 import("FLasher")
+import("ggplotFL")
+import("patchwork")
+
+importFrom("progressr",
+  "progressor")
+
+importFrom("foreach",
+  "%do%",
+  "foreach")
+
+importFrom("doFuture",
+  "%dofuture%")
+
+importFrom("future",
+  "nbrOfWorkers")
 
 importFrom("FLBRP",
+  "brp",
+  "computeRefpts",
+  "fbar<-",
+  "FLBRP",
   "refpts",
   "refpts<-",
-  "brp",
-  "FLBRP",
-  "remap",
-  "computeRefpts")
+  "remap")
 
 importFrom("stats",
   "coef",

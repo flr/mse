@@ -24,6 +24,10 @@ already filled up for the mean weight-at-age (\code{wt}), natural mortality
 }
 \examples{
 data(ple4.biol)
+\dontrun{
 initiate(ple4.biol, B0=450000)
+# Sets up parallel
+# plan(multisession, workers=4)
 initiate(propagate(ple4.biol, 100), B0=runif(100, 3e5, 5e5))
+}
 }

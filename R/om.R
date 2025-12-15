@@ -69,8 +69,12 @@ runOM <- function(lhs, history, deviances, ...) {
 #'
 #' @examples
 #' data(ple4.biol)
+#' \dontrun{
 #' initiate(ple4.biol, B0=450000)
+#' # Sets up parallel
+#' # plan(multisession, workers=4)
 #' initiate(propagate(ple4.biol, 100), B0=runif(100, 3e5, 5e5))
+#' }
 
 initiate <- function(biol, B0, h=0.75) {
   
@@ -103,7 +107,7 @@ initiate <- function(biol, B0, h=0.75) {
   init <- B0
 
   # RUN for iters
-  res <- foreach(i=seq(its), .combine=c) %do% {
+  res <- foreach(i=seq(its), .combine=c) %dofuture% {
 
     # EXTRACT to vectors
     m <- c(iter(m(biol)[, 1], i))
@@ -139,7 +143,7 @@ initiate <- function(biol, B0, h=0.75) {
 # deplete {{{
 
 #' @examples
-#' data(ple4)
+#' data(ple4.biol)
 #' ini <- initiate(propagate(ple4.biol, 100), B0=runif(100, 3e5, 5e5))
 #' dep <- deplete(ini, sel=catch.sel(ple4)[, 10], dep=runif(100, 0.10, 0.90))
 

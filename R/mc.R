@@ -48,5 +48,5 @@ setMethod("mcN", signature(x="FLQuant"),
         s=var(iter(x, seq(1, y))) ^ 0.5)))
 
   return(data.frame(iters=its, se=res))
-})
 
+})
