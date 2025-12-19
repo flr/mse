@@ -37,6 +37,15 @@ floval <- list(object="om", test="!is(object, \"FLo\")",
 
 # mpDispatch {{{
 
+#' Title
+#'
+#' @param ioval
+#' @param ...
+#' @param step
+#'
+#' @return
+#' @export
+
 mpDispatch <- function(ioval, ..., step){
 
   # GET arguments

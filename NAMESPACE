@@ -6,18 +6,12 @@ import("FLasher")
 import("ggplotFL")
 import("patchwork")
 
-importFrom("progressr",
-  "progressor")
-
 importFrom("foreach",
   "%do%",
   "foreach")
 
 importFrom("doFuture",
   "%dofuture%")
-
-importFrom("future",
-  "nbrOfWorkers")
 
 importFrom("FLBRP",
   "brp",
@@ -27,6 +21,15 @@ importFrom("FLBRP",
   "refpts",
   "refpts<-",
   "remap")
+
+importFrom("future",
+  "nbrOfWorkers")
+
+importFrom("ggrepel",
+  "geom_label_repel")
+
+importFrom("progressr",
+  "progressor")
 
 importFrom("stats",
   "coef",
@@ -39,16 +42,11 @@ importFrom("stats",
   "rf",
   "uniroot")
 
-importFrom("ggrepel",
-  "geom_label_repel")
-
 export(
   "bisect",
   "buffer.hcr",
-  "catchSSB.hcr",
   "combinations",
   "computeFp05",
-  "cpue.hcr",
   "cpue.ind",
   "cpues.ind",
   "decisions",
@@ -56,26 +54,20 @@ export(
   "deplete",
   "effort.is",
   "effortlimit.fb",
-  "expandGrid",
   "extractPerformance",
   "fixedC.hcr",
   "fixedF.hcr",
   "FLiem",
   "fwd.om",
   "goFish",
-  "gridList",
   "hockeystick.hcr",
-  "hr.hcr",
   "hyperstability.fb",
-  "ices.hcr",
-  "indicator.hcr",
   "indicator.is",
   "initiate",
   "labelPerformance",
   "len.ind",
   "loadlist",
   "meta.est",
-  "meta.hcr",
   "mlc.ind",
   "movingF.phcr",
   "mp",
@@ -89,7 +81,6 @@ export(
   "perfect.oem",
   "perfect.sa",
   "periodsPerformance",
-  "pid.hcr",
   "plot_buffer.hcr",
   "plot_hockeystick.hcr",
   "readPerformance",
@@ -107,8 +98,6 @@ export(
   "sp.is",
   "split.is",
   "tac.is",
-  "target.hcr",
-  "trend.hcr",
   "tunebisect",
   "tunegrid",
   "writePerformance")
@@ -139,7 +128,6 @@ exportMethods(
   "catch.wt",
   "catch.wt<-",
   "control",
-  "db",
   "debug",
   "deviances",
   "deviances<-",
@@ -171,6 +159,7 @@ exportMethods(
   "harvest<-",
   "hcr",
   "hcr<-",
+  "hr",
   "index.hat",
   "isys",
   "isys<-",
@@ -183,7 +172,6 @@ exportMethods(
   "m.spwn<-",
   "mat",
   "mat<-",
-  "mcN",
   "merge",
   "method",
   "method<-",

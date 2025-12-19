@@ -89,7 +89,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   dis <- dims(om)
   dmns <- dimnames(om)
 
-  # --- EXTRACT args
+  # --- EXTRACT and BUILD args
 
   iy <- args$iy
 
@@ -350,10 +350,10 @@ setMethod("goFish", signature(om="FLom"),
     # args
     ay <- args$ay <- an(i)
     dy <- args$dy <- ay - dlag
-    dys <- seq(ay - dlag - frq + 1, ay - dlag)
-    dy0 <- dys[1]
-    dyf <- dys[frq]
-    mys <- seq(ay + mlag, ay + mlag + frq - 1)
+    dys <- args$dys <- seq(ay - dlag - frq + 1, ay - dlag)
+    dy0 <- args$dy0 <- dys[1]
+    dyf <- args$dyf <- dys[frq]
+    mys <- args$mys <- seq(ay + mlag, ay + mlag + frq - 1)
     
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
@@ -542,7 +542,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl.tm$args <- args #sqy <- sqy
       ctrl.tm$tracking <- tracking
       ctrl.tm$ioval <- list(iv=list(t1=flsval), ov=list(t1=flqval))
-      ctrl.ym$step <- "tm"
+      ctrl.tm$step <- "tm"
       
       out <- do.call("mpDispatch", ctrl.tm)
       
@@ -636,7 +636,7 @@ setMethod("goFish", signature(om="FLom"),
       "\n", sep="\t", file=logfile, append=TRUE)
 
     # CLEAR memory
-    # gc()
+    gc()
   }
   
   # TRACK om in final years (after last ay)

@@ -782,6 +782,8 @@ extractPerformance <- function(dat, mp) {
   # ASSIGN to avoid column match 
   smp <- mp
 
+  dat[mp %like% smp]
+
   # FIND mps & om
   sub <- dat[mp %like% smp]
   mps <- sub[, as.character(unique(mp))]

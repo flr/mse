@@ -157,3 +157,53 @@ loadlist <- function(file) {
   mget(load(file, verbose=FALSE, envir=(.NE <- new.env())), envir=.NE)
 }
 # }}}
+
+# setFCB {{{
+setFCB <- function(output=c("catch", "landings", "discards", "fbar", "f",
+  "effort"), relative=FALSE, element=1) {
+
+  # SELECT output from possible values
+  output <- match.arg(output)
+
+  # EXTRACT valid FCB for output
+  targets <- subset(FLasher:::.vfcb, quant == output)[1,]
+
+  # BUILD FCB list
+  fcb <- ifelse(unlist(targets[c("fishery", "catch", "biol")]),
+    element, as.numeric(NA))
+
+  # ADD relative if needed
+  if(relative)
+    fcb <- c(fcb, setNames(fcb, nm=c("relFishery", "relCatch", "relBiol")))
+
+  fcb
+}
+# }}}
+
+# selecMetric {{{
+
+selectMetric <- function(metric="missing", stk, ind) {
+
+    # MISSING metric? ind
+    if(missing(metric)) {
+      if(length(ind) == 1) {
+        met <- ind[[1]]
+      } else {
+        met <- ind
+      }
+    # CHARACTER?
+    } else if (is(metric, "character")) {
+      # EXTRACT from ind,
+      if(metric %in% names(ind))
+        met <- ind[[metric]]
+      # or COMPUTE from stk
+      else
+        met <- do.call(metric, list(stk))
+    # FUNCTION?
+    } else if(is(metric, "function")) {
+      met <- do.call(metric, list(stk))
+    }
+    return(met)
+}
+# }}}
+

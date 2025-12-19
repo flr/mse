@@ -1,6 +1,6 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.2.3.9735
+Version: 2.2.3.9800
 Authors@R: c(person(given = "Iago", family = "Mosqueira",
   role = c("aut", "cre"), email = "iago.mosqueira@wur.nl"), 
   person("Ernesto", "Jardim", email = "ernesto.jardim@gmail.com",
@@ -37,35 +37,31 @@ Collate:
   'generics.R'
   'mseCtrl-class.R'
   'mpCtrl-class.R'
-  'oem.R'
-  'FLoem-class.R'
   'FLo-class.R'
   'FLom-class.R'
   'FLombf-class.R'
+  'oem.R'
+  'FLoem-class.R'
   'FLiem-class.R'
   'FLmse-class.R'
   'FLmses-class.R'
   'dispatch.R'
-  'fb.R'
-  'hcr.R'
-  'iem.R'
-  'is.R'
   'mp.R'
-  'phcr.R'
-  'ind.R'
-  'sa.R'
-  'tm.R'
-  'grid.R'
-  'mc.R'
-  'performance.R'
   'tune.R'
-  'om.R'
   'tracking.R'
-  'data.R'
-  'db.R'
-  'utilities.R'
+  'performance.R'
   'plot.R'
-  'statistics.R'
+  'data.R'
+  'utilities.R'
+  'sa.R'
+  'ind.R'
+  'phcr.R'
+  'hcr.R'
+  'is.R'
+  'iem.R'
+  'fb.R'
+  'tm.R'
+  'om.R'
 VignetteBuilder: knitr
 License: EUPL
 LazyLoad: true

@@ -261,8 +261,6 @@ setMethod("sr", signature(object="FLombf"),
 )
 # }}}
 
-# -- fishery metrics
-
 # catch, landings, discards {{{
 
 setMethod("catch", signature(object="FLombf"),
@@ -283,8 +281,6 @@ setMethod("discards", signature(object="FLombf"),
   }
 )
 # }}}
-
-# -- biol metrics
 
 # ssb, tsb {{{
 
@@ -445,6 +441,63 @@ setMethod("fbar", signature(object="FLombf"),
     return(res)
   }
 ) # }}}
+
+# hr {{{
+
+#' Compute partial harvest rates by fishery
+#'
+#' @title hr
+#' @description
+#' Compute partial harvest-rate estimates for each fishery in a FLombf operating
+#' model objecta. For each fishery the function calculates the ratio:
+#'   catch (by fishery) / sum(S_f * N * W)
+#' where S_f is the fishery selectivity (catch.sel), N is numbers-at-age and
+#' W are weights at age in the population.
+#' The resulting object(s) are given units 'hr'.
+#'
+#' @param om An operating model object (typically an \code{FLombf} or other
+#'   object for which \code{fisheries(om)} and \code{biol(om)} are defined).
+#' @return A list of FLQuant-like objects (one per fishery) containing the
+#'   partial harvest rate with units set to 'hr'.
+#' @details The function sums catches across sexes/other dimensions using
+#'   \code{unitSums} and similarly aggregates the product of numbers, weights
+#'   and selection pattern. The returned values are per-iteration and per-unit
+#'   as produced by the underlying FL* methods.
+
+partialHR <- function(om) {
+
+  # C_f / sum(S_f * N * W)
+  lapply(fisheries(om), function(x) {
+    # ADD catch across sexes
+    res <- unitSums(catch(x[[1]])) /
+      # ADD N * WT * S_f across ages and units
+      unitSums(quantSums(n(biol(om)) * wt(biol(om)) * catch.sel(x[[1]])))
+
+    units(res) <- 'hr'
+    
+    return(res)
+  })
+}
+
+#' hr method for FLombf
+#'
+#' @rdname hr
+#' @description
+#' S4 method for \code{hr(object)} when \code{object} is an \code{FLombf}.
+#' The method sums partial harvest-rate contributions across fisheries to
+#' produce a total harvest-rate estimate.
+#'
+#' @param object An \code{FLombf} object.
+#' @return An FLQuant (or aggregated FLQuant) that is the sum of the partial
+#'   harvest rates across fisheries.
+#' @examples
+
+setMethod("hr", signature(object="FLombf"),
+  function(object) {
+    Reduce('+', partialHR(object))
+})
+
+# }}}
 
 # summary {{{
 
@@ -665,7 +718,7 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
 })
 
 setMethod("metrics", signature(object="FLombf", metrics="list"),
-  function(object, metrics) {
+  function(object, metrics, names=NULL) {
 
     # LAPPLY over metrics
     res <- lapply(metrics, function(x) {

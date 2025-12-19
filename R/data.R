@@ -6,41 +6,38 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
-#' Example set of performance statistics
+#' A complete set of performance statistics
 #'
-#' A set of performance statistics is provided, coded in the format that
-#' `performance()`requires. The statistics included in this list are as
-#' follows:
-#'
-#' - SB0: Mean spawner biomass relative to unfished.
-#' - SBMSY: Mean spawnwer biomass relative to SBMSY.
-#' - Ftarget: Mean fishing mortality relative to target.
-#' - FMSY: Mean fishing mortality relative to FMSY.
-#' - green: Probability of being in Kobe green quadrant.
-#' - red: Probability of being in Kobe red quadrant.
-#' - PSBMSY: Probability of SB greater or equal to SBMSY.
-#' - PBlim: Probability that spawner biomass is above Blim.
-#' - risk1: ICES Risk 1, mean probability that spawner biomass is below Blim.
-#' - risk2: ICES Risk 2, probability that spawner biomass is above Blim once.
-#' - risk3: ICES Risk 3, max probability that spawner biomass is above Blim.
-#' - C: Mean catch over years.
-#' - VarC: Catch variability.
-#' - PC0: Probability of fishery shutdown.
-#'
-#' Each indicator is itself a list object, with three elements, the first two
-#' of them compulsory:
-#'
-#' - An unnamed element of class *formula*, e.g. `yearMeans(SB/SB0)`.
-#' - name: A short name to be output on tables and plots, of class character,
-#' e.g. "SB/SB[0]".
-#' - desc: A longer description of the indicator, of class character, e.g. "Mean
-#' spawner biomass relative to unfished"
-#'
+#' A list containing a large number of performance statistics:
+#' @format A named list with elements of class list, each containing three elements: a formula, a long name ('name'), and a description ('desc'), both of type 'character':
+#' \describe{
+#'   \item{SB}{SB: Mean spawner biomass}
+#'   \item{SB0}{SB/SB\[0]: Mean spawner biomass relative to unfished}
+#'   \item{minSB0}{min(SB/SB\[0]): Minimum spawner biomass relative to unfished}
+#'   \item{SBMSY}{SB/SB\[MSY]: Mean spawnwer biomass relative to SBMSY}
+#'   \item{F}{F: Mean fishing mortality}
+#'   \item{Ftarget}{F/F\[target]: Mean fishing mortality relative to target}
+#'   \item{FMSY}{F/F\[MSY]: Mean fishing mortality relative to FMSY}
+#'   \item{green}{P(Green): Probability of being in Kobe green quadrant}
+#'   \item{orange}{P(Orange): Probability of being in Kobe orange quadrant}
+#'   \item{yellow}{P(Yellow): Probability of being in Kobe yellow quadrant}
+#'   \item{red}{P(Red): Probability of being in Kobe red quadrant}
+#'   \item{PSBMSY}{P(SB>=SB\[MSY]): Probability of SB greater or equal to SBMSY}
+#'   \item{PSBlim}{P(SB>SB\[limit]): Probability that spawner biomass is above SBlim}
+#'   \item{PSB20B0}{P(SB > 0.20 %*% SB\[0]): Probability that spawner biomass is above 20% SB[0]}
+#'   \item{risk1}{mean(P(SB<B\[limit])): ICES Risk 1, mean probability that spawner biomass is below Blim}
+#'   \item{risk2}{once(P(SB<B\[limit])): ICES Risk 2, probability that spawner biomass is above Blim once}
+#'   \item{risk3}{max(P(SB>B\[limit])): ICES Risk 3, max probability that spawner biomass is above Blim}
+#'   \item{C}{mean(C): Mean catch over years}
+#'   \item{CMSY}{C/MSY: Mean proportion of MSY}
+#'   \item{AAVC}{AAV(C): Average annual variability in catch}
+#'   \item{IACC}{IAC(C): Percentage inter-annual change in catch}
+#'   \item{PC0}{P(shutdown): Probability of fishery shutdown, defined as catch less than 10% of MSY}
+#' }
 #' @docType data
 #' @keywords datasets
-#' @format An object of class list.
 #' @name statistics
-#' @rdname statistics
+#' @usage data(statistics)
 NULL
 
 #' @rdname mse_statistics
