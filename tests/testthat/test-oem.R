@@ -8,13 +8,13 @@
 
 load_all()
 
-data(ple4om)
+data(sol274)
 
 # --- perfect.oem
 
 args <- list(y0=dims(om)$minyear, dy=dims(om)$maxyear)
 
-obs <- perfect.oem(om, deviances=NULL, observations=NULL, args=args,
+obs <- perfect.oem(stock(om), deviances=NULL, observations=NULL, args=args,
   tracking=FLQuant())
 
 # CHECK om and obs match, with no deviances
@@ -23,6 +23,18 @@ all.equal(obs$stk, stock(om))
 
 all.equal(index(obs$idx[[1]]) * index.q(obs$idx[[1]]),
   stock.n(obs$stk), check.attributes = FALSE)
+
+
+data(sol274)
+
+args <- list(y0=dims(om)$minyear, dy=dims(om)$maxyear - 1, frq=1)
+
+a <- shortcut.oem(stock(om), deviances=NULL, observations=NULL, args=args, 
+  tracking=FLQuants(FLQuant()))
+
+b <- perfect.oem(stock(om), deviances=NULL, observations=NULL, args=args, 
+  tracking=FLQuants(FLQuant()))
+
 
 
 # --- sampling.oem
