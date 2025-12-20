@@ -14,8 +14,8 @@ hockeystick.hcr(
   drop = 0,
   metric = "ssb",
   output = "fbar",
-  dlow = NA,
-  dupp = NA,
+  dlow = NULL,
+  dupp = NULL,
   all = TRUE,
   args,
   tracking
@@ -41,49 +41,38 @@ applies the minimum allowable value (\code{min}), numeric or FLQuant.}
 
 \item{output}{Character. The output control variable (e.g., \code{"fbar"} for fishing mortality or \code{"catch"} for quotas), character.}
 
-\item{dlow}{A limit for the decrease in the output variable, e.g. 0.85 for a maximum decrease of 15\%, numeric.}
+\item{dlow}{A limit for the decrease in the output variable, e.g. 0.85 for a maximum decrease of 15\%, numeric. No limit is applied if NULL.}
 
-\item{dupp}{A limit for the increase in the output variable, e.g. 1.15 for a maximum increase of 15\%, numeric.}
+\item{dupp}{A limit for the increase in the output variable, e.g. 1.15 for a maximum increase of 15\%, numeric. No limit is applied if NULL.}
 
 \item{all}{If \code{TRUE}, upper and lower limits (\code{dupp} and \code{dlow}) are applied unconditionally, otherwise only when metric > trigger, logical.}
 
-\item{args}{A list containing additional arguments related to the assessment and HCR implementation, passed on by mp(). The following are used:
-\itemize{
-\item \code{ay}: Assessment year.
-\item \code{iy}: Implementation year.
-\item \code{data_lag}: Lag between data availability and the current year.
-\item \code{management_lag}: Lag between management decision and implementation.
-\item \code{frq}: Frequency of updates to the control rule.
-}}
+\item{args}{A list containing dimensionality arguments, passed on by mp().}
 
-\item{tracking}{An FLQuant used for tracking indicators, intermediate values, and decisions during HCR evaluation.}
+\item{tracking}{An FLQuant used for tracking indicators, intermediate values, and decisions during MP evaluation.}
 }
 \value{
 A list containing elements 'ctrl', a fwdControl object, and 'tracking'.
 }
 \description{
 A hockey-stick harvest control rule that sets the value of an output between a
-minimum and a target, based on that of a metric, compared with a limit and a trigger.
+minimum and a target, according to that of a metric, compared with a limit and
+a trigger.
 }
 \details{
 This function implements a hockey-stick shaped harvest control rule (HCR). It is
 commonly used to set F or effort, and sometimes catch, from a measure of stock
 status, such as estimated SSB or depletion. The function can take any input,
 'metric', if it can computed from an FLStock or is returned by the function run
-n the 'est' step. The 'output' argument can be set to any quantity that the OM
+in the 'est' step. The 'output' argument can be set to any quantity that the OM
 projection method can understand, e.g. fbar, effort or catch for 'fwd.om'.
 The HCR increases the control variable linearly between a lower threshold (\code{lim})
 and a trigger point (\code{trigger}), and sets it to a target level (\code{target}) when the
-metric is above the trigger:
-\itemize{
-\item Below \code{lim}: The control variable is set to \code{min}.
-\item Between \code{lim} and \code{trigger}: A linear hockey-stick rule is used to interpolate between \code{min} and \code{target}.
-\item Above \code{trigger}: The control variable is set to \code{target}.
-}
-
-The decreasing line can be cut at any point ('drop')
+metric is above the trigger. The decreasing line can be cut at any point ('drop'),
 where output values fall to the 'min' level set. See examples below.
-The function also applies optional upper (\code{dupp}) and lower (\code{dlow}) constraints to changes in the control variable. These constraints can be applied either unconditionally (\code{all = TRUE}) or only on the stock being above the trigger.
+The function can also apply optional upper (\code{dupp}) and lower (\code{dlow}) constraints
+to changes in the control variable. These constraints can be applied either
+unconditionally (\code{all = TRUE}) or only on the stock being above the trigger.
 }
 \examples{
 data(ple4)
@@ -98,9 +87,6 @@ ctrl <- hockeystick.hcr(stk = ple4, ind = FLQuants(), lim = 7e5, trigger = 1e6,
 
 # Inspect the control object
 print(ctrl)
-
-# Plot the HCR
-plot_hockeystick.hcr(list(lim = 7e5, trigger = 1e6, target = 0.24))
 
 # Add change limits
 ctrl2 <- hockeystick.hcr(stk = ple4, ind = FLQuants(), lim = 7e5, trigger = 1e6, 

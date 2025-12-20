@@ -12,20 +12,20 @@ X-schema.org-keywords: simulation, MSE, fisheries, flr, a4a, R
 Depends:
   R(>= 4.0),
   methods,
+  data.table,
   FLCore(>= 2.6.18),
-  ggplotFL(>= 2.6.10),
   FLFishery,
   FLasher(>= 0.6.7),
-  FLBRP(>= 2.5.8),
-  doFuture,
-  data.table,
-  progressr
+  ggplotFL(>= 2.6.10)
 Imports:
+  doFuture,
   foreach,
+  FLBRP(>= 2.5.8),
   future,
-  parallelly,
+  ggplot2,
   ggrepel,
-  patchwork
+  patchwork,
+  progressr
 Additional_repositories: https://flr.r-universe.dev
 Suggests:
   testthat,

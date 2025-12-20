@@ -8,15 +8,16 @@
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
 
-globalVariables(c("ay", "bufflow", "buffup", "data_lag", "dy", "frq", "fy", "lim",
-  "management_lag", "min", "sloperatio"))
+globalVariables(c("ay", "iy", "mys","bufflow", "buffup", "data_lag",
+  "dy", "frq", "fy", "lim", "management_lag", "min", "sloperatio"))
 
 # hockeystick.hcr {{{
 
 #' Hockey-stick Harvest Control Rule
 #'
 #' A hockey-stick harvest control rule that sets the value of an output between a 
-#' minimum and a target, based on that of a metric, compared with a limit and a trigger.
+#' minimum and a target, according to that of a metric, compared with a limit and
+#' a trigger.
 #'
 #' @details 
 #' This function implements a hockey-stick shaped harvest control rule (HCR). It is
@@ -43,8 +44,8 @@ globalVariables(c("ay", "bufflow", "buffup", "data_lag", "dy", "frq", "fy", "lim
 #' @param drop Numeric. A stock metric threshold below which the control variable is forced to `min` to prevent over-exploitation of severely depleted stocks, numeric  or FLQuant
 #' @param metric The stock metric to use for the HCR (e.g., `"ssb"` for spawning-stock biomass), character or function.
 #' @param output Character. The output control variable (e.g., `"fbar"` for fishing mortality or `"catch"` for quotas), character.
-#' @param dlow A limit for the decrease in the output variable, e.g. 0.85 for a maximum decrease of 15%, numeric.
-#' @param dupp A limit for the increase in the output variable, e.g. 1.15 for a maximum increase of 15%, numeric.
+#' @param dlow A limit for the decrease in the output variable, e.g. 0.85 for a maximum decrease of 15%, numeric. No limit is applied if NULL.
+#' @param dupp A limit for the increase in the output variable, e.g. 1.15 for a maximum increase of 15%, numeric. No limit is applied if NULL.
 #' @param all If `TRUE`, upper and lower limits (`dupp` and `dlow`) are applied unconditionally, otherwise only when metric > trigger, logical.
 #' @param args A list containing dimensionality arguments, passed on by mp().
 #' @param tracking An FLQuant used for tracking indicators, intermediate values, and decisions during MP evaluation.
@@ -74,7 +75,7 @@ globalVariables(c("ay", "bufflow", "buffup", "data_lag", "dy", "frq", "fy", "lim
 #' print(ctrl2)
 
 hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
-  metric="ssb", output="fbar", dlow=NA, dupp=NA, all=TRUE, args, tracking) {
+  metric="ssb", output="fbar", dlow=NULL, dupp=NULL, all=TRUE, args, tracking) {
 
   # EXTRACT args
   spread(args[c('ay', 'iy', 'dy', 'mys', 'management_lag')])
@@ -120,7 +121,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
   }
 
   # APPLY limits, always or if met < trigger
-  if(!is.na(dupp)) {
+  if(!is.null(dupp)) {
     if(all) {
     out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
     } else {
@@ -129,7 +130,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
     }
   }
 
-  if(!is.na(dlow)) {
+  if(!is.null(dlow)) {
     if(all) {
     out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
     } else {
@@ -156,6 +157,10 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
 
 # plot_hockeystick.hcr {{{
 
+#' @rdname hochestick.hcr
+#' @details
+#'
+#' @params
 #' @examples
 #' data(ple4)
 #' Set example HCR arguments

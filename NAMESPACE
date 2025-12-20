@@ -6,6 +6,21 @@ import("FLasher")
 import("ggplotFL")
 import("patchwork")
 
+importFrom("ggplot2",
+  "aes",
+  "annotate",
+  "coord_cartesian",
+  "geom_label",
+  "geom_line",
+  "geom_path",
+  "geom_point",
+  "geom_polygon",
+  "theme",
+  "xlab",
+  "ylab",
+  "xlim",
+  "ylim")
+
 importFrom("foreach",
   "%do%",
   "foreach")
@@ -29,7 +44,8 @@ importFrom("ggrepel",
   "geom_label_repel")
 
 importFrom("progressr",
-  "progressor")
+  "progressor",
+  "handlers")
 
 importFrom("stats",
   "coef",

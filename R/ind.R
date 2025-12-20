@@ -53,11 +53,11 @@ cpue.ind <- function(stk, idx, index=1, nyears=5, mean=yearMeans(index(idx)[[ind
 
 # cpues.ind {{{
 
-cpues.ind <- function(stk, idx, nyears=5, ayears=3, index=1, args, tracking) {
+cpues.ind <- function(stk, idx, nyears=5, index=1, args, tracking) {
 
   # CALL cpue.ind
   mets <- lapply(setNames(index, nm=names(idx[index])), function(x)
-    cpue.ind(stk, idx, nyears=nyears, ayears=ayears, index=x, args, tracking))
+    cpue.ind(stk, idx, nyears=nyears, index=x, args, tracking))
 
   ind <- lapply(mets, function(x) x$ind$index)
   
