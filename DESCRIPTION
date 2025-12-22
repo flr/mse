@@ -1,6 +1,6 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.2.3.9800
+Version: 2.2.3.9801
 Authors@R: c(person(given = "Iago", family = "Mosqueira",
   role = c("aut", "cre"), email = "iago.mosqueira@wur.nl"), 
   person("Ernesto", "Jardim", email = "ernesto.jardim@gmail.com",
@@ -14,13 +14,14 @@ Depends:
   methods,
   data.table,
   FLCore(>= 2.6.18),
-  FLFishery,
-  FLasher(>= 0.6.7),
-  ggplotFL(>= 2.6.10)
+  FLFishery
 Imports:
   doFuture,
   foreach,
+  future,
+  FLasher(>= 0.6.7),
   FLBRP(>= 2.5.8),
+  ggplotFL(>= 2.6.10),
   future,
   ggplot2,
   ggrepel,

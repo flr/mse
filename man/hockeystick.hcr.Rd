@@ -7,9 +7,9 @@
 hockeystick.hcr(
   stk,
   ind,
-  lim,
-  trigger,
   target,
+  trigger,
+  lim = 0,
   min = 0,
   drop = 0,
   metric = "ssb",
@@ -17,21 +17,23 @@ hockeystick.hcr(
   dlow = NULL,
   dupp = NULL,
   all = TRUE,
+  initial = NULL,
   args,
-  tracking
+  tracking,
+  ...
 )
 }
 \arguments{
-\item{stk}{The OEM observation or SA estimation, an FLStock object.}
+\item{stk}{The 'oem' observation or SA estimation, an FLStock object.}
 
 \item{ind}{Possible indicators returned by the 'est' step, FLQuants.}
 
-\item{lim}{The lower threshold of the stock metric, below which the control rule
-applies the minimum allowable value (\code{min}), numeric or FLQuant.}
+\item{target}{The output level applied when the stock metric is at or above the \code{trigger} value, numeric or FLQuant.}
 
 \item{trigger}{The stock status or metric value threshold above which the control variable reaches the target value, numeric or FLQuant.}
 
-\item{target}{The output level applied when the stock metric is at or above the \code{trigger} value, numeric or FLQuant.}
+\item{lim}{The lower threshold of the stock metric, below which the control rule
+applies the minimum allowable value (\code{min}), numeric or FLQuant.}
 
 \item{min}{Numeric. The minimum allowable control value (e.g., minimum F or catch).}
 
@@ -50,6 +52,8 @@ applies the minimum allowable value (\code{min}), numeric or FLQuant.}
 \item{args}{A list containing dimensionality arguments, passed on by mp().}
 
 \item{tracking}{An FLQuant used for tracking indicators, intermediate values, and decisions during MP evaluation.}
+
+\item{initial.}{Initial value of 'output' to use when applying 'dlow' and 'dupp' limits, numeric of FLQuant.}
 }
 \value{
 A list containing elements 'ctrl', a fwdControl object, and 'tracking'.
@@ -75,24 +79,27 @@ to changes in the control variable. These constraints can be applied either
 unconditionally (\code{all = TRUE}) or only on the stock being above the trigger.
 }
 \examples{
-data(ple4)
+# Example dataset
+data(sol274)
 
-# Define arguments, done automatically when called by mp()
-args <- list(ay = 2015, iy = 2015, dy=2014, management_lag = 1, mys=2016)
-track <- FLQuant(dimnames=list(metric="fbar.hcr", year=2014:2016))
+# Sets up an mpCtrl using hockeystick(fbar~ssb)
+ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=hockeystick.hcr, args=list(metric="ssb", trigger=45000, 
+    output="fbar", target=0.27)))
 
-# Apply the control rule
-ctrl <- hockeystick.hcr(stk = ple4, ind = FLQuants(), lim = 7e5, trigger = 1e6, 
-  target = 0.24, metric = "ssb", output = "fbar", args = args, tracking = track)
+plot_hockeystick.hcr(ctrl)
 
-# Inspect the control object
-print(ctrl)
+# Sets up a 40:10 HCR mpCtrl using hockeystick(fbar~depletion)
+ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=hockeystick.hcr, args=list(
+    metric="depletion", trigger=0.40, lim=0.10,
+    output="fbar", target=0.27, min=0.02)))
 
-# Add change limits
-ctrl2 <- hockeystick.hcr(stk = ple4, ind = FLQuants(), lim = 7e5, trigger = 1e6, 
-  target = 0.24, dlow=0.85, dupp=1.15, metric = "ssb", output = "fbar",
-  args = args, tracking = track)
+plot_hockeystick.hcr(ctrl)
 
-# Inspect the control object
-print(ctrl2)
+# Runs mp between 2021 and 2035
+run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
+
+# Plots results
+plot(om, run)
 }
