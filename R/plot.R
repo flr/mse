@@ -14,7 +14,7 @@ setMethod("plot", signature(x="FLo", y="missing"),
 
     # COMPUTE metrics
     if(is.null(metrics))
-      mets <- metrics(x)
+      mets <- metrics(x)[c("SB", "R", "C", "F")]
     else
       mets <- do.call("metrics", list(object=x, metrics=metrics))
 
@@ -35,7 +35,7 @@ setMethod("plot", signature(x="FLo", y="FLo"),
 
     # CALL metrics
     if(is.null(metrics))
-      fqs <- lapply(args[idx], function(x) metrics(stock(x)))
+      fqs <- lapply(args[idx], function(x) metrics(stock(x))[c("SB", "R", "C", "F")])
     else
       fqs <- lapply(args[idx], function(x) metrics(stock(x), metrics=metrics))
 
