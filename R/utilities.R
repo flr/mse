@@ -182,7 +182,7 @@ setFCB <- function(output=c("catch", "landings", "discards", "fbar", "f",
 
 # selecMetric {{{
 
-selectMetric <- function(metric="missing", stk, ind) {
+selectMetric <- function(metric="missing", stk, ind, ...) {
 
     # MISSING metric? ind
     if(missing(metric)) {
@@ -198,10 +198,10 @@ selectMetric <- function(metric="missing", stk, ind) {
         met <- ind[[metric]]
       # or COMPUTE from stk
       else
-        met <- do.call(metric, list(stk))
+        met <- do.call(metric, c(list(stk), list(...)))
     # FUNCTION?
     } else if(is(metric, "function")) {
-      met <- do.call(metric, list(stk))
+      met <- do.call(metric, c(list(stk), list(...)))
     }
     return(met)
 }
