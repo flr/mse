@@ -32,8 +32,13 @@
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
 #'   trigger=41500, target=0.27))))
 
-mpCtrl <- setClass("mpCtrl", contains="list")
-mpCtrl <- setClass("mpCtrl", contains="FLlst")
+mpCtrl <- setClass("mpCtrl", contains="list",
+  validity=function(object) {
+    if(!all(unlist(lapply(object, is, 'mseCtrl'))))
+      return("mpCtrl lemenets must all be of class 'mseCtrl'")
+
+    return(TRUE)
+  })
 
 #' @rdname mpCtrl-class
 #' @template bothargs
@@ -45,7 +50,7 @@ setMethod("initialize", "mpCtrl",
     dots <- list(...)
 
     # ASSIGN args list
-    if(length(dots) > 1) {
+    if(length(dots) > 1 | is(dots[[1]], 'mseCtrl')) {
           .Object@.Data <- dots
     # IF list is passed, need to assign elements
     } else {
