@@ -122,7 +122,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # frq defaults to 1
   frq <- args$frq <- if(is.null(args$frq)) 1 else args$frq
 
-  # vector of years to be projected
+  # vector of years on which to run mp
   vy <- args$vy <- ac(seq(iy, fy - management_lag, by=frq))
   
   # CHECK proj years do not extend beyond maxyear
@@ -352,7 +352,6 @@ setMethod("goFish", signature(om="FLom"),
     dy <- args$dy <- ay - dlag
     dys <- args$dys <- seq(ay - dlag - frq + 1, ay - dlag)
     dy0 <- args$dy0 <- dys[1]
-    dyf <- args$dyf <- dys[frq]
     mys <- args$mys <- seq(ay + mlag, ay + mlag + frq - 1)
     
     # years for status quo computations 
@@ -360,13 +359,13 @@ setMethod("goFish", signature(om="FLom"),
     
     # TRACK om, REDUCE dims
     track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "B.om", dys) <- unitSums(window(tsb(om),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "SB.om", dys) <- unitSums(window(ssb(om),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "C.om", dys) <- unitSums(window(catch(om),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     
     # --- OEM: Observation Error Model
     ctrl.oem <- args(oem)
@@ -392,11 +391,11 @@ setMethod("goFish", signature(om="FLom"),
     tracking <- o.out$tracking
     
     track(tracking, "B.obs", dys) <- unitSums(window(stock(stk0),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "SB.obs", dys) <- unitSums(window(ssb(stk0),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "C.obs", dys) <- unitSums(window(catch(stk0),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
 
     # --- est: Estimator of stock statistics
 
@@ -439,13 +438,13 @@ setMethod("goFish", signature(om="FLom"),
 
     # TODO: DO NOT WRITE if ind
     track(tracking, "F.est", dys) <- unitMeans(window(fbar(stk0),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "B.est", dys) <- unitSums(window(stock(stk0),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "SB.est", dys) <- unitSums(window(ssb(stk0),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "C.est", dys) <- unitSums(window(catch(stk0),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
 
     # --- phcr: HCR parameterization
     
@@ -641,7 +640,7 @@ setMethod("goFish", signature(om="FLom"),
   
   # TRACK om in final years (after last ay)
 
-  fys <- seq(dyf, ay + mlag + frq - 1)
+  fys <- seq(dy, ay + mlag + frq - 1)
   
   track(tracking, "F.om", fys) <- unitMeans(fbar(om))[, ac(fys)]
   track(tracking, "B.om", fys) <- unitSums(tsb(om))[, ac(fys)]
@@ -680,7 +679,7 @@ setMethod("goFish", signature(om="FLombf"),
 
   # TODO LOOP every module over stock
   if(is.null(args$stock))
-    args$stock <- seq(length(biols(om)))
+    args$stock <- seq(biols(om))
 
   # COPY ctrl
   ctrl0 <- ctrl
@@ -706,26 +705,25 @@ setMethod("goFish", signature(om="FLombf"),
     # time (start)
     stim <- Sys.time()
 
-    # args
+    # annual args
     ay <- args$ay <- an(i)
     dy <- args$dy <- ay - dlag
-    dys <- seq(ay - dlag - frq + 1, ay - dlag)
-    dy0 <- dys[1]
-    dyf <- dys[frq]
-    mys <- seq(ay + mlag, ay + mlag + frq - 1)
+    dys <- args$dys <- seq(ay - dlag - frq + 1, ay - dlag)
+    dy0 <- args$dy0 <- dys[1]
+    mys <- args$mys <- seq(ay + mlag, ay + mlag + frq - 1)
     
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
 
     # TRACK om
     track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "B.om", dys) <- unitSums(window(tsb(om),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "SB.om", dys) <- unitSums(window(ssb(om),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     track(tracking, "C.om", dys) <- unitSums(window(catch(om),
-      start=dy0, end=dyf))
+      start=dy0, end=dy))
     
     # --- OEM: Observation Error Model
 
@@ -769,11 +767,11 @@ setMethod("goFish", signature(om="FLombf"),
     observations(oem) <- lapply(o.out, "[[", "observations")
     
     # TRACK oem catch
-    track(tracking, "B.obs", dys) <- lapply(window(stk0, start=dy0, end=dyf),
+    track(tracking, "B.obs", dys) <- lapply(window(stk0, start=dy0, end=dy),
       function(x) areaSums(unitSums(stock(x))))
-    track(tracking, "SB.obs", dys) <- lapply(window(stk0, start=dy0, end=dyf),
+    track(tracking, "SB.obs", dys) <- lapply(window(stk0, start=dy0, end=dy),
       function(x) areaSums(unitSums(ssb(x))))
-    track(tracking, "C.obs", dys) <- lapply(window(stk0, start=dy0, end=dyf),
+    track(tracking, "C.obs", dys) <- lapply(window(stk0, start=dy0, end=dy),
       function(x) areaSums(unitSums(catch(x))))
 
     # --- est: Estimator of stock statistics
