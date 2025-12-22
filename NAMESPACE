@@ -15,6 +15,7 @@ importFrom("ggplot2",
   "geom_path",
   "geom_point",
   "geom_polygon",
+  "geom_vline",
   "theme",
   "xlab",
   "ylab",
@@ -27,6 +28,9 @@ importFrom("foreach",
 
 importFrom("doFuture",
   "%dofuture%")
+
+importFrom("future",
+  "plan")
 
 importFrom("FLBRP",
   "brp",
@@ -59,10 +63,8 @@ importFrom("stats",
   "uniroot")
 
 export(
-  "bisect",
   "buffer.hcr",
   "combinations",
-  "computeFp05",
   "cpue.ind",
   "cpues.ind",
   "decisions",
@@ -115,7 +117,6 @@ export(
   "split.is",
   "tac.is",
   "tunebisect",
-  "tunegrid",
   "writePerformance")
 
 exportClasses(
