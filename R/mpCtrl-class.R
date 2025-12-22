@@ -33,6 +33,7 @@
 #'   trigger=41500, target=0.27))))
 
 mpCtrl <- setClass("mpCtrl", contains="list")
+mpCtrl <- setClass("mpCtrl", contains="FLlst")
 
 #' @rdname mpCtrl-class
 #' @template bothargs
@@ -40,8 +41,17 @@ mpCtrl <- setClass("mpCtrl", contains="list")
 
 setMethod("initialize", "mpCtrl",
     function(.Object, ...) {
-      .Object <- callNextMethod(.Object, ...)
-      .Object
+
+    dots <- list(...)
+
+    # ASSIGN args list
+    if(length(dots) > 1) {
+          .Object@.Data <- dots
+    # IF list is passed, need to assign elements
+    } else {
+      .Object@.Data <- dots[[1]]
+    }
+    .Object
     })
 
 # TODO
