@@ -34,7 +34,7 @@ globalVariables(c("ay", "iy", "mys","bufflow", "buffup", "data_lag",
 #' to changes in the control variable. These constraints can be applied either
 #' unconditionally (`all = TRUE`) or only on the stock being above the trigger.
 #'
-#' @param stk The OEM observation or SA estimation, an FLStock object.
+#' @param stk The 'oem' observation or SA estimation, an FLStock object.
 #' @param ind Possible indicators returned by the 'est' step, FLQuants.
 #' @param lim The lower threshold of the stock metric, below which the control rule
 #' applies the minimum allowable value (`min`), numeric or FLQuant.
@@ -47,41 +47,45 @@ globalVariables(c("ay", "iy", "mys","bufflow", "buffup", "data_lag",
 #' @param dlow A limit for the decrease in the output variable, e.g. 0.85 for a maximum decrease of 15%, numeric. No limit is applied if NULL.
 #' @param dupp A limit for the increase in the output variable, e.g. 1.15 for a maximum increase of 15%, numeric. No limit is applied if NULL.
 #' @param all If `TRUE`, upper and lower limits (`dupp` and `dlow`) are applied unconditionally, otherwise only when metric > trigger, logical.
+#' @param initial. Initial value of 'output' to use when applying 'dlow' and 'dupp' limits, numeric of FLQuant.
 #' @param args A list containing dimensionality arguments, passed on by mp().
 #' @param tracking An FLQuant used for tracking indicators, intermediate values, and decisions during MP evaluation.
 #'
 #' @return A list containing elements 'ctrl', a fwdControl object, and 'tracking'.
 #' @examples
-# Load an FLStock as example input
-#' data(ple4)
+#' # Example dataset
+#' data(sol274)
 #' 
-#' # Define arguments, done automatically when called by mp()
-#' args <- list(ay = 2015, iy = 2015, dy=2014, management_lag = 1, mys=2016)
-#' track <- FLQuant(dimnames=list(metric="fbar.hcr", year=2014:2016))
+#' # Sets up an mpCtrl using hockeystick(fbar~ssb)
+#' ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(metric="ssb", trigger=45000, 
+#'     output="fbar", target=0.27)))
 #' 
-#' # Apply the control rule
-#' ctrl <- hockeystick.hcr(stk = ple4, ind = FLQuants(), lim = 7e5, trigger = 1e6, 
-#'   target = 0.24, metric = "ssb", output = "fbar", args = args, tracking = track)
+#' plot_hockeystick.hcr(ctrl)
 #' 
-#' # Inspect the control object
-#' print(ctrl)
+#' # Sets up a 40:10 HCR mpCtrl using hockeystick(fbar~depletion)
+#' ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(
+#'     metric="depletion", trigger=0.40, lim=0.10,
+#'     output="fbar", target=0.27, min=0.02)))
 #' 
-#' # Add change limits
-#' ctrl2 <- hockeystick.hcr(stk = ple4, ind = FLQuants(), lim = 7e5, trigger = 1e6, 
-#'   target = 0.24, dlow=0.85, dupp=1.15, metric = "ssb", output = "fbar",
-#'   args = args, tracking = track)
+#' plot_hockeystick.hcr(ctrl)
 #' 
-#' # Inspect the control object
-#' print(ctrl2)
+#' # Runs mp between 2021 and 2035
+#' run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
+#' 
+#' # Plots results
+#' plot(om, run)
 
-hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
-  metric="ssb", output="fbar", dlow=NULL, dupp=NULL, all=TRUE, args, tracking) {
+hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
+  metric="ssb", output="fbar", dlow=NULL, dupp=NULL, all=TRUE, initial=NULL,
+  args, tracking, ...) {
 
   # EXTRACT args
-  spread(args[c('ay', 'iy', 'dy', 'mys', 'management_lag')])
+  spread(args[c('ay', 'iy', 'dy', 'mys', 'management_lag', 'it')])
 
   # COMPUTE metric
-  met <- window(selectMetric(metric, stk, ind), start=dy, end=dy)
+  met <- window(selectMetric(metric, stk, ind, ...), start=dy, end=dy)
 
   # TRACK metric
   track(tracking, "met.hcr", dy) <- met
@@ -100,26 +104,32 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
   # APPLY drop to min
   out[c(met < drop)] <- min
 
-  # TRACK initial target
+  # IF NA, set to previous value
+  # if(any(is.na(out))) {
+  #   out[is.na(out)] <- pre[is.na(out)]
+  # }
+
+  # TRACK initial output
   track(tracking, paste0(output, ".hcr"), mys) <- out
 
   # TRACK decision: met <= lim, 1; lim < met < trigger, 2; met >= trigger, 3
   track(tracking, "decision.hcr", ay) <- ifelse(met < drop, 0,
     ifelse(met <= lim, 1, ifelse(met < trigger, 2, 3)))
 
-  # GET TAC dy / ay - 1
-  if(ay == iy) {
-    pre <- areaSums(unitSums(seasonSums(window(do.call(output, list(stk)),
-      start=ay - management_lag, end=ay - management_lag))))
-  } else {
-    pre <- c(tracking[[1]]["hcr", ac(ay)])
+  # GET previous output value if change limited
+  if(!is.null(dupp) | !is.null(dlow)) {
+    # GET initial value at start if set,
+    if(ay == iy) {
+      # STOP if initial is NULL
+      if(is.null(initial))
+        stop("To apply 'dlow' and 'dupp' limits, 'initial' is required")
+      pre <- FLQuant(initial, iter=args$it)
+    # OR previous decision,
+    } else {
+      pre <- tracking[[1]]['hcr', ac(ay)]
+    }
   }
-
-  # IF NA, set to previous value
-  if(any(is.na(out))) {
-    out[is.na(out)] <- pre[is.na(out)]
-  }
-
+  
   # APPLY limits, always or if met < trigger
   if(!is.null(dupp)) {
     if(all) {
@@ -163,7 +173,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
 #' @params
 #' @examples
 #' data(ple4)
-#' Set example HCR arguments
+#' # Set example HCR arguments
 #' args <- list(lim=1e5, trigger=4e5, target=0.25, min=0,
 #'   metric="ssb", output="fbar")
 #' # Plot hockeystick.hcr for given arguments
@@ -201,7 +211,7 @@ hockeystick.hcr <- function(stk, ind, lim, trigger, target, min=0, drop=0,
 
 plot_hockeystick.hcr <- function(args, obs="missing",
   kobe=FALSE, xtarget=args$trigger, alpha=0.3,
-  labels=c(lim="limit", trigger="trigger", min="min", target="target")) {
+  labels=c(lim="limit", trigger="trigger", min="min", target="target", drop="drop")) {
   
   # EXTRACT args from mpCtrl
   if(is(args, "mseCtrl"))
@@ -210,6 +220,8 @@ plot_hockeystick.hcr <- function(args, obs="missing",
     args <- args(args$hcr)
 
   # ASSIGN args if missing
+  if(!"lim" %in% names(args))
+    args$lim <- 0
   if(!"min" %in% names(args))
     args$min <- 0
   if(!"drop" %in% names(args))
@@ -256,19 +268,26 @@ plot_hockeystick.hcr <- function(args, obs="missing",
     annotate("segment", x=0, xend=trigger * 1.25, y=target, yend=target,
       linetype=2) +
     annotate("text", x=0, y=target + ylim / 30, label=labels$target, 
-      hjust="left") +
+      hjust="left", parse=TRUE) +
     # MIN
-    annotate("text", x=0, y=min + ylim / 30, label=labels$min, hjust="left") +
+    annotate("text", x=0, y=min + ylim / 30, label=labels$min, hjust="left", 
+      parse=TRUE) +
     # TRIGGER
     annotate("segment", x=trigger, xend=trigger, y=0, yend=target,
       linetype=2) +
     annotate("text", x=trigger, y=-ylim / 40, label=labels$trigger, 
-      vjust="bottom") +
+      vjust="bottom", parse=TRUE) +
     # LIMIT
     annotate("segment", x=lim, xend=lim, y=0, yend=min, linetype=2) +
-    annotate("text", x=lim, y=-ylim / 40, label=labels$lim, vjust="bottom") +
+    annotate("text", x=lim, y=-ylim / 40, label=labels$lim, vjust="bottom", 
+      parse=TRUE) +
     # HCR line
     geom_line()
+
+  # ADD drop
+  if(!is.null(args$drop) & args$drop != 0)
+    p <- p + annotate("text", x=drop, y=-ylim / 40, label=labels$drop, vjust="bottom", 
+      parse=TRUE)
 
   # KOBE
   # TODO: ONLY if set = 1
@@ -330,7 +349,6 @@ plot_hockeystick.hcr <- function(args, obs="missing",
       obs <- data.frame(met=obs, out=out[which.min(abs(met - obs))])
       p <- p + geom_point(data=obs, colour="red", size=3)
     }
-
   }
   return(p)
 }
