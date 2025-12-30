@@ -691,7 +691,7 @@ setMethod("metrics", signature(object="FLom", metrics="missing"),
 
 setMethod("metrics", signature(object="FLom", metrics="list"),
   function(object, metrics) {
-    FLQuants(metrics(object, metrics))
+    FLQuants(metrics(stock(object), metrics))
 })
 # }}}
 

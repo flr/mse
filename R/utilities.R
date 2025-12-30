@@ -6,8 +6,6 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
-options(future.globals.maxSize=995*1024^2)
-
 # merge (FLQuant, data.table) {{{
 
 setMethod("merge", signature(x="FLQuant", y="data.table"),
@@ -182,28 +180,61 @@ setFCB <- function(output=c("catch", "landings", "discards", "fbar", "f",
 
 # selecMetric {{{
 
+#' Select and/or Compute a Metric from the *stk* and *ind* inputs
+#'
+#' A metric, defined here as a time series, commonly age-aggregated, is computed or extracted
+#' from the input FLStock (*stk*) and FLQuants (*ind*). These have been returned by the call to the
+#' *est*inmation step in a call to `mp()`.
+#'
+#' If *metric* is a character string and matches a name in *ind*, then that *FLQuant* element
+#' is returned. Otherwise, or if *metric* is a function, it is called on *stk*. See examples below.
+#'
+#' @param metric A metric to use, which can be one of the following:
+#'   - `missing`: Defaults to the first element of the `ind` object if only one element is present.
+#'   - `character`: The name of a metric in `ind` to extract, or the name of a function to compute the metric.
+#'   - `function`: A function to compute the metric with *stk* as input.
+#' @param stk The stock object, used for computing the metric (if applicable).
+#' @param ind A FLQuants object containing potential metrics, used for extraction based on `metric`.
+#' @param ... Additional arguments passed to the function `metric` (if it is a function or callable).
+#'
+#' @return The selected or computed metric, either extracted from `ind` or computed using `stk` and `metric`.
+#' @author Iago Mosqueira (WUR)
+#' @examples
+#' data(ple4)
+#' # Computes 'catch' metric from 'stk', 'ind' is empty
+#' selectMetric("catch", stk=ple4, ind=FLQuants())
+#'
+#' # Computes own rfunction (ratio of discards to landings) as metric from 'stk'
+#' selectMetric(function(x) discards(x) / landings(x), stk=ple4, ind=FLQuants())
+#'
+#' # Returns 'catch' metric from 'ind' (defined as log), takes precedence over 'stk'
+#' selectMetric("catch", stk=ple4, ind=FLQuants(catch=log(catch(ple4))))
+#'
+#' # Any function available for 'stk' works
+#' selectMetric(ssb, stk=ple4, ind=FLQuants())
+
 selectMetric <- function(metric="missing", stk, ind, ...) {
 
-    # MISSING metric? ind
-    if(missing(metric)) {
-      if(length(ind) == 1) {
-        met <- ind[[1]]
-      } else {
-        met <- ind
-      }
-    # CHARACTER?
-    } else if (is(metric, "character")) {
-      # EXTRACT from ind,
-      if(metric %in% names(ind))
-        met <- ind[[metric]]
-      # or COMPUTE from stk
-      else
-        met <- do.call(metric, c(list(stk), list(...)))
-    # FUNCTION?
-    } else if(is(metric, "function")) {
-      met <- do.call(metric, c(list(stk), list(...)))
+  # MISSING metric? ind
+  if(missing(metric)) {
+    if(length(ind) == 1) {
+      met <- ind[[1]]
+    } else {
+      met <- ind
     }
-    return(met)
+  # CHARACTER?
+  } else if (is(metric, "character")) {
+    # EXTRACT from ind,
+    if(metric %in% names(ind))
+      met <- ind[[metric]]
+    # or COMPUTE from stk
+    else
+      met <- do.call(metric, c(list(stk), list(...)))
+  # FUNCTION?
+  } else if(is(metric, "function")) {
+    met <- do.call(metric, c(list(stk), list(...)))
+  }
+
+  return(met)
 }
 # }}}
-

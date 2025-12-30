@@ -1,9 +1,9 @@
 import("methods")
 import("data.table")
 import("FLCore")
+import("ggplotFL")
 import("FLFishery")
 import("FLasher")
-import("ggplotFL")
 import("patchwork")
 
 importFrom("ggplot2",
@@ -30,7 +30,10 @@ importFrom("doFuture",
   "%dofuture%")
 
 importFrom("future",
-  "plan")
+  "multicore",
+  "multisession",
+  "plan",
+  "sequential")
 
 importFrom("FLBRP",
   "brp",
@@ -63,7 +66,6 @@ importFrom("stats",
   "uniroot")
 
 export(
-  "buffer.hcr",
   "combinations",
   "cpue.ind",
   "cpues.ind",
@@ -83,10 +85,7 @@ export(
   "indicator.is",
   "initiate",
   "labelPerformance",
-  "len.ind",
   "loadlist",
-  "meta.est",
-  "mlc.ind",
   "movingF.phcr",
   "mp",
   "mpCtrl",
@@ -99,7 +98,6 @@ export(
   "perfect.oem",
   "perfect.sa",
   "periodsPerformance",
-  "plot_buffer.hcr",
   "plot_hockeystick.hcr",
   "readPerformance",
   "response.fb",
@@ -109,9 +107,7 @@ export(
   "setdeviances",
   "setLabelPerformance",
   "summaryPerformance",
-  "shortcut_devs",
   "shortcut.oem",
-  "shortcut.sa",
   "simulator",
   "sp.is",
   "split.is",

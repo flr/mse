@@ -1,11 +1,7 @@
----
-created: 2023-02-16T09:52:55+01:00
-updated: 2023-02-16T09:52:55+01:00
----
 # mse <img src="man/figures/logo.png" align="right" width="120" />
 
 [![R-CMD-check](https://github.com/flr/mse/workflows/R-CMD-check/badge.svg)](https://github.com/flr/mse/actions)
-[![License](https://eddelbuettel.github.io/badges/GPL2+.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
+[![License](https://flr-project.org/img/eupl12.svg)](https://eupl.eu/1.2/en)
 [![Codecov test coverage](https://codecov.io/gh/flr/mse/branch/master/graph/badge.svg)](https://codecov.io/gh/flr/mse?branch=master)
 ![r-universe](https://flr.r-universe.dev/badges/mse)
 

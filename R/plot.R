@@ -87,6 +87,8 @@ setMethod("plot", signature(x="FLom", y="list"),
     # WINDOW om
     if(isTRUE(window))
       maxyear <- min(unlist(lapply(y, function(i) dims(i)$minyear)))
+    else if(is.numeric(window))
+      maxyear <- window
     else
       maxyear <- min(unlist(lapply(y, function(i) dims(i)$maxyear)))
   

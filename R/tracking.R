@@ -1,5 +1,5 @@
 # tracking.R - DESC
-# /tracking.R
+# mse/R/tracking.R
 
 # Copyright Iago MOSQUEIRA (WMR), 2020
 # Author: Iago MOSQUEIRA (WMR) <iago.mosqueira@wur.nl>
@@ -83,11 +83,12 @@ setReplaceMethod("track", signature(object="FLQuant", value="fwdControl"),
 
 setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
   function(object, step, year=dimnames(value)$year, ..., value) {
-    
+
     # CHECK step exists
-    if(!step %in% dimnames(object[[1]])[[1]])
+    if(!step %in% dimnames(object[[1]])[[1]]) {
       object <- lapply(object, function(x)
-        expand(x, metric=c(dimnames(x)$metric, step)))
+        expand(x, metric=c(dimnames(x)$metric, step), fill=FALSE))
+    }
 
     # TODO: USE season of value (1) object[[1]][step, ac(year),,dim(value)[4]] <- c(value)
     object[[1]][step, ac(year)] <- c(value)
@@ -97,7 +98,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
 )
 # }}}
 
-# track<- FLQuants, numeric{{{
+# track<- FLQuants, numeric {{{
 
 setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
   function(object, step, year=dimnames(value)$year, ..., value) {
@@ -105,7 +106,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
     # CHECK step exists
     if(!step %in% dimnames(object[[1]])[[1]])
       object <- lapply(object, function(x)
-        expand(x, metric=c(dimnames(x)$metric, step)))
+        expand(x, metric=c(dimnames(x)$metric, step), fill=FALSE))
 
     if(length(object) == 1)
       object[[1]][step, ac(year)] <- c(value)
@@ -150,7 +151,7 @@ setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
     # CHECK step exists
     if(!step %in% dimnames(object[[1]])[[1]])
       object <- lapply(object, function(x)
-        expand(x, metric=c(dimnames(x)$metric, step)))
+        expand(x, metric=c(dimnames(x)$metric, step), fill=FALSE))
     
     for(i in stock)
       object[[i]][step, ac(year)] <- value[[i]]

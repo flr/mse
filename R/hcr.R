@@ -8,9 +8,6 @@
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
 
-globalVariables(c("ay", "iy", "mys","bufflow", "buffup", "data_lag",
-  "dy", "frq", "fy", "lim", "management_lag", "min", "sloperatio"))
-
 # hockeystick.hcr {{{
 
 #' Hockey-stick Harvest Control Rule
@@ -52,6 +49,8 @@ globalVariables(c("ay", "iy", "mys","bufflow", "buffup", "data_lag",
 #' @param tracking An FLQuant used for tracking indicators, intermediate values, and decisions during MP evaluation.
 #'
 #' @return A list containing elements 'ctrl', a fwdControl object, and 'tracking'.
+#' Three elements in *tracking* report on the steps inside *hockeystick.hcr*:
+#' - decision.hcr
 #' @examples
 #' # Example dataset
 #' data(sol274)
@@ -88,7 +87,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   met <- window(selectMetric(metric, stk, ind, ...), start=dy, end=dy)
 
   # TRACK metric
-  track(tracking, "met.hcr", dy) <- met
+  track(tracking, "metric.hcr", dy) <- met
   
   # - APPLY rule
 
@@ -104,16 +103,11 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   # APPLY drop to min
   out[c(met < drop)] <- min
 
-  # IF NA, set to previous value
-  # if(any(is.na(out))) {
-  #   out[is.na(out)] <- pre[is.na(out)]
-  # }
-
   # TRACK initial output
-  track(tracking, paste0(output, ".hcr"), mys) <- out
+  track(tracking, "decision.hcr", mys) <- out
 
   # TRACK decision: met <= lim, 1; lim < met < trigger, 2; met >= trigger, 3
-  track(tracking, "decision.hcr", ay) <- ifelse(met < drop, 0,
+  track(tracking, "rule.hcr", ay) <- ifelse(met < drop, 0,
     ifelse(met <= lim, 1, ifelse(met < trigger, 2, 3)))
 
   # GET previous output value if change limited
@@ -196,18 +190,16 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE, xtarget=args$trigger * 0.80) +
 #' geom_vline(xintercept=args$trigger * 0.80, linetype=3) +
 #' geom_label(x=args$trigger * 0.80, y=0.7, label="SBtarget")
-#' # ADD a time line and decade labels
+#' # ADD decade labels
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE) +
-#'   geom_line(data=model.frame(metrics(ple4, list(met=ssb, out=fbar)))) +
 #'   geom_label(data=model.frame(metrics(ple4[, ac(seq(1957,2017, by=10))],
-#'   list(met=ssb, out=fbar))), aes(label=year),
+#'   list(metric=ssb, output=fbar))), aes(label=year),
 #'   fill=c("white", rep("gray", 5), "orange"))
 #' # Example on relative terms where trigger < xtarget
 #' args <- list(lim=0., trigger=0.9, target=1, min=0,
 #'   metric="ssb", output="fbar")  
 #' plot_hockeystick.hcr(args, kobe=TRUE, xtarget=1) +
 #' geom_vline(xintercept=1)
-#' plot_hockeystick.hcr(args, obs=3e5)
 
 plot_hockeystick.hcr <- function(args, obs="missing",
   kobe=FALSE, xtarget=args$trigger, alpha=0.3,
@@ -429,317 +421,3 @@ fixedF.hcr <- function(stk, ftrg, args, tracking){
 	list(ctrl=ctrl, tracking=tracking)
 
 } # }}}
-
-# movingF.hcr {{{
-
-#' [TODO:description]
-#'
-#' @param stk [TODO:description]
-#' @param hcrpars [TODO:description]
-#' @param args [TODO:description]
-#' @param tracking [TODO:description]
-#'
-#' @return [TODO:description]
-#' @export
-#'
-#' @examples
-
-movingF.hcr <- function(stk, hcrpars, args, tracking){
-
-	ay <- args$ay
-	# rule 
-	if(!is(hcrpars, "FLQuant"))
-    hcrpars <- FLQuant(c(hcrpars), dimnames=list(iter=dimnames(stk@catch)$iter))
-	
-  # create control file
-  ctrl <- as(FLQuants(fbar=hcrpars), 'fwdControl')
-	
-  # return
-	list(ctrl=ctrl, tracking=tracking)
-
-} # }}}
-
-# buffer.hcr {{{
-
-buffer.hcr <- function(stk, ind, metric='wmean',
-  target=1, width=0.5, lim=max(target * 0.10, target - 2 * width), 
-  bufflow=max(lim * 1.50, target - width), buffupp=target + width,
-  sloperatio=0.15, scale=lastcatch,
-  initac=NULL, dupp=NULL, dlow=NULL, all=TRUE, ..., args, tracking) {
-
-  # EXTRACT args
-  ay <- args$ay
-  iy <- args$iy
-  data_lag <- args$data_lag
-  man_lag <- args$management_lag
-  frq <- args$frq
-
-  # SET data year
-  dy <- ay - data_lag
-  # SET control years
-  cys <- seq(ay + man_lag, ay + man_lag + frq - 1)
-
-  # COMPUE and window metric
-  met <- mse::selectMetric(metric, stk, ind)
-  met <- window(met, start=dy, end=dy)
-
-  # COMPUTE gradient of decrease
-  dgradient <- (1 - 2^(-1)) / (bufflow - lim)
-  
-  # COMPUTE HCR multiplier if ...
-  # BELOW lim
-  hcrm <- ifelse(met <= lim, ((met / lim) ^ 2) / 2,
-    # BETWEEN lim and bufflow
-    ifelse(met <= bufflow,
-      (0.5 * (1 + (met - lim) / (bufflow - lim))),
-    # BETWEEN bufflow and buffupp
-    ifelse(met < buffupp, 1, 
-    # ABOVE buffupp, as proportion of dgradient
-      1 + sloperatio * dgradient * (met - buffupp))))
-
-  # TRACK decision
-  dec <- cut(met, c(0, lim, bufflow, buffupp, Inf), labels=seq(1,4))
-  
-  track(tracking, "decision.hcr", ay) <- as.numeric(dec)
-
-  # GET initial TAC,
-  if(!is.null(initac) & ay == iy) {
-    lastcatch <- FLQuant(initac, iter=args$it)
-  # previous TAC, or
-  } else {
-    # DEBUG: tracking has copies by season, TURN annual?
-    lastcatch <- tracking[[1]]['hcr', ac(ay),,1]
-    # previous catch
-    if(all(is.na(lastcatch)))
-      lastcatch <- unitSums(areaSums(seasonSums(catch(stk)[, ac(ay - args$data_lag)])))
-  }
-
-  # SET TAC
-  out <- scale * hcrm
-
-  # TRACK first decision
-  track(tracking, "rule.hcr", cys) <- out
-
-  # APPLY limits, always or if met < trigger
-  if(!is.null(dupp)) {
-    if(all) {
-      out[out > lastcatch * dupp] <-
-        lastcatch[out > lastcatch * dupp] * dupp
-    } else {
-      out[out > lastcatch * dupp & met > bufflow] <-
-        lastcatch[out > lastcatch * dupp & met > bufflow] * dupp
-    }
-  }
-
-  if(!is.null(dlow)) {
-    if(all) {
-      out[out < lastcatch * dlow] <-
-        lastcatch[out < lastcatch * dlow] * dlow
-    } else {
-      out[out < lastcatch * dlow & met > bufflow] <-
-        lastcatch[out < lastcatch * dlow & met > bufflow] * dlow
-    }
-  }
-
-  # TRACK TAC limited
-  # sum(old > out)
-  # sum(old < out)
-
-  # CONTROL
-  ctrl <- fwdControl(
-    # TARGET for frq years
-    c(lapply(cys, function(x) list(quant="catch", value=c(out), year=x))))
-	
-  list(ctrl=ctrl, tracking=tracking)
-}
-# }}}
-
-# plot_buffer.hcr {{{
-
-plot_buffer.hcr <- function(args, obs="missing", alpha=0.3,
-  labels=c(lim="limit", bufflow="Lower~buffer", buffupp="Upper~buffer",
-    metric=metric, output=output), metric=args$metric, output='multiplier',
-    xlim=buffupp * 1.50, ylim=scale * 1.50) {
-
-  # EXTRACT args from mpCtrl
-  if(is(args, "mseCtrl"))
-    args <- args(args)
-
-  # GET args
-  spread(lapply(args, c), FORCE=TRUE)
-
-  # PARSE labels
-  alllabels <- formals()$labels
-  alllabels[names(labels)] <- labels
-  labels <- as.list(alllabels)
-
-  # SET met values
-  met <- seq(0, xlim, length=200)
-
-  # COMPUTE gradient of decrease
-  dgradient <- (1 - 2^(-1))/(bufflow - lim)
-
-  # COMPUTE HCR multiplier if ...
-
-  # BELOW lim
-  out <- ifelse(met <= lim, ((met / lim) ^ 2) / 2,
-    # BETWEEN lim and bufflow
-    ifelse(met <= bufflow,
-      (0.5 * (1 + (met - lim) / (bufflow - lim))),
-    # BETWEEN bufflow and buffupp
-    ifelse(met < buffupp, 1, 
-    # ABOVE buffupp, as proportion of dgradient
-      1 + sloperatio * dgradient * (met - buffupp))))
-
-  # DATA
-  # TODO: ADD 'set'
-  dat <- data.frame(metric=met, output=out)
-  
-  # TODO:
-  scale <- 1
-  
-  # TODO: ADD aes(group='set')
-  p <- ggplot(dat, aes(x=metric, y=output)) +
-    coord_cartesian(ylim = c(0, ylim), clip="off") +
-    # HCR line
-    geom_line() +
-    # TODO: TARGET & WIDTH
-    # BUFFER UPP
-    annotate("segment", x=buffupp, xend=buffupp, y=0, yend=scale, linetype=2) +
-    annotate("point", x=buffupp, y=scale, size=3) +
-    annotate("text", x=buffupp, y=-ylim / 40, label=labels$buffupp,
-      vjust="bottom", parse=TRUE) +
-    # BUFFER LOW
-    annotate("segment", x=bufflow, xend=bufflow, y=0, yend=scale, linetype=2) +
-    annotate("point", x=bufflow, y=scale, size=3) +
-    annotate("text", x=bufflow, y=-ylim / 40, label=labels$bufflow,
-      vjust="bottom", parse=TRUE) +
-    # LIMIT
-    annotate("segment", x=lim, xend=lim, y=0, yend=out[which.min(abs(met - lim))], 
-      linetype=2) +
-    annotate("point", x=lim, y=out[which.min(abs(met - lim))], size=3) +
-    annotate("text", x=lim, y=-ylim / 40, label=labels$lim, vjust="bottom",
-      parse=TRUE) +
-    # SLOPE
-    annotate("segment", x=buffupp, xend=xlim, y=1, yend=1, linetype=2) +
-    annotate("text", x=buffupp + (xlim - buffupp) / 3, y=1, label="slope", 
-      vjust="bottom", parse=TRUE)
-
-  # AXIS labels
-  if(!is.null(labels$metric))
-    p <- p + xlab(parse(text=labels$metric))
-  if(!is.null(labels$output))
-    p <- p + ylab(parse(text=labels$output))
-
-  # OBS
-  if(!missing(obs)) {
-    # FLStock
-    if(is.FLStock(obs)) {
-      obs <- model.frame(metrics(obs, list(metric=get(metric), output=get(output))))
-      xlim <- max(obs$metric, na.rm=TRUE) * 1.05
-      ylim <- max(obs$output, na.rm=TRUE) * 1.05
-
-      # PLOT line if 1 iter
-      if(length(unique(obs$iter)) == 1)
-        p <- p + geom_point(data=obs, alpha=alpha) +
-          geom_path(data=obs, alpha=alpha) +
-          geom_label(data=subset(obs, year %in% c(min(year), max(year))),
-            aes(label=year), fill=c('gray', 'white'), alpha=1)
-      # PLOT with alpha if multiple
-      else
-        p <- p + geom_point(data=obs, alpha=alpha)
-    }
-    # NUMERIC
-    else if(is.numeric(obs)) {
-      obs <- data.frame(metric=obs, output=output[which.min(abs(metric - obs))])
-      p <- p + geom_point(data=obs, colour="red", size=3)
-    }
-
-  }
-  return(p)
-}
-
-# args <- list(lim=0.4, bufflow=1, buffupp=2,
-#   sloperatio=0.2)
-
-# plot_buffer.hcr(args, labels=list(metric='CPUE', output='C~mult'))
-
-# }}}
-
-# depletion.hcr {{{
-
-depletion.hcr <- function(stk, ind, metric='ssb', mult=1, hrmsy, K,
-  trigger=0.4, lim=0.1, min=0.00001, dupp=NULL, dlow=NULL, all=TRUE,
-  ..., args, tracking) {
-
-  # EXTRACT args
-  ay <- args$ay
-  iy <- args$iy
-  data_lag <- args$data_lag
-  man_lag <- args$management_lag
-  frq <- args$frq
-
-  # SET data year
-  dy <- ay - data_lag
-  # SET control years
-  cys <- seq(ay + man_lag, ay + man_lag + frq - 1)
-
-  # COMPUTE and window metric
-  met <- mse::selectMetric(metric, stk, ind)
-  met <- window(met, start=dy, end=dy)
-
-  # COMPUTE HCR multiplier if ...
-  hcrm <- ifelse((met / K) >= trigger, 1,
-    # metric betwween lim and trigger, and above
-    ifelse((met / K) >= lim,      
-      ((met / K) - lim) / (trigger - lim), min))
-
-  # TRACK decision
-  dec <- cut((met / K), c(0, lim, trigger, Inf), labels=seq(1, 3))
-  # track(tracking, "decision.hcr", ay) <- as.numeric(dec)
-
-  # SET HR target
-  hrtarget <- hrmsy * hcrm * mult
-
-  # SET TAC
-  out <- met * hrtarget
-
-  # TRACK first decision
-  track(tracking, "rule.hcr", cys) <- out
-
-  # TODO: ADD initac and TAC from tracking
-  lastcatch <- unitSums(seasonSums(window(catch(stk), start=dy, end=dy)))
-
-  # APPLY limits, always or if met < trigger
-  if(!is.null(dupp)) {
-    if(all) {
-      out[out > lastcatch * dupp] <-
-        lastcatch[out > lastcatch * dupp] * dupp
-    } else {
-      out[out > lastcatch * dupp & met < trigger] <-
-        lastcatch[out > lastcatch * dupp & met < trigger] * dupp
-    }
-  }
-
-  if(!is.null(dlow)) {
-    if(all) {
-      out[out < lastcatch * dlow] <-
-        lastcatch[out < lastcatch * dlow] * dlow
-    } else {
-      out[out < lastcatch * dlow & met < trigger] <-
-        lastcatch[out < lastcatch * dlow & met < trigger] * dlow
-    }
-  }
-
-  # TRACK TAC limited
-  # sum(old > out)
-  # sum(old < out)
-
-  # CONTROL
-  ctrl <- fwdControl(
-    # TARGET for frq years
-    c(lapply(cys, function(x) list(quant="catch", value=c(out), year=x))))
-	
-  list(ctrl=ctrl, tracking=tracking)
-}
-# }}}

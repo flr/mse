@@ -57,6 +57,10 @@ applies the minimum allowable value (\code{min}), numeric or FLQuant.}
 }
 \value{
 A list containing elements 'ctrl', a fwdControl object, and 'tracking'.
+Three elements in \emph{tracking} report on the steps inside \emph{hockeystick.hcr}:
+\itemize{
+\item decision.hcr
+}
 }
 \description{
 A hockey-stick harvest control rule that sets the value of an output between a

@@ -6,6 +6,9 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
+globalVariables(c(".", "ay", "iy", "mys", "bufflow", "buffup", "data_lag",
+  "dy", "frq", "fy", "lim", "management_lag", "min", "sloperatio"))
+
 # debug, undebug {{{
 
 #' Debugging mse modules
