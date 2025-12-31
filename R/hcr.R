@@ -374,8 +374,8 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
     # TODO: EXPAND years, if needed
     ctrg <- c(ctrg[, ac(seq(ay + mlag, ay + frq))])
   } else {
-    # REPLICATE
-    ctrg <- rep(ctrg, args$it)[seq(args$it)]
+    # REPLICATE for iters and years
+    ctrg <- rep(rep(ctrg, args$it)[seq(args$it)], length(args$mys))
   }
 
 	# create control object
@@ -410,8 +410,8 @@ fixedF.hcr <- function(stk, ftrg, args, tracking){
   if(is(ftrg, 'FLQuant')) {
     # EXPAND iters
     ftrg <- propagate(ftrg, args$it)
-    # TODO: EXPAND years, if needed
-    ftrg <- c(ftrg[, ac(seq(ay + mlag, ay + frq))])
+    # REPLICATE for iters and years
+    ftrg <- rep(rep(ftrg, args$it)[seq(args$it)], length(args$mys))
   }
 
 	# create control object
