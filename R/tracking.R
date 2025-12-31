@@ -6,231 +6,73 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
-# track<- FLQuants, fwdControl{{{
-
-#' @rdname tracking
-#' @examples
-#' tracking <- FLQuants(FLQuant(dimnames=list(metric="hcr",
-#'   year=1990:1992, iter=1:10), units=""))
-#' track(tracking, "hcr", 1990) <- fwdControl(year=1990, quant="fbar",
-#' value=0.15)
-#' tracking
-
-setReplaceMethod("track", signature(object="FLQuants", value="fwdControl"),
-  function(object, step, year=value$year, iter=seq(dim(object[[1]])[6]),
-    ..., value) {
-
-    # FIND target row(s)
-    target <- which(!is.na(apply(iters(value), 1:2, function(x)
-      sum(x))[,'value']))
-
-    # SINGLE stock, tracks first row only
-    if(length(unique(value$biol)) == 1) {
-      object[[1]][step, ac(year),,1,, iter] <- value@iters[target, 'value',]
-
-    # MULTIPLE stocks
-    } else {
-
-      # FIND biols in control with value
-      ids <- unique(value$biol)
-
-      for(i in ids[!is.na(ids)]) {
-        object[[i]][step, ac(year),,1,, iter] <- value@iters[value$biol == i & !is.na(value$value), 'value', ]
-      }
-    }
-
-    return(object)
-  }
-)
-
-# }}}
-
-# track<- FLQuant, fwdControl{{{
-
-#' @rdname tracking
-#' @examples
-#' tracking <- FLQuant(dimnames=list(metric="hcr",
-#'   year=1990:1992, iter=1:10), units="")
-#' track(tracking, "hcr", 1990) <- fwdControl(year=1990, quant="fbar",
-#' value=0.15)
-#' tracking
-
-setReplaceMethod("track", signature(object="FLQuant", value="fwdControl"),
-  function(object, step, year=value$year, iter=seq(dim(object)[6]),
-    ..., value) {
-
-    # FIND target row(s)
-    target <- which(!is.na(apply(iters(value), 1:2, function(x)
-      sum(x))[,'value']))
-
-    object[step, ac(year),,1,, iter] <- value@iters[target, 'value',]
-
-    return(object)
-  }
-)
-
-# }}}
-
-# track<- FLQuants, FLQuant {{{
-
-#' @rdname tracking
-#' @examples
-#' tracking <- FLQuants(
-#'   A=FLQuant(dimnames=list(metric="conv.est", year=1990:1992), units=""),
-#'   B=FLQuant(dimnames=list(metric="conv.est", year=1990:1992), units=""))
-#' track(tracking, "conv.est", 1990) <- FLQuants(A=FLQuant(0), B=FLQuant(1))
-#' tracking
-
-setReplaceMethod("track", signature(object="FLQuants", value="FLQuant"),
+setReplaceMethod("track", signature(object="data.table", value="numeric"),
   function(object, step, year=dimnames(value)$year, ..., value) {
 
-    # CHECK step exists
-    if(!step %in% dimnames(object[[1]])[[1]]) {
-      object <- lapply(object, function(x)
-        expand(x, metric=c(dimnames(x)$metric, step), fill=FALSE))
-    }
+    # ADD step if missing
+    object <- .addMetricDT(object, step)
 
-    # TODO: USE season of value (1) object[[1]][step, ac(year),,dim(value)[4]] <- c(value)
-    object[[1]][step, ac(year)] <- c(value)
+    nos <- object[, length(unique(iter))] * length(year)
 
-    return(object)
+    # ASSIGN
+    object[eval(object[, year %in% ..year & metric == step]),
+      data := rep_len(value, nos)]
+
+    return(object[])
   }
 )
-# }}}
 
-# track<- FLQuants, numeric {{{
-
-setReplaceMethod("track", signature(object="FLQuants", value="numeric"),
+setReplaceMethod("track", signature(object="data.table", value="FLQuant"),
   function(object, step, year=dimnames(value)$year, ..., value) {
 
-    # CHECK step exists
-    if(!step %in% dimnames(object[[1]])[[1]])
-      object <- lapply(object, function(x)
-        expand(x, metric=c(dimnames(x)$metric, step), fill=FALSE))
+    # ADD step if missing
+    object <- .addMetricDT(object, step)
 
-    if(length(object) == 1)
-      object[[1]][step, ac(year)] <- c(value)
-    else {
-      len <- length(object)
-      value <- rep(value, length=len)
-      for(i in seq(len))
-        object[[i]][step, ac(year)] <- c(value[i])
-    }
+    # ASSIGN
+    object[eval(object[, year %in% ..year & metric == step]), data := c(value)]
 
-    return(object)
-  }
-)
-# }}}
-
-# track<- FLQuants, FLQuants{{{
-
-#' @rdname tracking
-#' @examples
-#' # When tracking multiple stocks
-#' tracking <- FLQuants(
-#'   A=FLQuant(dimnames=list(metric="conv.est", year=1990:1992), units=""),
-#'   B=FLQuant(dimnames=list(metric="conv.est", year=1990:1992), units=""))
-#' # FLQuants
-#' track(tracking, "conv.est", 1990) <- FLQuants(A=FLQuant(0), B=FLQuant(1))
-#' tracking
-#' # numeric
-#' track(tracking, "conv.est", 1990) <- 3
-#' tracking
-#' track(tracking, "conv.est", 1990) <- c(1,2)
-#' tracking
-#' # fwdControl
-#' track(tracking, "conv.est", 1990) <- fwdControl(
-#'   list(year=1990, biol=1, quant="fbar", value=0.20),
-#'   list(year=1990, biol=2, quant="fbar", value=0.18))
-#' tracking
-
-setReplaceMethod("track", signature(object="FLQuants", value="FLQuants"),
-  function(object, step, year=dimnames(value)$year, stock=names(value),
-  ..., value) {
-    
-    # CHECK step exists
-    if(!step %in% dimnames(object[[1]])[[1]])
-      object <- lapply(object, function(x)
-        expand(x, metric=c(dimnames(x)$metric, step), fill=FALSE))
-    
-    for(i in stock)
-      object[[i]][step, ac(year)] <- value[[i]]
-
-    return(object)
+    return(object[])
   }
 )
 
-# }}}
+setReplaceMethod("track", signature(object="data.table", value="fwdControl"),
+  function(object, step, year=unique(value$year), ..., value) {
 
-# track<- FLQuants, lists{{{
+    # ADD step if missing
+    object <- .addMetricDT(object, step)
 
-#' @rdname tracking
-#' @examples
-#' # When tracking multiple stocks
-#' tracking <- FLQuants(
-#'   A=FLQuant(dimnames=list(metric="conv.est", year=1990:1992), units=""),
-#'   B=FLQuant(dimnames=list(metric="conv.est", year=1990:1992), units=""))
-#' # FLQuants
-#' track(tracking, "conv.est", 1990) <- FLQuants(A=FLQuant(0), B=FLQuant(1))
-#' tracking
-#' # numeric
-#' track(tracking, "conv.est", 1990) <- 3
-#' tracking
-#' track(tracking, "conv.est", 1990) <- c(1,2)
-#' tracking
-#' # fwdControl
-#' track(tracking, "conv.est", 1990) <- fwdControl(
-#'   list(year=1990, biol=1, quant="fbar", value=0.20),
-#'   list(year=1990, biol=2, quant="fbar", value=0.18))
-#' tracking
+    # ASSIGN
+    object[eval(object[, year %in% ..year & metric == step]), data := value$value]
 
-setReplaceMethod("track", signature(object="FLQuants", value="list"),
-  function(object, step, year=dimnames(value)$year, stock=names(value),
-    ..., value) {
-    
-    # CHECK step exists
-    if(!step %in% dimnames(object[[1]])[[1]])
-      object <- lapply(object, function(x)
-        expand(x, metric=c(dimnames(x)$metric, step)))
-    
-    for(i in stock)
-      track(object[[i]], step=step, year=year) <- value[[i]]
-
-    return(object)
+    return(object[])
   }
 )
 
-# }}}
-
-# track<- FLQuant, numeric{{{
-
-setReplaceMethod("track", signature(object="FLQuant", value="numeric"),
+setReplaceMethod("track", signature(object="data.table", value="FLQuants"),
   function(object, step, year=dimnames(value)$year, ..., value) {
 
-    # CHECK step exists
-    if(!step %in% dimnames(object)[[1]]) {
-      object <- expand(object, metric=c(dimnames(object)$metric, step))
-    }
-    object[step, ac(year)] <- c(value)
+    # ADD step if missing
+    object <- .addMetricDT(object, step)
 
-    return(object)
+    # ASSIGN
+    for(i in names(value))
+      object[eval(object[, biol == i & year %in% ..year & metric == step]),
+        data := c(value[[i]])]
+   
+    return(object[])
   }
 )
-# }}}
 
-# track<- FLQuant, FLQuant {{{
+.addMetricDT <- function(x, step) {
 
-setReplaceMethod("track", signature(object="FLQuant", value="FLQuant"),
-  function(object, step, year=dimnames(value)$year, ..., value) {
+  test <- step %in% .subset2(x[J(step), on='metric', mult='first', nomatch=0], 'metric')
 
-    # CHECK step exists
-    if(!step %in% dimnames(object)[[1]]) {
-      object <- expand(object, metric=c(dimnames(object)$metric, step))
-    }
+  if(test)
+    return(x)
 
-    object[step, ac(year)] <- value
+  dtnew <- x[metric == x[1, metric],]
+  dtnew[, metric := step][, data := as.numeric(NA)]
+  
+  return(rbindlist(list(x, dtnew)))
+}
 
-    return(object)
-  }
-)
-# }}}

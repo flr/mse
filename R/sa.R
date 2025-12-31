@@ -23,9 +23,15 @@
 #' @return A *list* with elements *stk* and *tracking*.
 #'
 #' @examples
+#' # Example dataset
 #' data(sol274)
-#' perfect.sa(stock(om), FLIndices(), args=list(ay=2018, dy=2017),
-#'   tracking=FLQuants(FLQuant(dimnames=list(metric="conv.est", year=2018))))
+#' 
+#' # Sets up an mpCtrl for catch ~ MSY
+#' ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=fixedC.hcr, args=list(ctrg=11400)))
+#' 
+#' # Runs mp between 2021 and 2035
+#' run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
 
 perfect.sa <- function(stk, idx, args, tracking, ...) {
  

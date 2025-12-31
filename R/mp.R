@@ -42,8 +42,8 @@
 #' plot(om, tes)
 
 mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
-  scenario="NA", tracking="missing", logfile=tempfile(),
-  verbose=!handlers(global = NA), progress=handlers(global = NA), parallel=TRUE, 
+  scenario="NA", tracking="missing", verbose=!handlers(global = NA),   
+  progress=handlers(global = NA), parallel=TRUE, 
   window=TRUE, .DEBUG=FALSE) {
 
   # GET do.future workers
@@ -80,7 +80,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     res <- foreach(i=seq(length(om)), .combine="c") %do% {
       mp(om[[i]], oem=oem[[i]], iem=iem,
         control=control, args=args, scenario=scenario, tracking=tracking, 
-        logfile=logfile, verbose=verbose, parallel=parallel)
+        verbose=verbose, parallel=parallel)
     }
     return(FLmses(res))
   }
@@ -160,26 +160,16 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if (!missing(tracking))
     metric <- c(metric, tracking)
 
-  # SETUP tracking FLQs
-  tracking <- FLQuant(NA, dimnames=list(
+  bnames <- if(is(om, "FLombf")) names(biols(om)) else name(stock(om))
+
+  tracking <- do.call(CJ, list(biol=bnames,
     metric=c(metric, steps[steps %in% names(ctrl)], "fb", "fwd", "time", "pid"),
     year=ac(seq(iy - data_lag - frq + 1, fy - management_lag + frq)),
     unit="unique",
     season=dmns$season,
-    iter=1:args$it))
+    iter=1:args$it,
+    data=as.numeric(NA)))
 
-  # TODO: 
-  if(is(om, "FLombf")) {
-    tracking <- FLQuants(setNames(rep(list(tracking), length(names(biols(om)))),
-      names(biols(om))))
-  } else if (is(om, "FLom")){
-    tracking <- FLQuants(A=tracking)
-  }
-
-  # GET historical from OM DEBUG different from original
-  # hyrs <- ac(c(iy - args$management_lag + 1, iy))
-  # track(tracking, "F.om", hyrs) <- window(catch(om), start=hyrs[1], end=hyrs[2])
-  
   # SET seed
   if (!is.null(args$seed))
     seed <- args$seed
@@ -226,7 +216,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
         call0 <- list(
           om = iter(om, j),
           oem = iter(oem, j),
-          tracking = iter(tracking, j),
+          tracking = tracking[iter %in% j],
           fb=iter(fb, j),
           projection=projection(om),
           iem=iter(iem, j),
@@ -234,7 +224,6 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
           args=c(args[!names(args) %in% "it"], it=length(j)),
           verbose=verbose,
           progress=progress,
-          logfile=logfile,
           .DEBUG=.DEBUG)
 
         out <- do.call(goFish, call0)
@@ -257,7 +246,6 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
         args=args,
         verbose=verbose,
         progress=progress,
-        logfile=logfile,
         .DEBUG=.DEBUG)
 
       out <- do.call(goFish, call0)
@@ -287,8 +275,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       oem <- lst0$oem
 
   # tracking
-  tracking <- window(lst0$tracking, start=an(iy) - data_lag,
-    end=an(vy[length(vy)]) + frq)
+  tracking <- lst0$tracking
 
   # END year print
   if(verbose) cat("\n")
@@ -305,7 +292,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 # goFish(FLom) {{{
 
 setMethod("goFish", signature(om="FLom"),
-  function(om, fb, projection, oem, iem, tracking, logfile, ctrl, args,
+  function(om, fb, projection, oem, iem, tracking, ctrl, args,
     verbose, progress, .DEBUG) {
 
   if(.DEBUG)
@@ -325,10 +312,6 @@ setMethod("goFish", signature(om="FLom"),
   # CHECK inputs
   dom <- dimnames(stock(om))
   dst <- dimnames(observations(oem, "stk"))
-
-  # LOGFILE header
-  cat("pid", "year", dimnames(tracking[[1]])[[1]], sep="\t", "\n",
-    file=logfile, append=TRUE)
 
   # COPY ctrl
   ctrl0 <- ctrl
@@ -612,9 +595,9 @@ setMethod("goFish", signature(om="FLom"),
     om <- out$om
 
     # final control
-    track(tracking, "fwd", mys) <- ctrl[1,]
+    track(tracking, "fwd", mys) <- ctrl
     
-    # time (in minutes, per iter)   
+    # time (in minutes per iter)   
     track(tracking, "time", ay) <- as.numeric(difftime(Sys.time(), stim,
       units = "mins")) / args$it
 
@@ -622,18 +605,10 @@ setMethod("goFish", signature(om="FLom"),
     id <- Sys.getpid()
     track(tracking, "pid", ay) <- id
 
-    # OUTPUT summary to logfile
-    lapply(dys, function(x)
-      cat(id, x, c(iterMeans(tracking[[1]][, ac(x)])), "\n", sep="\t",
-        file=logfile, append=TRUE))
-    
     # REPORT progress
     if(progress)
       p(message = sprintf("year: %s", i))
  
-    cat(id, paste0("[", ay, "]"), c(iterMeans(tracking[[1]][, ac(ay)])),
-      "\n", sep="\t", file=logfile, append=TRUE)
-
     # CLEAR memory
     gc()
   }
@@ -657,7 +632,7 @@ setMethod("goFish", signature(om="FLom"),
 
 setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
-    verbose, progress, logfile, .DEBUG) {
+    verbose, progress, .DEBUG) {
 
   if(.DEBUG)
     browser()

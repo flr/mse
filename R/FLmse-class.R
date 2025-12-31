@@ -60,7 +60,7 @@
 FLmse <- setClass("FLmse",
 	slots=c(
     om="FLo",
-		tracking="FLQuants",
+		tracking="data.table",
     control="mpCtrl",
     oem="FLoem",
     # TODO args vs. mpargs
@@ -118,16 +118,7 @@ setGeneric("tracking", function(object, ...) standardGeneric("tracking"))
 
 setMethod("tracking", signature("FLmse"),
   function(object, biol="missing") {
-
-    if(length(object@tracking) == 1)
-  	  return(object@tracking[[1]])
-    else
-      if(missing(biol))
-  	    return(object@tracking)
-      else
-  	    return(object@tracking[[biol]])
-
-  	object
+    return(object@tracking)
 })
 
 #' @rdname FLmse-class
@@ -137,19 +128,9 @@ setGeneric("tracking<-", function(object, ..., value) standardGeneric("tracking<
 
 #' @rdname FLom-class
 
-setReplaceMethod("tracking", signature("FLmse", "FLQuants"),
+setReplaceMethod("tracking", signature("FLmse", "data.table"),
   function(object, value) {
 	  object@tracking <- value
-  	object
-})
-
-setReplaceMethod("tracking", signature("FLmse", "FLQuant"),
-  function(object, biol="missing", value) {
-    if(length(object@tracking) == 1)
-  	  object@tracking[[1]] <- value
-    else
-  	  object@tracking[[biol]] <- value
-
   	object
 })
 
@@ -313,7 +294,8 @@ setMethod("iter", signature(obj="FLmse"),
     # OEM
     oem(obj) <- iter(oem(obj), iter)
     # tracking
-    slot(obj, "tracking") <- iter(slot(obj, "tracking"), iter)
+    tra <- slot(object, "tracking")
+    slot(obj, "tracking") <- tra[eval(tra[, iter %in% ..iter]),]
 
     return(obj)
   }

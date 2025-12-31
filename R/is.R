@@ -155,7 +155,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   fut <- ffwd(fut, sr=srr, control=fctrl)
 
   # ID iters where hcr set met trigger and F > fmin
-  id <- c(tracking[[1]]["decision.hcr", ac(ay)] > 2) &
+  id <- tracking[metric  == "rule.hcr" & year == ay, data > 2] &
     c(fbar(fut)[, ac(ay + management_lag)] > fmin)
 
   # EXTRACT catches
@@ -169,7 +169,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   if(ay == iy)
     prev_tac <- rep(c(initac), length=args$it)
   else
-    prev_tac <- c(tracking[[1]]["isys", ac(ay)])
+    prev_tac <- c(tracking[metric == "isys" & year == ay])
 
   # APPLY upper and lower TAC limit, if not NA and only for id iters
   if(!is.na(dtacupp)) {

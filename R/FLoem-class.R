@@ -240,7 +240,7 @@ setMethod("iter", signature(obj = "FLoem"),
     # observations
     if(length(observations(obj)) > 0) {
       observations(obj) <- rapply(observations(obj), FLCore::iter,
-        classes = c("FLStock", "FLIndex", "FLIndexBiomass"),
+        classes = c("FLStock", "FLStockR", "FLIndex", "FLIndexBiomass"),
         how = "replace", iter=iter)
 
       # PARSE non-FLR objects (lists) in observations (e.g. SA files)

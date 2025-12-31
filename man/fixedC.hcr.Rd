@@ -16,7 +16,13 @@ No matter what get C = Ctrg
 The control argument is a list of parameters used by the HCR.
 }
 \examples{
+# Example dataset
 data(sol274)
-fixedC.hcr(stock(om), ctrg=50000, args=list(ay=2017, management_lag=1,
-  frq=1, it=100), tracking=FLQuant())
+
+# Sets up an mpCtrl for catch ~ MSY
+ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=fixedC.hcr, args=list(ctrg=11400)))
+
+# Runs mp between 2021 and 2035
+run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
 }

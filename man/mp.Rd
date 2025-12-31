@@ -13,7 +13,6 @@ mp(
   args,
   scenario = "NA",
   tracking = "missing",
-  logfile = tempfile(),
   verbose = !handlers(global = NA),
   progress = handlers(global = NA),
   parallel = TRUE,

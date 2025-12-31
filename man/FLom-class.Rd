@@ -11,7 +11,7 @@
 \alias{sr<-,FLom,FLSR-method}
 \alias{combine,FLom,FLom-method}
 \alias{om<-,FLmse,FLo-method}
-\alias{tracking<-,FLmse,FLQuants-method}
+\alias{tracking<-,FLmse,data.table-method}
 \alias{control<-,FLmse,mpCtrl-method}
 \alias{oem<-,FLmse,FLoem-method}
 \title{A class for an operating model (OM)}
@@ -32,7 +32,7 @@ FLom(...)
 
 \S4method{om}{FLmse,FLo}(object) <- value
 
-\S4method{tracking}{FLmse,FLQuants}(object) <- value
+\S4method{tracking}{FLmse,data.table}(object) <- value
 
 \S4method{control}{FLmse,mpCtrl}(object) <- value
 

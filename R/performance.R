@@ -424,7 +424,9 @@ setMethod("performance", signature(x="FLmse"),
 
       # GET tracking elements as FLQuants
       if(length(tracking(x) > 0)) {
-        tracks <- divide(tracking(x), dim=1)
+        tracks <- tracking(x)
+        setnames(tracks, 1:2, c('quant', 'qname'))
+        tracks <- as(tracks, 'FLQuants')
       } else {
         tracks <- NULL
       }
