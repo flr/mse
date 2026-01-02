@@ -158,6 +158,7 @@ setReplaceMethod("tm", signature("mpCtrl", "function"), function(object, value){
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
 #'   trigger=41500, target=0.27))))
+
 setMethod("show", signature(object = "mpCtrl"),
   function(object) {
 

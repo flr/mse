@@ -166,9 +166,9 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   tracking <- do.call(CJ, list(biol=bnames,
     metric=c(metric, steps[steps %in% names(ctrl)], "fb", "fwd", "time", "pid"),
     year=ac(seq(iy - data_lag - frq + 1, fy - management_lag + frq)),
-    unit="unique",
-    # TODO: SEASONAL management
-    season="all",
+    # unit="unique",
+    # TODO: SEASONAL management?
+    # season="all",
     iter=1:args$it,
     data=as.numeric(NA)))
 

@@ -691,6 +691,7 @@ setMethod("[", signature(x="FLombf"),
 ) # }}}
 
 # metrics {{{
+
 setMethod("metrics", signature(object="FLombf", metrics="missing"),
   function(object, named=TRUE) {
  
@@ -727,10 +728,12 @@ setMethod("metrics", signature(object="FLombf", metrics="list"),
     })
 
     # RESHAPE as biol$metric
-    #res <- lapply(setNames(nm=names(res[[1]])), function(x)
-    #  FLQuants(lapply(res, function(y) y[[x]])))
+    res <- lapply(setNames(nm=names(res[[1]])), function(x)
+      FLQuants(lapply(res, function(y) y[[x]]))
+    )
 
-    res <- list(FLQuants(res))
+    if(!is.null(names))
+      res <- res[names]
 
     return(res)
 })
