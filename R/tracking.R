@@ -6,6 +6,8 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
+# track<-(data.table, numeric) {{{
+
 setReplaceMethod("track", signature(object="data.table", value="numeric"),
   function(object, step, year=dimnames(value)$year, ..., value) {
 
@@ -21,6 +23,9 @@ setReplaceMethod("track", signature(object="data.table", value="numeric"),
     return(object[])
   }
 )
+# }}}
+
+# track<-(data.table, FLQuant) {{{
 
 setReplaceMethod("track", signature(object="data.table", value="FLQuant"),
   function(object, step, year=dimnames(value)$year, ..., value) {
@@ -34,6 +39,9 @@ setReplaceMethod("track", signature(object="data.table", value="FLQuant"),
     return(object[])
   }
 )
+# }}}
+
+# track<-(data.table, fwdControl) {{{
 
 setReplaceMethod("track", signature(object="data.table", value="fwdControl"),
   function(object, step, year=unique(value$year), ..., value) {
@@ -47,6 +55,10 @@ setReplaceMethod("track", signature(object="data.table", value="fwdControl"),
     return(object[])
   }
 )
+
+# }}}
+
+# track<-(data.table, FLQuants) {{{
 
 setReplaceMethod("track", signature(object="data.table", value="FLQuants"),
   function(object, step, year=dimnames(value)$year, ..., value) {
@@ -62,6 +74,9 @@ setReplaceMethod("track", signature(object="data.table", value="FLQuants"),
     return(object[])
   }
 )
+# }}}
+
+# functions {{{
 
 .addMetricDT <- function(x, step) {
 
@@ -75,4 +90,4 @@ setReplaceMethod("track", signature(object="data.table", value="FLQuants"),
   
   return(rbindlist(list(x, dtnew)))
 }
-
+# }}}

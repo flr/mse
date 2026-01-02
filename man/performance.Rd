@@ -13,7 +13,7 @@
   statistics = mse::statistics[c("C", "F", "SB", "AAVC")],
   refpts = FLPar(),
   years = setNames(nm = dimnames(x[[1]])$year[-1]),
-  probs = c(0.1, 0.25, 0.5, 0.75, 0.9),
+  probs = NULL,
   om = NULL,
   type = NULL,
   run = NULL,
