@@ -138,8 +138,8 @@ setReplaceMethod("tracking", signature("FLmse", "data.table"),
 
 #' @rdname FLmse-class
 setMethod("control", "FLmse",
-  function(object, i="missing") {
-    if(missing(i))
+  function(object, i=NULL) {
+    if(is.null(i))
       return(object@control)
     else
       return(object@control[[i]])

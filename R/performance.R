@@ -161,7 +161,7 @@ setMethod("performance", signature(x="FLQuants"),
         if(all(unlist(lapply(all.vars(j[names(j) == ""][[1]][[2]]), function(x)
           exists(x) | x %in% names(inp))))) {
 
-          return(as.data.frame(eval(j[names(j) == ""][[1]][[2]], inp), drop=FALSE))     
+          return(as.data.frame(eval(j[names(j) == ""][[1]][[2]], inp), drop=FALSE)) 
 
         } else {
 
@@ -300,7 +300,6 @@ setMethod("performance", signature(x="list"),
 
     # HANDLE list(FLmses), assumes performance is stored
     if(all(unlist(lapply(x, is, 'FLmses')))) {
-      
       return(rbindlist(lapply(x, function(i) performance(i))))
     }
 
