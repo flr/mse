@@ -357,7 +357,8 @@ setMethod("goFish", signature(om="FLom"),
     ctrl.oem$method <- method(oem)
     ctrl.oem$deviances <- deviances(oem)
     ctrl.oem$observations <- observations(oem)
-    ctrl.oem$stk <- stock(om)
+    # TEST: nounit
+    ctrl.oem$stk <- nounit(stock(om))
     ctrl.oem$args <- args
     ctrl.oem$tracking <- tracking
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
@@ -715,11 +716,8 @@ setMethod("goFish", signature(om="FLombf"),
     # GET OM observation
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
 
-    # stk <- lapply(stk, nounit)
-
-    # TODO:
-    # names(tracking) <- names(stk)
-    # names(observations(oem)) <- names(stk)
+    # TEST: nounit
+    stk <- lapply(stk, nounit)
 
     # APPLY oem across stocks
     o.out <- Map(function(stk, dev, obs) {
@@ -812,15 +810,15 @@ setMethod("goFish", signature(om="FLombf"),
       }
     }
 
-    # TRACK est TODO: MAKE robust
-    track(tracking, "F.est", seq(ay, ay + frq - 1)) <- 
-      lapply(stk0, function(x) seasonMeans(window(fbar(x), start=dy0, end=dy)))
-    track(tracking, "B.est", seq(ay, ay + frq - 1)) <- 
-      lapply(stk0, function(x) window(stock(x)[,,,1], start=dy0, end=dy))
-    track(tracking, "SB.est", seq(ay, ay + frq - 1)) <- 
-      lapply(stk0, function(x) window(ssb(x)[,,,1], start=dy0, end=dy))
-    track(tracking, "C.est", seq(ay, ay + frq - 1)) <- 
-      lapply(stk0, function(x) seasonSums(window(catch(x), start=dy0, end=dy)))
+    # TRACK est
+    track(tracking, "F.est", seq(ay, ay + frq - 1)) <- lapply(stk0, function(x)
+        seasonMeans(window(fbar(x), start=dy0, end=dy)))
+    track(tracking, "B.est", seq(ay, ay + frq - 1)) <- lapply(stk0, function(x)
+        window(stock(x)[,,,1], start=dy0, end=dy))
+    track(tracking, "SB.est", seq(ay, ay + frq - 1)) <- lapply(stk0, function(x)
+        window(ssb(x)[,,,1], start=dy0, end=dy))
+    track(tracking, "C.est", seq(ay, ay + frq - 1)) <- lapply(stk0, function(x)
+        areaSums(seasonSums(window(catch(x), start=dy0, end=dy))))
 
     # --- phcr: HCR parameterization
     
