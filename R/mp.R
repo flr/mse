@@ -136,6 +136,9 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # --- RUN checks on inputs
 
+  # CATCH case of refpts with 1 iter
+  refpts(om) <- propagate(refpts(om), dims(om)$it)
+
   # TODO CHECK control: c('est', 'hcr') %in% names(control)
 
   # TODO CHECK iy is correct
@@ -277,7 +280,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       oem <- lst0$oem
 
   # tracking
-  tracking <- lst0$tracking
+  tracking <- lst0$tracking[!is.na(data),]
 
   # END year print
   if(verbose) cat("\n")
