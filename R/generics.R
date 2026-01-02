@@ -7,7 +7,9 @@
 # Distributed under the terms of the EUPL-1.2
 
 globalVariables(c(".", "ay", "iy", "mys", "bufflow", "buffup", "data_lag",
-  "dy", "frq", "fy", "lim", "management_lag", "min", "sloperatio"))
+  "dy", "frq", "fy", "lim", "management_lag", "min", "sloperatio", "..iter",
+  "..year", "x", "y", "i", "j", "J", "k", "metric", "nsqy", "object", "qname", 
+  "trigger"))
 
 # debug, undebug {{{
 
