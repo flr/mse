@@ -203,20 +203,31 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 #' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
 
 effort.is <- function(stk, ctrl, args, tracking){
-	ay <- args$ay
-	it <- dims(stk)$iter
+	
+  # dims
+  ay <- args$ay
+	it <- args$it
 	iy <- args$iy
 	management_lag <- args$management_lag
 	data_lag <- args$data_lag
-	# reference value
-	if(ay==iy) fay <- fbar(stk)[,ac(ay-data_lag)] else fay <- yearMeans(fbar(stk)[,ac(args$sqy)])
-	# target to reach defined by HCR (in f units)
+	
+  # reference value
+	if(ay == iy) 
+    fay <- fbar(stk)[,ac(dy)]
+  else 
+    fay <- yearMeans(fbar(stk)[, ac(args$sqy)])
+	
+  # target to reach defined by HCR (in f units)
 	trgt <- ctrl$value
-	# multiplier
-	mult <- trgt/fay
-	# new control file, in relative terms
-	ctrl <- getCtrl(mult, "f", ay+management_lag, it, rel.year=ay-data_lag)
+	
+  # multiplier
+	mult <- trgt / fay
+	
+  # new control file, in relative terms
+  ctrl <- fwdControl(list(value=mult, year=mys, rel.year=dy, quant="fbar"))
+
 	list(ctrl = ctrl, tracking = tracking)
+
 } # }}}
 
 # indicator.is {{{
