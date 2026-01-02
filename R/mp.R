@@ -808,6 +808,8 @@ setMethod("goFish", signature(om="FLombf"),
       if (!is.null(out.assess$args)) {
         args(ctrl0$est)[names(out.assess$args)] <- out.assess$args
       }
+    } else {
+      stop("'control' must contain an 'est' mseCtrl element.")
     }
 
     # TRACK est
@@ -900,8 +902,7 @@ setMethod("goFish", signature(om="FLombf"),
      tracking <- out$tracking
 
     } else {
-      # BUG: DROP getCtrl
-      ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
+      stop("'control' must contain an 'hcr' mseCtrl element.")
     }
     
     track(tracking, "hcr", mys) <- ctrl
