@@ -155,6 +155,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     "B.est", "SB.est", "C.est", "F.est", "conv.est",
     # iem
     "iem")
+
   steps <- c("phcr", "hcr", "isys", "tm")
 
   if (!missing(tracking))
@@ -166,7 +167,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     metric=c(metric, steps[steps %in% names(ctrl)], "fb", "fwd", "time", "pid"),
     year=ac(seq(iy - data_lag - frq + 1, fy - management_lag + frq)),
     unit="unique",
-    season=dmns$season,
+    # TODO: SEASONAL management
+    season="all",
     iter=1:args$it,
     data=as.numeric(NA)))
 
@@ -487,7 +489,7 @@ setMethod("goFish", signature(om="FLom"),
         year=mys)), "fwdControl")
     }
     
-    # tracking multiple targets/limits, one year
+    # tracking
     track(tracking, "hcr", mys) <- ctrl
 
     #----------------------------------------------------------
@@ -654,7 +656,7 @@ setMethod("goFish", signature(om="FLombf"),
 
   # TODO LOOP every module over stock
   if(is.null(args$stock))
-    args$stock <- seq(biols(om))
+    args$stock <- names(biols(om))
 
   # COPY ctrl
   ctrl0 <- ctrl
@@ -691,14 +693,15 @@ setMethod("goFish", signature(om="FLombf"),
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
 
     # TRACK om
-    track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
-      start=dy0, end=dy))
-    track(tracking, "B.om", dys) <- unitSums(window(tsb(om),
-      start=dy0, end=dy))
-    track(tracking, "SB.om", dys) <- unitSums(window(ssb(om),
-      start=dy0, end=dy))
-    track(tracking, "C.om", dys) <- unitSums(window(catch(om),
-      start=dy0, end=dy))
+    track(tracking, "F.om", dys) <- window(lapply(fbar(om),
+      function(x) seasonMeans(unitMeans(x))), start=dy0, end=dy)
+    track(tracking, "B.om", dys) <- window(lapply(tsb(om),
+      function(x) unitSums(x)[,,,1]), start=dy0, end=dy)
+    # TODO: GET spawning season(s)
+    track(tracking, "SB.om", dys) <- window(lapply(ssb(om),
+      function(x) unitSums(x)[,,,1]), start=dy0, end=dy)
+    track(tracking, "C.om", dys) <- window(lapply(catch(om),
+      function(x) seasonSums(unitSums(x))), start=dy0, end=dy)
     
     # --- OEM: Observation Error Model
 
@@ -719,11 +722,10 @@ setMethod("goFish", signature(om="FLombf"),
     # names(observations(oem)) <- names(stk)
 
     # APPLY oem across stocks
-    # TODO: TIME and SPEED UP
-    o.out <- Map(function(stk, dev, obs, tra) {
+    o.out <- Map(function(stk, dev, obs) {
 
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
-        observations=obs, tracking=FLQuants(tra))))
+        observations=obs, tracking=tracking)))
 
       # TODO: PICK UP fbar range from observations
       # range(obs.oem$stk, c("minfbar", "maxfbar")) <- 
@@ -731,23 +733,23 @@ setMethod("goFish", signature(om="FLombf"),
 
       return(obs.oem)
     }, stk=stk, obs=observations(oem)[names(stk)],
-      dev=deviances(oem)[names(stk)], tra=tracking[names(stk)])
+      dev=deviances(oem)[names(stk)])
 
     # EXTRACT oem observations TODO: CLEAN & ADD methods
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
 
-    tracking <- FLQuants(lapply(o.out, function(x) x$tracking[[1]]))
+    tracking <- o.out[[length(o.out)]]$tracking
     
     observations(oem) <- lapply(o.out, "[[", "observations")
     
     # TRACK oem catch
     track(tracking, "B.obs", dys) <- lapply(window(stk0, start=dy0, end=dy),
-      function(x) areaSums(unitSums(stock(x))))
+      function(x) areaSums(unitSums(stock(x)))[,,,1])
     track(tracking, "SB.obs", dys) <- lapply(window(stk0, start=dy0, end=dy),
-      function(x) areaSums(unitSums(ssb(x))))
+      function(x) areaSums(unitSums(stock(x)))[,,,1])
     track(tracking, "C.obs", dys) <- lapply(window(stk0, start=dy0, end=dy),
-      function(x) areaSums(unitSums(catch(x))))
+      function(x) seasonSums(areaSums(unitSums(catch(x)))))
 
     # --- est: Estimator of stock statistics
 
@@ -791,17 +793,17 @@ setMethod("goFish", signature(om="FLombf"),
 
         ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), 
           ov=list(t1=flsval))
-# BUG:
-        out.assess <- Map(function(x, y, z) {
-          do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=z)))
-          }, x=stk0[args$stock], y=idx0[args$stock], z=tracking[args$stock])
+ 
+        out.assess <- Map(function(x, y) {
+          do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=tracking)))
+          }, x=stk0[args$stock], y=idx0[args$stock])
       
         stk0 <- FLStocks(lapply(out.assess, "[[", "stk"))
       
         if(!is.null(out.assess[[1]]$ind))
           ind <- lapply(out.assess, "[[", "ind")
         
-        tracking[args$stock] <- FLQuants(lapply(out.assess, "[[", "tracking"))
+        tracking <- out.assess[[length(out.assess)]]$tracking
       }
 
       # TODO: PASS args generated at est to ctrl
@@ -812,14 +814,13 @@ setMethod("goFish", signature(om="FLombf"),
 
     # TRACK est TODO: MAKE robust
     track(tracking, "F.est", seq(ay, ay + frq - 1)) <- 
-      lapply(window(lapply(stk0, fbar), start=dy, end=dy + frq - 1), unitMeans)
+      lapply(stk0, function(x) seasonMeans(window(fbar(x), start=dy0, end=dy)))
     track(tracking, "B.est", seq(ay, ay + frq - 1)) <- 
-      lapply(window(lapply(stk0, stock), start=dy, end=dy + frq - 1), unitSums)
+      lapply(stk0, function(x) window(stock(x)[,,,1], start=dy0, end=dy))
     track(tracking, "SB.est", seq(ay, ay + frq - 1)) <- 
-      lapply(window(lapply(stk0, ssb), start=dy, end=dy + frq - 1), unitSums)
+      lapply(stk0, function(x) window(ssb(x)[,,,1], start=dy0, end=dy))
     track(tracking, "C.est", seq(ay, ay + frq - 1)) <- 
-      lapply(window(lapply(stk0, catch), start=dy, end=dy + frq - 1),
-        function(x) areaSums(unitSums(x)))
+      lapply(stk0, function(x) seasonSums(window(catch(x), start=dy0, end=dy)))
 
     # --- phcr: HCR parameterization
     
@@ -899,6 +900,7 @@ setMethod("goFish", signature(om="FLombf"),
       }
 
      tracking <- out$tracking
+
     } else {
       # BUG: DROP getCtrl
       ctrl <- getCtrl(yearMeans(fbar(stk0)[,sqy]), "f", ay + args$management_lag, it)
@@ -1029,10 +1031,8 @@ setMethod("goFish", signature(om="FLombf"),
     # BUG:
     # track(tracking, "fwd", seq(ay, ay+frq-1)) <- ctrl
     # time (end)   
-    track(tracking, "time", ay) <- as.numeric(Sys.time()) -     
-      tracking[[1]]["time", i]
-    id <- Sys.getpid()
-    track(tracking, "pid", ay) <- id
+    track(tracking, "time", ay) <- as.numeric(Sys.time() - stim)
+    track(tracking, "pid", ay) <- Sys.getpid()
 
     # invisible(gc())
   }
