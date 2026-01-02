@@ -616,7 +616,7 @@ setMethod("goFish", signature(om="FLom"),
       p(message = sprintf("year: %s", i))
  
     # CLEAR memory
-    gc()
+    #gc()
   }
   
   # TRACK om in final years (after last ay)
