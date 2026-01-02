@@ -28,7 +28,7 @@ setMethod("merge", signature(x="FLQuant", y="data.table"),
   return(
   list(
     om = Reduce("combine", lapply(res, '[[', "om")),
-    tracking = Reduce("combine", lapply(res, '[[', "tracking")),
+    tracking = rbindlist(lapply(res, '[[', "tracking")),
     oem = Reduce("combine", lapply(res, '[[', "oem"))
 		)
   )
