@@ -331,6 +331,10 @@ setMethod("goFish", signature(om="FLom"),
     # time (start)
     stim <- Sys.time()
   
+    # REPORT progress
+    if(progress)
+      p(message = sprintf("year: %s", i))
+
     if(verbose){
       cat(i, " - ")
     }
@@ -611,10 +615,6 @@ setMethod("goFish", signature(om="FLom"),
     id <- Sys.getpid()
     track(tracking, "pid", ay) <- id
 
-    # REPORT progress
-    if(progress)
-      p(message = sprintf("year: %s", i))
- 
     # CLEAR memory
     #gc()
   }
@@ -1115,13 +1115,13 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       # MODIFY module args
       args(control[[module]])[names(mopts)] <- lapply(mopts, "[", i)
 
-      # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
-         progress=progress)
-
       # PROGRESS
       if(!progress)
         p(message = sprintf("MP: %s", i))
+
+      # CALL mp, parallel left to work along MPs
+      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
+         progress=progress)
 
       # RETURN performance
       if(perf)
