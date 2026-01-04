@@ -1091,12 +1091,31 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     rep(i, length=largs)
   })
 
+  # CREATE standard names for single argument
+  if(length(mopts) == 1)
+    onms <- paste(module, names(mopts)[1], round(mopts[[1]], 2), sep='_')
+  
+  # RENAME list elements
+  if(is.null(names)) {
+    # NO names and one element changed? USE standard
+    if(length(mopts) == 1)
+      names <- onms
+    # OR sequence if more than one element
+    else
+      names <- paste(module, seq(largs), sep='_')
+  # IF names given
+  } else {
+    # PASTE to standard if one
+    if(length(names) == 1)
+      names <- paste(names, onms, sep="-")
+  }
+
   message("Running mps() over module '", module, "' with ", largs,
     " argument sets.")
 
   # LOOP over values
 
-  if(parallel) {
+  if(parallel & nbrOfWorkers() > 1) {
 
     message("Running on ", nbrOfWorkers(), " nodes.")
 
@@ -1152,6 +1171,8 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     })
   }
 
+  names(res) <- names
+
   # STOP or WARN if missing runs
   done <- unlist(lapply(res, function(x) any(c("FLmse", "data.table") %in% is(x))))
 
@@ -1160,28 +1181,6 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   if(sum(done) < largs)
     warning(paste("Some calls to mp() did not run:"), seq(largs)[!done])
-
-  # CREATE standard names for single argument
-  if(length(mopts) == 1)
-    onms <- paste(module, names(mopts)[1], round(mopts[[1]], 2), sep='_')
-
-  # RENAME list elements
-  if(is.null(names)) {
-    # NO names and one element changed? USE standard
-    if(length(mopts) == 1)
-      names(res) <- onms
-    # OR sequence if more than one element
-    else
-      names(res) <- paste(module, seq(largs), sep='_')
-  # IF names given
-  } else {
-    # PASTE to standard if one
-    if(length(names) == 1)
-      names(res) <- paste(names, onms, sep="-")
-    # USE as supplied
-    else
-      names(res) <- names
-  }
 
   # RETURN performance
   if(perf) {
