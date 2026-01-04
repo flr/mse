@@ -120,7 +120,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
       pre <- FLQuant(initial, iter=args$it)
     # OR previous decision,
     } else {
-      pre <- tracking[[1]]['hcr', ac(ay)]
+      pre <- tracking[metric == 'hcr' & year == ay, data]
     }
   }
   
