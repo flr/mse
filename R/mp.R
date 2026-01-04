@@ -322,7 +322,7 @@ setMethod("goFish", signature(om="FLom"),
   ctrl0 <- ctrl
   
   if(progress)
-    p <- progressor(steps=length(vy))
+    p <- progressor(steps=length(vy) + 1)
 
   # go fish!
 
@@ -671,7 +671,7 @@ setMethod("goFish", signature(om="FLombf"),
 
   # SET progressor
   if(progress)
-    p <- progressor(steps=length(vy))
+    p <- progressor(steps=length(vy) + 1)
 
   for(i in vy) {
 
