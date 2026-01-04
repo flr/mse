@@ -154,3 +154,15 @@ setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
 )
 
 # }}}
+
+# tracking {{{
+setMethod("tracking", signature(object="FLmses"),
+  function(object, ...) {
+    
+    # COMBINE tracking from each FLmse
+    track <- rbindlist(lapply(object@.Data, tracking), idcol="run")
+    
+    return(track)
+  }
+)
+# }}}
