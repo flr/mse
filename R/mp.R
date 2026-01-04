@@ -1186,7 +1186,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if(perf) {
 
     # ASSEMBLE single performance table
-    res <- rbindlist(res[done], idcol="run")
+    res <- rbindlist(res[done])
 
     # ADD mp
     res[, mp := paste(om, type, run, sep="_")]
