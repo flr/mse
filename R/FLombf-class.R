@@ -23,21 +23,32 @@ FLombf <- setClass("FLombf",
 setGeneric("FLombf")
 
 setMethod("initialize", "FLombf",
-    function(.Object, ..., biols, fisheries, name, refpts, fleetBehaviour,
-      projection, FCB) {
-      if (!missing(name)) .Object@name <- name
-      if (!missing(biols)) .Object@biols <- biols
-      if (!missing(fisheries)) .Object@fisheries <- fisheries
-      if (!missing(refpts)) .Object@refpts <- refpts
-      if (!missing(fleetBehaviour)) .Object@fleetBehaviour <- fleetBehaviour
-      if (!missing(projection)) .Object@projection <- projection
+  function(.Object, ..., biols, fisheries, name, refpts, fleetBehaviour,
+    projection, FCB) {
+
+      if (!missing(name))
+        .Object@name <- name
+      if (!missing(biols)) 
+        .Object@biols <- biols
+      if (!missing(fisheries)) 
+        .Object@fisheries <- fisheries
+      if (!missing(refpts)) 
+        .Object@refpts <- refpts
+      if (!missing(fleetBehaviour)) 
+        .Object@fleetBehaviour <- fleetBehaviour
+      if (!missing(projection))
+        .Object@projection <- projection
+      else
+        .Object@projection <- mseCtrl(method=fwd.om)
       if(missing(FCB))
         .Object@FCB <- FLFishery::FCB(fcb2int(guessfcb(biols, fisheries),
           biols, fisheries))
       else
         .Object@FCB <- FCB
+      
       .Object <- callNextMethod(.Object, ...)
-      .Object
+
+      return(.Object)
 })
   
 setValidity("FLombf",

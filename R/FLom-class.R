@@ -76,9 +76,8 @@ FLom <- setClass("FLom",
 setGeneric("FLom")
 
 setMethod("initialize", "FLom",
-    function(.Object, ...,
-             stock, sr, refpts, fleetBehaviour, projection, name) {
-      # slots
+  function(.Object, ..., stock, sr, refpts, fleetBehaviour, projection, name) {
+
       if (!missing(stock))
         .Object@stock <- stock 
       if (!missing(name))
@@ -113,8 +112,6 @@ setMethod("initialize", "FLom",
         .Object@sr@params <- args[['params']][pars,]
         args$params <- NULL
       }
-
-      # PARSE end
 
       # HANDLE deviances
       if("deviances" %in% names(args)) {
