@@ -1,8 +1,6 @@
 # mse <img src="man/figures/logo.png" align="right" width="120" />
 
-[![R-CMD-check](https://github.com/flr/mse/workflows/R-CMD-check/badge.svg)](https://github.com/flr/mse/actions)
-[![License](https://flr-project.org/img/eupl12.svg)](https://eupl.eu/1.2/en)
-[![Codecov test coverage](https://codecov.io/gh/flr/mse/branch/master/graph/badge.svg)](https://codecov.io/gh/flr/mse?branch=master)
+[![License](https://flrproject.org/img/eupl12.svg)](https://eupl.eu/1.2/en)
 ![r-universe](https://flr.r-universe.dev/badges/mse)
 
 ## Overview
