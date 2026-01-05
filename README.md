@@ -1,6 +1,6 @@
 # mse <img src="man/figures/logo.png" align="right" width="120" />
 
-[![License](https://flrproject.org/img/eupl12.svg)](https://eupl.eu/1.2/en)
+[![License](https://github.com/flr/flr.github.io/blob/master/img/eupl_1.2.svg)](https://eupl.eu/1.2/en)
 ![r-universe](https://flr.r-universe.dev/badges/mse)
 
 ## Overview
