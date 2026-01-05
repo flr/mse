@@ -106,7 +106,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   # TRACK initial output
   track(tracking, "decision.hcr", mys) <- out
 
-  # TRACK decision: met <= lim, 1; lim < met < trigger, 2; met >= trigger, 3
+  # TRACK rule: met <= lim, 1; lim < met < trigger, 2; met >= trigger, 3
   track(tracking, "rule.hcr", ay) <- ifelse(met < drop, 0,
     ifelse(met <= lim, 1, ifelse(met < trigger, 2, 3)))
 

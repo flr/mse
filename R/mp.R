@@ -1094,15 +1094,12 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # CREATE standard names for single argument
   if(length(mopts) == 1)
     onms <- paste(module, names(mopts)[1], round(mopts[[1]], 2), sep='_')
+  else
+    onms <- paste(paste(names(mopts), collapse='-'), seq(largs), sep='_')
   
   # RENAME list elements
   if(is.null(names)) {
-    # NO names and one element changed? USE standard
-    if(length(mopts) == 1)
       names <- onms
-    # OR sequence if more than one element
-    else
-      names <- paste(module, seq(largs), sep='_')
   # IF names given
   } else {
     # PASTE to standard if one
@@ -1127,7 +1124,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       progress <- TRUE
     }
 
-    res <- foreach(i = seq(largs), .errorhandling="pass",
+    res <- foreach(i = seq(largs), .errorhandling="pass", .inorder=FALSE,
       .options.future=list(globals=structure(TRUE, add=c("control", "module",
       "mopts", "om", "oem", "iem", "args"), seed=seed))) %dofuture% {
 
