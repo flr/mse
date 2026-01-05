@@ -2,6 +2,8 @@
 
 [![License](https://github.com/flr/flr.github.io/blob/master/img/eupl_1.2.svg)](https://eupl.eu/1.2/en)
 ![r-universe](https://flr.r-universe.dev/badges/mse)
+![GitHub issues](https://img.shields.io/github/issues/flr/mse)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/flr/mse)
 
 ## Overview
 
