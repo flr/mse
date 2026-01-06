@@ -225,8 +225,8 @@ plot_hockeystick.hcr <- function(args, obs="missing",
 
   # SET args
   spread(lapply(args, c))
-  xlim <- trigger * 1.50
-  ylim <- target * 1.50
+  xlim <- max(trigger) * 1.50
+  ylim <- max(target) * 1.50
   
   # SET met values
   met <- seq(0, xlim, length=200)

@@ -74,7 +74,7 @@ setValidity("FLoem",
 
 # }}}
 
-#  accessor methods {{{
+# accessor methods {{{
 
 #' @rdname FLoem-class
 #' @aliases observations observations-methods
