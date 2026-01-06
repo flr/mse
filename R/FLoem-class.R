@@ -345,7 +345,7 @@ setMethod("window", signature(x="FLoem"),
 
     # observations
     observations(x) <- rapply(observations(x), window,
-      classes=c("FLStock", "FLIndex", "FLIndexBiomass"),
+      classes=c("FLStock", "FLstockR", "FLIndex", "FLIndexBiomass"),
       how="replace", ...)
 
     # deviances
@@ -361,7 +361,7 @@ setMethod("fwdWindow", signature(x="FLoem", y="missing"),
 
     # observations
     observations(x) <- rapply(observations(x), fwdWindow,
-      classes=c("FLStock", "FLIndex", "FLIndexBiomass"),
+      classes=c("FLStock", "FLStockR", "FLIndex", "FLIndexBiomass"),
       how="replace", end=end, nsq=nsq)
 
     # deviances

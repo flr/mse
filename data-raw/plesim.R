@@ -87,16 +87,22 @@ plot(stock(fut3msy), stock(futf0))
 data(ple4.indices)
 
 idx <- FLIndex(name="SUR", desc="An IBTS-like survey",
-  sel.pattern=expand(sel.pattern(ple4.indices[[6]])[,1], year=seq(1980, 2025), fill=TRUE),
-  index.q=quantMeans(expand(index.q(ple4.indices[[2]])[1:8,1], year=seq(1980, 2025), 
-    fill=TRUE) * rlnorm(100, 0, 0.2)),
+  sel.pattern=expand(sel.pattern(ple4.indices[[6]])[,1],
+    year=seq(1980, 2025), fill=TRUE),
+  index.q=quantMeans(expand(index.q(ple4.indices[[2]])[1:8,1],
+    year=seq(1980, 2025), fill=TRUE)) *
+      rlnorm(100, stock(run)[, ac(seq(1980,2025))] %=% 0, 0.2),
   catch.wt=stock.wt(run)[1:8, ac(seq(1980,2025))],
+  catch.n=catch.n(run)[1:8, ac(seq(1980,2025))],
   range=c(startf=0.5, endf=0.5)
 )
 
 idx <- survey(run, idx, stability=0.86)
 
-oem <- FLoem(observations=list(stk=run, idx=FLIndices(SUR=idx)), method=sampling.oem)
+idb <- as(idx, 'FLIndexBiomass')
+
+oem <- FLoem(observations=list(stk=run, idx=FLIndices(SUR=idx, CPUE=idb)),
+  method=sampling.oem)
 
 oem <- fwdWindow(oem, end=2055)
 
@@ -105,7 +111,7 @@ save(om, oem, file="../data/plesim.rda", compress="xz")
 
 # TEST
 
-arule <- mpCtrl(list(
+rule <- mpCtrl(list(
 
   # (est)imation method: shortcut.sa + SSB deviances
   est = mseCtrl(method=perfect.sa),
@@ -118,7 +124,7 @@ arule <- mpCtrl(list(
 ))
 
 
-run <- mp(om, ctrl=arule, args=list(iy=2025))
+run <- mp(om, ctrl=rule, args=list(iy=2025))
 
 plot(om, run)
 
@@ -134,10 +140,5 @@ rule <- mpCtrl(list(
       target=refpts(om)$FMSY, min=0,
     metric="ssb", output="fbar"))
 ))
-
-
-
-
-mp(om, oem=oem, control)
 
 

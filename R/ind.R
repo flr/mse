@@ -9,8 +9,43 @@
 
 # cpue.ind {{{
 
-cpue.ind <- function(stk, idx, index=1, nyears=5, mean=yearMeans(index(idx)[[index]]),
-  sd=sqrt(yearVars(index(idx)[[index]])), args, tracking) {
+#' Computes CPUE-based Indicators of changes in Stock Abundance
+#'
+#' This function computes four abundance indicators from one CPUE or biomass
+#' index of abundance: the index itself, an average over a number of years, a
+#' weighted mean over those same years and the slope of the trend over the same period.
+#'
+#' @param stk An object representing the stock returned by the `oem` modules, FLStock.
+#' @param idx An FLIndices containing the indices rturned by the `oem` module.
+#' @param index An integer or character, specifying the index to use from `idx`. Default is 1.
+#' @param nyears An integer, the number of years to consider for the calculations. Default is 5.
+#' @param args A list containing dimensionality arguments, passed on by mp().
+#' @param tracking An FLQuant used for tracking indicators, intermediate values, and decisions during MP evaluation.
+#' @details
+#' The weighted average returned in the 'wmean' element is calculated over the last
+#' `nyears`. The last year's weight is set as 50%, and the remaining years share the 
+#' other 50% proportionally. The 'slope' metric is computed on the log-transformed data.
+#'
+#' Three elements are added to the `tracking` table:
+#' - mean.ind, with the index average
+#' - wmean.ind, with the index weighted average
+#' - slope.ind, with the index slope
+#' @return A list containing 'stk', the input FLStock, 'ind, an FLQuants object
+#' containing the computed index metrics, and the 'tracking' table.
+#' @examples
+#' data(plesim)
+#' # MP control with CPUE: catch ~ weighted 4-year mean CPUE
+#' ctrl <- mpCtrl(est=mseCtrl(method=cpue.ind, args=list(index=2)),
+#'   hcr=mseCtrl(method=hockeystick.hcr, args=list(metric="wmean",
+#'   trigger=2000, output="catch", target=1.25e5)))
+#'
+#' # Run the MP
+#'  run <- mp(om, oem, control=ctrl, args=list(iy=2025, fy=2035))
+#'
+#' # Plot results
+#' plot(om, run)
+
+cpue.ind <- function(stk, idx, index=1, nyears=5, args, tracking) {
 
   # ARGS
   ay <- args$ay
@@ -32,23 +67,19 @@ cpue.ind <- function(stk, idx, index=1, nyears=5, mean=yearMeans(index(idx)[[ind
   slope <- dat[, .(data=coef(lm(log(data + 1e-22) ~ year))[2]), by=iter]
   slope <- FLQuant(slope$data, dimnames=dimnames(imean)[-4], units="")
 
-  # 4. EXP zscore
-  #score <- expand(yearMeans(seasonMeans(zscore(met, mean=FLQuant(mean),
-  #  sd=FLQuant(sd)))), year=ay - dlag)
-  
   # OUTPUT
-  ind <- FLQuants(index=met, mean=imean, wmean=wmean, slope=slope)#, zscore=score)
+  ind <- FLQuants(index=met, mean=imean, wmean=wmean, slope=slope)
 
   # TRACK
-  track(tracking, "mean.ind", ac(ay)) <- mean
+  track(tracking, "mean.ind", ac(ay)) <- imean
   track(tracking, "wmean.ind", ac(ay)) <- wmean
   track(tracking, "slope.ind", ac(ay)) <- slope
-  #track(tracking, "zscore.ind", ac(ay)) <- score
 
-  return(list(stk=stk, ind=ind, tracking=tracking, cpue=met))
+  return(list(stk=stk, ind=ind, tracking=tracking))
 
 }
 # }}}
+
 
 # cpues.ind {{{
 

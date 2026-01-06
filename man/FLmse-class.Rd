@@ -41,7 +41,7 @@ tracking(object, ...)
 
 tracking(object, ...) <- value
 
-\S4method{control}{FLmse}(object, i = "missing")
+\S4method{control}{FLmse}(object, i = NULL)
 
 oem(object, ...)
 
