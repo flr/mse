@@ -1050,8 +1050,6 @@ setMethod("goFish", signature(om="FLombf"),
 
 # TODO: mps(FLmse, oem=oem(), ctrl=control(), args=args(), ...)
 
-# statistics, metrics, years - om=name(om), type, run=names,
-
 mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   statistics=NULL, metrics=NULL, type=character(1), names=NULL, parallel=TRUE,
   perf=!is.null(statistics), ...) {

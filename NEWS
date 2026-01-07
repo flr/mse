@@ -1,3 +1,15 @@
+ mse 2.5.0
+
+ NEW FEATURES
+
+- The `setcontrol` function allows changes on the fly to an mpCtrl object, for example
+  inside a call to `mp()`, e.g. `mp(om, control=setcontrol(ctrl, hcr=list(min=0.1))` to
+  change the existing value for the `min` argument to a new one.
+
+ USER-VISIBLE CHANGES
+
+ BUG FIXES
+
  mse 2.2.2
 
  NEW FEATURES
