@@ -107,8 +107,20 @@ oem <- FLoem(observations=obs, deviances=devs, method=sampling.oem)
 
 # SAVE
 
-save(om, oem, file="../data/sol274.rda", compress="xz")
+nom <- new('FLom')
 
+for(i in slotNames(nom))
+  slot(nom, i) <- slot(om, i)
+
+noem <- new('FLoem')
+
+for(i in slotNames(noem))
+  slot(noem, i) <- slot(oem, i)
+
+om <- nom
+oem <- noem
+
+save(om, oem, file="../data/sol274.rda", compress="xz")
 
 # --- TEST
 
