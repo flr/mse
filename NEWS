@@ -8,13 +8,15 @@
 
  USER-VISIBLE CHANGES
 
+- plot_hockeystick.hcr uses geom_label rather than geom_text.
+
  BUG FIXES
 
  mse 2.2.2
 
  NEW FEATURES
 
-- New hockeytsick.hcr, can be used to set multiple HS-shaped HCRs.
+- New hockeystick.hcr, can be used to set multiple HS-shaped HCRs.
 
  mse 2.2
 

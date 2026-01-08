@@ -1,6 +1,6 @@
 Package: mse
 Title: Tools for Running Management Strategy Evaluations using FLR
-Version: 2.4.0.9001
+Version: 2.4.0.9002
 Authors@R: c(person(given = "Iago", family = "Mosqueira",
   role = c("aut", "cre"), email = "iago.mosqueira@wur.nl"), 
   person("Ernesto", "Jardim", email = "ernesto.jardim@gmail.com",
@@ -62,7 +62,6 @@ Collate:
   'fb.R'
   'tm.R'
   'om.R'
-VignetteBuilder: knitr
 License: EUPL
 LazyLoad: true
 LazyData: false
