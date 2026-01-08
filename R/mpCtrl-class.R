@@ -335,10 +335,25 @@ setcontrol <- function(control, ...) {
 
   # LOOP over named list (modules) and apply over @args
   for(i in names(dots)) {
-      args(control[[i]])[names(dots[[i]])] <- as.list(dots[[i]])
+      control[[i]]@args[names(dots[[i]])] <- as.list(dots[[i]])
   }
 
   return(control)
 }
 
 # }}}
+
+# [, [[<- {{{
+
+setMethod("[", signature(x="mpCtrl", i="ANY", j="missing", drop="missing"),
+  function(x, i) {
+    return(mpCtrl(callNextMethod()))
+})
+
+#setMethod("[[<-", signature(x="mpCtrl", i="ANY", j="missing", value="mseCtrl"),
+#  function(x, i, value) {
+#    return(mpCtrl(callNextMethod()))
+#  })
+
+# }}}
+
