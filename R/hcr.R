@@ -201,7 +201,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
 #' plot_hockeystick.hcr(args, kobe=TRUE, xtarget=1) +
 #' geom_vline(xintercept=1)
 
-plot_hockeystick.hcr <- function(args, obs="missing",
+plot_hockeystick.hcr <- function(args, obs=NULL,
   kobe=FALSE, xtarget=args$trigger, alpha=0.3,
   labels=c(lim="limit", trigger="trigger", min="min", target="target", drop="drop")) {
   
@@ -225,9 +225,11 @@ plot_hockeystick.hcr <- function(args, obs="missing",
 
   # SET args
   spread(lapply(args, c))
+
+  # GET plot limits
   xlim <- max(trigger) * 1.50
   ylim <- max(target) * 1.50
-  
+
   # SET met values
   met <- seq(0, xlim, length=200)
 
@@ -255,35 +257,36 @@ plot_hockeystick.hcr <- function(args, obs="missing",
   # TODO: ADD aes(group='set')
   p <- ggplot(dat, aes(x=metric, y=output)) +
     coord_cartesian(ylim = c(0, ylim), clip="off") +
-    # DROP xlab(toupper(metric)) + ylab(toupper(output)) +
     # TARGET
     annotate("segment", x=0, xend=trigger * 1.25, y=target, yend=target,
       linetype=2) +
-    annotate("text", x=0, y=target + ylim / 30, label=labels$target, 
-      hjust="left", parse=TRUE) +
+    annotate("label", x=0, y=target + ylim / 40, label=labels$target, 
+      hjust="left", vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
     # MIN
-    annotate("text", x=0, y=min + ylim / 30, label=labels$min, hjust="left", 
-      parse=TRUE) +
+    annotate("label", x=0, y=min + ylim / 40, label=labels$min, hjust="left", 
+      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+    # LIMIT
+    annotate("segment", x=lim, xend=lim, y=min + ylim / 10, yend=min, linetype=2) +
+    annotate("label", x=lim, y=min + ylim / 10, label=labels$lim, vjust="bottom", 
+      parse=TRUE, fill=flpalette[2], alpha=0.5) +
     # TRIGGER
     annotate("segment", x=trigger, xend=trigger, y=0, yend=target,
       linetype=2) +
-    annotate("text", x=trigger, y=-ylim / 40, label=labels$trigger, 
-      vjust="bottom", parse=TRUE) +
-    # LIMIT
-    annotate("segment", x=lim, xend=lim, y=0, yend=min, linetype=2) +
-    annotate("text", x=lim, y=-ylim / 40, label=labels$lim, vjust="bottom", 
-      parse=TRUE) +
+    annotate("label", x=trigger, y=min + ylim / 10, label=labels$trigger, 
+      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
     # HCR line
-    geom_line()
+    geom_line(size=1)
 
   # ADD drop
-  if(!is.null(args$drop) & args$drop != 0)
-    p <- p + annotate("text", x=drop, y=-ylim / 40, label=labels$drop, vjust="bottom", 
-      parse=TRUE)
+  if(!is.null(args$drop) & args$drop != 0) {
+
+    ydrop <- dat$output[which.min(abs(dat$metric - drop)) + 1]
+
+    p <- p + annotate("label", x=drop, y=ydrop + ylim / 30, label=labels$drop, 
+      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5)
+  }
 
   # KOBE
-  # TODO: ONLY if set = 1
-
   if(kobe) {
   
   # YELLOW inflection point
@@ -319,12 +322,10 @@ plot_hockeystick.hcr <- function(args, obs="missing",
   }
 
   # OBS
-  if(!missing(obs)) {
+  if(!is.null(obs)) {
     # FLStock
     if(is.FLStock(obs)) {
       obs <- model.frame(metrics(obs, list(metric=get(metric), output=get(output))))
-      xlim <- max(obs$met, na.rm=TRUE) * 1.05
-      ylim <- max(obs$out, na.rm=TRUE) * 1.05
 
       # PLOT line if 1 iter
       if(length(unique(obs$iter)) == 1)
@@ -337,14 +338,17 @@ plot_hockeystick.hcr <- function(args, obs="missing",
         p <- p + geom_point(data=obs, alpha=alpha)
     }
     # NUMERIC
-    else if(is.numeric(obs)) {
-      obs <- data.frame(met=obs, out=out[which.min(abs(met - obs))])
+    else if(is(obs, 'FLQuants')) {
+      obs <- data.frame(metric=obs$metric, output=obs$output)
+      p <- p + geom_point(data=obs, colour="red", size=3)
+    } else if(is(obs, 'FLQuant')) {
+      obs <- data.frame(metric=obs, output=0)
       p <- p + geom_point(data=obs, colour="red", size=3)
     }
   }
+
   return(p)
 }
-
 # }}}
 
 # fixedC.hcr {{{
