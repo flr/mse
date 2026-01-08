@@ -501,8 +501,7 @@ setMethod("goFish", signature(om="FLom"),
     }
     
     # tracking
-    # track(tracking, "hcr", mys) <- ctrl
-    track(tracking, "hcr", ay) <- ctrl[1,]
+    track(tracking, "hcr", ay) <- ctrl
 
     #----------------------------------------------------------
     # Implementation system
@@ -524,7 +523,7 @@ setMethod("goFish", signature(om="FLom"),
       tracking <- out$tracking
 
       # TODO: DEAL with ctrl rows in tracking
-      track(tracking, "isys", ay) <- ctrl[1,]
+      track(tracking, "isys", ay) <- ctrl
     }    
 
     #----------------------------------------------------------
@@ -545,7 +544,7 @@ setMethod("goFish", signature(om="FLom"),
       attr(ctrl, "snew") <- out$flq
       tracking <- out$tracking
 
-      track(tracking, "tm", mys) <- ctrl
+      track(tracking, "tm", ay) <- ctrl
     }
 
     #==========================================================
@@ -566,7 +565,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl <- out$ctrl
       tracking <- out$tracking
       
-      track(tracking, "iem", mys) <- ctrl
+      track(tracking, "iem", ay) <- ctrl
     }
 
     #==========================================================
@@ -587,7 +586,7 @@ setMethod("goFish", signature(om="FLom"),
       ctrl <- out$ctrl
       tracking <- out$tracking
       
-      track(tracking, "fb", mys) <- ctrl
+      track(tracking, "fb", ay) <- ctrl
     }
 
     #----------------------------------------------------------
@@ -609,7 +608,7 @@ setMethod("goFish", signature(om="FLom"),
     om <- out$om
 
     # final control
-    track(tracking, "fwd", ay) <- ctrl[1,]
+    track(tracking, "fwd", ay) <- ctrl
     
     # time (in minutes per iter)   
     track(tracking, "time", ay) <- as.numeric(difftime(Sys.time(), stim,
@@ -676,7 +675,6 @@ setMethod("goFish", signature(om="FLombf"),
   # SET progressor
   if(progress)
     p <- progressor(steps=length(vy) + 1)
-
   for(i in vy) {
 
     if(verbose) {
@@ -912,7 +910,7 @@ setMethod("goFish", signature(om="FLombf"),
       stop("'control' must contain an 'hcr' mseCtrl element.")
     }
     
-    track(tracking, "hcr", mys) <- ctrl
+    track(tracking, "hcr", ay) <- ctrl
     
     #----------------------------------------------------------
     # Implementation system
@@ -950,8 +948,7 @@ setMethod("goFish", signature(om="FLombf"),
 
       tracking <- out$tracking
 
-      # BUG: DEAL with multirow ctrl
-      track(tracking, "isys", mys) <- ctrl[1,]
+      track(tracking, "isys", ay) <- ctrl
     }    
 
     #----------------------------------------------------------
@@ -972,7 +969,7 @@ setMethod("goFish", signature(om="FLombf"),
       attr(ctrl, "snew") <- out$flq
       tracking <- out$tracking
 
-      track(tracking, "tm", seq(ay, ay+frq-1)) <- ctrl
+      track(tracking, "tm", ay) <- ctrl
     }
 
     #==========================================================
@@ -993,8 +990,8 @@ setMethod("goFish", signature(om="FLombf"),
       
       ctrl <- out$ctrl
       tracking <- out$tracking
-      # TODO: ADD sum of ctrl      
-      track(tracking, "iem", seq(ay, ay+frq-1)) <- ctrl[1,]
+
+      track(tracking, "iem", ay) <- ctrl
     }
 
     #==========================================================
@@ -1017,7 +1014,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
       tracking <- out$tracking
       
-      track(tracking, "fb", seq(ay, ay + frq - 1)) <- ctrl
+      track(tracking, "fb", ay) <- ctrl
     }
 
     #----------------------------------------------------------
@@ -1034,8 +1031,8 @@ setMethod("goFish", signature(om="FLombf"),
 
     om <- do.call("mpDispatch", ctrl.om)$om
 
-    # BUG:
-    # track(tracking, "fwd", seq(ay, ay+frq-1)) <- ctrl
+    track(tracking, "fwd", ay) <- ctrl
+
     # time (end)   
     track(tracking, "time", ay) <- as.numeric(Sys.time() - stim)
     track(tracking, "pid", ay) <- Sys.getpid()
