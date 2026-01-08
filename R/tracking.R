@@ -49,8 +49,28 @@ setReplaceMethod("track", signature(object="data.table", value="fwdControl"),
     # ADD step if missing
     object <- .addMetricDT(object, step)
 
+    # GET value over multiple years or fisheries
+    dms <- dim(target(value))
+    
+    if(dms[1] > 1) {
+
+      # IF multiple years
+      if(length(unique(value$year)) == dms[1]) {
+
+        # SELECT first
+        value <- iters(value)[1, 'value', ]
+      
+      } else if(length(unique(value$fishery)) == dms[1]) {
+      
+        # AGGREGATE
+        value <- apply(iters(value), 2:3, sum)['value',]
+      }
+    } else {
+      value <- value[1,]$value
+    }
+
     # ASSIGN
-    object[eval(object[, year %in% ..year & metric == step]), data := value$value]
+    object[eval(object[, year %in% ..year & metric == step]), data := value]
 
     return(object[])
   }
