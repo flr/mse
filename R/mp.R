@@ -341,9 +341,11 @@ setMethod("goFish", signature(om="FLom"),
 
     # args
     ay <- args$ay <- an(i)
+    # data years
     dy <- args$dy <- ay - dlag
     dys <- args$dys <- seq(ay - dlag - frq + 1, ay - dlag)
     dy0 <- args$dy0 <- dys[1]
+    # management years
     mys <- args$mys <- seq(ay + mlag, ay + mlag + frq - 1)
     
     # years for status quo computations 
@@ -427,6 +429,8 @@ setMethod("goFish", signature(om="FLom"),
           out.assess$args
       }
       tracking <- out.assess$tracking
+    } else {
+      stop("'control' must contain an 'est' mseCtrl element")
     }
 
     # TODO: DO NOT WRITE if ind
@@ -491,14 +495,14 @@ setMethod("goFish", signature(om="FLom"),
       
       ctrl <- out.hcr$ctrl
       tracking <- out.hcr$tracking
+
     } else {
-      # DEFAULTS to F = mean(Fbar) over nsqy years
-      ctrl <- as(FLQuants(fbar=expand(yearMeans(fbar(stk0)[, sqy]), 
-        year=mys)), "fwdControl")
+      stop("'control' must contain a 'hcr' mseCtrl element")
     }
     
     # tracking
-    track(tracking, "hcr", mys) <- ctrl
+    # track(tracking, "hcr", mys) <- ctrl
+    track(tracking, "hcr", ay) <- ctrl[1,]
 
     #----------------------------------------------------------
     # Implementation system
@@ -520,7 +524,7 @@ setMethod("goFish", signature(om="FLom"),
       tracking <- out$tracking
 
       # TODO: DEAL with ctrl rows in tracking
-      track(tracking, "isys", mys) <- ctrl[1,]
+      track(tracking, "isys", ay) <- ctrl[1,]
     }    
 
     #----------------------------------------------------------
@@ -605,7 +609,7 @@ setMethod("goFish", signature(om="FLom"),
     om <- out$om
 
     # final control
-    track(tracking, "fwd", mys) <- ctrl
+    track(tracking, "fwd", ay) <- ctrl[1,]
     
     # time (in minutes per iter)   
     track(tracking, "time", ay) <- as.numeric(difftime(Sys.time(), stim,

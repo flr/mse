@@ -60,11 +60,16 @@ setReplaceMethod("track", signature(object="data.table", value="fwdControl"),
         # SELECT first
         value <- iters(value)[1, 'value', ]
       
+      # IF multiple fisheries
       } else if(length(unique(value$fishery)) == dms[1]) {
       
         # AGGREGATE
-        value <- apply(iters(value), 2:3, sum)['value',]
+        if(value$quant[1] %in% c("catch", "landings", "discards", "effort"))
+          value <- apply(iters(value), 2:3, sum, na.rm=TRUE)['value',]
+        else
+          value <- apply(iters(value), 2:3, mean, na.rm=TRUE)['value',]
       }
+    # ELSE use 1st
     } else {
       value <- value[1,]$value
     }
