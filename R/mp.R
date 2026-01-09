@@ -350,7 +350,7 @@ setMethod("goFish", signature(om="FLom"),
     
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
-    
+
     # TRACK om, REDUCE dims
     track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
       start=dy0, end=dy))
@@ -366,7 +366,6 @@ setMethod("goFish", signature(om="FLom"),
     ctrl.oem$method <- method(oem)
     ctrl.oem$deviances <- deviances(oem)
     ctrl.oem$observations <- observations(oem)
-    # TEST: nounit
     ctrl.oem$stk <- nounit(stock(om))
     ctrl.oem$args <- args
     ctrl.oem$tracking <- tracking
@@ -384,7 +383,7 @@ setMethod("goFish", signature(om="FLom"),
     idx0 <- o.out$idx
     observations(oem) <- o.out$observations
     tracking <- o.out$tracking
-    
+
     track(tracking, "B.obs", dys) <- unitSums(window(stock(stk0),
       start=dy0, end=dy))
     track(tracking, "SB.obs", dys) <- unitSums(window(ssb(stk0),
