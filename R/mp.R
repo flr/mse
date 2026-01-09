@@ -149,6 +149,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # --- INIT tracking
   
+  # TRACKS set in goFish
   metric <- c(
     # om
     "B.om", "SB.om", "C.om", "F.om",
@@ -161,14 +162,18 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   steps <- c("phcr", "hcr", "isys", "tm")
 
+  # USER added tracks
   if (!missing(tracking))
     metric <- c(metric, tracking)
 
+  # GET names of biols / stock
   bnames <- if(is(om, "FLombf")) names(biols(om)) else name(stock(om))
-
+  
+  # BUILD data.table
   tracking <- do.call(CJ, list(biol=bnames,
     metric=c(metric, steps[steps %in% names(ctrl)], "fb", "fwd", "time", "pid"),
-    year=ac(seq(iy - data_lag - frq + 1, fy - management_lag + frq)),
+    #year=ac(seq(iy - data_lag - frq + 1, fy - management_lag + frq)),
+    year=vy,
     # unit="unique",
     # TODO: SEASONAL management?
     # season="all",
@@ -352,14 +357,14 @@ setMethod("goFish", signature(om="FLom"),
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
 
     # TRACK om, REDUCE dims
-    track(tracking, "F.om", dys) <- unitMeans(window(fbar(om),
-      start=dy0, end=dy))
-    track(tracking, "B.om", dys) <- unitSums(window(tsb(om),
-      start=dy0, end=dy))
-    track(tracking, "SB.om", dys) <- unitSums(window(ssb(om),
-      start=dy0, end=dy))
-    track(tracking, "C.om", dys) <- unitSums(window(catch(om),
-      start=dy0, end=dy))
+    track(tracking, "F.om", ay) <- unitMeans(window(fbar(om),
+      start=dy, end=dy))
+    track(tracking, "B.om", ay) <- unitSums(window(tsb(om),
+      start=dy, end=dy))
+    track(tracking, "SB.om", ay) <- unitSums(window(ssb(om),
+      start=dy, end=dy))
+    track(tracking, "C.om", ay) <- unitSums(window(catch(om),
+      start=dy, end=dy))
     
     # --- OEM: Observation Error Model
     ctrl.oem <- args(oem)
@@ -384,12 +389,12 @@ setMethod("goFish", signature(om="FLom"),
     observations(oem) <- o.out$observations
     tracking <- o.out$tracking
 
-    track(tracking, "B.obs", dys) <- unitSums(window(stock(stk0),
-      start=dy0, end=dy))
-    track(tracking, "SB.obs", dys) <- unitSums(window(ssb(stk0),
-      start=dy0, end=dy))
-    track(tracking, "C.obs", dys) <- unitSums(window(catch(stk0),
-      start=dy0, end=dy))
+    track(tracking, "B.obs", ay) <- unitSums(window(stock(stk0),
+      start=dy, end=dy))
+    track(tracking, "SB.obs", ay) <- unitSums(window(ssb(stk0),
+      start=dy, end=dy))
+    track(tracking, "C.obs", ay) <- unitSums(window(catch(stk0),
+      start=dy, end=dy))
 
     # --- est: Estimator of stock statistics
 
@@ -413,11 +418,19 @@ setMethod("goFish", signature(om="FLom"),
       )
 
       stk0 <- out.assess$stk
+
+      # GET tracking
+      tracking <- out.assess$tracking
       
       # EXTRACT ind(icators) if returned
       if(!is.null(out.assess$ind)) {
+        
         ind <- out.assess$ind
+
         # TRACK indicators
+        for(i in names(ind))
+          track(tracking, paste0(i, ".ind"), ay) <- window(ind[[i]], start=dy, end=dy)
+
       } else {
         ind <- FLQuants()
       }
@@ -427,20 +440,18 @@ setMethod("goFish", signature(om="FLom"),
         args(ctrl0$est)[names(out.assess$args)] <-
           out.assess$args
       }
-      tracking <- out.assess$tracking
     } else {
       stop("'control' must contain an 'est' mseCtrl element")
     }
 
-    # TODO: DO NOT WRITE if ind
-    track(tracking, "F.est", dys) <- unitMeans(window(fbar(stk0),
-      start=dy0, end=dy))
-    track(tracking, "B.est", dys) <- unitSums(window(stock(stk0),
-      start=dy0, end=dy))
-    track(tracking, "SB.est", dys) <- unitSums(window(ssb(stk0),
-      start=dy0, end=dy))
-    track(tracking, "C.est", dys) <- unitSums(window(catch(stk0),
-      start=dy0, end=dy))
+    track(tracking, "F.est", ay) <- unitMeans(window(fbar(stk0),
+      start=dy, end=dy))
+    track(tracking, "B.est", ay) <- unitSums(window(stock(stk0),
+      start=dy, end=dy))
+    track(tracking, "SB.est", ay) <- unitSums(window(ssb(stk0),
+      start=dy, end=dy))
+    track(tracking, "C.est", ay) <- unitSums(window(catch(stk0),
+      start=dy, end=dy))
 
     # --- phcr: HCR parameterization
     
@@ -464,7 +475,7 @@ setMethod("goFish", signature(om="FLom"),
 
     if(exists("hcrpars")){
       # TODO
-      track(tracking, "phcr", dys) <- c(hcrpars[1,])
+      track(tracking, "phcr", ay) <- c(hcrpars[1,])
      }
 
     # --- hcr: Harvest Control Rule
@@ -621,15 +632,6 @@ setMethod("goFish", signature(om="FLom"),
     #gc()
   }
   
-  # TRACK om in final years (after last ay)
-
-  fys <- seq(dy, ay + mlag + frq - 1)
-  
-  track(tracking, "F.om", fys) <- unitMeans(fbar(om))[, ac(fys)]
-  track(tracking, "B.om", fys) <- unitSums(tsb(om))[, ac(fys)]
-  track(tracking, "SB.om", fys) <- unitSums(ssb(om))[, ac(fys)]
-  track(tracking, "C.om", fys) <- unitSums(catch(om))[, ac(fys)]
-
   # RETURN
   list(om=om, tracking=tracking, oem=oem, args=args)
   } 

@@ -87,7 +87,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   met <- window(selectMetric(metric, stk, ind, ...), start=dy, end=dy)
 
   # TRACK metric
-  track(tracking, "metric.hcr", dy) <- met
+  track(tracking, "metric.hcr", ay) <- met
   
   # - APPLY rule
 
@@ -104,7 +104,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   out[c(met < drop)] <- min
 
   # TRACK initial output
-  track(tracking, "decision.hcr", mys) <- out
+  track(tracking, "decision.hcr", ay) <- out
 
   # TRACK rule: met <= lim, 1; lim < met < trigger, 2; met >= trigger, 3
   track(tracking, "rule.hcr", ay) <- ifelse(met < drop, 0,
@@ -120,7 +120,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
       pre <- FLQuant(initial, iter=args$it)
     # OR previous decision,
     } else {
-      pre <- tracking[metric == 'hcr' & year == ay, data]
+      pre <- tracking[metric == 'hcr' & year == ay - 1, data]
     }
   }
   

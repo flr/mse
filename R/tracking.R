@@ -101,7 +101,7 @@ setReplaceMethod("track", signature(object="data.table", value="FLQuants"),
 )
 # }}}
 
-# functions {{{
+# functions: .addMetricDT {{{
 
 .addMetricDT <- function(x, step) {
 
