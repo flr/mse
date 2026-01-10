@@ -18,7 +18,7 @@ library(FLSRTMB)
 
 # --- LOAD data, inputs and results of 2022 ICES WGNSSK sol.27.4 SA
 
-load('sol274/data.Rdata')
+load('sol274/data.rda')
 
 # RUN McMC fit
 
@@ -33,7 +33,7 @@ save(mcfit, file="sol274/mcfit.rda", compress="xz")
 
 # --- SETUP om & oem
 
-load('sol274/mcfit.Rdata')
+load('sol274/mcfit.rda')
 
 # FINAL year
 fy <- 2042
