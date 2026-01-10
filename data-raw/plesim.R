@@ -17,6 +17,8 @@ its <- 100
 # LOAD ple4 as reference
 data(ple4)
 
+stock.n(ple4) <- stock.n(ple4) / 100
+
 # FIT SRR w/fixed steepness
 sr <- srrTMB(as.FLSR(ple4, model=bevholtSV), spr0=mean(spr0y(ple4)), s=0.52)
 
@@ -30,16 +32,14 @@ fbar(brp) <- FLQuant(rep(0.01, length(ys)))
 stk <- as(brp, "FLStock")
 
 # FIX year dimnames & units
-
 dimnames(stk) <- list(year=ys)
-
 units(stk) <- standardUnits(stk)
 
 # PROPAGATE to its
 stk <- FLStockR(propagate(stk, its))
 
+# ADD refpts
 refpts(stk) <- Fbrp(brp)
-
 b0 <- an(Fbrp(brp)["B0"])
 
 # CREATE rffwd control:
@@ -55,6 +55,8 @@ run <- rffwd(stk, sr=sr, control=control, deviances=residuals(sr))
 # PLOT
 plotAdvice(run)
 
+# -- OM
+
 # CREATE om
 om <- FLom(stock=run, refpts=refpts(run), sr=sr)
 
@@ -65,27 +67,15 @@ om <- fwdWindow(om, end=2055,
 # GET refpts
 brps <- brp(FLBRP(as(run, 'FLStock'), sr=list(model=sr@model, params=sr@params)))
 
+# ADD renamed refpts
 refpts(om) <- remap(refpts(brps))
 
-# CHECK
+# -- OEM
 
-futmsy <- fwd(om, fbar=fbar(om)[, ac(2025:2055)] %=% refpts(om)$FMSY)
-
-ssb(futmsy)[, '2055'] / refpts(om)$SBMSY
-
-fut3msy <- fwd(om, fbar=fbar(om)[, ac(2025:2055)] %=% refpts(om)$FMSY * 3)
-
-futf0 <- fwd(om, fbar=fbar(om)[, ac(2025:2055)] %=% 0)
-
-ssb(futf0)[, '2055'] / refpts(om)$SB0
-
-plot(stock(futmsy), stock(futf0))
-plot(stock(fut3msy), stock(futf0))
-
-# OEM
-
+# GET indices
 data(ple4.indices)
 
+# BUILD pseudo-BTS
 idx <- FLIndex(name="SUR", desc="An IBTS-like survey",
   sel.pattern=expand(sel.pattern(ple4.indices[[6]])[,1],
     year=seq(1980, 2025), fill=TRUE),
@@ -97,10 +87,13 @@ idx <- FLIndex(name="SUR", desc="An IBTS-like survey",
   range=c(startf=0.5, endf=0.5)
 )
 
+# CONSTRUCT at-age survey
 idx <- survey(run, idx, stability=0.86)
 
+# CONSTRUCT biomass index
 idb <- as(idx, 'FLIndexBiomass')
 
+# BUILD oem
 oem <- FLoem(observations=list(stk=run, idx=FLIndices(SUR=idx, CPUE=idb)),
   method=sampling.oem)
 
@@ -109,7 +102,10 @@ oem <- fwdWindow(oem, end=2055)
 # SAVE
 save(om, oem, file="../data/plesim.rda", compress="xz")
 
-# TEST
+
+# -- TESTS
+
+# 
 
 rule <- mpCtrl(list(
 
@@ -123,11 +119,11 @@ rule <- mpCtrl(list(
     metric="ssb", output="fbar"))
 ))
 
-
 run <- mp(om, ctrl=rule, args=list(iy=2025))
 
 plot(om, run)
 
+#
 
 rule <- mpCtrl(list(
 
@@ -141,4 +137,19 @@ rule <- mpCtrl(list(
     metric="ssb", output="fbar"))
 ))
 
+# 
+
+futmsy <- fwd(om, fbar=fbar(om)[, ac(2025:2055)] %=% refpts(om)$FMSY)
+
+ssb(futmsy)[, '2055'] / refpts(om)$SBMSY
+
+fut3msy <- fwd(om, fbar=fbar(om)[, ac(2025:2055)] %=% refpts(om)$FMSY * 3)
+
+futf0 <- fwd(om, fbar=fbar(om)[, ac(2025:2055)] %=% 0)
+
+ssb(futf0)[, '2055'] / refpts(om)$SB0
+
+plot(stock(futmsy), stock(futf0))
+
+plot(stock(fut3msy), stock(futf0))
 
