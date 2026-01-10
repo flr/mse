@@ -389,7 +389,7 @@ setMethod("goFish", signature(om="FLom"),
     observations(oem) <- o.out$observations
     tracking <- o.out$tracking
 
-    track(tracking, "B.obs", ay) <- unitSums(window(stock(stk0),
+    track(tracking, "B.obs", ay) <- unitSums(window(tsb(stk0),
       start=dy, end=dy))
     track(tracking, "SB.obs", ay) <- unitSums(window(ssb(stk0),
       start=dy, end=dy))
@@ -446,7 +446,7 @@ setMethod("goFish", signature(om="FLom"),
 
     track(tracking, "F.est", ay) <- unitMeans(window(fbar(stk0),
       start=dy, end=dy))
-    track(tracking, "B.est", ay) <- unitSums(window(stock(stk0),
+    track(tracking, "B.est", ay) <- unitSums(window(tsb(stk0),
       start=dy, end=dy))
     track(tracking, "SB.est", ay) <- unitSums(window(ssb(stk0),
       start=dy, end=dy))
@@ -1111,7 +1111,6 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     " argument sets.")
 
   # LOOP over values
-
   if(parallel & nbrOfWorkers() > 1) {
 
     message("Running on ", nbrOfWorkers(), " nodes.")
@@ -1133,11 +1132,11 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
       # PROGRESS
       if(!progress)
-        p(message = sprintf("MP: %s", i))
+        p(message = sprintf("MP: %i / %i", i, largs))
 
       # CALL mp, parallel left to work along MPs
       run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
-         progress=progress)
+         progress=progress, verbose=FALSE)
 
       # RETURN performance
       if(perf)
