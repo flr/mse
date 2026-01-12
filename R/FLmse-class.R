@@ -294,7 +294,7 @@ setMethod("iter", signature(obj="FLmse"),
     # OEM
     oem(obj) <- iter(oem(obj), iter)
     # tracking
-    tra <- slot(object, "tracking")
+    tra <- slot(obj, "tracking")
     slot(obj, "tracking") <- tra[eval(tra[, iter %in% ..iter]),]
 
     return(obj)

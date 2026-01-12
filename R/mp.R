@@ -700,15 +700,15 @@ setMethod("goFish", signature(om="FLombf"),
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
 
     # TRACK om
-    track(tracking, "F.om", dys) <- window(lapply(fbar(om),
-      function(x) seasonMeans(unitMeans(x))), start=dy0, end=dy)
-    track(tracking, "B.om", dys) <- window(lapply(tsb(om),
-      function(x) unitSums(x)[,,,1]), start=dy0, end=dy)
+    track(tracking, "F.om", ay) <- window(lapply(fbar(om),
+      function(x) seasonMeans(unitMeans(x))), start=dy, end=dy)
+    track(tracking, "B.om", ay) <- window(lapply(tsb(om),
+      function(x) unitSums(x)[,,,1]), start=dy, end=dy)
     # TODO: GET spawning season(s)
-    track(tracking, "SB.om", dys) <- window(lapply(ssb(om),
-      function(x) unitSums(x)[,,,1]), start=dy0, end=dy)
-    track(tracking, "C.om", dys) <- window(lapply(catch(om),
-      function(x) seasonSums(unitSums(x))), start=dy0, end=dy)
+    track(tracking, "SB.om", ay) <- window(lapply(ssb(om),
+      function(x) unitSums(x)[,,,1]), start=dy, end=dy)
+    track(tracking, "C.om", ay) <- window(lapply(catch(om),
+      function(x) seasonSums(unitSums(x))), start=dy, end=dy)
     
     # --- OEM: Observation Error Model
 
@@ -748,11 +748,11 @@ setMethod("goFish", signature(om="FLombf"),
     observations(oem) <- lapply(o.out, "[[", "observations")
     
     # TRACK oem catch
-    track(tracking, "B.obs", dys) <- lapply(window(stk0, start=dy0, end=dy),
+    track(tracking, "B.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) areaSums(unitSums(stock(x)))[,,,1])
-    track(tracking, "SB.obs", dys) <- lapply(window(stk0, start=dy0, end=dy),
+    track(tracking, "SB.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) areaSums(unitSums(stock(x)))[,,,1])
-    track(tracking, "C.obs", dys) <- lapply(window(stk0, start=dy0, end=dy),
+    track(tracking, "C.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) seasonSums(areaSums(unitSums(catch(x)))))
 
     # --- est: Estimator of stock statistics
@@ -819,14 +819,14 @@ setMethod("goFish", signature(om="FLombf"),
     }
 
     # TRACK est
-    track(tracking, "F.est", seq(ay, ay + frq - 1)) <- lapply(stk0, function(x)
-        seasonMeans(window(fbar(x), start=dy0, end=dy)))
-    track(tracking, "B.est", seq(ay, ay + frq - 1)) <- lapply(stk0, function(x)
-        window(stock(x)[,,,1], start=dy0, end=dy))
-    track(tracking, "SB.est", seq(ay, ay + frq - 1)) <- lapply(stk0, function(x)
-        window(ssb(x)[,,,1], start=dy0, end=dy))
-    track(tracking, "C.est", seq(ay, ay + frq - 1)) <- lapply(stk0, function(x)
-        areaSums(seasonSums(window(catch(x), start=dy0, end=dy))))
+    track(tracking, "F.est", ay) <- lapply(stk0, function(x)
+        unitMeans(seasonMeans(window(fbar(x), start=dy, end=dy))))
+    track(tracking, "B.est", ay) <- lapply(stk0, function(x)
+        unitSums(window(stock(x)[,,,1], start=dy, end=dy)))
+    track(tracking, "SB.est", ay) <- lapply(stk0, function(x)
+        unitSums(window(ssb(x)[,,,1], start=dy, end=dy)))
+    track(tracking, "C.est", ay) <- lapply(stk0, function(x)
+        unitSums(areaSums(seasonSums(window(catch(x), start=dy, end=dy)))))
 
     # --- phcr: HCR parameterization
     

@@ -12,6 +12,8 @@
 
 ## BUG FIXES
 
+- iter(FLmses) used wrong name for object when subsetting tracking data.table.
+
 # mse 2.2.2
 
 ## NEW FEATURES
