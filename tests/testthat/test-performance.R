@@ -37,8 +37,12 @@ tes <- lapply(years, function(yr) {
   performance(om, statistics=statistics, years=yr, run='A')
 })
 
+tes$many[statistic=='PSBlim', data, by=year]
+
+tes$many[, .N, by=name]
+
 # ANY NA?
-expect_equal(sum(unlist(lapply(tes, function(x) x[, sum(is.na(data))]))), 0)
+eqpect_equal(sum(unlist(lapply(tes, function(x) x[, sum(is.na(data))]))), 0)
 
 # MEAN inside performance same as outside?
 

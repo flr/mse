@@ -58,7 +58,7 @@ plotAdvice(run)
 # -- OM
 
 # CREATE om
-om <- FLom(stock=run, refpts=refpts(run), sr=sr)
+om <- FLom(stock=run, refpts=refpts(run), sr=sr, name="PLE")
 
 # EXTEND to 2055
 om <- fwdWindow(om, end=2055,

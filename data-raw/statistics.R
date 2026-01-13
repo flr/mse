@@ -34,33 +34,33 @@ statistics <- list(
   FMSY = list(~F/FMSY, name = "F/F[MSY]",
     desc = "Fishing mortality relative to FMSY"),
   # green
-  green = list(~FLQuant((SB / SBMSY) > 1 & (F / FMSY) < 1),
+  green = list(~iterMeans(FLQuant((SB / SBMSY) > 1 & (F / FMSY) < 1)),
     name = "P(Green)", desc = "Probability of being in Kobe green quadrant"),
   # orange
-  orange = list(~FLQuant((SB / SBMSY) >= 1 & (F / FMSY) >= 1),
+  orange = list(~iterMeans(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) >= 1)),
     name = "P(Orange)", desc = "Probability of being in Kobe orange quadrant"),
   # yellow
-  yellow = list(~FLQuant((SB / SBMSY) < 1 & (F / FMSY) < 1),
+  yellow = list(~iterMeans(FLQuant((SB / SBMSY) < 1 & (F / FMSY) < 1)),
     name = "P(Yellow)", desc = "Probability of being in Kobe yellow quadrant"),
   # red
-  red = list(~FLQuant((SB / SBMSY) < 1 & (F / FMSY) > 1),
+  red = list(~iterMeans(FLQuant((SB / SBMSY) < 1 & (F / FMSY) > 1)),
     name = "P(Red)", desc = "Probability of being in Kobe red quadrant"),
   # PSBMSY
-  PSBMSY = list(~(SB / SBMSY) >= 1, name = "P(SB>=SB[MSY])",
+  PSBMSY = list(~iterMeans((SB / SBMSY) >= 1), name = "P(SB>=SB[MSY])",
     desc = "Probability of SB greater or equal to SBMSY"),
   # PSBlim
-  PSBlim = list(~(SB / SBlim) > 1, name = "P(SB>SB[limit])", 
+  PSBlim = list(~iterMeans((SB / SBlim) > 1), name = "P(SB>SB[limit])", 
     desc = "Probability that spawner biomass is above SBlim"),
   # PSB20B0
-  PSB20B0 = list(~(SB / (0.2 * SB0)) > 1 / dim(SB)[2],
+  PSB20B0 = list(~iterMeans((SB / (0.2 * SB0)) > 1),
     name = "P(SB > 0.20 %*% SB[0])", 
     desc = "Probability that spawner biomass is above 20% SB[0]"),
   # risk1
-  risk1 = list(~(SB / SBlim) < 1,
+  risk1 = list(~iterMeans((SB / SBlim) < 1),
     name = "P(SB<B[limit])", 
     desc = "ICES Risk 1, probability that spawner biomass is below Blim"),
   # risk2
-  risk2 = list(~iterMeans((SB / SBlim) < 1) > 0,
+  risk2 = list(~iterMeans(((SB / SBlim) < 1) > 0),
     name = "once(P(SB<B[limit]))", 
     desc = "ICES Risk 2, probability that spawner biomass is above Blim once"),
   # risk3
@@ -78,7 +78,7 @@ statistics <- list(
   IACC = list(~100 * (abs(C[, -1] - C[, -dim(C)[2]])) / C[, -dim(C)[2]],
   name="IAC(C)", desc="Percentage inter-annual change in catch"),
   # PC0
-  PC0 = list(~C < 0.01 * MSY, name = "P(shutdown)", 
+  PC0 = list(~iterMeans(C < 0.01 * MSY), name = "P(shutdown)", 
     desc = "Probability of fishery shutdown")
   )
 
