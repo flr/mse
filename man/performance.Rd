@@ -21,16 +21,15 @@
   ...
 )
 
-\S4method{performance}{FLStock}(x, metrics = FLCore::metrics(x), ...)
+\S4method{performance}{FLStock}(x, statistics, metrics = FLCore::metrics(x), ...)
 
 \S4method{performance}{FLStocks}(
   x,
   statistics,
+  metrics = FLCore::metrics,
   refpts = FLPar(),
   years = seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
-  metrics = FLCore::metrics,
   probs = NULL,
-  grid = missing,
   mc.cores = 1,
   ...
 )
@@ -41,7 +40,6 @@
   refpts = FLPar(),
   years = seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
   probs = NULL,
-  grid = "missing",
   mc.cores = 1,
   ...
 )

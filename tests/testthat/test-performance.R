@@ -7,31 +7,42 @@
 # Distributed under the terms of the EUPL-1.2
 
 
-# --- performance(FLom)
+data(plesim)
 
-data(sol274)
-x <- window(om, end=2021)
-
+# LOAD statistics
 data(statistics)
-stats <- statistics[c("SB", "SBMSY", "PSBMSY", "F", "C", "IACC")]
 
-# - performance(FLom, statistics, metrics, refpts, years, probs, om, type, run, mp)
+# GET variables used in statistics
+vars_stats <- unique(unlist(lapply(statistics, function(x) all.vars(x[[1]]))))
 
-per0 <- performance(x)
-per1 <- performance(x, statistics=stats)
-per <- performance(x, statistics=stats, om='sol274')
-per <- performance(x, statistics=stats, om='sol274', type='none')
-per <- performance(x, years=1958:2021)
-per <- performance(x, statistics=stats, metrics=)
-per <- performance(x, statistics=stats)
+# GET variables available in om refpts and metrics
+x <- c(dimnames(refpts(om))$params, names(metrics(om)))
 
+# IDENTIFY missing variables
+lapply(setNames(nm=vars_stats[!vars_stats %in% x]), exists)
 
-
-# - performance(FLom, statistics, metrics, years, probs, om, type, mp, run, ...)
-
-# - performance(FLom, statistics, metrics, years, probs, om, type, mp, run, ...)
-
-# - performance(FLom, statistics, metrics, years, probs, om, type, mp, run, ...)
+# ADD if needed
+refpts(om)$Ftarget <- refpts(om)$FMSY
+refpts(om)$SBlim <- refpts(om)$SB0 * 0.15
+refpts(om)$MSY <- refpts(om)$SBMSY * refpts(om)$FMSY * 0.50
+# DEBUG: refpts(om)['MSY',] <- 1280
 
 
-#  --- performance(FLombf)
+# --- FLom
+
+years <- list(one=1990, many=1990:1995, unnamed=list(1990:1995),
+  named=list(S=1990:1995))
+
+tes <- lapply(years, function(yr) {
+  performance(om, statistics=statistics, years=yr, run='A')
+})
+
+# ANY NA?
+expect_equal(sum(unlist(lapply(tes, function(x) x[, sum(is.na(data))]))), 0)
+
+# MEAN inside performance same as outside?
+
+tesmany_mean <- tes$many[, .(data=mean(data), year=1995), by=.(statistic, iter, name, desc, om, run, mp)][, .(statistic, year, data, iter, name, desc, om, run, mp)]
+setkey(tesmany_mean, statistic)
+
+expect_identical(tesmany_mean[statistic == "green"], tes$unnamed[statistic == "green"])
