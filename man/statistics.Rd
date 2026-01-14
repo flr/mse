@@ -34,8 +34,8 @@ A named list with elements of class list, each containing three elements: a form
 A list containing named elements, each of which represents a specific statistic. Each of them contains:
 \itemize{
 \item \code{formula}: A formula defining how the metric is calculated.
-\item \code{name}: A short descriptive name.
-\item \code{desc}: A detailed description of the metric.
+\item \code{name}: A short descriptive name. This can contain \code{\link[=plotmath]{plotmath()}} expressions to be parsed by plot functions.
+\item \code{desc}: A more detailed description of the metric.
 }
 }
 \usage{
@@ -52,10 +52,19 @@ very similar outcomes, so a subset should be made of those most relevant to the
 management objectives of interest.
 }
 \details{
-Performance statistics are used by the performance method.
-The formula is evaluated with access to the reference points of the OM, contained
-in the \code{refpts} slot, a set of \link[FLCore:metrics]{FLCore::metrics} obtained from the projected OM, as well as
-any function available in the workspace.
+Performance statistics are used by the \code{\link[=performance]{performance()}} method to compute time series,
+or aggregates along time, of quantities of interest related to the result of applying
+a particular management procedure to an operating model. They combione \code{\link[FLCore:metrics]{FLCore::metrics()}}
+computed from the projected stocks, populations and fisheries, with biological,
+economic or other reference points, but can also use the results of calculations and
+decisions carried out by the MP.
+
+Of the three elements in the list used to define each statistic, the first unnamed
+element, of class 'formula' is the one evaluated by \code{\link[=performance]{performance()}}. The formula is
+evaluated with access to the reference points of the OM, contained in the \code{refpts}
+slot, a set of \link[FLCore:metrics]{FLCore::metrics} obtained from the projected OM, the contents of the
+\link{tracking} table with decisions and outputs from the MP internal calcultions, as well
+as any function available in the workspace.
 
 The statistics currently included are:
 \describe{
@@ -87,6 +96,6 @@ The statistics currently included are:
 \examples{
 data(statistics)
 # Access a specific statistic
-statistics$SB
+statistics$SBMSY
 }
 \keyword{datasets}
