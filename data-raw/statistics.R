@@ -56,12 +56,10 @@ statistics <- list(
     name = "P(SB > 0.20 %*% SB[0])", 
     desc = "Probability that spawner biomass is above 20% SB[0]"),
   # risk1
-  risk1 = list(~iterMeans((SB / SBlim) < 1),
-    name = "P(SB<B[limit])", 
+  risk1 = list(~iterMeans((SB / SBlim) < 1), name = "P(SB<B[limit])", 
     desc = "ICES Risk 1, probability that spawner biomass is below Blim"),
   # risk2
-  risk2 = list(~iterMeans(((SB / SBlim) < 1) > 0),
-    name = "once(P(SB<B[limit]))", 
+  risk2 = list(~iterMeans(((SB / SBlim) < 1) > 0), name = "once(P(SB<B[limit]))", 
     desc = "ICES Risk 2, probability that spawner biomass is above Blim once"),
   # risk3
   risk3 = list(~apply(iterMeans((SB / SBlim) < 1), c(1,3:6), max),
@@ -71,12 +69,12 @@ statistics <- list(
   C = list(~C, name = "C (t)", desc = "Catch"),
   # C/MSY
   CMSY = list(~C/MSY, name = "C/MSY", desc = "Proportion of MSY"),
-  # AAV
-  AAVC = list(~abs(C[, -1] - C[, -dim(C)[2]]) / C[, -dim(C)[2]],
-    name = "AAV(C)", desc = "Annual variability in catch"),
   # IACC
-  IACC = list(~100 * (abs(C[, -1] - C[, -dim(C)[2]])) / C[, -dim(C)[2]],
-  name="IAC(C)", desc="Percentage inter-annual change in catch"),
+  IACC = list(~100 * abs(C[, -1] / C[, -dim(C)[2]] - 1), name="IAC(C)", 
+    desc="Percentage inter-annual change in catch"),
+  # PIACC20%
+  PIACC20 = list(~iterMeans(abs(C[, -1] / C[, -dim(C)[2]] - 1) < 0.20),
+    name="P(IAC(C)<0.20)", desc="Probability of inter-annual change in catch < 20%"),
   # PC0
   PC0 = list(~iterMeans(C < 0.01 * MSY), name = "P(shutdown)", 
     desc = "Probability of fishery shutdown")
