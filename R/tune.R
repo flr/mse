@@ -1,5 +1,5 @@
-# tune.R - DESC
-# /tune.R
+# tune.R - Algorithms for tuning MPs
+# mse/R/tune.R
 
 # Copyright European Union, 2018
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
@@ -8,7 +8,30 @@
 
 # tunebisect: BISECTION tuning {{{
 
-#' 
+#' Tune Management Procedures Using Bisection Method
+#'
+#' The `tunebisect` function is designed to tune a single parameter of a sinfgle
+#' modules in a Management Procedure (MP), typically in the Harvest Control Rule.
+#' It uses a bisection algorithm to iteratively adjust  the parameter to achieve a
+#' specified probabilistic management objective in a given time frame.
+#'
+#' Burden, Richard L.; Faires, J. Douglas (2016), "2.1 The Bisection Algorithm", Numerical Analysis (10th ed.), Cenage Learning, ISBN 978-1-305-25366-7
+#'
+#' @param om An object representing the Operating Model, class FLom or FLombf.
+#' @param oem Observation Error Model, class FLoem or missing, the default.
+#' @param control A control object containing the settings and parameters for the Management Procedure, class mpCtrl.
+#' @param statistic A named list of length 1 defining the statistic used for tuning. The list must include:
+#'   \describe{
+#'     \item{name}{The name of the statistic.}
+#'     \item{formula}{The formula used to compute the statistic.}
+#'     \item{desc}{A description of the statistic.}
+#'   }
+#' @param metrics Optional. A set of metrics used for performance evaluation; defaults to `NULL`.
+#' @param args A list of arguments for running the Management Procedure. Must include  `iy` (initial year).
+#' @param tune A named list specifying the parameter of the HCR to tune and its range.  The list must include  the parameter name and the minimum and maximum values as a vector of length 2.
+#' @param prob The target probability for tuning; defaults to `0.5`. Must be a value between 0 and 1.
+#' @param tol Tolerance for the difference between the computed and target probabilities; defaults to `0.01`.
+#' @param maxit Maximum number of iterations
 #' @examples
 #' # dataset contains both OM (FLom) and OEM (FLoem)
 #' data(sol274)
