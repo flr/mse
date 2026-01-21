@@ -305,9 +305,6 @@ setMethod("goFish", signature(om="FLom"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
     verbose, progress, .DEBUG) {
 
-  if(.DEBUG)
-    browser()
-  
   # ARGUMENTS
   it <- args$it     # number of iterations
   y0 <- args$y0     # initial data year
@@ -332,6 +329,9 @@ setMethod("goFish", signature(om="FLom"),
   # go fish!
 
   for(i in vy) {
+
+  if(.DEBUG)
+    browser()
 
     # time (start)
     stim <- Sys.time()
@@ -644,9 +644,6 @@ setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
     verbose, progress, .DEBUG) {
 
-  if(.DEBUG)
-    browser()
-
   it <- args$it     # number of iterations
   y0 <- args$y0     # initial data year
   fy <- args$fy     # final year
@@ -677,6 +674,9 @@ setMethod("goFish", signature(om="FLombf"),
   if(progress)
     p <- progressor(steps=length(vy) + 1)
   for(i in vy) {
+
+  if(.DEBUG)
+    browser()
 
     if(verbose) {
       cat(i, " > ")

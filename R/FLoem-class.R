@@ -366,7 +366,7 @@ setMethod("fwdWindow", signature(x="FLoem", y="missing"),
 
     # deviances
     deviances(x) <- rapply(deviances(x), window, classes=c("FLQuant"),
-      how="replace",  end=end, nsq=nsq)
+      how="replace",  end=end)
 
     return(x)
   }
