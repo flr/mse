@@ -371,7 +371,11 @@ setMethod("goFish", signature(om="FLom"),
     ctrl.oem$method <- method(oem)
     ctrl.oem$deviances <- deviances(oem)
     ctrl.oem$observations <- observations(oem)
-    ctrl.oem$stk <- nounit(stock(om))
+    
+    # MATCH dim(stk) to observations$stk
+    sdi <- dim(observations(oem)$stk)[c(3,4,5)] == 1
+    ctrl.oem$stk <- simplify(stock(om), c("unit", "season", "area")[sdi])
+
     ctrl.oem$args <- args
     ctrl.oem$tracking <- tracking
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
