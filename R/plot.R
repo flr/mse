@@ -12,13 +12,17 @@ setMethod("plot", signature(x="FLo", y="missing"),
 
     args <- list(...)
 
+    # IF args, plot list
+    if(length(args) > 1)
+      return(plot(x, args, metrics=metrics))
+
     # COMPUTE metrics
     if(is.null(metrics))
       mets <- metrics(x)[c("SB", "R", "C", "F")]
     else
       mets <- do.call("metrics", list(object=x, metrics=metrics))
 
-    plot(mets) + ylim(c(0, NA))
+    return(plot(mets) + ylim(c(0, NA)))
   }
 )
 # }}}
