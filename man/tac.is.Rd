@@ -10,7 +10,7 @@ tac.is(
   args,
   output = "catch",
   recyrs = -2,
-  Fdevs = fbar(fut) \%=\% 1,
+  Fdevs = unitMeans(fbar(fut)) \%=\% 1,
   dtaclow = NA,
   dtacupp = NA,
   fmin = 0,
