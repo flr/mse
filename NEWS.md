@@ -1,4 +1,4 @@
-# mse 2.5.0
+# mse 2.4.2
 
 ## NEW FEATURES
 
@@ -9,6 +9,7 @@
 ## USER-VISIBLE CHANGES
 
 - plot_hockeystick.hcr uses geom_label rather than geom_text.
+- oem will simplify stock according to dims of observations$stk only
 
 ## BUG FIXES
 
