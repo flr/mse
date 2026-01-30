@@ -53,7 +53,7 @@
 
 tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   Fdevs=unitMeans(fbar(fut)) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0, reuse=TRUE,
-  initac=metrics(stk, output)[, ac(iy - 1)], tracking) {
+  initac=metrics(stk, output)[, ac(iy - data_lag)], tracking) {
 
   # EXTRACT args
   spread(args)
@@ -137,22 +137,22 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
         # target
         list(year=cys, quant="fbar", value=c(ftar)))
     } else {
-      fctrl <- fwdControl(
-        # ay as intermediate with Fsq TODO: Other options
-        list(year=seq(ay - data_lag + 1, length=management_lag),
-          quant="fbar", value=rep(c(fsq), management_lag)),
-        # target
-        list(year=cys, quant="fbar", value=c(ftar)))
+      fctrl <- fwdControl(      
+        list(year=seq(dy + 1, mys[1] - 1), quant="fbar",
+          value=rep(c(fsq), data_lag + management_lag - 1)),
+        list(year=mys, quant="fbar",
+          value=c(ftar)))
     }
 
   # else only for my
   } else {
     fctrl <- fwdControl(
-      list(year=ay + management_lag, quant="fbar", value=ftar))
+      list(year=ay, quant="fbar", value=ftar))
   }
 
   # RUN STF ffwd
-  fut <- ffwd(fut, sr=srr, control=fctrl)
+if(any(is.na(fctrl$value))) browser()
+  fut <- fwd(fut, sr=srr, control=fctrl)
 
   # ID iters where hcr set met trigger and F > fmin
   id <- tracking[metric  == "rule.hcr" & year == ay, data > 2] &
@@ -160,9 +160,9 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
   # EXTRACT catches
   if(isTRUE(reuse) | toupper(reuse) == "C") {
-    TAC <- expand(catch(fut)[, ac(cys)[1]], year=seq(length(cys)))
+    TAC <- areaSums(unitSums(expand(catch(fut)[, ac(cys)[1]], year=seq(length(cys)))))
   } else {
-    TAC <- catch(fut)[, ac(cys)]
+    TAC <- areaSums(unitSums(catch(fut)[, ac(cys)]))
   }
 
   # GET TAC dy / ay - 1
