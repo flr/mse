@@ -43,20 +43,12 @@ perfect.oem <- function(stk, deviances, observations, args, tracking,
   dy <- ac(args$dy)
 
   # GET perfect stock
+  # TODO: GET perfect stocks
+  
 	stk <- window(stk, start=y0, end=dy, extend=FALSE)
   
-  # SIMPLIFY to match observations$stk
-  dio <- dim(observations$stk)
-  dis <- dim(stk)
-
-  if(!is.null(dio)) {
-    if(dio[3] > dis[3])
-      stk <- nounit(stk)
-    if(dio[4] > dis[4])
-      stk <- noseason(stk)
-  }
-
-  # SET perfect FLIndex per stock
+  # SET perfect FLIndex
+  # TODO: SET perfect FLIndex per stock
   if(biomass) {
     idx <- FLIndices(A=survey(stk, index.q=0.01, biomass=TRUE))
   } else {
@@ -271,7 +263,6 @@ default.oem <- function(om) {
     stk=FLQuants(catch.n=catch.n(obs$stk) %=% 1))
 
   # method is perfect.oem
-
   return(FLoem(method=perfect.oem, observations=obs))
 }
 # }}}

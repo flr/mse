@@ -52,7 +52,7 @@
 #' plot(om, TAC.IS=run)
 
 tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
-  Fdevs=fbar(fut) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0, reuse=TRUE,
+  Fdevs=unitMeans(fbar(fut)) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0, reuse=TRUE,
   initac=metrics(stk, output)[, ac(iy - 1)], tracking) {
 
   # EXTRACT args
@@ -102,7 +102,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   # TODO: OTHER rec options
   
   # SET GM recruitment from past
-  gmnrec <- unitSums(exp(yearMeans(log(rec(stk)[, recyrs]))))
+  gmnrec <- exp(yearMeans(log(unitSums(rec(stk))[, recyrs])))
 
   # SETUP SRR
   srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
@@ -127,7 +127,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   if(management_lag > 0) {
  
     # SET F for intermediate year
-    fsq <- fbar(stk)[, ac(dy)]
+    fsq <- unitMeans(fbar(stk)[, ac(dy)])
 
     # TODO: ADD TAC option
 

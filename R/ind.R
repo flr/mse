@@ -80,7 +80,6 @@ cpue.ind <- function(stk, idx, index=1, nyears=5, args, tracking) {
 }
 # }}}
 
-
 # cpues.ind {{{
 
 cpues.ind <- function(stk, idx, nyears=5, index=1, args, tracking) {

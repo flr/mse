@@ -373,7 +373,7 @@ setMethod("goFish", signature(om="FLom"),
     ctrl.oem$observations <- observations(oem)
     
     # MATCH dim(stk) to observations$stk
-    sdi <- dim(observations(oem)$stk)[c(3,4,5)] == 1
+    sdi <- dim(observations(oem)$stk)[c(3, 4, 5)] == 1
     ctrl.oem$stk <- simplify(stock(om), c("unit", "season", "area")[sdi])
 
     ctrl.oem$args <- args
