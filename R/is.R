@@ -107,8 +107,8 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   # SETUP SRR
   srr <- predictModel(model=rec~a, params=FLPar(a=gmnrec))
 
-  # STORE geomeanrec value
-  track(tracking, "gmrec.isys", ay + management_lag) <- gmnrec
+  # TRACK geomeanrec value
+  track(tracking, "gmrec.isys", ay) <- gmnrec
 
   # ADD F deviances for 1 year
 
@@ -121,7 +121,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   }
 
   # TRACK Ftarget
-  track(tracking, "fbar.isys", cys) <- ftar
+  track(tracking, "fbar.isys", ay) <- ftar
 
   # FORECAST for iyrs and my IF mlag > 0,
   if(management_lag > 0) {
@@ -137,11 +137,10 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
         # target
         list(year=cys, quant="fbar", value=c(ftar)))
     } else {
-      fctrl <- fwdControl(      
-        list(year=seq(dy + 1, mys[1] - 1), quant="fbar",
-          value=rep(c(fsq), data_lag + management_lag - 1)),
-        list(year=mys, quant="fbar",
-          value=c(ftar)))
+      fctrl <- fwdControl(c(      
+        lapply(seq(dy + 1, mys[1] - 1), function(y) list(year=y,
+          quant="fbar", value=c(fsq))),
+        list(list(year=mys, quant="fbar", value=c(ftar)))))
     }
 
   # else only for my
