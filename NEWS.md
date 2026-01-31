@@ -1,3 +1,9 @@
+# mse 2.4.3
+
+## BUG FIXES
+
+- The correct fy is now set in mp() when data_lag, management_lag and frq are all > 1
+
 # mse 2.4.2
 
 ## NEW FEATURES

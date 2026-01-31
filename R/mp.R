@@ -123,7 +123,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   frq <- args$frq <- if(is.null(args$frq)) 1 else args$frq
 
   # vector of years on which to run mp
-  vy <- args$vy <- ac(seq(iy, fy - management_lag, by=frq))
+  vy <- args$vy <- ac(seq(iy, fy - management_lag - frq + 1, by=frq))
   
   # CHECK proj years do not extend beyond maxyear
   if(an(vy[length(vy)]) + frq > dis$maxyear) {
