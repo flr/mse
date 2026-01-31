@@ -58,14 +58,11 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   # EXTRACT args
   spread(args)
 
-  # SET control years
-  cys <- seq(ay + management_lag, ay + management_lag + frq - 1)
-
-  # PREPARE stk for cys, biology as in last nsqy years
+  # PREPARE stk for mys, biology as in last nsqy years
   if(management_lag == 0) {
     fut <- stk
   } else {
-    fut <- fwdWindow(stk, end=cys[length(cys)], nsq=nsqy)
+    fut <- fwdWindow(stk, end=mys[length(mys)], nsq=nsqy)
   }
 
   # PARSE recyrs if numeric
@@ -114,10 +111,10 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
   # reuse = TRUE
   if(isTRUE(reuse) | toupper(reuse) == 'F') {
-    ftar <- rep(c(ctrl[1,]$value * Fdevs[, ac(cys[1])]), length(cys))
+    ftar <- c(ctrl[1,]$value * Fdevs[, ac(mys[1])])
   # reuse = FALSE
   } else {
-    ftar <- c(ctrl$value * Fdevs[, ac(cys)])
+    ftar <- c(ctrl$value * Fdevs[, ac(mys)])
   }
 
   # TRACK Ftarget
@@ -135,13 +132,16 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     if(data_lag == 0) {
       fctrl <- fwdControl(
         # target
-        list(year=cys, quant="fbar", value=c(ftar)))
+        list(year=mys, quant="fbar", value=c(ftar)))
     } else {
-      fctrl <- fwdControl(c(      
+      fctrl <- fwdControl(c(
+        # SET F for intermediate year(s)
         lapply(seq(dy + 1, mys[1] - 1), function(y) list(year=y,
           quant="fbar", value=c(fsq))),
-        list(list(year=mys, quant="fbar", value=c(ftar)))))
+        # ... and for management years
+        lapply(mys, function(y) list(year=y, quant="fbar", value=c(ftar)))))
     }
+
 
   # else only for my
   } else {
@@ -150,7 +150,6 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   }
 
   # RUN STF ffwd
-if(any(is.na(fctrl$value))) browser()
   fut <- fwd(fut, sr=srr, control=fctrl)
 
   # ID iters where hcr set met trigger and F > fmin
@@ -159,9 +158,9 @@ if(any(is.na(fctrl$value))) browser()
 
   # EXTRACT catches
   if(isTRUE(reuse) | toupper(reuse) == "C") {
-    TAC <- areaSums(unitSums(expand(catch(fut)[, ac(cys)[1]], year=seq(length(cys)))))
+    TAC <- areaSums(unitSums(expand(catch(fut)[, ac(mys)[1]], year=seq(length(mys)))))
   } else {
-    TAC <- areaSums(unitSums(catch(fut)[, ac(cys)]))
+    TAC <- areaSums(unitSums(catch(fut)[, ac(mys)]))
   }
 
   # GET TAC dy / ay - 1
@@ -179,13 +178,13 @@ if(any(is.na(fctrl$value))) browser()
   }
 
   # CONSTRUCT fwdControl  TODO: USE frq here
-  ctrl <- fwdControl(lapply(seq(length(cys)), function(x)
-    list(year=cys[x], quant=output, value=TAC[,x])))
+  ctrl <- fwdControl(lapply(seq(length(mys)), function(x)
+    list(year=mys[x], quant=output, value=TAC[,x])))
 
   # PROJECT survivors if man_lag = 0
   if(management_lag == 0) {
     ctrl <- merge(ctrl,
-      fwdControl(list(year=cys[length(cys)] + 1, quant="catch", value=0)))
+      fwdControl(list(year=mys[length(mys)] + 1, quant="catch", value=0)))
   }
     
   return(list(ctrl=ctrl, tracking=tracking))

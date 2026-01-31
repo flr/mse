@@ -3,8 +3,22 @@ import("data.table")
 import("FLCore")
 import("ggplotFL")
 import("FLFishery")
-import("FLasher")
 import("patchwork")
+
+importFrom("FLasher",
+  "FCB",
+  "FCB<-",
+  "fwd",
+  "fwdControl",
+  "iters",
+  "iters<-",
+  "merge",
+  "partialF",
+  "plot",
+  "show",
+  "stf",
+  "target",
+  "target<-")
 
 importFrom("ggplot2",
   "aes",
