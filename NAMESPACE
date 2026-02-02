@@ -4,21 +4,7 @@ import("FLCore")
 import("ggplotFL")
 import("FLFishery")
 import("patchwork")
-
-importFrom("FLasher",
-  "FCB",
-  "FCB<-",
-  "fwd",
-  "fwdControl",
-  "iters",
-  "iters<-",
-  "merge",
-  "partialF",
-  "plot",
-  "show",
-  "stf",
-  "target",
-  "target<-")
+import("FLasher")
 
 importFrom("ggplot2",
   "aes",
