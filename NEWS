@@ -1,5 +1,9 @@
  mse 2.4.4
 
+ BUG FIXES
+
+- Depends package changed to get all of FLasher loaded
+
  mse 2.4.3
 
  BUG FIXES
