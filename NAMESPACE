@@ -30,10 +30,13 @@ importFrom("doFuture",
   "%dofuture%")
 
 importFrom("future",
+  "cluster",
   "multicore",
   "multisession",
+  "nbrOfWorkers",
   "plan",
-  "sequential")
+  "sequential",
+  "tweak")
 
 importFrom("FLBRP",
   "brp",
@@ -43,9 +46,6 @@ importFrom("FLBRP",
   "refpts",
   "refpts<-",
   "remap")
-
-importFrom("future",
-  "nbrOfWorkers")
 
 importFrom("ggrepel",
   "geom_label_repel")
