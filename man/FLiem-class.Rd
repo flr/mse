@@ -24,9 +24,10 @@ The \code{FLiem} class stores the information relative to the implementation err
 \section{Slots}{
 
 \describe{
-\item{method}{\code{character} with the name of the method to be run. Note a function of method must exist in the environment with the same name.}
-\item{args}{\code{list} with arguments to be passed to the function defined in \code{method}}
-}
+\item{\code{method}}{The method to berun, class \code{function}.}
+
+\item{\code{args}}{Arguments to be used when \code{method} is called, class list.}
+}}
 
 \section{Accessors}{
 

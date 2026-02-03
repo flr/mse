@@ -2,10 +2,8 @@
 #'
 #' @description The \code{FLiem} class stores the information relative to the implementation error model of the MSE.
 #'
-#' @section Slots:
-#' \describe{
-#'    \item{method}{\code{character} with the name of the method to be run. Note a function of method must exist in the environment with the same name.}
-#'    \item{args}{\code{list} with arguments to be passed to the function defined in \code{method}}
+#' @slot method The method to berun, class `function`.
+#' @slot args  Arguments to be used when `method` is called, class list.
 #' @template Accessors
 #' @template Constructors
 #' @docType class
