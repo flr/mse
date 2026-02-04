@@ -6,7 +6,7 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
  
-globalVariables(c(".", "data", "mp", "om", "run", "statistic"))
+globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit", "season"))
 
 # performance(FLQuants) {{{
 

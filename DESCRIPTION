@@ -15,11 +15,11 @@ Depends:
   data.table,
   FLCore(>= 2.6.22),
   FLFishery,
-  FLasher(>= 0.7.1),
+  FLasher(>= 0.7.1)
 Imports:
   future,
-  doFuture,
   progressr,
+  doFuture,
   foreach,
   FLBRP(>= 2.5.8),
   ggplotFL(>= 2.6.10),

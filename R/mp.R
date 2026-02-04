@@ -34,8 +34,11 @@
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
 #'   trigger=41500, target=0.27))))
+#' # Runs mp
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034))
+#' # Runs mp with triannual management
 #' tes3 <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034, frq=3))
+#' # Compare both runs
 #' plot(om, list(annual=tes, triannual=tes3))
 #' # 'perfect.oem' is used if none is given
 #' tes <- mp(om, ctrl=control, args=list(iy=2021, fy=2035))
