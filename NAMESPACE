@@ -30,6 +30,7 @@ importFrom("doFuture",
   "%dofuture%")
 
 importFrom("future",
+  "availableCores",
   "cluster",
   "multicore",
   "multisession",

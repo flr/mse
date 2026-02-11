@@ -21,11 +21,11 @@ tunebisect(
 )
 }
 \arguments{
-\item{om}{An object representing the Operating Model, class FLom or FLombf.}
+\item{om}{An object representing the Operating Model, of class \linkS4class{FLom} or \linkS4class{FLombf}.}
 
-\item{oem}{Observation Error Model, class FLoem or missing, the default.}
+\item{oem}{Observation Error Model, class \linkS4class{FLoem} or missing, the default.}
 
-\item{control}{A control object containing the settings and parameters for the Management Procedure, class mpCtrl.}
+\item{control}{A control object containing the settings and parameters for the Management Procedure, class  \linkS4class{mpCtrl}.}
 
 \item{statistic}{A named list of length 1 defining the statistic used for tuning. The list must include:
 \describe{
@@ -34,7 +34,7 @@ tunebisect(
 \item{desc}{A description of the statistic.}
 }}
 
-\item{metrics}{Optional. A set of metrics used for performance evaluation; defaults to \code{NULL}.}
+\item{metrics}{Optional. A set of metrics used for performance evaluation; defaults to \code{NULL} to use the default metrics for the class of the \code{om} object.}
 
 \item{args}{A list of arguments for running the Management Procedure. Must include  \code{iy} (initial year).}
 
@@ -44,16 +44,22 @@ tunebisect(
 
 \item{tol}{Tolerance for the difference between the computed and target probabilities; defaults to \code{0.01}.}
 
-\item{maxit}{Maximum number of iterations}
+\item{maxit}{Maximum number of iterations, defaults to 12.}
 }
 \description{
-The \code{tunebisect} function is designed to tune a single parameter of a sinfgle
-modules in a Management Procedure (MP), typically in the Harvest Control Rule.
-It uses a bisection algorithm to iteratively adjust  the parameter to achieve a
-specified probabilistic management objective in a given time frame.
+The \code{tunebisect} function is designed to tune a single parameter of a single
+modules in a Management Procedure (MP), typically in the Harvest Control Rule (hcr).
+It uses a bisection algorithm to iteratively adjust the parameter value unitl it
+achieves specified probability value for a given management objective overn a
+selected time frame. For example, it can try to find a value for the \code{target}
+argument of a \code{hocketstick.hcr} that obtains a 60\% mean probability of SSB being above
+SSB\link{MSY} over the 2032 to 2042 period.
 }
 \details{
-Burden, Richard L.; Faires, J. Douglas (2016), "2.1 The Bisection Algorithm", Numerical Analysis (10th ed.), Cenage Learning, ISBN 978-1-305-25366-7
+Two initial MP runs are carried out employing the argument values provided in \code{tune}.
+They need to return probabilities that are on both sides of the expected one. If not,
+the function will return both runs for inspection. The function should then be rerun
+with an wider range of values, or the time-frame extended.
 }
 \examples{
 # dataset contains both OM (FLom) and OEM (FLoem)
@@ -70,4 +76,9 @@ tune=list(target=c(0.15, 0.35)),
 metrics=list(SB=ssb), statistic=statistics['PSBMSY'], years=2025:2034)
 # Plot tuned MP
 plot(om, tun)
+}
+\references{
+{
+Burden, Richard L.; Faires, J. Douglas (2016), "2.1 The Bisection Algorithm", Numerical Analysis (10th ed.), Cenage Learning, ISBN 978-1-305-25366-7
+}
 }

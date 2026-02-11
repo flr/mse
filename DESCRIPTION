@@ -15,9 +15,9 @@ Depends:
   data.table,
   FLCore(>= 2.6.22),
   FLFishery,
-  FLasher(>= 0.7.1)
-Imports:
+  FLasher(>= 0.7.1),
   future,
+Imports:
   progressr,
   doFuture,
   foreach,

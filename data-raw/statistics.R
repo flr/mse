@@ -21,6 +21,9 @@ statistics <- list(
   # SBMSY
   SBMSY = list(~SB/SBMSY, name = "SB/SB[MSY]",
     desc = "Spawnwer biomass relative to SBMSY"),
+  # IACB
+  IACB=list(~100 * (SB[, -1] - SB[, -dim(SB)[2]]) / SB[, -dim(SB)[2]],
+    name="IAC(B)", desc="Percentage inter-annual change in biomass"),
   # R
   R = list(~R, name = "Recruits",
     desc = "Recruitment"),
@@ -44,13 +47,16 @@ statistics <- list(
     name = "P(Yellow)", desc = "Probability of being in Kobe yellow quadrant"),
   # red
   red = list(~iterMeans(FLQuant((SB / SBMSY) < 1 & (F / FMSY) > 1)),
-    name = "P(Red)", desc = "Probability of being in Kobe red quadrant"),
+    name = "P(Red)", desc = "Probabil = ity of being in Kobe red quadrant"),
   # PSBMSY
   PSBMSY = list(~iterMeans((SB / SBMSY) >= 1), name = "P(SB>=SB[MSY])",
     desc = "Probability of SB greater or equal to SBMSY"),
   # PSBlim
   PSBlim = list(~iterMeans((SB / SBlim) > 1), name = "P(SB>SB[limit])", 
     desc = "Probability that spawner biomass is above SBlim"),
+  # PBlim
+  PBlim = list(~iterMeans((SB / Blim) < 1), name = "P(B<B[lim])", 
+    desc = "Probability that spawner biomass is below Blim"),
   # PSB20B0
   PSB20B0 = list(~iterMeans((SB / (0.2 * SB0)) > 1),
     name = "P(SB > 0.20 %*% SB[0])", 
@@ -67,6 +73,8 @@ statistics <- list(
     desc = "ICES Risk 3, max probability that spawner biomass is above Blim"),
   # C
   C = list(~C, name = "C (t)", desc = "Catch"),
+  # CPUE (C/F)
+  CPUE=list(~C/F, name = "CPUE", desc = "C over fishing mortality"),
   # C/MSY
   CMSY = list(~C/MSY, name = "C/MSY", desc = "Proportion of MSY"),
   # IACC
