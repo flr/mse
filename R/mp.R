@@ -121,6 +121,10 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # management_lag: time in years between ay and implementation
   management_lag <- args$management_lag <-
     if(is.null(args$management_lag)) 1 else args$management_lag
+
+  # STOP if management_lag < 1, OM won't progress
+  if(management_lag < 1)
+    stop("'management_lag' must be 1 or greater.")
   
   # frq defaults to 1
   frq <- args$frq <- if(is.null(args$frq)) 1 else args$frq
