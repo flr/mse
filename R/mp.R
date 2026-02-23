@@ -12,8 +12,31 @@
 
 #' mp executes a single run of a Management Procedure
 #'
-#' An individual management procedure (MP) is run for a number of years,
-#' on an operating model, observation error model, control and arguments.
+#' An individual management procedure (MP) defined by the `control` argument, is run
+#' under a temporal configuration defined in the `args` list, and on a given operating
+#' model (`om`). Particular observation error (`oem`), and implementation error model
+#' (`iem`) elements can also be specified.
+#'
+#' @details
+#' Calls to `mp()` can be run in parallel using `%dofuture%`. Iterations in the `om` are
+#' split across the number of availabnle workers, as set by a call to `plan()`. This can 
+#' specially improve computations for MPs fitting any kind of model or doing other
+#' non-vectorizsed calculations.
+#'
+#' Progress in the simulation is reported via a progress bar as set by the `progressr` 
+#' package, if a global handler is set up using `handlers(global=TRUE)`. This bar works
+#' when a parallel plan has been set up. Otherwise, a simple print out of the year being 
+#' run is shown.
+#'
+#' The `args` list controls the timing of the simulation and its elements:
+#' - iy: the initial year of simulation inn which decisions are made. The only required element in `args`.
+#' - fy: final year, defaults to last year in `om` object.
+#' - y0: first data year, defaults to first year in `om` object.
+#' - nsqy: number of years for status-quo calculations, defaults to 3.
+#' - data_lag: number of years between last data point and decision year, defaults to 1.
+#' - management_lag: number of years between decision and its application. Must be greater than 0, and defaults to 1.
+#' - frq: frequendcy of advice in years, defaults to 1.
+#' - vy: vector of years in which advice is givenm, defaults to a sequence between `iy` and `fy` every `frq` years.
 #'
 #' @param om The operating model (OM), an object of class *FLom* or *FLombf*.
 #' @param oem The observation error model (OEM), an object of class *FLoem*.
@@ -21,10 +44,10 @@
 #' @param ctrl A control structure for the MP run, an object of class *mpCtrl*.
 #' @param args MSE arguments, *list*. Only 'iy', the intermediate (starting) year, is required.
 #' @param scenario Name of the scenario tested in this run, *character*.
-#' @param tracking Extra elements (rows) to add to the standard tracking *FLQuant* in its first dimensions, *character*.
-#' @param verbose Should output be verbose or not, *logical*.
+#' @param tracking Extra elements (rows) to add to the standard tracking *FLQuant* in its first dimensions, *character*. Elements can also be added by individual control modules.
+#' @param verbose Should output be verbose (year being executed) or not, *logical*.
 #'
-#' @return An object of class *FLmse*.
+#' @return An object of class *FLmse*, trimmed to start in year `iy` unless `window` is set to`FALSE`. 
 #'
 #' @examples
 #' # dataset contains both OM (FLom) and OEM (FLoem)
