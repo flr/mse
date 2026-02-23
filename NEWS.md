@@ -3,12 +3,16 @@
 ## BUG FIXES
 
 - Depends package changed to get all of FLasher loaded
+ 
+## USER-VISIBLE CHANGES
+
+- 'management_lag' in mp() args must be greater than 0
 
 # mse 2.4.3
 
 ## BUG FIXES
 
-- The correct fy is now set in mp() when data_lag, management_lag and frq are all > 1
+- The correct 'fy' is now set in mp() when 'data_lag', 'management_lag' and 'frq' are all > 1
 
 # mse 2.4.2
 
