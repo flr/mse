@@ -83,12 +83,27 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   # EXTRACT args
   spread(args[c('ay', 'iy', 'dy', 'mys', 'management_lag', 'it')])
 
+  # CHECK function args
+
+  # All !NA
+  if(any(is.na(c(c(lim), c(trigger), c(min), c(target)))))
+    stop("All arguments must not be NA")
+  # All >= 0
+  if(any(c(c(lim), c(trigger), c(min), c(target)) < 0))
+    stop("All arguments must be positive")
+  # lim < trigger
+  if(any(lim > trigger))
+    stop("'lim' must be smaller or equal 'trigger'")
+  # min < target
+  if(any(min > target))
+    stop("'min' must be smaller or equal 'target'")
+
   # COMPUTE metric
   met <- window(selectMetric(metric, stk, ind, ...), start=dy, end=dy)
 
   # TRACK metric
   track(tracking, "metric.hcr", ay) <- met
-  
+
   # - APPLY rule
 
   # BELOW lim
