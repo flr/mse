@@ -4,6 +4,10 @@
 
 - Depends package changed to get all of FLasher loaded
 
+## USER-VISIBLE CHANGES
+
+- mp() does not accept a management_lag smaller than 1, otherwise OM won't update.
+
 # mse 2.4.3
 
 ## BUG FIXES

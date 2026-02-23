@@ -73,7 +73,6 @@ export(
   "decisions",
   "default.oem",
   "deplete",
-  "effort.is",
   "effortlimit.fb",
   "fixedC.hcr",
   "fixedF.hcr",

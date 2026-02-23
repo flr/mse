@@ -6,3 +6,4 @@ paper
 ^\.Rproj\.user$
 data-raw
 man-roxygen
+^\.github$
