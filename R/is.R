@@ -59,11 +59,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   spread(args)
 
   # PREPARE stk for mys, biology as in last nsqy years
-  if(management_lag == 0) {
-    fut <- stk
-  } else {
-    fut <- fwdWindow(stk, end=mys[length(mys)], nsq=nsqy)
-  }
+  fut <- fwdWindow(stk, end=mys[length(mys)], nsq=nsqy)
 
   # PARSE recyrs if numeric
   id <- dimnames(stk)$year
@@ -141,8 +137,6 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
         # ... and for management years
         lapply(mys, function(y) list(year=y, quant="fbar", value=c(ftar)))))
     }
-
-
   # else only for my
   } else {
     fctrl <- fwdControl(
@@ -191,42 +185,6 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 }
 
 # }}}
-
-# effort.is {{{
-
-#' effort implementation function
-#'
-#' @param stk The perceived FLStock.
-#' @param imp_control A list with the elements: nsqy, delta_tac_min, delta_tac_max
-#' @param ay The year for which the target F is set, based on the SSB in year (ay - control$ssb_lag).
-
-effort.is <- function(stk, ctrl, args, tracking){
-	
-  # dims
-  ay <- args$ay
-	it <- args$it
-	iy <- args$iy
-	management_lag <- args$management_lag
-	data_lag <- args$data_lag
-	
-  # reference value
-	if(ay == iy) 
-    fay <- fbar(stk)[,ac(dy)]
-  else 
-    fay <- yearMeans(fbar(stk)[, ac(args$sqy)])
-	
-  # target to reach defined by HCR (in f units)
-	trgt <- ctrl$value
-	
-  # multiplier
-	mult <- trgt / fay
-	
-  # new control file, in relative terms
-  ctrl <- fwdControl(list(value=mult, year=mys, rel.year=dy, quant="fbar"))
-
-	list(ctrl = ctrl, tracking = tracking)
-
-} # }}}
 
 # indicator.is {{{
 
