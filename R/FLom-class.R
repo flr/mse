@@ -682,8 +682,13 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 # metrics {{{
 setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
-    FLQuants(metrics(stock(object), list(SB=ssb, R=rec, C=catch,
-      L=landings, D=discards,F=fbar)))
+    res <- FLQuants(metrics(stock(object), list(SB=ssb, R=rec, C=catch,
+      L=landings, D=discards, F=fbar)))
+    # JOIN units
+    res[-6] <- lapply(res[-6], unitSums)
+    res[6] <- lapply(res[6], unitMeans)
+
+    return(res)
 })
 
 setMethod("metrics", signature(object="FLom", metrics="list"),
