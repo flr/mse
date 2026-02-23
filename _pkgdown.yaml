@@ -1,1 +1,3 @@
 url: https://flrproject.org/mse
+template:
+  bootstrap: 5
