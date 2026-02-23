@@ -13,7 +13,7 @@ setMethod("plot", signature(x="FLo", y="missing"),
     args <- list(...)
 
     # IF args, plot list
-    if(length(args) > 1)
+    if(length(args) >= 1)
       return(plot(x, args, metrics=metrics))
 
     # COMPUTE metrics
