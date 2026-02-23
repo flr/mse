@@ -33,16 +33,41 @@ mp(
 
 \item{scenario}{Name of the scenario tested in this run, \emph{character}.}
 
-\item{tracking}{Extra elements (rows) to add to the standard tracking \emph{FLQuant} in its first dimensions, \emph{character}.}
+\item{tracking}{Extra elements (rows) to add to the standard tracking \emph{FLQuant} in its first dimensions, \emph{character}. Elements can also be added by individual control modules.}
 
-\item{verbose}{Should output be verbose or not, \emph{logical}.}
+\item{verbose}{Should output be verbose (year being executed) or not, \emph{logical}.}
 }
 \value{
-An object of class \emph{FLmse}.
+An object of class \emph{FLmse}, trimmed to start in year \code{iy} unless \code{window} is set to\code{FALSE}.
 }
 \description{
-An individual management procedure (MP) is run for a number of years,
-on an operating model, observation error model, control and arguments.
+An individual management procedure (MP) defined by the \code{control} argument, is run
+under a temporal configuration defined in the \code{args} list, and on a given operating
+model (\code{om}). Particular observation error (\code{oem}), and implementation error model
+(\code{iem}) elements can also be specified.
+}
+\details{
+Calls to \code{mp()} can be run in parallel using \verb{\%dofuture\%}. Iterations in the \code{om} are
+split across the number of availabnle workers, as set by a call to \code{plan()}. This can
+specially improve computations for MPs fitting any kind of model or doing other
+non-vectorizsed calculations.
+
+Progress in the simulation is reported via a progress bar as set by the \code{progressr}
+package, if a global handler is set up using \code{handlers(global=TRUE)}. This bar works
+when a parallel plan has been set up. Otherwise, a simple print out of the year being
+run is shown.
+
+The \code{args} list controls the timing of the simulation and its elements:
+\itemize{
+\item iy: the initial year of simulation inn which decisions are made. The only required element in \code{args}.
+\item fy: final year, defaults to last year in \code{om} object.
+\item y0: first data year, defaults to first year in \code{om} object.
+\item nsqy: number of years for status-quo calculations, defaults to 3.
+\item data_lag: number of years between last data point and decision year, defaults to 1.
+\item management_lag: number of years between decision and its application. Must be greater than 0, and defaults to 1.
+\item frq: frequendcy of advice in years, defaults to 1.
+\item vy: vector of years in which advice is givenm, defaults to a sequence between \code{iy} and \code{fy} every \code{frq} years.
+}
 }
 \examples{
 # dataset contains both OM (FLom) and OEM (FLoem)
