@@ -16,7 +16,7 @@ To install this package, start R and enter:
 install.packages("mse", repos="http://flrproject.org/R")
 ```
 
-or directly from the github repository by using:
+or do so directly from the github repository by using:
 
 ```
 remotes::install_github("flr/mse")
@@ -26,7 +26,7 @@ remotes::install_github("flr/mse")
 - [Help pages](http://flrproject.org/mse)
 
 ## License
-Copyright (c) 2016-2022 European Union. European Commission Joint Research Centre D.02. Released under the [EUPL 1.1](https://joinup.ec.europa.eu/community/eupl/og_page/eupl).
+Copyright (c) 2016-2026 European Union. European Commission Joint Research Centre D.02. Released under the [EUPL 1.1](https://joinup.ec.europa.eu/community/eupl/og_page/eupl).
 
 ## Contact
 You are welcome to:
