@@ -1,7 +1,10 @@
 # mp executes a single run of a Management Procedure
 
-An individual management procedure (MP) is run for a number of years, on
-an operating model, observation error model, control and arguments.
+An individual management procedure (MP) defined by the `control`
+argument, is run under a temporal configuration defined in the `args`
+list, and on a given operating model (`om`). Particular observation
+error (`oem`), and implementation error model (`iem`) elements can also
+be specified.
 
 ## Usage
 
@@ -53,15 +56,51 @@ mp(
 - tracking:
 
   Extra elements (rows) to add to the standard tracking *FLQuant* in its
-  first dimensions, *character*.
+  first dimensions, *character*. Elements can also be added by
+  individual control modules.
 
 - verbose:
 
-  Should output be verbose or not, *logical*.
+  Should output be verbose (year being executed) or not, *logical*.
 
 ## Value
 
-An object of class *FLmse*.
+An object of class *FLmse*, trimmed to start in year `iy` unless
+`window` is set to`FALSE`.
+
+## Details
+
+Calls to `mp()` can be run in parallel using `%dofuture%`. Iterations in
+the `om` are split across the number of availabnle workers, as set by a
+call to `plan()`. This can specially improve computations for MPs
+fitting any kind of model or doing other non-vectorizsed calculations.
+
+Progress in the simulation is reported via a progress bar as set by the
+`progressr` package, if a global handler is set up using
+`handlers(global=TRUE)`. This bar works when a parallel plan has been
+set up. Otherwise, a simple print out of the year being run is shown.
+
+The `args` list controls the timing of the simulation and its elements:
+
+- iy: the initial year of simulation inn which decisions are made. The
+  only required element in `args`.
+
+- fy: final year, defaults to last year in `om` object.
+
+- y0: first data year, defaults to first year in `om` object.
+
+- nsqy: number of years for status-quo calculations, defaults to 3.
+
+- data_lag: number of years between last data point and decision year,
+  defaults to 1.
+
+- management_lag: number of years between decision and its application.
+  Must be greater than 0, and defaults to 1.
+
+- frq: frequendcy of advice in years, defaults to 1.
+
+- vy: vector of years in which advice is givenm, defaults to a sequence
+  between `iy` and `fy` every `frq` years.
 
 ## Examples
 
@@ -97,21 +136,9 @@ tes3 <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034, frq=3))
 #> 2021  - 2024  - 2027  - 2030  - 
 # Compare both runs
 plot(om, list(annual=tes, triannual=tes3))
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
 
 # 'perfect.oem' is used if none is given
 tes <- mp(om, ctrl=control, args=list(iy=2021, fy=2035))
 #> 2021  - 2022  - 2023  - 2024  - 2025  - 2026  - 2027  - 2028  - 2029  - 2030  - 2031  - 2032  - 2033  - 2034  - 
 plot(om, tes)
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
 ```

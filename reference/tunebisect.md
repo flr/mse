@@ -152,10 +152,4 @@ metrics=list(SB=ssb), statistic=statistics['PSBMSY'], years=2025:2034)
 #> [5] diff: -0.004, prob: 0.5
 # Plot tuned MP
 plot(om, tun)
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
 ```

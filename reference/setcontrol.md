@@ -46,10 +46,4 @@ run02 <- mp(om, control=setcontrol(ctrl, hcr=list(trigger=25000)),
 
 # Plots results
 plot(om, list(T45k=run, T25k=run02))
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
 ```

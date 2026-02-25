@@ -177,10 +177,4 @@ run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
 
 # Plots results
 plot(om, run)
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
 ```

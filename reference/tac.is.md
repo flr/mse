@@ -118,10 +118,4 @@ run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))
 #> 2021  - 2022  - 2023  - 2024  - 2025  - 2026  - 
 # Plot run time series
 plot(om, TAC.IS=run)
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
-#> Warning: Removed 4500 rows containing non-finite outside the scale range
-#> (`stat_fl_quantiles()`).
 ```

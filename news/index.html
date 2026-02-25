@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,10 @@
 <div class="section level3">
 <h3 id="user-visible-changes-2-4-4">USER-VISIBLE CHANGES<a class="anchor" aria-label="anchor" href="#user-visible-changes-2-4-4"></a></h3>
 <ul><li>‘management_lag’ in mp() args must be greater than 0</li>
+</ul></div>
+<div class="section level3">
+<h3 id="user-visible-changes-2-4-4-1">USER-VISIBLE CHANGES<a class="anchor" aria-label="anchor" href="#user-visible-changes-2-4-4-1"></a></h3>
+<ul><li>mp() does not accept a management_lag smaller than 1, otherwise OM won’t update.</li>
 </ul></div>
 </div>
     <div class="section level2">

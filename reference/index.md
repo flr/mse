@@ -54,9 +54,6 @@
   [`undebug(`*`<FLo>`*`,`*`<ANY>`*`)`](https://flrproject.org/mse/reference/debug-mse.md)
   : Debugging mse modules
 
-- [`effort.is()`](https://flrproject.org/mse/reference/effort.is.md) :
-  effort implementation function
-
 - [`fixedC.hcr()`](https://flrproject.org/mse/reference/fixedC.hcr.md) :
   A fixed target C
 
