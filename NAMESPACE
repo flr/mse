@@ -5,6 +5,7 @@ import("ggplotFL")
 import("FLFishery")
 import("patchwork")
 import("FLasher")
+import("progressr")
 
 importFrom("ggplot2",
   "aes",
@@ -50,10 +51,6 @@ importFrom("FLBRP",
 
 importFrom("ggrepel",
   "geom_label_repel")
-
-importFrom("progressr",
-  "progressor",
-  "handlers")
 
 importFrom("stats",
   "coef",

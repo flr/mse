@@ -17,8 +17,8 @@ Depends:
   FLFishery,
   FLasher(>= 0.7.1),
   future,
-Imports:
   progressr,
+Imports:
   doFuture,
   foreach,
   FLBRP(>= 2.5.8),
