@@ -279,7 +279,7 @@ setMethod("performance", signature(x="list"),
 
       # TODO: ADD om if missing, via idcol or :=, DROP Map
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
-        refpts=refpts(i), statistics=statistics, years=years, probs=probs),
+        refpts=refpts(i), statistics=statistics, years=years, probs=probs, run=j),
         list(...))), i=x, j=names(x)))
 
       return(res[])
