@@ -240,6 +240,13 @@ setMethod("method", signature("mpCtrl"),
   })
 
 #' @rdname mpCtrl-class
+#' @aliases args,mpCtrl-method
+setMethod("args", signature("mpCtrl"),
+  function(name) {
+    return(lapply(name, slot, "args"))
+  })
+
+#' @rdname mpCtrl-class
 #' @aliases method<-,mpCtrl-method
 setReplaceMethod("method", signature(object="mpCtrl", value="function"),
   function(object, element, value) {
