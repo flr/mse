@@ -37,13 +37,13 @@ statistics <- list(
   FMSY = list(~F/FMSY, name = "F/F[MSY]",
     desc = "Fishing mortality relative to FMSY"),
   # green
-  green = list(~iterMeans(FLQuant((SB / SBMSY) > 1 & (F / FMSY) < 1)),
+  green = list(~iterMeans(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) <= 1)),
     name = "P(Green)", desc = "Probability of being in Kobe green quadrant"),
   # orange
-  orange = list(~iterMeans(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) >= 1)),
+  orange = list(~iterMeans(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) > 1)),
     name = "P(Orange)", desc = "Probability of being in Kobe orange quadrant"),
   # yellow
-  yellow = list(~iterMeans(FLQuant((SB / SBMSY) < 1 & (F / FMSY) < 1)),
+  yellow = list(~iterMeans(FLQuant((SB / SBMSY) < 1 & (F / FMSY) <= 1)),
     name = "P(Yellow)", desc = "Probability of being in Kobe yellow quadrant"),
   # red
   red = list(~iterMeans(FLQuant((SB / SBMSY) < 1 & (F / FMSY) > 1)),
@@ -61,6 +61,9 @@ statistics <- list(
   PSB20B0 = list(~iterMeans((SB / (0.2 * SB0)) > 1),
     name = "P(SB > 0.20 %*% SB[0])", 
     desc = "Probability that spawner biomass is above 20% SB[0]"),
+  # PFMSY
+  PFMSY = list(~iterMeans((F / FMSY) <= 1), name = "P(F<=F[MSY])",
+    desc = "Probability of F less or equal to FMSY"),
   # risk1
   risk1 = list(~iterMeans((SB / SBlim) < 1), name = "P(SB<B[limit])", 
     desc = "ICES Risk 1, probability that spawner biomass is below Blim"),
