@@ -96,6 +96,7 @@
   [`iters(`*`<mpCtrl>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
   [`iter(`*`<mpCtrl>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
   [`method(`*`<mpCtrl>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
+  [`args(`*`<mpCtrl>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
   [`` `method<-`( ``*`<mpCtrl>`*`,`*`<function>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
   [`` `args<-`( ``*`<mpCtrl>`*`,`*`<function>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
   [`debug(`*`<mpCtrl>`*`,`*`<character>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)

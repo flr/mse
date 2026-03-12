@@ -72,6 +72,9 @@ iter(obj, iter)
 # S4 method for class 'mpCtrl'
 method(object, element)
 
+# S4 method for class 'mpCtrl'
+args(name)
+
 # S4 method for class 'mpCtrl,function'
 method(object, element) <- value
 
