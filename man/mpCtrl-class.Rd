@@ -40,6 +40,7 @@
 \alias{iters,mpCtrl-method}
 \alias{iter,mpCtrl-method}
 \alias{method,mpCtrl-method}
+\alias{args,mpCtrl-method}
 \alias{method<-,mpCtrl,function-method}
 \alias{method<-,mpCtrl-method}
 \alias{args<-,mpCtrl,function-method}
@@ -96,6 +97,8 @@ tm(object) <- value
 \S4method{iter}{mpCtrl}(obj, iter)
 
 \S4method{method}{mpCtrl}(object, element)
+
+\S4method{args}{mpCtrl}(name)
 
 \S4method{method}{mpCtrl,function}(object, element) <- value
 
