@@ -581,7 +581,6 @@ setMethod("fwdWindow", signature(x="FLombf", y="missing"),
     fisheries(x) <- lapply(fisheries(x), fwdWindow, end=end, nsq=nsq)
 
     return(x)
-
   }
 ) # }}}
 
