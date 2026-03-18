@@ -59,11 +59,12 @@ setMethod("initialize", "mpCtrl",
     .Object
     })
 
-# TODO
-# validity
-# initialize with ...
+# }}}
 
-#' @rdname mpCtrl-class
+# accessors {{{
+
+# - est {{{
+
 #' @aliases est est-methods
 setGeneric("est", function(object, ...) standardGeneric("est"))
 
@@ -76,11 +77,19 @@ setGeneric("est<-", function(object, value) standardGeneric("est<-"))
 
 #' @rdname mpCtrl-class
 setReplaceMethod("est", signature("mpCtrl", "function"), function(object, value){
-	object$est <- value
+	object$est@method <- value
 	object
 })
 
 #' @rdname mpCtrl-class
+setReplaceMethod("est", signature("mpCtrl", "mseCtrl"), function(object, value){
+	object$est <- value
+	object
+})
+# }}}
+
+# - phcr {{{
+
 #' @aliases phcr phcr-methods
 setGeneric("phcr", function(object, ...) standardGeneric("phcr"))
 
@@ -93,11 +102,19 @@ setGeneric("phcr<-", function(object, value) standardGeneric("phcr<-"))
 
 #' @rdname mpCtrl-class
 setReplaceMethod("phcr", signature("mpCtrl", "function"), function(object, value){
-	object$phcr <- value
+	object$phcr@method <- value
 	object
 })
 
 #' @rdname mpCtrl-class
+setReplaceMethod("phcr", signature("mpCtrl", "mseCtrl"), function(object, value){
+	object$phcr <- value
+	object
+})
+# }}}
+
+# - hcr {{{
+
 #' @aliases hcr hcr-methods
 setGeneric("hcr", function(object, ...) standardGeneric("hcr"))
 
@@ -110,11 +127,19 @@ setGeneric("hcr<-", function(object, value) standardGeneric("hcr<-"))
 
 #' @rdname mpCtrl-class
 setReplaceMethod("hcr", signature("mpCtrl", "function"), function(object, value){
-	object$hcr <- value
+	object$hcr@method <- value
 	object
 })
 
 #' @rdname mpCtrl-class
+setReplaceMethod("hcr", signature("mpCtrl", "mseCtrl"), function(object, value){
+	object$hcr <- value
+	object
+})
+# }}}
+
+# - isys {{{
+
 #' @aliases isys isys-methods
 setGeneric("isys", function(object, ...) standardGeneric("isys"))
 
@@ -127,11 +152,19 @@ setGeneric("isys<-", function(object, value) standardGeneric("isys<-"))
 
 #' @rdname mpCtrl-class
 setReplaceMethod("isys", signature("mpCtrl", "function"), function(object, value){
-	object$isys <- value
+	object$isys@method <- value
 	object
 })
 
 #' @rdname mpCtrl-class
+setReplaceMethod("isys", signature("mpCtrl", "mseCtrl"), function(object, value){
+	object$isys <- value
+	object
+})
+# }}}
+
+# - tm {{{
+
 #' @aliases tm tm-methods
 setGeneric("tm", function(object, ...) standardGeneric("tm"))
 
@@ -144,9 +177,16 @@ setGeneric("tm<-", function(object, value) standardGeneric("tm<-"))
 
 #' @rdname mpCtrl-class
 setReplaceMethod("tm", signature("mpCtrl", "function"), function(object, value){
+	object$tm@method <- value
+	object
+})
+
+#' @rdname mpCtrl-class
+setReplaceMethod("tm", signature("mpCtrl", "mseCtrl"), function(object, value){
 	object$tm <- value
 	object
 })
+# }}}
 
 # }}}
 

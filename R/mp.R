@@ -218,7 +218,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   
   # CHECK and WARN if fb in control
   if("fb" %in% names(control))
-     stop("control contains an 'fb' element, should be fleetBehaviour(om)")
+     stop("control contains an 'fb' element, should be placed in fleetBehaviour(om)")
 
   # SET fleetBehaviour to NULL if not given
   if (exists(fleetBehaviour(om)))
