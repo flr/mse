@@ -86,6 +86,12 @@ setReplaceMethod("est", signature("mpCtrl", "mseCtrl"), function(object, value){
 	object$est <- value
 	object
 })
+
+#' @rdname mpCtrl-class
+setReplaceMethod("est", signature("mpCtrl", "list"), function(object, value){
+	object$est@args <- value
+	object
+})
 # }}}
 
 # - phcr {{{
@@ -109,6 +115,12 @@ setReplaceMethod("phcr", signature("mpCtrl", "function"), function(object, value
 #' @rdname mpCtrl-class
 setReplaceMethod("phcr", signature("mpCtrl", "mseCtrl"), function(object, value){
 	object$phcr <- value
+	object
+})
+
+#' @rdname mpCtrl-class
+setReplaceMethod("phcr", signature("mpCtrl", "list"), function(object, value){
+	object$phcr@args <- value
 	object
 })
 # }}}
@@ -136,6 +148,12 @@ setReplaceMethod("hcr", signature("mpCtrl", "mseCtrl"), function(object, value){
 	object$hcr <- value
 	object
 })
+
+#' @rdname mpCtrl-class
+setReplaceMethod("hcr", signature("mpCtrl", "list"), function(object, value){
+	object$hcr@args <- value
+	object
+})
 # }}}
 
 # - isys {{{
@@ -161,6 +179,12 @@ setReplaceMethod("isys", signature("mpCtrl", "mseCtrl"), function(object, value)
 	object$isys <- value
 	object
 })
+
+#' @rdname mpCtrl-class
+setReplaceMethod("isys", signature("mpCtrl", "list"), function(object, value){
+	object$isys@args <- value
+	object
+})
 # }}}
 
 # - tm {{{
@@ -184,6 +208,12 @@ setReplaceMethod("tm", signature("mpCtrl", "function"), function(object, value){
 #' @rdname mpCtrl-class
 setReplaceMethod("tm", signature("mpCtrl", "mseCtrl"), function(object, value){
 	object$tm <- value
+	object
+})
+
+#' @rdname mpCtrl-class
+setReplaceMethod("tm", signature("mpCtrl", "list"), function(object, value){
+	object$tm@args <- value
 	object
 })
 # }}}
