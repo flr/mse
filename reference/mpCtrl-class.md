@@ -10,8 +10,6 @@ for those modules required by the defined MP.
 # S4 method for class 'mpCtrl'
 initialize(.Object, ...)
 
-est(object, ...)
-
 # S4 method for class 'mpCtrl'
 est(object)
 
@@ -20,7 +18,8 @@ est(object) <- value
 # S4 method for class 'mpCtrl,function'
 est(object) <- value
 
-phcr(object, ...)
+# S4 method for class 'mpCtrl,mseCtrl'
+est(object) <- value
 
 # S4 method for class 'mpCtrl'
 phcr(object)
@@ -30,7 +29,8 @@ phcr(object) <- value
 # S4 method for class 'mpCtrl,function'
 phcr(object) <- value
 
-hcr(object, ...)
+# S4 method for class 'mpCtrl,mseCtrl'
+phcr(object) <- value
 
 # S4 method for class 'mpCtrl'
 hcr(object)
@@ -40,7 +40,8 @@ hcr(object) <- value
 # S4 method for class 'mpCtrl,function'
 hcr(object) <- value
 
-isys(object, ...)
+# S4 method for class 'mpCtrl,mseCtrl'
+hcr(object) <- value
 
 # S4 method for class 'mpCtrl'
 isys(object)
@@ -50,7 +51,8 @@ isys(object) <- value
 # S4 method for class 'mpCtrl,function'
 isys(object) <- value
 
-tm(object, ...)
+# S4 method for class 'mpCtrl,mseCtrl'
+isys(object) <- value
 
 # S4 method for class 'mpCtrl'
 tm(object)
@@ -58,6 +60,9 @@ tm(object)
 tm(object) <- value
 
 # S4 method for class 'mpCtrl,function'
+tm(object) <- value
+
+# S4 method for class 'mpCtrl,mseCtrl'
 tm(object) <- value
 
 # S4 method for class 'mpCtrl'

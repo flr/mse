@@ -11,7 +11,7 @@ only for those modules required by the defined MP."><meta property="og:image" co
 
     <a class="navbar-brand me-2" href="../index.html">mse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,8 +47,6 @@ only for those modules required by the defined MP.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'mpCtrl'</span></span>
 <span><span class="fu">initialize</span><span class="op">(</span><span class="va">.Object</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">est</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># S4 method for class 'mpCtrl'</span></span>
 <span><span class="fu">est</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
 <span></span>
@@ -57,7 +55,8 @@ only for those modules required by the defined MP.</p>
 <span><span class="co"># S4 method for class 'mpCtrl,function'</span></span>
 <span><span class="fu">est</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="fu">phcr</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="co"># S4 method for class 'mpCtrl,mseCtrl'</span></span>
+<span><span class="fu">est</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'mpCtrl'</span></span>
 <span><span class="fu">phcr</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
@@ -67,7 +66,8 @@ only for those modules required by the defined MP.</p>
 <span><span class="co"># S4 method for class 'mpCtrl,function'</span></span>
 <span><span class="fu">phcr</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="fu">hcr</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="co"># S4 method for class 'mpCtrl,mseCtrl'</span></span>
+<span><span class="fu">phcr</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'mpCtrl'</span></span>
 <span><span class="fu">hcr</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
@@ -77,7 +77,8 @@ only for those modules required by the defined MP.</p>
 <span><span class="co"># S4 method for class 'mpCtrl,function'</span></span>
 <span><span class="fu">hcr</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="fu">isys</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="co"># S4 method for class 'mpCtrl,mseCtrl'</span></span>
+<span><span class="fu">hcr</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'mpCtrl'</span></span>
 <span><span class="fu">isys</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
@@ -87,7 +88,8 @@ only for those modules required by the defined MP.</p>
 <span><span class="co"># S4 method for class 'mpCtrl,function'</span></span>
 <span><span class="fu">isys</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="fu">tm</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="co"># S4 method for class 'mpCtrl,mseCtrl'</span></span>
+<span><span class="fu">isys</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'mpCtrl'</span></span>
 <span><span class="fu">tm</span><span class="op">(</span><span class="va">object</span><span class="op">)</span></span>
@@ -95,6 +97,9 @@ only for those modules required by the defined MP.</p>
 <span><span class="fu">tm</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'mpCtrl,function'</span></span>
+<span><span class="fu">tm</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'mpCtrl,mseCtrl'</span></span>
 <span><span class="fu">tm</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'mpCtrl'</span></span>
