@@ -8,7 +8,7 @@
 
 # FLo {{{
 setMethod("plot", signature(x="FLo", y="missing"),
-  function(x, ..., metrics=NULL) {
+  function(x, ..., metrics=list(Rec=rec, SSB=ssb, Catch=catch, F=fbar)) {
 
     args <- list(...)
 
@@ -17,10 +17,7 @@ setMethod("plot", signature(x="FLo", y="missing"),
       return(plot(x, args, metrics=metrics))
 
     # COMPUTE metrics
-    if(is.null(metrics))
-      mets <- metrics(x)[c("SB", "R", "C", "F")]
-    else
-      mets <- do.call("metrics", list(object=x, metrics=metrics))
+    mets <- do.call("metrics", list(object=x, metrics=metrics))
 
     return(plot(mets) + ylim(c(0, NA)))
   }
@@ -29,7 +26,7 @@ setMethod("plot", signature(x="FLo", y="missing"),
 
 # FLo, FLo {{{
 setMethod("plot", signature(x="FLo", y="FLo"),
-  function(x, y, ..., metrics=NULL) {
+  function(x, y, ..., metrics=list(Rec=rec, SSB=ssb, Catch=catch, F=fbar)) {
 
     # GET all args
     args <- c(list(x, y), list(...))
@@ -38,10 +35,7 @@ setMethod("plot", signature(x="FLo", y="FLo"),
     idx <- unlist(lapply(args, is, "FLo"))
 
     # CALL metrics
-    if(is.null(metrics))
-      fqs <- lapply(args[idx], function(x) metrics(stock(x))[c("SB", "R", "C", "F")])
-    else
-      fqs <- lapply(args[idx], function(x) metrics(stock(x), metrics=metrics))
+    fqs <- lapply(args[idx], function(x) metrics(stock(x), metrics=metrics))
 
     plotListFLQuants(fqs)
   }
@@ -51,7 +45,8 @@ setMethod("plot", signature(x="FLo", y="FLo"),
 # FLo, FLmse {{{
 
 setMethod("plot", signature(x="FLo", y="FLmse"),
-  function(x, y, ..., metrics=NULL, window=TRUE) {
+  function(x, y, ..., metrics=list(Rec=rec, SSB=ssb, Catch=catch, F=fbar),
+    window=TRUE) {
 
     # MERGE all FLmse args
     y <- c(list(y), list(...))
