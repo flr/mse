@@ -36,6 +36,9 @@ statistics <- list(
   # FMSY
   FMSY = list(~F/FMSY, name = "F/F[MSY]",
     desc = "Fishing mortality relative to FMSY"),
+  # HR
+  HR = list(~HR, name = "HR",
+    desc = "Harvest rate"),
   # green
   green = list(~iterMeans(FLQuant((SB / SBMSY) >= 1 & (F / FMSY) <= 1)),
     name = "P(Green)", desc = "Probability of being in Kobe green quadrant"),
