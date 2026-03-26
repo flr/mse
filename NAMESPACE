@@ -3,9 +3,13 @@ import("data.table")
 import("FLCore")
 import("ggplotFL")
 import("FLFishery")
-import("patchwork")
 import("FLasher")
-import("progressr")
+
+importFrom("progressr",
+  "handler_cli",
+  "handler_rstudio",
+  "handler_txtprogressbar",
+  "handlers")
 
 importFrom("ggplot2",
   "aes",
@@ -48,9 +52,6 @@ importFrom("FLBRP",
   "refpts",
   "refpts<-",
   "remap")
-
-importFrom("ggrepel",
-  "geom_label_repel")
 
 importFrom("stats",
   "coef",
@@ -103,6 +104,7 @@ export(
   "simulator",
   "sp.is",
   "split.is",
+  "statistics",
   "tac.is",
   "tunebisect")
 
