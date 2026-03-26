@@ -471,7 +471,15 @@ setMethod("fbar", signature(object="FLom"),
     return(fbar(stock(object)))
   }
 ) 
+# }}}
 
+# hr {{{
+
+setMethod("hr", signature(object="FLom"),
+  function(object) {
+    return(hr(stock(object)))
+  }
+) 
 # }}}
 
 # rec {{{
@@ -481,7 +489,6 @@ setMethod("rec", signature(object="FLom"),
     return(rec(stock(object)))
   }
 ) 
-
 # }}}
 
 # summary {{{
@@ -680,13 +687,21 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 # }}}
 
 # metrics {{{
+
 setMethod("metrics", signature(object="FLom", metrics="missing"),
   function(object) {
-    res <- FLQuants(metrics(stock(object), list(SB=ssb, R=rec, C=catch,
-      L=landings, D=discards, F=fbar)))
-    # JOIN units
-    res[-6] <- lapply(res[-6], unitSums)
-    res[6] <- lapply(res[6], unitMeans)
+
+    # CALL on stock
+    res <- FLQuants(metrics(stock(object), metrics=list(R=rec, SB=ssb, B=tsb,
+      C=catch, L=landings, D=discards, F=fbar, HR=hr)))
+    
+    # MERGE units
+    res[1:6] <- lapply(res[1:6], unitSums)
+
+    res[["HR"]] <- unitMeans(res[["HR"]])
+    
+    if("F" %in% names(res))
+      res[["F"]] <- unitMeans(res[["F"]])
 
     return(res)
 })
