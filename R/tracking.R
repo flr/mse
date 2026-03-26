@@ -9,15 +9,19 @@
 # track<-(data.table, numeric) {{{
 
 setReplaceMethod("track", signature(object="data.table", value="numeric"),
-  function(object, step, year=dimnames(value)$year, ..., value) {
+  function(object, step, year=dimnames(value)$year, biol=1, ..., value) {
 
     # ADD step if missing
     object <- .addMetricDT(object, step)
 
+    # COMPUTE number of elements
     nos <- object[, length(unique(iter))] * length(year)
 
+    # GET biol name
+    bion <- object[, unique(biol)][biol]
+
     # ASSIGN
-    object[eval(object[, year %in% ..year & metric == step]),
+    object[eval(object[, biol == bion & year %in% ..year & metric == step]),
       data := rep_len(value, nos)]
 
     return(object[])
@@ -28,13 +32,13 @@ setReplaceMethod("track", signature(object="data.table", value="numeric"),
 # track<-(data.table, FLQuant) {{{
 
 setReplaceMethod("track", signature(object="data.table", value="FLQuant"),
-  function(object, step, year=dimnames(value)$year, ..., value) {
+  function(object, step, year=dimnames(value)$year, biol=1, ..., value) {
 
     # ADD step if missing
     object <- .addMetricDT(object, step)
 
     # ASSIGN
-    object[eval(object[, year %in% ..year & metric == step]), data := c(value)]
+    object[eval(object[, biol == object[, unique(biol)][biol] & year %in% ..year & metric == step]), data := c(value)]
 
     return(object[])
   }
@@ -44,38 +48,32 @@ setReplaceMethod("track", signature(object="data.table", value="FLQuant"),
 # track<-(data.table, fwdControl) {{{
 
 setReplaceMethod("track", signature(object="data.table", value="fwdControl"),
-  function(object, step, year=unique(value$year), ..., value) {
+  function(object, step, year=unique(value$year), biol=1, ..., value) {
 
     # ADD step if missing
     object <- .addMetricDT(object, step)
 
-    # GET value over multiple years or fisheries
-    dms <- dim(target(value))
-    
-    if(dms[1] > 1) {
+    # SET biol
+    if(!is.na(value$biol[1])) {
+      biol <- value$biol[1]
+    }
 
-      # IF multiple years
-      if(length(unique(value$year)) == dms[1]) {
+    # SUBSET first year
+    value <- value[value$year == min(value$year),]
 
-        # SELECT first
-        value <- iters(value)[1, 'value', ]
-      
-      # IF multiple fisheries
-      } else if(length(unique(value$fishery)) == dms[1]) {
-      
-        # AGGREGATE
-        if(value$quant[1] %in% c("catch", "landings", "discards", "effort"))
-          value <- apply(iters(value), 2:3, sum, na.rm=TRUE)['value',]
-        else
-          value <- apply(iters(value), 2:3, mean, na.rm=TRUE)['value',]
-      }
-    # ELSE use 1st
+    # IF fisheries, merge by biol
+    if(all(!is.na(value$fishery))) {
+      # AGGREGATE
+      if(value$quant[1] %in% c("catch", "landings", "discards", "effort"))
+        value <- apply(iters(value), 2:3, sum, na.rm=TRUE)['value',]
+      else
+        value <- apply(iters(value), 2:3, mean, na.rm=TRUE)['value',]
     } else {
-      value <- value[1,]$value
+      value <- value$value
     }
 
     # ASSIGN
-    object[eval(object[, year %in% ..year & metric == step]), data := value]
+    object[eval(object[, biol == object[, unique(biol)][..biol] & year %in% ..year & metric == step]), data := value]
 
     return(object[])
   }
@@ -101,8 +99,9 @@ setReplaceMethod("track", signature(object="data.table", value="FLQuants"),
 )
 # }}}
 
-# functions: .addMetricDT {{{
+# .functions {{{
 
+# .addMetricDT: Adds a metric if not included
 .addMetricDT <- function(x, step) {
 
   test <- step %in% .subset2(x[J(step), on='metric', mult='first', nomatch=0], 'metric')
