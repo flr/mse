@@ -23,7 +23,7 @@ Imports:
   FLFishery,
   FLBRP(>= 2.5.8),
   ggplot2,
-  ggplotFL(>= 2.6.10)
+  ggplotFL(>= 2.7.2)
 Additional_repositories: https://flr.r-universe.dev
 Suggests:
   testthat,
