@@ -27,7 +27,6 @@ refpts(om)$SBlim <- refpts(om)$SB0 * 0.15
 refpts(om)$MSY <- refpts(om)$SBMSY * refpts(om)$FMSY * 0.50
 # DEBUG: refpts(om)['MSY',] <- 1280
 
-
 # --- FLom
 
 years <- list(one=1990, many=1990:1995, unnamed=list(1990:1995),
@@ -50,3 +49,5 @@ tesmany_mean <- tes$many[, .(data=mean(data), year=1995), by=.(statistic, iter, 
 setkey(tesmany_mean, statistic)
 
 expect_identical(tesmany_mean[statistic == "green"], tes$unnamed[statistic == "green"])
+
+

@@ -40,7 +40,7 @@
 #'   trigger=2000, output="catch", target=1.25e5)))
 #'
 #' # Run the MP
-#'  run <- mp(om, oem, control=ctrl, args=list(iy=2025, fy=2035))
+#' run <- mp(om, oem, control=ctrl, args=list(iy=2025, fy=2035))
 #'
 #' # Plot results
 #' plot(om, run)

@@ -4,8 +4,8 @@
 \alias{performance}
 \alias{performance,FLStock-method}
 \alias{performance,FLStocks-method}
-\alias{performance,list-method}
 \alias{performance,FLom-method}
+\alias{performance,list-method}
 \title{Compute performance statistics}
 \usage{
 \S4method{performance}{FLQuants}(
@@ -34,6 +34,15 @@
   ...
 )
 
+\S4method{performance}{FLom}(
+  x,
+  refpts = x@refpts,
+  statistics = mse::statistics[c("C", "F", "HR", "SB")],
+  metrics = NULL,
+  om = name(x),
+  ...
+)
+
 \S4method{performance}{list}(
   x,
   statistics,
@@ -41,15 +50,6 @@
   years = seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
   probs = NULL,
   mc.cores = 1,
-  ...
-)
-
-\S4method{performance}{FLom}(
-  x,
-  refpts = x@refpts,
-  statistics = mse::statistics[c("C", "F", "SB")],
-  metrics = NULL,
-  om = name(x),
   ...
 )
 }

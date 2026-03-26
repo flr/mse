@@ -11,26 +11,31 @@
 \alias{est<--methods}
 \alias{est<-,mpCtrl,function-method}
 \alias{est<-,mpCtrl,mseCtrl-method}
+\alias{est<-,mpCtrl,list-method}
 \alias{phcr,mpCtrl-method}
 \alias{phcr<-}
 \alias{phcr<--methods}
 \alias{phcr<-,mpCtrl,function-method}
 \alias{phcr<-,mpCtrl,mseCtrl-method}
+\alias{phcr<-,mpCtrl,list-method}
 \alias{hcr,mpCtrl-method}
 \alias{hcr<-}
 \alias{hcr<--methods}
 \alias{hcr<-,mpCtrl,function-method}
 \alias{hcr<-,mpCtrl,mseCtrl-method}
+\alias{hcr<-,mpCtrl,list-method}
 \alias{isys,mpCtrl-method}
 \alias{isys<-}
 \alias{isys<--methods}
 \alias{isys<-,mpCtrl,function-method}
 \alias{isys<-,mpCtrl,mseCtrl-method}
+\alias{isys<-,mpCtrl,list-method}
 \alias{tm,mpCtrl-method}
 \alias{tm<-}
 \alias{tm<--methods}
 \alias{tm<-,mpCtrl,function-method}
 \alias{tm<-,mpCtrl,mseCtrl-method}
+\alias{tm<-,mpCtrl,list-method}
 \alias{show,mpCtrl-method}
 \alias{iters,mpCtrl-method}
 \alias{iter,mpCtrl-method}
@@ -53,6 +58,8 @@ est(object) <- value
 
 \S4method{est}{mpCtrl,mseCtrl}(object) <- value
 
+\S4method{est}{mpCtrl,list}(object) <- value
+
 \S4method{phcr}{mpCtrl}(object)
 
 phcr(object) <- value
@@ -60,6 +67,8 @@ phcr(object) <- value
 \S4method{phcr}{mpCtrl,function}(object) <- value
 
 \S4method{phcr}{mpCtrl,mseCtrl}(object) <- value
+
+\S4method{phcr}{mpCtrl,list}(object) <- value
 
 \S4method{hcr}{mpCtrl}(object)
 
@@ -69,6 +78,8 @@ hcr(object) <- value
 
 \S4method{hcr}{mpCtrl,mseCtrl}(object) <- value
 
+\S4method{hcr}{mpCtrl,list}(object) <- value
+
 \S4method{isys}{mpCtrl}(object)
 
 isys(object) <- value
@@ -77,6 +88,8 @@ isys(object) <- value
 
 \S4method{isys}{mpCtrl,mseCtrl}(object) <- value
 
+\S4method{isys}{mpCtrl,list}(object) <- value
+
 \S4method{tm}{mpCtrl}(object)
 
 tm(object) <- value
@@ -84,6 +97,8 @@ tm(object) <- value
 \S4method{tm}{mpCtrl,function}(object) <- value
 
 \S4method{tm}{mpCtrl,mseCtrl}(object) <- value
+
+\S4method{tm}{mpCtrl,list}(object) <- value
 
 \S4method{show}{mpCtrl}(object)
 
