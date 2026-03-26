@@ -34,6 +34,16 @@ performance(
   ...
 )
 
+# S4 method for class 'FLom'
+performance(
+  x,
+  refpts = x@refpts,
+  statistics = mse::statistics[c("C", "F", "HR", "SB")],
+  metrics = NULL,
+  om = name(x),
+  ...
+)
+
 # S4 method for class 'list'
 performance(
   x,
@@ -42,16 +52,6 @@ performance(
   years = seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
   probs = NULL,
   mc.cores = 1,
-  ...
-)
-
-# S4 method for class 'FLom'
-performance(
-  x,
-  refpts = x@refpts,
-  statistics = mse::statistics[c("C", "F", "SB")],
-  metrics = NULL,
-  om = name(x),
   ...
 )
 ```
@@ -114,6 +114,8 @@ Iago Mosqueira, EC JRC
 ``` r
 # LOAD example FLmse object
 data(sol274)
+#> Warning: namespace ‘patchwork’ is not available and has been replaced
+#> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘dplyr’ is not available and has been replaced
 #> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘TMB’ is not available and has been replaced

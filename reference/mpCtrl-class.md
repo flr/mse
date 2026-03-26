@@ -21,6 +21,9 @@ est(object) <- value
 # S4 method for class 'mpCtrl,mseCtrl'
 est(object) <- value
 
+# S4 method for class 'mpCtrl,list'
+est(object) <- value
+
 # S4 method for class 'mpCtrl'
 phcr(object)
 
@@ -30,6 +33,9 @@ phcr(object) <- value
 phcr(object) <- value
 
 # S4 method for class 'mpCtrl,mseCtrl'
+phcr(object) <- value
+
+# S4 method for class 'mpCtrl,list'
 phcr(object) <- value
 
 # S4 method for class 'mpCtrl'
@@ -43,6 +49,9 @@ hcr(object) <- value
 # S4 method for class 'mpCtrl,mseCtrl'
 hcr(object) <- value
 
+# S4 method for class 'mpCtrl,list'
+hcr(object) <- value
+
 # S4 method for class 'mpCtrl'
 isys(object)
 
@@ -54,6 +63,9 @@ isys(object) <- value
 # S4 method for class 'mpCtrl,mseCtrl'
 isys(object) <- value
 
+# S4 method for class 'mpCtrl,list'
+isys(object) <- value
+
 # S4 method for class 'mpCtrl'
 tm(object)
 
@@ -63,6 +75,9 @@ tm(object) <- value
 tm(object) <- value
 
 # S4 method for class 'mpCtrl,mseCtrl'
+tm(object) <- value
+
+# S4 method for class 'mpCtrl,list'
 tm(object) <- value
 
 # S4 method for class 'mpCtrl'

@@ -132,8 +132,8 @@
 - [`performance(`*`<FLQuants>`*`)`](https://flrproject.org/mse/reference/performance.md)
   [`performance(`*`<FLStock>`*`)`](https://flrproject.org/mse/reference/performance.md)
   [`performance(`*`<FLStocks>`*`)`](https://flrproject.org/mse/reference/performance.md)
-  [`performance(`*`<list>`*`)`](https://flrproject.org/mse/reference/performance.md)
   [`performance(`*`<FLom>`*`)`](https://flrproject.org/mse/reference/performance.md)
+  [`performance(`*`<list>`*`)`](https://flrproject.org/mse/reference/performance.md)
   : Compute performance statistics
 
 - [`sampling.oem()`](https://flrproject.org/mse/reference/sampling.oem.md)

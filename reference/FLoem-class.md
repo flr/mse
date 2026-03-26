@@ -96,6 +96,8 @@ provided, this is used for sizing, but not for populating any slot.
 
 ``` r
 data(sol274)
+#> Warning: namespace ‘patchwork’ is not available and has been replaced
+#> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘dplyr’ is not available and has been replaced
 #> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘TMB’ is not available and has been replaced
@@ -1075,6 +1077,8 @@ deviances(oem, "stk", "catch.n")
 #> 
 #> units:  thousands 
 data(sol274)
+#> Warning: namespace ‘patchwork’ is not available and has been replaced
+#> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘dplyr’ is not available and has been replaced
 #> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘TMB’ is not available and has been replaced
@@ -1099,6 +1103,8 @@ dims(deviances(x)$stk$catch.n)$iter
 dims(deviances(x)$idx[[1]])$iter
 #> [1] 50
 data(sol274)
+#> Warning: namespace ‘patchwork’ is not available and has been replaced
+#> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘dplyr’ is not available and has been replaced
 #> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘TMB’ is not available and has been replaced

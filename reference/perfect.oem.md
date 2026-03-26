@@ -50,6 +50,8 @@ step, and does not append them to existing objects in *observations*.
 ``` r
 # On FLom
 data(sol274)
+#> Warning: namespace ‘patchwork’ is not available and has been replaced
+#> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘dplyr’ is not available and has been replaced
 #> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘TMB’ is not available and has been replaced

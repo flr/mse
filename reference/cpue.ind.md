@@ -71,7 +71,7 @@ ctrl <- mpCtrl(est=mseCtrl(method=cpue.ind, args=list(index=2)),
   trigger=2000, output="catch", target=1.25e5)))
 
 # Run the MP
- run <- mp(om, oem, control=ctrl, args=list(iy=2025, fy=2035))
+run <- mp(om, oem, control=ctrl, args=list(iy=2025, fy=2035))
 #> 2025  - 2026  - 2027  - 2028  - 2029  - 2030  - 2031  - 2032  - 2033  - 2034  - 
 
 # Plot results

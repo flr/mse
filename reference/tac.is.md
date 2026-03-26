@@ -92,6 +92,8 @@ usually worst estimated.
 
 ``` r
 data(sol274)
+#> Warning: namespace ‘patchwork’ is not available and has been replaced
+#> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘dplyr’ is not available and has been replaced
 #> by .GlobalEnv when processing object ‘om’
 #> Warning: namespace ‘TMB’ is not available and has been replaced

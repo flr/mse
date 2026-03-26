@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.7.9012</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,6 +67,16 @@
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># S4 method for class 'FLom'</span></span>
+<span><span class="fu">performance</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  refpts <span class="op">=</span> <span class="va">x</span><span class="op">@</span><span class="va">refpts</span>,</span>
+<span>  statistics <span class="op">=</span> <span class="fu">mse</span><span class="fu">::</span><span class="va"><a href="statistics.html">statistics</a></span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"F"</span>, <span class="st">"HR"</span>, <span class="st">"SB"</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  metrics <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  om <span class="op">=</span> <span class="fu">name</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># S4 method for class 'list'</span></span>
 <span><span class="fu">performance</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
@@ -75,16 +85,6 @@
 <span>  years <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu">dims</span><span class="op">(</span><span class="va">x</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">minyear</span> <span class="op">+</span> <span class="fl">1</span>, <span class="fu">dims</span><span class="op">(</span><span class="va">x</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">maxyear</span><span class="op">)</span>,</span>
 <span>  probs <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mc.cores <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  <span class="va">...</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for class 'FLom'</span></span>
-<span><span class="fu">performance</span><span class="op">(</span></span>
-<span>  <span class="va">x</span>,</span>
-<span>  refpts <span class="op">=</span> <span class="va">x</span><span class="op">@</span><span class="va">refpts</span>,</span>
-<span>  statistics <span class="op">=</span> <span class="fu">mse</span><span class="fu">::</span><span class="va"><a href="statistics.html">statistics</a></span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"F"</span>, <span class="st">"SB"</span><span class="op">)</span><span class="op">]</span>,</span>
-<span>  metrics <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  om <span class="op">=</span> <span class="fu">name</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -143,6 +143,8 @@ necessary matching between <em>metrics</em>, <em>refpts</em> and the statistics 
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># LOAD example FLmse object</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sol274</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>namespace ‘patchwork’ is not available and has been replaced</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> by .GlobalEnv when processing object ‘om’</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>namespace ‘dplyr’ is not available and has been replaced</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> by .GlobalEnv when processing object ‘om’</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>namespace ‘TMB’ is not available and has been replaced</span>
