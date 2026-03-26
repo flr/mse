@@ -150,7 +150,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     stop("'management_lag' must be 1 or greater.")
   
   # frq defaults to 1
-  frq <- args$frq <- if(is.null(args$frq)) 1 else args$frq
+  frq <-  args$frq <- if(is.null(args$frq)) 1 else args$frq
 
   # vector of years on which to run mp
   vy <- args$vy <- ac(seq(iy, fy - management_lag - frq + 1, by=frq))
@@ -166,8 +166,8 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # --- RUN checks on inputs
 
-  # CATCH case of refpts with 1 iter
-  refpts(om) <- propagate(refpts(om), dims(om)$it)
+  # TODO: CATCH case of refpts with 1 iter
+  # refpts(om) <- propagate(refpts(om), dims(om)$it)
 
   # TODO CHECK control: c('est', 'hcr') %in% names(control)
 
@@ -202,13 +202,11 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # BUILD data.table
   tracking <- do.call(CJ, list(biol=bnames,
     metric=c(metric, steps[steps %in% names(ctrl)], "fb", "fwd", "time", "pid"),
-    #year=ac(seq(iy - data_lag - frq + 1, fy - management_lag + frq)),
     year=vy,
-    # unit="unique",
     # TODO: SEASONAL management?
     # season="all",
     iter=1:args$it,
-    data=as.numeric(NA)))
+    data=as.numeric(NA), sorted=FALSE))
 
   # SET seed
   if (!is.null(args$seed))
@@ -345,6 +343,7 @@ setMethod("goFish", signature(om="FLom"),
   dlag <- args$data_lag  # years between assessment and last data
   mlag <- args$management_lag # years between assessment and management
   frq <- args$frq   # frequency
+  args$stock <- 1
 
   # CHECK inputs
   dom <- dimnames(stock(om))
@@ -687,15 +686,15 @@ setMethod("goFish", signature(om="FLombf"),
   dlag <- args$data_lag  # years between assessment and last data
   mlag <- args$management_lag # years between assessment and management
   frq <- args$frq   # frequency
-  bns <- names(biols(om))
-  fns <- names(fisheries(om))
+  bns <- args$bns <- names(biols(om))
+  fns <- args$fns <- names(fisheries(om))
 
   # CHECK oem mode (byfishery)
   byfishery <- isTRUE(args(oem)$byfishery)
 
   # TODO LOOP every module over stock
   if(is.null(args$stock))
-    args$stock <- names(biols(om))
+    args$stock <- seq(biols(om))
 
   # COPY ctrl
   ctrl0 <- ctrl
@@ -899,11 +898,12 @@ setMethod("goFish", signature(om="FLombf"),
         ctrl.hcr$stk <- stk0[[1]]
         ctrl.hcr$ind <- ind
       } else if(length(args$stock) == 1) {
-        ctrl.hcr$stk <- stk0[[args$stock]]
-        ctrl.hcr$ind <- ind[[args$stock]]
+        id <- bns[args$stock]
+        ctrl.hcr$stk <- stk0[[id]]
+        ctrl.hcr$ind <- ind[[id]]
       } else {
-        ctrl.hcr$stk <- stk0
-        ctrl.hcr$ind <- ind
+        ctrl.hcr$stk <- stk0[args$stock]
+        ctrl.hcr$ind <- ind[args$stock]
       }
 
       ctrl.hcr$args <- args
@@ -933,7 +933,7 @@ setMethod("goFish", signature(om="FLombf"),
         
         # CHANGE on those missing
         for(i in unique(fbis$biol)) {
-          fbis[fbis$biol == i, c("minAge", "maxAge")]  <- frgs[[i]]
+          fbis[fbis$biol == i, c("minAge", "maxAge")]  <- frgs[[bns[i]]]
         }
         # ASSIGN back into ctrl
         target(ctrl)[ctrl$quant %in% c("f", "fbar"),] <- fbis
@@ -944,8 +944,8 @@ setMethod("goFish", signature(om="FLombf"),
     } else {
       stop("'control' must contain an 'hcr' mseCtrl element.")
     }
-    
-    track(tracking, "hcr", ay) <- ctrl
+
+    track(tracking, "hcr", ay, biol=args$stock) <- ctrl
     
     #----------------------------------------------------------
     # Implementation system
@@ -960,13 +960,13 @@ setMethod("goFish", signature(om="FLombf"),
       if(args$stock == 'all')
         ctrl.is$stk <- stk0
       else if(length(args$stock) == 1)
-        ctrl.is$stk <- stk0[[args$stock]]
+        ctrl.is$stk <- stk0[[bns[args$stock]]]
       else
         ctrl.is$stk <- stk0
 
       ctrl.is$args <- args #ay <- ay
       ctrl.is$tracking <- tracking
-      #
+      
       if(length(ctrl.is$stk) == 1) {
         ctrl.is$ioval <- list(iv=list(t1=flsval, t2=flfval),
           ov=list(t1=flfval))
@@ -983,7 +983,7 @@ setMethod("goFish", signature(om="FLombf"),
 
       tracking <- out$tracking
 
-      track(tracking, "isys", ay) <- ctrl
+      track(tracking, "isys", ay, biol=args$stock) <- ctrl
     }    
 
     #----------------------------------------------------------
@@ -1004,7 +1004,7 @@ setMethod("goFish", signature(om="FLombf"),
       attr(ctrl, "snew") <- out$flq
       tracking <- out$tracking
 
-      track(tracking, "tm", ay) <- ctrl
+      track(tracking, "tm", ay, biol=args$stock) <- ctrl
     }
 
     #==========================================================
@@ -1026,7 +1026,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
       tracking <- out$tracking
 
-      track(tracking, "iem", ay) <- ctrl
+      track(tracking, "iem", ay, biol=args$stock) <- ctrl
     }
 
     #==========================================================
@@ -1049,8 +1049,11 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl <- out$ctrl
       tracking <- out$tracking
       
-      track(tracking, "fb", ay) <- ctrl
+      track(tracking, "fb", ay, biol=args$stock) <- ctrl
     }
+
+    # TODO: SET correct biol from FCB if needed
+    # ctrl$biol <- FCB(om)[, 'B']
 
     #----------------------------------------------------------
     # stock dynamics and OM projections
@@ -1060,13 +1063,12 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.om$om <- om
     ctrl.om$method <- method(projection)
     # DEBUG
-    # ctrl.om$deviances <- residuals(sr(om))
     ctrl.om$ioval <- list(iv=list(t1=floval), ov=list(t1=floval))
     ctrl.om$step <- "om"
 
     om <- do.call("mpDispatch", ctrl.om)$om
 
-    track(tracking, "fwd", ay) <- ctrl
+    track(tracking, "fwd", ay, biol=args$stock) <- ctrl
 
     # time (end)   
     track(tracking, "time", ay) <- as.numeric(Sys.time() - stim)
