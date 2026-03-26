@@ -256,12 +256,26 @@ default.oem <- function(om) {
   stk <- stock(om)
   
   # observations match OM
-  obs <- list(stk=stk, idx=FLIndices(A=as(stk, 'FLIndex')))
+  if(is(om, 'FLom')) {
 
-  # deviances are NULL
-  devs <- list(idx=FLQuants(A=index.q(obs$idx$A) %=% 1),
-    stk=FLQuants(catch.n=catch.n(obs$stk) %=% 1))
+    obs <- list(stk=stk, idx=FLIndices(A=as(stk, 'FLIndex')))
 
+    devs <- list(idx=FLQuants(A=index.q(obs$idx$A) %=% 1),
+      stk=FLQuants(catch.n=catch.n(obs$stk) %=% 1))
+
+  }  else if(is(om, 'FLombf')) {
+
+    obs <- lapply(setNames(nm=names(biols(om))), function(x)
+      list(stk=stk[[x]], idx=FLIndices(A=as(stk[[x]], 'FLIndex'))))
+
+    devs <- lapply(setNames(nm=names(biols(om))), function(x)
+      list(idx=FLQuants(A=index.q(obs[[x]]$idx$A) %=% 1),
+        stk=FLQuants(catch.n=catch.n(obs[[x]]$stk) %=% 1)))
+
+  }  else {
+    stop(paste("'om' is not of a recognized class:", class(om)))
+  }
+  
   # method is perfect.oem
   return(FLoem(method=perfect.oem, observations=obs))
 }
