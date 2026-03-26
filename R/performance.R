@@ -8,6 +8,37 @@
  
 globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit", "season"))
 
+# .functions {{{
+
+# .validStats: returns statistics valid for the input object
+.validStats <- function(x, statistics=mse::statistics) {
+
+  # FIND needed elements
+  needs <- lapply(statistics, function(x) {
+    vars <- all.vars(x[[1]][[2]])
+    vars[!unlist(lapply(vars, exists))]
+  })
+
+  # EXTRACT refpts in object
+  if(is(x, 'FLom'))
+    rdnms <- dimnames(refpts(x))$params
+  else
+    rdnms <- dimnames(refpts(x)[[1]])$params
+
+  # GET names in refpts and metrics, plus FLQuant dimnames
+  available <- c(rdnms, c("C", "SB", "B", "F", "HR"),
+    c("age", "year", "unit", "season", "area"))
+
+  # WHAT statistics can be computed (needs match available)?
+  valid <- unlist(lapply(needs, function(x) {
+    all(x %in% available)
+  }))
+
+  return(statistics[valid])
+}
+
+# }}}
+
 # performance(FLQuants) {{{
 
 #' Compute performance statistics
@@ -143,6 +174,7 @@ setMethod("performance", signature(x="FLQuants"),
 
     # LOOP over years
     res <- data.table::rbindlist(Map(function(i, ni) {
+
       # LOOP over statistics
     data.table::rbindlist(lapply(statistics, function(j) {
 
@@ -263,84 +295,12 @@ setMethod("performance", signature(x="FLStocks"),
   })
 # }}}
 
-# performance(list) FLmse / FLQuants {{{
-
-#' @rdname performance
-
-setMethod("performance", signature(x="list"),
-  function(x, statistics, refpts=FLPar(),
-    years=seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
-    probs=NULL, mc.cores=1, ...) {
-
-    # HANDLE list(FLom | FLombf)
-    if(all(unlist(lapply(x, is, 'FLo')))) {
-      if(missing(statistics))
-        statistics <- mse::statistics[c('C', 'F', 'SB')]
-
-      # TODO: ADD om if missing, via idcol or :=, DROP Map
-      res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
-        refpts=refpts(i), statistics=statistics, years=years, probs=probs, run=j),
-        list(...))), i=x, j=names(x)))
-
-      return(res[])
-    }
- 
-    # COERCE OMs added as reference
-    if(any(unlist(lapply(x, is, 'FLo')))) {
-      x <- lapply(x, function(i) {
-        if(is(i, 'FLo'))
-          return(FLmse(om=i))
-        else
-          return(i)
-
-      })
-    }
-
-    # HANDLE list(FLmses), assumes performance is stored
-    if(all(unlist(lapply(x, is, 'FLmses')))) {
-      return(rbindlist(lapply(x, function(i) performance(i))))
-    }
-
-    # HANDLE list(mse) | FLmses
-    if(all(unlist(lapply(x, is, 'FLmse')))) {
-
-      res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
-        refpts=refpts(i), statistics=statistics, years=years, probs=probs, 
-        run=j, om=name(om(i))), list(...))), i=x, j=names(x)))
-
-      # SET mp if possible
-      # TODO: IF type, run missing
-      if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
-        res[, mp:=paste(om, type, run, sep="_")]
-
-      return(res[])
-    }
-         
-    # ELSE assume list of FLQuants
-    if(!all(unlist(lapply(x, is, 'FLQuants'))))
-      stop("input list must contain objects of class FLQuants")
-
-    if(mc.cores > 1) {
-      res <- data.table::rbindlist(parallel::mclapply(x, performance,
-        statistics=statistics, refpts=refpts, years=years, probs=probs,
-        mp=mp, mc.cores=mc.cores), idcol='run')
-    } else {
-      res <- data.table::rbindlist(lapply(x, performance,
-        statistics=statistics, refpts=refpts, years=years, probs=probs, mp=mp),
-        idcol='run')
-    }
-    
-    return(res[])
-  }
-) 
-# }}}
-
 # performance(FLom) {{{
 
 #' @rdname performance
 
 setMethod("performance", signature(x="FLom"),
-  function(x, refpts=x@refpts, statistics=mse::statistics[c('C', 'F', 'SB')],
+  function(x, refpts=x@refpts, statistics=mse::statistics[c('C', 'F', 'HR', 'SB')],
     metrics=NULL, om=name(x), ...) {
 
     # BUG: metrics argument hides metrics method
@@ -357,39 +317,6 @@ setMethod("performance", signature(x="FLom"),
 )
 # }}}
 
-# performance(FLombf) {{{
-setMethod("performance", signature(x="FLombf"),
-  function(x, statistics=NULL, refpts=x@refpts,
-    metrics=NULL, years=as.character(seq(dims(x)$minyear + 1, dims(x)$maxyear)),
-    probs=NULL, om=name(x), ...) {
-
-    # COMPUTE metrics
-    if(is.null(metrics))
-      mets <- do.call('metrics', list(object=x))
-    else
-      mets <- do.call('metrics', list(object=x, metrics=metrics))
-
-    if(is.null(statistics))
-      statistics <- mse_statistics()[c("C", "SB", "F")]
-
-    # CALL performance by biol
-    res <- mapply(function(me, rp) {
-      performance(x=me, statistics=statistics, refpts=rp, years=years,
-        probs=probs, ...)
-      }, me=mets, rp=x@refpts, SIMPLIFY=FALSE)
-
-    res <- rbindlist(res, idcol="biol")
-
-    # ADD om and drop mp
-    res[, om:=get('om')]
-    res[, mp:=NULL]
-
-    return(res[])
-  }
-)
-
-# }}}
-
 # performance(FLmse) {{{
 
 #' @examples
@@ -397,7 +324,8 @@ setMethod("performance", signature(x="FLombf"),
 #' data(statistics)
 
 setMethod("performance", signature(x="FLmse"),
-  function(x, om=name(x@om), control=FALSE, type="MP", run="1", ...) {
+  function(x, statistics=.validStatistics(om(x)), om=name(x@om), control=FALSE,
+    type="MP", run="1", ...) {
 
     args <- list(...)
 
@@ -424,8 +352,8 @@ setMethod("performance", signature(x="FLmse"),
 
       # COMPUTE on x@om      
       # TODO: MISSING iter
-      res <- do.call(performance, c(list(x=x@om), args, control_args,
-        tracks, om=name(x@om), type=type, run=run))
+      res <- do.call(performance, c(list(x=x@om, statistics=statistics), args,
+        control_args, tracks, om=name(x@om), type=type, run=run))
 
       # NAME mp if  possible
       # TODO: IF type, run missing
@@ -509,4 +437,76 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
     return(x)
 })
 
+# }}}
+
+# performance(list) FLmse / FLQuants {{{
+
+#' @rdname performance
+
+setMethod("performance", signature(x="list"),
+  function(x, statistics, refpts=FLPar(),
+    years=seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
+    probs=NULL, mc.cores=1, ...) {
+
+    # HANDLE list(FLom | FLombf)
+    if(all(unlist(lapply(x, is, 'FLo')))) {
+      if(missing(statistics))
+        statistics <- mse::statistics[c('C', 'F', 'SB')]
+
+      # TODO: ADD om if missing, via idcol or :=, DROP Map
+      res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
+        refpts=refpts(i), statistics=statistics, years=years, probs=probs, run=j),
+        list(...))), i=x, j=names(x)))
+
+      return(res[])
+    }
+ 
+    # COERCE OMs added as reference
+    if(any(unlist(lapply(x, is, 'FLo')))) {
+      x <- lapply(x, function(i) {
+        if(is(i, 'FLo'))
+          return(FLmse(om=i))
+        else
+          return(i)
+
+      })
+    }
+
+    # HANDLE list(FLmses), assumes performance is stored
+    if(all(unlist(lapply(x, is, 'FLmses')))) {
+      return(rbindlist(lapply(x, function(i) performance(i))))
+    }
+
+    # HANDLE list(mse) | FLmses
+    if(all(unlist(lapply(x, is, 'FLmse')))) {
+
+      res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
+        refpts=refpts(i), statistics=statistics, years=years, probs=probs, 
+        run=j, om=name(om(i))), list(...))), i=x, j=names(x)))
+
+      # SET mp if possible
+      # TODO: IF type, run missing
+      if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
+        res[, mp:=paste(om, type, run, sep="_")]
+
+      return(res[])
+    }
+         
+    # ELSE assume list of FLQuants
+    if(!all(unlist(lapply(x, is, 'FLQuants'))))
+      stop("input list must contain objects of class FLQuants")
+
+    if(mc.cores > 1) {
+      res <- data.table::rbindlist(parallel::mclapply(x, performance,
+        statistics=statistics, refpts=refpts, years=years, probs=probs,
+        mp=mp, mc.cores=mc.cores), idcol='run')
+    } else {
+      res <- data.table::rbindlist(lapply(x, performance,
+        statistics=statistics, refpts=refpts, years=years, probs=probs, mp=mp),
+        idcol='run')
+    }
+    
+    return(res[])
+  }
+) 
 # }}}
