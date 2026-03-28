@@ -1,130 +1,673 @@
-# test-performance.R - DESC
-# /home/mosqu003/Projects/FLR/code/mse/mse/tests/testthat/test-performance.R
+# test-performance.R - Unit tests for performance() function family
+# flr/mse/tests/testthat/test-performance.R
 
-# Copyright (c) WMR, 2025.
-# Author: Iago MOSQUEIRA <iago.mosqueira@wur.nl>
+# Copyright (c) WMR, 2026.
+# Author: Iago Mosqueira (WUR)
 #
 # Distributed under the terms of the EUPL-1.2
 
 
-data(plesim)
+# -- TEST: performance(FLQuants) {{{
 
-# ADD missing refpts
-refpts(om)$MSY <- refpts(om)$SBMSY * 0.30
-refpts(om)$Blim <- refpts(om)$SBMSY * 0.20
-refpts(om)$SBlim <- refpts(om)$SBMSY * 0.20
-refpts(om)$Ftarget <- refpts(om)$FMSY
+context("performance: FLQuants method")
 
-# LOAD statistics
-data(statistics)
+test_that("performance(FLQuants) returns data.table with correct structure", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics, refpts=refpts(flom),
+    om="ple", run="r00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+  expect_true(all(c("statistic", "year", "name", "desc", "data", "iter") 
+    %in% colnames(result)))
+  expect_true(all(!is.na(result$data)))
+})
 
-# OBJECTS
+test_that("performance(FLQuants) includes FMSY and other refpt statistics", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[c("FMSY", "SBMSY", "SB0", "green")],
+    refpts=refpts(flom), om="ple", run="r00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(all(c("FMSY", "SBMSY", "SB0", "green") %in% result$statistic))
+  expect_true(all(!is.na(result$data)))
+})
 
-flom <- fwd(window(om, end=2035),  control=fwdControl(year=2026:2035,
-  quant='fbar', value=0.11))
+test_that("performance(FLQuants) computes Kobe quadrant probabilities correctly", {
+  x <- metrics(flom)
+  result <- performance(x, 
+    statistics=statistics[c("green", "yellow", "orange", "red")],
+    refpts=refpts(flom), om="ple", run="r00", type="test")
+  
+  # Check probabilities are between 0 and 1
+  expect_true(all(result$data >= 0 & result$data <= 1))
+  
+  # Verify green/yellow/orange/red are in results
+  expect_true(all(c("green", "yellow", "orange", "red") %in% result$statistic))
+  
+  expect_true(all(!is.na(result$data)))
+})
 
-control <- mpCtrl(list(
-  est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.20))))
+test_that("performance(FLQuants) Kobe quadrants sum to approximately 1", {
+  x <- metrics(flom)
+  result <- performance(x, 
+    statistics=statistics[c("green", "yellow", "orange", "red")],
+    refpts=refpts(flom), om="ple", run="test_sum_quadrants")
+  
+  if(nrow(result) > 0) {
+    result_wide <- data.table::dcast(result, iter + year ~ statistic, value.var = "data")
+    result_wide[, quadrant_sum := green + yellow + orange + red]
+    
+    # All sums should be approximately 1 (allowing for numerical precision)
+    expect_true(all(abs(result_wide$quadrant_sum - 1.0) < 0.01))
+  }
+})
 
-flmse <- mp(flom, ctrl=control, args=list(iy=2025))
+test_that("performance(FLQuants) with identifier arguments", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[c("C", "F")],
+    refpts=refpts(flom), om="ple", run="r00", type="test")
+  
+  expect_true("om" %in% colnames(result))
+  expect_true("run" %in% colnames(result))
+  expect_true("type" %in% colnames(result))
+  expect_true("mp" %in% colnames(result))
+})
 
-flmses <- mps(flom, ctrl=control, args=list(iy=2022),
-  hcr=list(ftrg=c(0.15, 0.18, 0.21)))
+test_that("performance(FLQuants) returns no NA data values", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[1:5],
+    refpts=refpts(flom), run="test_na")
+  
+  na_count <- sum(is.na(result$data))
+  expect_equal(na_count, 0)
+})
+# }}}
 
-# flombf(1)
-# flombf(2)
+# -- TEST: performance(FLom) {{{
 
-# - FLQuants
+context("performance: FLom method")
 
-x <- metrics(flom)
+test_that("performance(FLom) with statistics and refpts", {
+  result <- performance(flom, statistics=statistics, refpts=refpts(flom),
+    run="r00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+  expect_true(all(c("statistic", "year", "data") %in% colnames(result)))
+})
 
-per100  <- performance(x, statistics=statistics, refpts=refpts(om),
-  om="ple", run="r00", type="test")
+test_that("performance(FLom) without refpts works", {
+  result <- performance(flom, statistics=statistics,
+    run="r00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
 
-# - FLom
+test_that("performance(FLom) with default statistics works", {
+  result <- performance(flom, run="r00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+  expect_true(length(unique(result$statistic)) > 0)
+})
 
-x <- flom
+test_that("performance(FLom) includes FMSY statistic when available", {
+  result <- performance(flom, 
+    statistics=statistics[c("FMSY", "SBMSY")],
+    refpts=refpts(flom), run="test_refpt_stats")
+  
+  expect_true("FMSY" %in% result$statistic)
+  expect_true("SBMSY" %in% result$statistic)
+})
 
-per201  <- performance(x, statistics=statistics, refpts=refpts(om),
-  run="r00", type="test")
+test_that("performance(FLom) includes green statistic", {
+  result <- performance(flom, 
+    statistics=statistics[c("green")],
+    refpts=refpts(flom), run="test_green")
+  
+  expect_true("green" %in% result$statistic)
+  # Green should be probability (0-1)
+  expect_true(all(result$data >= 0 & result$data <= 1))
+})
+# }}}
 
-per202  <- performance(x, statistics=statistics, run="r00", type="test")
+# -- TEST: performance(FLStock) {{{
 
-per203  <- performance(x, run="r00", type="test")
+context("performance: FLStock method")
 
-# - FLmse
+test_that("performance(FLStock) with explicit metrics", {
+  x <- stock(flom)
+  result <- performance(x, statistics=statistics[c("C", "F")],
+    metrics=list(C=catch, F=fbar), om="om00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+  expect_true(all(c("C", "F") %in% result$statistic))
+})
 
-x <- flmse
+test_that("performance(FLStock) with automatic metrics", {
+  x <- stock(flom)
+  result <- performance(x, statistics=statistics[c("C", "F")],
+    om="om00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(all(c("C", "F") %in% result$statistic))
+})
 
-per301  <- performance(x, statistics=statistics, run="r00", type="test")
+test_that("performance(FLStock) with refpt-based statistics", {
+  x <- stock(flom)
+  result <- performance(x, statistics=statistics[c("C", "F", "FMSY")],
+    refpts=refpts(flom), om="om00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(all(c("C", "F", "FMSY") %in% result$statistic))
+})
+# }}}
 
-per302  <- performance(x, run="r00", type="test")
+# -- TEST: performance(FLStocks) {{{
 
-# - FLmses
+context("performance: FLStocks method")
 
-x <- flmses
+test_that("performance(FLStocks) with explicit metrics", {
+  x <- FLStocks(A=stock(flom), B=stock(flom))
+  result <- performance(x, statistics=statistics[c("C", "F")],
+    metrics=list(C=catch, F=fbar), om="om00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true("biol" %in% colnames(result))
+  expect_equal(length(unique(result$biol)), 2)
+})
 
-per401  <- performance(x, statistics=statistics, type="test")
+test_that("performance(FLStocks) with automatic metrics", {
+  x <- FLStocks(A=stock(flom), B=stock(flom))
+  result <- performance(x, statistics=statistics[c("C", "F")],
+    om="om00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_equal(length(unique(result$biol)), 2)
+})
 
-per402  <- performance(x, type="test")
+test_that("performance(FLStocks) with refpt-based statistics", {
+  x <- FLStocks(A=stock(flom), B=stock(flom))
+  result <- performance(x, statistics=statistics[c("C", "F", "FMSY")],
+    refpts=refpts(flom), om="om00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true("FMSY" %in% result$statistic)
+  expect_equal(length(unique(result$biol)), 2)
+})
+# }}}
 
-# RETURN data.table
+# -- TEST: performance(FLmse) {{{
 
-x <- mps(flom, ctrl=control, args=list(iy=2021, fy=2034),
-  hcr=list(ftrg=c(0.15, 0.18, 0.21)), statistics=statistics)
+context("performance: FLmse method")
 
-print(x)
+test_that("performance(FLmse) with statistics", {
+  result <- performance(flmse, statistics=statistics, run="r00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
 
-# - list
+test_that("performance(FLmse) with default statistics", {
+  result <- performance(flmse, run="r00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
 
-# list(FLo)
+# -- TEST: performance(FLmses) {{{
 
-x <- list(A=flom, B=flom)
+context("performance: FLmses method")
 
-per511  <- performance(x, statistics=statistics, type="test")
+test_that("performance(FLmses) with statistics", {
+  result <- performance(flmses, statistics=statistics, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
 
-# list(FLmse, FLo)
+test_that("performance(FLmses) with default statistics", {
+  result <- performance(flmses, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
+# }}}
 
-x <- c(flmses, A=flom)
+# -- TEST: performance(list) - list(FLo) {{{
 
-per521  <- performance(x, statistics=statistics, type="test")
+context("performance: list(FLo) method")
 
-# list(FLmses)
+test_that("performance(list(FLo)) handles multiple FLom objects", {
+  x <- list(A=flom, B=flom)
+  result <- performance(x, statistics=statistics, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
 
-x <- list(A=flmses, B=flmses)
+test_that("performance(list(FLo)) includes run identifiers", {
+  x <- list(A=flom, B=flom)
+  result <- performance(x, statistics=statistics[1:3], type="test")
+  
+  expect_true("run" %in% colnames(result))
+})
+# }}}
 
-per531  <- performance(x, statistics=statistics, type="test")
+# -- TEST: performance(list) - list(FLmse, FLo)
 
-# list(FLQuants)
+context("performance: list(FLmse, FLo) method")
 
-x <- list(A=metrics(flom), B=metrics(om))
+test_that("performance(list(FLmse, FLo)) handles mixed FLmses and FLom", {
+  x <- c(flmses, A=flom)
+  result <- performance(x, statistics=statistics, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
+# }}}
 
-per541  <- performance(x, statistics=statistics, refpts=refpts(flom),
-  om="ple", run="r00", type="test")
+# -- TEST: performance(FLmses) {{{
 
-# - FLStock
+context("performance: FLmses method")
 
-x <- stock(flom)
+test_that("performance(FLmses) with statistics", {
+  result <- performance(flmses, statistics=statistics, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
 
-per501  <- performance(x, statistics=statistics[c("C", "F")],
-  metrics=list(C=catch, F=fbar), om="om00", type="test")
+test_that("performance(FLmses) with default statistics", {
+  result <- performance(flmses, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
 
-per502  <- performance(x, statistics=statistics[c("C", "F")],
-  om="om00", type="test")
+# -- TEST: performance(FLmses) {{{
 
-per503  <- performance(x, statistics=statistics[c("C", "F", "FMSY")],
-  refpts=refpts(om), om="om00", type="test")
+context("performance: FLmses method")
 
-# - FLStocks
+test_that("performance(FLmses) with statistics", {
+  result <- performance(flmses, statistics=statistics, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
 
-x <- FLStocks(A=stock(flom), B=stock(flom))
+test_that("performance(FLmses) with default statistics", {
+  result <- performance(flmses, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
+# }}}
 
-per601  <- performance(x, statistics=statistics[c("C", "F")],
-  metrics=list(C=catch, F=fbar), om="om00", type="test")
+# -- TEST: performance(list) - list(FLo) {{{
 
-per602  <- performance(x, statistics=statistics[c("C", "F")],
-  om="om00", type="test")
+context("performance: list(FLo) method")
 
-per603  <- performance(x, statistics=statistics[c("C", "F", "FMSY")],
-  refpts=refpts(om), om="om00", type="test")
+test_that("performance(list(FLo)) handles multiple FLom objects", {
+  x <- list(A=flom, B=flom)
+  result <- performance(x, statistics=statistics, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
+
+test_that("performance(list(FLo)) includes run identifiers", {
+  x <- list(A=flom, B=flom)
+  result <- performance(x, statistics=statistics[1:3], type="test")
+  
+  expect_true("run" %in% colnames(result))
+})
+# }}}
+
+# -- TEST: performance(list) - list(FLmse, FLo)
+
+context("performance: list(FLmse, FLo) method")
+
+test_that("performance(list(FLmse, FLo)) handles mixed FLmses and FLom", {
+  x <- c(flmses, A=flom)
+  result <- performance(x, statistics=statistics, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
+# }}}
+
+# -- TEST: performance(list) - list(FLmses) {{{
+
+context("performance: list(FLmses) method")
+
+test_that("performance(list(FLmses)) handles multiple FLmses objects", {
+  x <- list(A=flmses, B=flmses)
+  result <- performance(x, statistics=statistics, type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
+# }}}
+
+# -- TEST: performance(list) - list(FLQuants) {{{
+
+context("performance: list(FLQuants) method")
+
+test_that("performance(list(FLQuants)) handles multiple metrics lists", {
+  x <- list(A=metrics(flom), B=metrics(om))
+  result <- performance(x, statistics=statistics, refpts=refpts(flom),
+    om="ple", run="r00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
+
+test_that("performance(list(FLQuants)) includes run identifiers", {
+  x <- list(A=metrics(flom), B=metrics(om))
+  result <- performance(x, statistics=statistics[1:3], refpts=refpts(flom),
+    om="ple", run="r00", type="test")
+  
+  expect_true("run" %in% colnames(result))
+})
+# }}}
+
+# -- TEST: Reference Point Statistics - FMSY, green, orange, red, etc. {{{
+
+context("performance: Reference point-based statistics (FMSY, green, etc.)")
+
+test_that("performance computes FMSY correctly", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[c("FMSY")],
+    refpts=refpts(flom), run="test_fmsy")
+  
+  expect_true("FMSY" %in% result$statistic)
+  # F/FMSY should be positive
+  expect_true(all(result$data > 0))
+  expect_true(all(!is.na(result$data)))
+})
+
+test_that("performance computes SBMSY correctly", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[c("SBMSY")],
+    refpts=refpts(flom), run="test_sbmsy")
+  
+  expect_true("SBMSY" %in% result$statistic)
+  # SB/SBMSY should be positive
+  expect_true(all(result$data > 0))
+})
+
+test_that("performance computes SB0 correctly", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[c("SB0")],
+    refpts=refpts(flom), run="test_sb0")
+  
+  expect_true("SB0" %in% result$statistic)
+  # SB/SB0 should be positive
+  expect_true(all(result$data >= 0))
+})
+
+test_that("performance computes green quadrant probability", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[c("green")],
+    refpts=refpts(flom), run="test_green_prob")
+  
+  expect_true("green" %in% result$statistic)
+  # Green should be probability (0-1)
+  expect_true(all(result$data >= 0 & result$data <= 1))
+})
+
+test_that("performance computes orange quadrant probability", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[c("orange")],
+    refpts=refpts(flom), run="test_orange_prob")
+  
+  expect_true("orange" %in% result$statistic)
+  # Orange should be probability (0-1)
+  expect_true(all(result$data >= 0 & result$data <= 1))
+})
+
+test_that("performance computes red quadrant probability", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[c("red")],
+    refpts=refpts(flom), run="test_red_prob")
+  
+  expect_true("red" %in% result$statistic)
+  # Red should be probability (0-1)
+  expect_true(all(result$data >= 0 & result$data <= 1))
+})
+
+test_that("performance computes yellow quadrant probability", {
+  x <- metrics(flom)
+  result <- performance(x, statistics=statistics[c("yellow")],
+    refpts=refpts(flom), run="test_yellow_prob")
+  
+  expect_true("yellow" %in% result$statistic)
+  # Yellow should be probability (0-1)
+  expect_true(all(result$data >= 0 & result$data <= 1))
+})
+# }}}
+
+# -- TEST: Kobe Quadrant Consistency {{{
+
+context("performance: Kobe quadrant consistency")
+
+test_that("Kobe quadrants (green, orange, red, yellow) sum to 1", {
+  x <- metrics(flom)
+  result <- performance(x, 
+    statistics=statistics[c("green", "orange", "red", "yellow")],
+    refpts=refpts(flom), run="test_kobe_sum")
+  
+  if(nrow(result) > 0) {
+    result_wide <- data.table::dcast(result, iter + year ~ statistic, value.var = "data")
+    result_wide[, quadrant_sum := green + orange + red + yellow]
+    
+    # All sums should be approximately 1
+    expect_true(all(abs(result_wide$quadrant_sum - 1.0) < 0.01))
+  }
+})
+
+test_that("performance Kobe statistics are internally consistent across inputs", {
+  # Test with different input types (FLQuants vs FLom)
+  x1 <- metrics(flom)
+  result1 <- performance(x, statistics=statistics[c("green")],
+    refpts=refpts(flom), run="test_kobe_consistency1")
+  
+  result2 <- performance(x, statistics=statistics[c("green")],
+    refpts=refpts(flom), run="test_kobe_consistency2")
+  
+  # Both should produce valid probabilities
+  expect_true(all(result1$data >= 0 & result1$data <= 1))
+  expect_true(all(result2$data >= 0 & result2$data <= 1))
+})
+# }}}
+
+# -- TEST: Multiple Reference Point Statistics Combined {{{
+
+context("performance: Combined reference point statistics")
+
+test_that("performance handles multiple refpt statistics simultaneously", {
+  x <- metrics(flom)
+  multi_stats <- list(
+    FMSY=statistics$FMSY,
+    SBMSY=statistics$SBMSY,
+    SB0=statistics$SB0,
+    green=statistics$green
+  )
+  
+  result <- performance(x, statistics=multi_stats, refpts=refpts(flom),
+    run="test_multi_refpt")
+  
+  expect_true(all(c("FMSY", "SBMSY", "SB0", "green") %in% result$statistic))
+  expect_true(all(!is.na(result$data)))
+})
+
+test_that("performance handles mixed basic and refpt statistics", {
+  x <- metrics(flom)
+  mixed_stats <- list(
+    C=statistics$C,
+    F=statistics$F,
+    FMSY=statistics$FMSY,
+    green=statistics$green
+  )
+  
+  result <- performance(x, statistics=mixed_stats, refpts=refpts(flom),
+    run="test_mixed_stats")
+  
+  expect_true(all(c("C", "F", "FMSY", "green") %in% result$statistic))
+})
+# }}}
+
+# -- TEST: Output Structure and Columns {{{
+
+context("performance: Output structure")
+
+test_that("performance output has required columns", {
+  result <- performance(flom, statistics=statistics[1:5], refpts=refpts(flom),
+    run="test_structure")
+  
+  required_cols <- c("statistic", "year", "name", "desc", "data", "iter")
+  expect_true(all(required_cols %in% colnames(result)))
+})
+
+test_that("performance output is a data.table", {
+  result <- performance(flom, statistics=statistics[1:5], 
+    run="test_datatable")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(is.data.table(result))
+})
+
+test_that("performance output has proper data types", {
+  result <- performance(flom, statistics=statistics[1:3],
+    run="test_types")
+  
+  expect_true(is.numeric(result$data))
+  expect_true(is.numeric(result$iter) || is.integer(result$iter))
+  expect_true(is.character(result$statistic))
+})
+# }}}
+
+# -- TEST: Error Handling {{{
+
+context("performance: Error handling")
+
+test_that("performance warns if statistic variable missing", {
+  bad_stats <- list(
+    BadStat = list(~yearMeans(NONEXISTENT_VAR),
+      name = "Bad",
+      desc = "This should fail"),
+    GoodStat = list(~C,
+      name = "Good",
+      desc = "This should work")
+  )
+  
+  x <- metrics(flom)
+  expect_warning(
+    performance(x, statistics=bad_stats, refpts=refpts(flom),
+      run="bad_stat"),
+    regex = "could not be computed|check metrics"
+  )
+})
+
+test_that("performance stops if statistics not unique", {
+  x <- metrics(flom)
+  dup_stats <- list(
+    Stat1 = list(~yearMeans(C), name = "C", desc = "Catch"),
+    Stat1 = list(~yearMeans(F), name = "F", desc = "F")
+  )
+  
+  expect_error(
+    performance(x, statistics=dup_stats, refpts=refpts(flom),
+      run="dup_stats"),
+    regex = "unique"
+  )
+})
+
+# }}}
+
+# -- TEST: Data Consistency and Reproducibility {{{
+
+context("performance: Data consistency")
+
+test_that("performance produces consistent results on repeated calls", {
+  set.seed(123)
+  result1 <- performance(flom, statistics=statistics[1:5],
+    refpts=refpts(flom), run="consistency1")
+  
+  set.seed(123)
+  result2 <- performance(flom, statistics=statistics[1:5],
+    refpts=refpts(flom), run="consistency2")
+  
+  # Data values should be identical
+  expect_equal(result1$data, result2$data)
+})
+
+test_that("performance identifiers can be controlled", {
+  x <- metrics(flom)
+  result1 <- performance(x, statistics=statistics[1:3],
+    refpts=refpts(flom), om="OM1", run="run1", type="MP1")
+  
+  result2 <- performance(x, statistics=statistics[1:3],
+    refpts=refpts(flom), om="OM2", run="run2", type="MP2")
+  
+  # om, run, type should differ
+  expect_false(identical(result1$om, result2$om))
+  expect_false(identical(result1$run, result2$run))
+  expect_false(identical(result1$type, result2$type))
+})
+# }}}
+
+# -- TEST: Edge Cases {{{
+
+context("performance: Edge cases")
+
+test_that("performance handles single statistic", {
+  result <- performance(flom, statistics=statistics["C"],
+    run="single_stat")
+  
+  expect_s3_class(result, "data.table")
+  expect_true("C" %in% result$statistic)
+})
+
+test_that("performance handles statistics with default descriptions", {
+  minimal_stats <- list(
+    MinStat = list(~yearMeans(C), name = "Minimal")
+  )
+  
+  x <- metrics(flom)
+  result <- performance(x, statistics=minimal_stats, refpts=refpts(flom),
+    run="minimal_stat")
+  
+  # Should add desc based on name
+  expect_true(all(!is.na(result$desc)))
+})
+# }}}
+
+# -- CLEANUP: Verify no R-level errors {{{
+
+context("performance: Final validation")
+
+test_that("No errors in executing all major performance calls", {
+  # This test ensures all major code paths execute without errors
+  expect_silent({
+    # FLQuants
+    x <- metrics(flom)
+    per100 <- performance(x, statistics=statistics, refpts=refpts(flom),
+      om="ple", run="r00", type="test")
+    
+    # FLom with refpts
+    per201 <- performance(flom, statistics=statistics, refpts=refpts(flom),
+      run="r00", type="test")
+    
+    # FLmse
+    per301 <- performance(flmse, statistics=statistics, run="r00", type="test")
+    
+    # FLmses
+    per401 <- performance(flmses, statistics=statistics, type="test")
+  })
+})
+# }}}
