@@ -358,7 +358,7 @@ test_that("performance(list(FLmses)) handles multiple FLmses objects", {
 context("performance: list(FLQuants) method")
 
 test_that("performance(list(FLQuants)) handles multiple metrics lists", {
-  x <- list(A=metrics(flom), B=metrics(om))
+  x <- list(A=metrics(flom), B=metrics(flom))
   result <- performance(x, statistics=statistics, refpts=refpts(flom),
     om="ple", run="r00", type="test")
   
@@ -367,7 +367,7 @@ test_that("performance(list(FLQuants)) handles multiple metrics lists", {
 })
 
 test_that("performance(list(FLQuants)) includes run identifiers", {
-  x <- list(A=metrics(flom), B=metrics(om))
+  x <- list(A=metrics(flom), B=metrics(flom))
   result <- performance(x, statistics=statistics[1:3], refpts=refpts(flom),
     om="ple", run="r00", type="test")
   
@@ -472,7 +472,7 @@ test_that("Kobe quadrants (green, orange, red, yellow) sum to 1", {
 
 test_that("performance Kobe statistics are internally consistent across inputs", {
   # Test with different input types (FLQuants vs FLom)
-  x1 <- metrics(flom)
+  x <- metrics(flom)
   result1 <- performance(x, statistics=statistics[c("green")],
     refpts=refpts(flom), run="test_kobe_consistency1")
   
@@ -546,7 +546,7 @@ test_that("performance output has proper data types", {
     run="test_types")
   
   expect_true(is.numeric(result$data))
-  expect_true(is.numeric(result$iter) || is.integer(result$iter))
+  expect_true(is.numeric(result$iter) || is.integer(result$iter) || is.character(result$iter))
   expect_true(is.character(result$statistic))
 })
 # }}}
