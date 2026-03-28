@@ -40,11 +40,11 @@
 #' @param initac Initial catch from which to compute catch change limits. Defaults to previous observed catch.
 #' @param tracking The tracking object.
 #' @examples
-#' data(sol274)
+#' data(plesim)
 #' # Setup control with tac.is
 #' control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
 #'   hcr=mseCtrl(method=hockeystick.hcr,
-#'     args=list(lim=0, trigger=4.3e5, target=0.21)),
+#'     args=list(lim=0, trigger=14000, target=0.18)),
 #'   isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
 #' # Run MP until 2025
 #' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))
@@ -188,10 +188,49 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
 # indicator.is {{{
 
-#' indicator implementation function
+#' Indicator Implementation System Module
 #'
-#' @param stk The perceived FLStock.
-#' @param ctrl control file with HCR decision
+#' Applies the harvest control rule (HCR) decision to scale the target catch or
+#' fishing mortality based on a reference quantity (status-quo fishing mortality or catch).
+#'
+#' This implementation system (IS) function adjusts the management decision from the HCR
+#' step by multiplying it with a reference quantity computed from the stock-at-age data
+#' in the perceived stock, allowing for indicator-based management approaches. The reference
+#' quantity can be either the status-quo fishing mortality (input system) or catch (output system).
+#'
+#' @param stk The perceived FLStock object returned by the OEM module.
+#' @param ctrl The fwdControl object output by the *hcr* step, containing the HCR decision.
+#' @param args The MSE run arguments, including `sqy` (status-quo years).
+#' @param tracking The tracking object for recording module decisions and outputs.
+#' @param system Character, either "output" (default) or "input". If "output", catch is used
+#'   as reference; if "input", fishing mortality is used.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return A list containing:
+#'   \item{ctrl}{The modified fwdControl with scaled target values.}
+#'   \item{tracking}{The updated tracking object.}
+#'
+#' @details
+#' When `system="output"`, the function scales the HCR target by the mean catch from the
+#' status-quo years. When `system="input"`, it scales by the mean fishing mortality.
+#' This approach allows MPs to work with relative rather than absolute targets.
+#'
+#' @examples
+#' data(plesim)
+#' # Setup control with indicator.is using output system (catch-based)
+#' control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
+#'   hcr=mseCtrl(method=hockeystick.hcr,
+#'     args=list(lim=0, trigger=0.5, target=1.2)),
+#'   isys=mseCtrl(method=indicator.is, args=list(system="output"))))
+#' # Run MP
+#' run <- mp(om, oem, control=control, args=list(iy=2021, fy=2027))
+#'
+#' @author Ernesto Jardim, Iago Mosqueira
+#' @seealso \code{\link{tac.is}}, \code{\link{sp.is}}, \code{\link{seasonal.is}}
+#' @keywords manip
+
+
+
 
 indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"), ...){
 
@@ -205,7 +244,7 @@ indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"),
 	}  	
 	# new control file
 	ctrl@target[,'quantity'] <- quantity
-	ctrl$value <- ctrl$value*vsq
+	ctrl$value <- ctrl$value * vsq
 
 	# return
 	list(ctrl = ctrl, tracking = tracking)

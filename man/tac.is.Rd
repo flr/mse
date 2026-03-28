@@ -61,11 +61,11 @@ years to exclude at the end. For example, \code{c(30, 2)} will use the last 30
 years but excluding the last two, usually worst estimated.
 }
 \examples{
-data(sol274)
+data(plesim)
 # Setup control with tac.is
 control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
   hcr=mseCtrl(method=hockeystick.hcr,
-    args=list(lim=0, trigger=4.3e5, target=0.21)),
+    args=list(lim=0, trigger=14000, target=0.18)),
   isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
 # Run MP until 2025
 run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))

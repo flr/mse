@@ -2,18 +2,20 @@
 % Please edit documentation in R/performance.R
 \name{performance}
 \alias{performance}
+\alias{performance,FLQuants-method}
+\alias{performance,FLo-method}
+\alias{performance,FLmse-method}
+\alias{performance,FLmses-method}
+\alias{performance,list-method}
 \alias{performance,FLStock-method}
 \alias{performance,FLStocks-method}
-\alias{performance,FLom-method}
-\alias{performance,list-method}
-\title{Compute performance statistics}
+\title{Compute Performance Statistics for Management Procedure Evaluation}
 \usage{
 \S4method{performance}{FLQuants}(
   x,
   statistics = mse::statistics[c("C", "F", "SB", "AAVC")],
   refpts = FLPar(),
   years = setNames(nm = dimnames(x[[1]])$year[-1]),
-  probs = NULL,
   om = NULL,
   type = NULL,
   run = NULL,
@@ -21,20 +23,7 @@
   ...
 )
 
-\S4method{performance}{FLStock}(x, statistics, metrics = FLCore::metrics(x), ...)
-
-\S4method{performance}{FLStocks}(
-  x,
-  statistics,
-  metrics = FLCore::metrics,
-  refpts = FLPar(),
-  years = seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
-  probs = NULL,
-  mc.cores = 1,
-  ...
-)
-
-\S4method{performance}{FLom}(
+\S4method{performance}{FLo}(
   x,
   refpts = x@refpts,
   statistics = mse::statistics[c("C", "F", "HR", "SB")],
@@ -43,95 +32,139 @@
   ...
 )
 
+\S4method{performance}{FLmse}(
+  x,
+  statistics = .validStatistics(om(x)),
+  om = name(x@om),
+  control = FALSE,
+  type = "MP",
+  run = "1",
+  ...
+)
+
+\S4method{performance}{FLmses}(x, ...)
+
 \S4method{performance}{list}(
   x,
   statistics,
   refpts = FLPar(),
   years = seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
-  probs = NULL,
-  mc.cores = 1,
   ...
 )
+
+\S4method{performance}{FLStock}(
+  x,
+  statistics,
+  metrics = list(R = rec, SB = ssb, B = tsb, C = catch, L = landings, D = discards, F =
+    fbar, HR = hr),
+  ...
+)
+
+\S4method{performance}{FLStocks}(x, statistics, ...)
 }
 \arguments{
-\item{statistics}{statistics to be computed, as formula, name and description, \code{list}}
+\item{x}{An object holding simulation results. Supported classes:
+\code{FLQuants}, \code{FLStock}, \code{FLStocks}, \code{FLom}, \code{FLmse}, \code{FLmses}, or \code{list}.}
 
-\item{refpts}{Reference points for calculations, \code{list}}
+\item{statistics}{A list of statistics to compute. Each element must be a named list
+with a formula and metadata (name, desc). See Details.}
 
-\item{years}{Years on which statistics should be computed, defaults to last year of input FLQuants}
+\item{refpts}{Reference points for calculations, typically an \code{FLPar} object.
+Defaults to \code{FLPar()} (empty).}
 
-\item{run}{Object holding the results of forward projections, as a named
-\code{FLQuants}}
+\item{years}{Years on which statistics should be computed. Can be:
+\itemize{
+\item A vector of years to use
+\item A named list of year vectors (names become year labels in output)
+Defaults to last year of input if omitted.
+}}
+
+\item{om}{Optional name for the operating model.}
+
+\item{type}{Optional name for the MP type.}
+
+\item{run}{Optional name for the model run.}
+
+\item{mp}{Optional combined MP name. Auto-generated if not provided.}
+
+\item{...}{Additional arguments passed through (e.g., custom metrics, tracking data).}
+
+\item{metrics}{Optional metrics object for FLStock/FLStocks input. Can be:
+\itemize{
+\item An \code{FLQuants} object with pre-computed metrics
+\item A list of metric functions
+\item A single function to compute metrics
+}}
+
+\item{control}{Logical. For FLmse input, include HCR control arguments in output?
+Defaults to FALSE.}
+
+\item{probs}{Optional numeric vector of quantiles (0-1) to compute on statistic
+distributions across iterations. If NULL (default), returns mean values.}
+
+\item{mc.cores}{Integer. Number of cores for parallel processing when handling
+lists or FLStocks. Defaults to 1 (sequential).}
 }
 \value{
-data.table Results of computing performance statistics.
+A \code{data.table} containing computed performance statistics with columns:
+\itemize{
+\item statistic: Name of the computed statistic
+\item year: Year or period for which statistic was computed
+\item name: Display name of statistic
+\item desc: Description of statistic
+\item iter: Iteration number (or median/quantile if probs specified)
+\item data: The computed value
+\item om, type, run, mp: Identifiers for the analysis
+}
 }
 \description{
-TODO
+Evaluates the performance of a management procedure by computing statistical
+metrics across simulated projections. Supports multiple input types (FLQuants,
+FLStock, FLStocks, FLom, FLmse, FLmses, and lists) and computes custom statistics
+defined by formulas that reference metrics and reference points.
 }
 \details{
-Each statistics is an object of class list object, with three elements, the
-first two of them compulsory:
+Each statistic is defined as a named list containing:
 \itemize{
-\item An unnamed element of class \emph{formula}, e.g. \code{yearMeans(SB/SB0)}.
-\item name: A short name to be output on tables and plots, of class character,
-e.g. "SB/SB\link{0}".
-\item desc: A longer description of the statistics, of class character, e.g. "Mean
-spawner biomass relative to unfished"
+\item A formula (unnamed element) using metric and reference point names,
+e.g., \code{~yearMeans(SB/SB0)}
+\item name: Short name for tables/plots, e.g., "SB/SB\link{0}"
+\item desc: Longer description, e.g., "Mean spawner biomass relative to unfished"
 }
 
-Each statistic \code{formula} is evaluated against the \emph{metrics} and \emph{refpts} used
-in the function call. Formulas can thus use (i) the names of the \code{FLQuants}
-object or of the object returned by the call to \code{metrics()}, (ii) of the
-\emph{params} in the \emph{refpts} object and, for all classes but \code{FLQuants}, (iii)
-functions that can be called on \emph{object}. See examples below for the
-necessary matching between \emph{metrics}, \emph{refpts} and the statistics formulas.
+Statistics formulas can reference:
+\enumerate{
+\item Names of \code{FLQuants} elements (metrics from estimation)
+\item Parameter names in the \code{refpts} object
+\item FLQuant dimension names (age, year, unit, season, area)
+\item Functions callable on the source object (for non-FLQuants input)
+}
 }
 \examples{
-
 # LOAD example FLmse object
-data(sol274)
-# GENERATE pseudo-run from last 20 years of OM
-run <- window(stock(om), start=2012, end=2021)
-# DEFINE statistics
-statistics <- list(
-  dCatch=list(~yearMeans(C[, -1]/C[, -dims(C)$year]),
-    name="mean(C[t] / C[t-1])",
-    desc="Mean absolute proportional change in catch"),
-  varCatch=list(~yearVars(C),
-    name="var(C)",
-    desc="Variance in catch"),
-  varF=list(~yearVars(F),
-    name="var(F)",
-    desc="Variance in fishing mortality"))
-# COMPUTE performance
-performance(run, statistics, refpts=FLPar(MSY=110000),
-  metrics=list(C=catch, F=fbar), years=list(short=2016:2018, long=2016:2021))
-# Minimum statistic, named list with formula and name
-performance(run, statistics=list(CMSY=list(~yearMeans(C/MSY), name="CMSY")),
-  refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
-  years=list(2012:2021))
-# return quantiles
-performance(run, statistics, refpts=FLPar(MSY=110000),
-  metrics=list(C=catch, F=fbar), years=list(2012:2021),
-  probs =  c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95))
-# DEFINE statistics without summaries
-statistics <- list(
-  CMSY=list(~yearMeans(C/MSY),
-    name="CMSY",
-    desc="Catch over MSY"))
-# COMPUTE performance
-perf <- performance(run, statistics, refpts=FLPar(MSY=110000),
-  metrics=list(C=catch), years=list(2012:2021))
-# COMPUTE summaries
-perf[, .(CMSY=mean(data))]
-perf <- performance(FLStocks(B=run, A=run), statistics, 
-  refpts=FLPar(MSY=110000), metrics=list(C=catch), years=list(2012:2015))
+data(plesim)
+# Extract FLQuants using metrics
+x <- metrics(om)
+performance(x, statistics=statistics[c("SB", "SBMSY", "F", "FMSY")],
+  refpts=refpts(om), om="ple", run="r00", type="test")
+# Compute on OM, name taken from slot
+performance(om, statistics=statistics[c("SB", "SBMSY", "F", "FMSY")],
+  run="r00", type="test")
+# Setup an example MSE
+control <- mpCtrl(list(
+  est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.15))))
+# ... and run it
+mse <- mp(om, ctrl=control, args=list(iy=2025, fy=2030))
+# Compute performance using all default statistics, data(statistics)
+performance(mse, run="r00", type="test")
+# or select a few of them
+performance(mse, statistics=statistics[c("SBMSY", "FMSY")], run="r00", type="test")
 }
 \seealso{
-\code{\link{FLQuants}}
+\link{statistics}, \code{\link[=refpts]{refpts()}}, \code{\link[FLCore:metrics]{FLCore::metrics()}}
 }
 \author{
-Iago Mosqueira, EC JRC
+Iago Mosqueira (WMR)
 }
 \keyword{utilities}

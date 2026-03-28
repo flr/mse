@@ -49,7 +49,7 @@ control <- FLPar(Feq=0.21, Frate=0.08, Fsigma=0.10, SB0=c(Fbrp(brp)["B0"]),
 # ADD rec devs
 residuals(sr) <- rlnormar1(n=its, meanlog=0, sdlog=0.3, rho=0.1, years=ys)
 
-# PROJCET forward stk history
+# PROJECT forward stk history
 run <- rffwd(stk, sr=sr, control=control, deviances=residuals(sr))
 
 # PLOT
@@ -75,7 +75,7 @@ refpts(om) <- remap(refpts(brps))
 # GET indices
 data(ple4.indices)
 
-# BUILD pseudo-BTS
+# BUILD pseudo-IBTS
 idx <- FLIndex(name="SUR", desc="An IBTS-like survey",
   sel.pattern=expand(sel.pattern(ple4.indices[[6]])[,1],
     year=seq(1980, 2025), fill=TRUE),
@@ -93,11 +93,24 @@ idx <- survey(run, idx, stability=0.86)
 # CONSTRUCT biomass index
 idb <- as(idx, 'FLIndexBiomass')
 
+# DEVIANCES
+devs <- list(stk=list(catch.n=rlnorm(100, catch.n(om) %=% 0, 0.20)))
+
 # BUILD oem
-oem <- FLoem(observations=list(stk=run, idx=FLIndices(SUR=idx, CPUE=idb)),
-  method=sampling.oem)
+oem <- FLoem(observations=list(stk=as(run, 'FLStock'), idx=FLIndices(SUR=idx, CPUE=idb)),
+  deviances=devs, method=sampling.oem)
 
 oem <- fwdWindow(oem, end=2055)
+
+# DROP pkg refs
+nom <- FLom()
+for(i in slotNames(om)) slot(nom, i) <- slot(om, i)
+
+noem <- FLoem()
+for(i in slotNames(oem)) slot(noem, i) <- slot(oem, i)
+
+om <- nom
+oem <- noem
 
 # SAVE
 save(om, oem, file="../data/plesim.rda", compress="xz")

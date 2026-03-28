@@ -71,12 +71,12 @@ The \code{args} list controls the timing of the simulation and its elements:
 }
 \examples{
 # dataset contains both OM (FLom) and OEM (FLoem)
-data(sol274)
+data(plesim)
 # Set control: sa and hcr
 control <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
-  trigger=41500, target=0.27))))
+  trigger=14000, target=0.18))))
 # Runs mp
 tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034))
 # Runs mp with triannual management

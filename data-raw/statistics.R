@@ -95,3 +95,5 @@ statistics <- list(
   )
 
 save(statistics, file="../data/statistics.rda", compress="xz")
+
+save(statistics, file="../R/sysdata.rda", compress="xz")

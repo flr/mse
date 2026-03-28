@@ -82,7 +82,7 @@ setGeneric("observations", function(object, ...) standardGeneric("observations")
 
 #' @rdname FLoem-class
 #' @examples
-#' data(sol274)
+#' data(plesim)
 
 setMethod("observations", "FLoem",
   function(object, ...) {
@@ -222,11 +222,10 @@ setMethod("show", signature(object = "FLoem"),
 
 #' @rdname FLoem-class
 #' @examples
-#' data(sol274)
+#' data(plesim)
 #' x <- iter(oem, 1:50)
 #' dims(observations(x)$stk)$iter
 #' dims(deviances(x)$stk$catch.n)$iter
-#' dims(deviances(x)$idx[[1]])$iter
 
 setMethod("iter", signature(obj = "FLoem"),
   function(obj, iter){
@@ -261,7 +260,7 @@ setMethod("iter", signature(obj = "FLoem"),
 
 #' @rdname FLoem-class
 #' @examples
-#' data(sol274)
+#' data(plesim)
 #' iter(oem, 1:50)
 
 setMethod("combine", signature(x="FLoem", y="FLoem"),

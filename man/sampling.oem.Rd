@@ -42,7 +42,7 @@ simplified to match the dimensions of that present in the \emph{observations}
 slot.
 }
 \examples{
-data(sol274)
+data(plesim)
 # Generate samples from year 2000:2016
 sampling.oem(stock(om), deviances=deviances(oem),
   observations=observations(oem),

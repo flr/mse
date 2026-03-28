@@ -2,15 +2,58 @@
 % Please edit documentation in R/is.R
 \name{indicator.is}
 \alias{indicator.is}
-\title{indicator implementation function}
+\title{Indicator Implementation System Module}
 \usage{
 indicator.is(stk, ctrl, args, tracking, system = c("output", "input"), ...)
 }
 \arguments{
-\item{stk}{The perceived FLStock.}
+\item{stk}{The perceived FLStock object returned by the OEM module.}
 
-\item{ctrl}{control file with HCR decision}
+\item{ctrl}{The fwdControl object output by the \emph{hcr} step, containing the HCR decision.}
+
+\item{args}{The MSE run arguments, including \code{sqy} (status-quo years).}
+
+\item{tracking}{The tracking object for recording module decisions and outputs.}
+
+\item{system}{Character, either "output" (default) or "input". If "output", catch is used
+as reference; if "input", fishing mortality is used.}
+
+\item{...}{Additional arguments (currently unused).}
+}
+\value{
+A list containing:
+\item{ctrl}{The modified fwdControl with scaled target values.}
+\item{tracking}{The updated tracking object.}
 }
 \description{
-indicator implementation function
+Applies the harvest control rule (HCR) decision to scale the target catch or
+fishing mortality based on a reference quantity (status-quo fishing mortality or catch).
 }
+\details{
+This implementation system (IS) function adjusts the management decision from the HCR
+step by multiplying it with a reference quantity computed from the stock-at-age data
+in the perceived stock, allowing for indicator-based management approaches. The reference
+quantity can be either the status-quo fishing mortality (input system) or catch (output system).
+
+When \code{system="output"}, the function scales the HCR target by the mean catch from the
+status-quo years. When \code{system="input"}, it scales by the mean fishing mortality.
+This approach allows MPs to work with relative rather than absolute targets.
+}
+\examples{
+data(plesim)
+# Setup control with indicator.is using output system (catch-based)
+control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
+  hcr=mseCtrl(method=hockeystick.hcr,
+    args=list(lim=0, trigger=0.5, target=1.2)),
+  isys=mseCtrl(method=indicator.is, args=list(system="output"))))
+# Run MP
+run <- mp(om, oem, control=control, args=list(iy=2021, fy=2027))
+
+}
+\seealso{
+\code{\link{tac.is}}, \code{\link{sp.is}}, \code{\link{seasonal.is}}
+}
+\author{
+Ernesto Jardim, Iago Mosqueira
+}
+\keyword{manip}

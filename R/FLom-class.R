@@ -663,7 +663,7 @@ setMethod("iter", signature(obj="FLom"),
 
 #' @rdname FLom-class
 #' @examples
-#' data(sol274)
+#' data(plesim)
 #' comb <- combine(iter(om, 1:50), iter(om, 51:100))
 #' all.equal(om, comb)
 
