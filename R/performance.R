@@ -10,8 +10,8 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit", "s
 
 # .functions {{{
 
-# .validStats: returns statistics valid for the input object
-.validStats <- function(x, statistics=mse::statistics) {
+# .validStatistics: returns statistics valid for the input object
+.validStatistics <- function(x, statistics=mse::statistics) {
 
   # FIND needed elements
   needs <- lapply(statistics, function(x) {
@@ -99,10 +99,6 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit", "s
 #' performance(run, statistics=list(CMSY=list(~yearMeans(C/MSY), name="CMSY")),
 #'   refpts=FLPar(MSY=110000), metrics=list(C=catch, F=fbar),
 #'   years=list(2012:2021))
-#' # return quantiles
-#' performance(run, statistics, refpts=FLPar(MSY=110000),
-#'   metrics=list(C=catch, F=fbar), years=list(2012:2021),
-#'   probs =  c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95))
 #' # DEFINE statistics without summaries
 #' statistics <- list(
 #'   CMSY=list(~yearMeans(C/MSY),
@@ -116,7 +112,7 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit", "s
 
 setMethod("performance", signature(x="FLQuants"),
   function(x, statistics=mse::statistics[c("C", "F", "SB", "AAVC")],
-    refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]), probs=NULL,
+    refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
     om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
 
     # TODO: CHECK statistics are all valid
@@ -228,13 +224,6 @@ setMethod("performance", signature(x="FLQuants"),
     # MERGE
     res <- merge(res, inds, by='statistic')
     
-    # QUANTILES if probs
-    if(!is.null(probs)) {
-      # statistic year name data prob
-      res <- res[, .(data=quantile(data, probs=probs, na.rm=TRUE), prob=probs),
-        by=.(statistic, year, name, desc)]
-    }
-
     # CREATE empty cols
     set(res, j=c('om', 'type', 'run', 'mp'), value=as.list(rep(character(1), 4)))
 
@@ -247,72 +236,25 @@ setMethod("performance", signature(x="FLQuants"),
 
 # }}}
 
-# performance(FLStock) {{{
-
-#' @rdname performance
-
-setMethod("performance", signature(x="FLStock"),
-  function(x, statistics, metrics=FLCore::metrics(x), ...) {
-
-      # CREATE or PASS FLQuants
-      if(is(metrics, "FLQuants"))
-        flqs <- metrics
-      else if(is.list(metrics) & is.function(metrics[[1]]))
-        flqs <- do.call(FLCore::metrics, list(object=x, metrics))
-      else if(is.function(metrics))
-        flqs <- do.call(metrics, list(x))
-      else
-        stop("metrics could not be computed")
-
-    return(performance(flqs, statistics=statistics, ...)[])
-  }
-)
-# }}}
-
-# performance(FLStocks) {{{
-
-#' @rdname performance
-#' @examples
-#' perf <- performance(FLStocks(B=run, A=run), statistics, 
-#'   refpts=FLPar(MSY=110000), metrics=list(C=catch), years=list(2012:2015))
-
-setMethod("performance", signature(x="FLStocks"),
-  function(x, statistics, metrics=FLCore::metrics, refpts=FLPar(),
-    years=seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
-    probs=NULL, mc.cores=1, ...) {
-
-    if(mc.cores > 1) {
-      res <- data.table::rbindlist(parallel::mclapply(x, performance,
-        statistics=statistics, metrics=metrics, refpts=refpts, years=years,
-        probs=probs, mc.cores=mc.cores, ...), idcol='biol')
-    } else {
-      res <- data.table::rbindlist(lapply(x, performance,
-        statistics=statistics, metrics=metrics, refpts=refpts, years=years,
-        probs=probs, ...), idcol='biol')
-    }
-    
-    return(res[]) 
-  })
-# }}}
-
 # performance(FLom) {{{
 
 #' @rdname performance
 
-setMethod("performance", signature(x="FLom"),
+setMethod("performance", signature(x="FLo"),
   function(x, refpts=x@refpts, statistics=mse::statistics[c('C', 'F', 'HR', 'SB')],
     metrics=NULL, om=name(x), ...) {
 
-    # BUG: metrics argument hides metrics method
+    # COMPUTE metrics
     if(is.null(metrics))
       metrics <- metrics(x)
+    else
+      metrics <- metrics(x, metrics)
 
     # SET NULL name if missing
     if(length(om) == 0)
       om <- NULL
 
-    return(performance(stock(x), refpts=refpts, metrics=metrics, 
-      statistics=statistics, om=om, ...))
+    return(performance(metrics, refpts=refpts, statistics=statistics, om=om, ...))
   }
 )
 # }}}
@@ -365,7 +307,8 @@ setMethod("performance", signature(x="FLmse"),
           
         hcrargs <- args(control(x, 'hcr'))
 
-        # USE only numeric or FLQuant/FLPar with single dims but 'iter', and that 1 | iter(om)
+        # USE only numeric or FLQuant/FLPar with single dims but 'iter',
+        # and that 1 | iter(om)
         hcrargs <- lapply(hcrargs, function(i) {
         
           if(is(i, "FLQuant")) {
@@ -422,14 +365,34 @@ setMethod("performance", signature(x="FLmses"),
     if(length(args) == 0)
       return(slot(x, 'performance'))
     else {
-      if(all(unlist(lapply(args, is, "FLmses"))))
+      
+      if(!"statistics" %in% names(args)) {
+        args$statistics <- .validStatistics(om(x[[1]]))
+      }
+
+      if(!"years" %in% names(args)) {
+        args$years <- dimnames(om(x[[1]]))$year[-1]
+      }
+
+      if(all(unlist(lapply(args, is, "FLmses")))) {
         return(rbindlist(c(list(performance(x)), lapply(args, performance))))
-      else
-        # CALL performance(list)
-        callNextMethod()
+
+      } else {
+
+        res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
+          refpts=refpts(i), run=j, om=name(om(i))), args)), i=x, j=names(x)))
+
+        # SET mp if possible
+        if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
+          res[, mp:=paste(om, type, run, sep="_")]
+
+        return(res)
+      }
     }
-  } 
+  }
 )
+
+# performance<-(FLmse, data.table)
 
 setMethod('performance<-', signature(x='FLmses', value="data.frame"),
   function(x, value){
@@ -445,68 +408,83 @@ setMethod('performance<-', signature(x='FLmses', value="data.frame"),
 
 setMethod("performance", signature(x="list"),
   function(x, statistics, refpts=FLPar(),
-    years=seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
-    probs=NULL, mc.cores=1, ...) {
+    years=seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear), ...) {
 
-    # HANDLE list(FLom | FLombf)
+    # - list(FLom | FLombf)
     if(all(unlist(lapply(x, is, 'FLo')))) {
       if(missing(statistics))
         statistics <- mse::statistics[c('C', 'F', 'SB')]
 
       # TODO: ADD om if missing, via idcol or :=, DROP Map
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
-        refpts=refpts(i), statistics=statistics, years=years, probs=probs, run=j),
+        refpts=refpts(i), statistics=statistics, years=years, run=j),
         list(...))), i=x, j=names(x)))
 
       return(res[])
     }
  
-    # COERCE OMs added as reference
+    # - list (FLmse/FLom), coerce to FLmse and pass
     if(any(unlist(lapply(x, is, 'FLo')))) {
       x <- lapply(x, function(i) {
         if(is(i, 'FLo'))
-          return(FLmse(om=i))
+          return(FLmse(om=i, tracking=data.table()))
         else
           return(i)
-
       })
     }
 
-    # HANDLE list(FLmses), assumes performance is stored
-    if(all(unlist(lapply(x, is, 'FLmses')))) {
-      return(rbindlist(lapply(x, function(i) performance(i))))
+    # - list(mse) | FLmses
+    if(all(unlist(lapply(x, is, 'FLmse')))) {
+      return(performance(FLmses(x), statistics=statistics, years=years, ...)[])
     }
 
-    # HANDLE list(mse) | FLmses
-    if(all(unlist(lapply(x, is, 'FLmse')))) {
-
-      res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
-        refpts=refpts(i), statistics=statistics, years=years, probs=probs, 
-        run=j, om=name(om(i))), list(...))), i=x, j=names(x)))
-
-      # SET mp if possible
-      # TODO: IF type, run missing
-      if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
-        res[, mp:=paste(om, type, run, sep="_")]
-
-      return(res[])
+    # - list(FLmses), assumes performance is stored
+    if(all(unlist(lapply(x, is, 'FLmses')))) {
+      return(rbindlist(lapply(x, function(i) performance(i))))
     }
          
     # ELSE assume list of FLQuants
     if(!all(unlist(lapply(x, is, 'FLQuants'))))
       stop("input list must contain objects of class FLQuants")
-
-    if(mc.cores > 1) {
-      res <- data.table::rbindlist(parallel::mclapply(x, performance,
-        statistics=statistics, refpts=refpts, years=years, probs=probs,
-        mp=mp, mc.cores=mc.cores), idcol='run')
-    } else {
+      
       res <- data.table::rbindlist(lapply(x, performance,
-        statistics=statistics, refpts=refpts, years=years, probs=probs, mp=mp),
-        idcol='run')
-    }
+        statistics=statistics, refpts=refpts, ...), idcol='run')
     
     return(res[])
   }
 ) 
+# }}}
+
+# performance(FLStock) {{{
+
+#' @rdname performance
+
+.metrics <- list(R=rec, SB=ssb, B=tsb, C=catch, L=landings, D=discards, F=fbar, HR=hr)
+
+
+setMethod("performance", signature(x="FLStock"),
+  function(x, statistics, metrics=.metrics, ...) {
+
+      flqs <- metrics(x, metrics=metrics)
+
+    return(performance(flqs, statistics=statistics, ...)[])
+  }
+)
+# }}}
+
+# performance(FLStocks) {{{
+
+#' @rdname performance
+#' @examples
+#' perf <- performance(FLStocks(B=run, A=run), statistics, 
+#'   refpts=FLPar(MSY=110000), metrics=list(C=catch), years=list(2012:2015))
+
+setMethod("performance", signature(x="FLStocks"),
+  function(x, statistics, ...) {
+
+    res <- rbindlist(lapply(x, performance,
+      statistics=statistics, ...), idcol='biol')
+    
+    return(res[]) 
+  })
 # }}}
