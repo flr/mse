@@ -686,7 +686,7 @@ setMethod("goFish", signature(om="FLombf"),
   dlag <- args$data_lag  # years between assessment and last data
   mlag <- args$management_lag # years between assessment and management
   frq <- args$frq   # frequency
-  bns <- args$bns <- names(biols(om))
+  bnms <- args$bnms <- names(biols(om))
   fns <- args$fns <- names(fisheries(om))
 
   # CHECK oem mode (byfishery)
@@ -798,7 +798,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.est$step <- "est"
 
       # SET empty, to be replaced
-      ind <- lapply(setNames(nm=bns), function(x) FLQuants())
+      ind <- lapply(setNames(nm=bnms), function(x) FLQuants())
 
       # SET stocks to est on
       if(is.null(args$stock)) {
@@ -898,7 +898,7 @@ setMethod("goFish", signature(om="FLombf"),
         ctrl.hcr$stk <- stk0[[1]]
         ctrl.hcr$ind <- ind
       } else if(length(args$stock) == 1) {
-        id <- bns[args$stock]
+        id <- bnms[args$stock]
         ctrl.hcr$stk <- stk0[[id]]
         ctrl.hcr$ind <- ind[[id]]
       } else {
@@ -933,7 +933,7 @@ setMethod("goFish", signature(om="FLombf"),
         
         # CHANGE on those missing
         for(i in unique(fbis$biol)) {
-          fbis[fbis$biol == i, c("minAge", "maxAge")]  <- frgs[[bns[i]]]
+          fbis[fbis$biol == i, c("minAge", "maxAge")]  <- frgs[[bnms[i]]]
         }
         # ASSIGN back into ctrl
         target(ctrl)[ctrl$quant %in% c("f", "fbar"),] <- fbis
@@ -960,7 +960,7 @@ setMethod("goFish", signature(om="FLombf"),
       if(args$stock == 'all')
         ctrl.is$stk <- stk0
       else if(length(args$stock) == 1)
-        ctrl.is$stk <- stk0[[bns[args$stock]]]
+        ctrl.is$stk <- stk0[[bnms[args$stock]]]
       else
         ctrl.is$stk <- stk0
 
