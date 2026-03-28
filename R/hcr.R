@@ -81,9 +81,9 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   args, tracking, ...) {
 
   # EXTRACT args
-  spread(args[c('ay', 'iy', 'dy', 'mys', 'management_lag', 'it')])
+  spread(args)
 
-  # CHECK function args
+  # CHECK function arguments
 
   # All !NA
   if(any(is.na(c(c(lim), c(trigger), c(min), c(target)))))
@@ -119,10 +119,10 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   out[c(met < drop)] <- min
 
   # TRACK initial output
-  track(tracking, "decision.hcr", ay) <- out
+  track(tracking, "decision.hcr", year=ay, biol=stock) <- out
 
   # TRACK rule: met <= lim, 1; lim < met < trigger, 2; met >= trigger, 3
-  track(tracking, "rule.hcr", ay) <- ifelse(met < drop, 0,
+  track(tracking, "rule.hcr", year=ay, biol=args$stock) <- ifelse(met < drop, 0,
     ifelse(met <= lim, 1, ifelse(met < trigger, 2, 3)))
 
   # GET previous output value if change limited
@@ -135,7 +135,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
       pre <- FLQuant(initial, iter=args$it)
     # OR previous decision,
     } else {
-      pre <- tracking[metric == 'hcr' & year == ay - 1, data]
+      pre <- tracking[metric == 'hcr' & year == ay - 1 & biol == bnms[stock], data]
     }
   }
   
