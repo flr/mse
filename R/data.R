@@ -40,12 +40,8 @@
 #' @usage data(statistics)
 NULL
 
-#' @rdname mse_statistics
-mse_statistics <- function() {
-  env <- new.env()
-  do.call("data", list('statistics', package='mse', envir=env))
-  return(get('statistics', envir=env))
-}
+#' plesim
+
 
 #' FLom object for North sea plaice
 #' 
