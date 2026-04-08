@@ -93,11 +93,20 @@ idx <- survey(run, idx, stability=0.86)
 # CONSTRUCT biomass index
 idb <- as(idx, 'FLIndexBiomass')
 
+# ASSEMBLE FLindices
+ids <- FLIndices(SUR=idx, CPUE=idb)
+
 # DEVIANCES
-devs <- list(stk=list(catch.n=rlnorm(100, catch.n(om) %=% 0, 0.20)))
+devs <- list(
+  stk=FLQuants(catch.n=rlnorm(100, catch.n(om) %=% 0, 0.20)),
+  idx=FLQuants(SUR=rlnormar1(100,  index.q(idx) %=% 0, 0.20,
+      years=dimnames(index(idx))$year),
+    CPUE=rlnormar1(100,  index.q(idx) %=% 0, 0.30,
+      years=dimnames(index(idx))$year))
+)
 
 # BUILD oem
-oem <- FLoem(observations=list(stk=as(run, 'FLStock'), idx=FLIndices(SUR=idx, CPUE=idb)),
+oem <- FLoem(observations=list(stk=as(run, 'FLStock'), idx=ids),
   deviances=devs, method=sampling.oem)
 
 oem <- fwdWindow(oem, end=2055)

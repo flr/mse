@@ -468,9 +468,16 @@ setMethod("performance", signature(x="list"),
     # ELSE assume list of FLQuants
     if(!all(unlist(lapply(x, is, 'FLQuants'))))
       stop("input list must contain objects of class FLQuants")
-      
-      res <- data.table::rbindlist(lapply(x, performance,
-        statistics=statistics, refpts=refpts, ...), idcol='run')
+
+    # DEBUG:
+    if(!is(refpts, "list")) {
+      refpts <- lapply(setNames(nm=names(x)), function(x) refpts)
+    }
+     
+    # CALL performance(FLQuants)
+    res <- data.table::rbindlist(Map(function(x, y)
+      performance(x, statistics=statistics, refpts=y, ...),
+      x=x, y=refpts))#, idcol='run')
     
     return(res[])
   }

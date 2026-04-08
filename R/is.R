@@ -53,7 +53,7 @@
 
 tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   Fdevs=unitMeans(fbar(fut)) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0, reuse=TRUE,
-  initac=metrics(stk, output)[, ac(iy - data_lag)], tracking) {
+  initac=unitSums(metrics(stk, output)[, ac(iy - data_lag)]), tracking) {
 
   # EXTRACT args
   spread(args)
@@ -114,7 +114,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   }
 
   # TRACK Ftarget
-  track(tracking, "fbar.isys", ay) <- ftar
+  track(tracking, "fbar.isys", ay) <- unitMeans(ftar)
 
   # FORECAST for iyrs and my IF mlag > 0,
   if(management_lag > 0) {
@@ -148,7 +148,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
   # ID iters where hcr set met trigger and F > fmin
   id <- tracking[metric  == "rule.hcr" & year == ay, data > 2] &
-    c(fbar(fut)[, ac(ay + management_lag)] > fmin)
+    c(unitMeans(fbar(fut)[, ac(ay + management_lag)]) > fmin)
 
   # EXTRACT catches
   if(isTRUE(reuse) | toupper(reuse) == "C") {
