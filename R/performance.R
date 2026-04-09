@@ -317,6 +317,31 @@ setMethod("performance", signature(x="FLom"),
 )
 # }}}
 
+# performance(FLom) {{{
+
+#' @rdname performance
+
+setMethod("performance", signature(x="FLombf"),
+  function(x, refpts=x@refpts, statistics=mse::statistics[c('C', 'F', 'HR', 'SB')],
+    metrics=NULL, om=name(x), ...) {
+
+    # COMPUTE metrics, argument hides metrics method
+    if(is.null(metrics))
+      metrics <- metrics(x)
+
+    # SET NULL name if missing
+    if(length(om) == 0)
+      om <- NULL
+
+    res <- rbindlist(lapply(setNames(nm=names(metrics)), function(x) 
+      performance(metrics[[x]], refpts=refpts[[x]], statistics=statistics,
+        om=om, ...)), idcol="biol")
+ 
+    return(res)
+  }
+)
+# }}}
+
 # performance(FLmse) {{{
 
 #' @examples
@@ -346,6 +371,7 @@ setMethod("performance", signature(x="FLmse"),
         tracks <- copy(tracking(x))
         setnames(tracks, 1:2, c('quant', 'qname'))
         tracks <- as(tracks, 'FLQuants')
+        tracks <- lapply(tracks, setquant, "age")
       } else {
         tracks <- NULL
       }
