@@ -81,7 +81,14 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   args, tracking, ...) {
 
   # EXTRACT args
+<<<<<<< HEAD
   spread(args)
+=======
+  spread(args[c('ay', 'iy', 'dy', 'mys', 'management_lag', 'it', 'stock')])
+  
+  # GET biol name
+  bname <- tracking[, unique(biol)][stock]
+>>>>>>> main
 
   # CHECK function arguments
 
@@ -132,10 +139,14 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
       # STOP if initial is NULL
       if(is.null(initial))
         stop("To apply 'dlow' and 'dupp' limits, 'initial' is required")
-      pre <- FLQuant(initial, iter=args$it)
+      pre <- FLQuant(c(initial), iter=args$it)
     # OR previous decision,
     } else {
+<<<<<<< HEAD
       pre <- tracking[metric == 'hcr' & year == ay - 1 & biol == bnms[stock], data]
+=======
+      pre <- tracking[metric == 'hcr' & year == ay - 1 & biol == bname, data]
+>>>>>>> main
     }
   }
   
