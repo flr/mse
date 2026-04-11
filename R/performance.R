@@ -6,7 +6,8 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
  
-globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit", "season"))
+globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
+  "season", "area"))
 
 # .functions {{{
 
@@ -270,7 +271,7 @@ setMethod("performance", signature(x="FLo"),
 )
 # }}}
 
-# performance(FLom) {{{
+# performance(FLombf) {{{
 
 #' @rdname performance
 
@@ -287,7 +288,7 @@ setMethod("performance", signature(x="FLombf"),
       om <- NULL
 
     res <- rbindlist(lapply(setNames(nm=names(metrics)), function(x) 
-      performance(metrics[[x]], refpts=refpts[[x]], statistics=statistics,
+      performance(metrics[[x]], refpts=refpts, statistics=statistics,
         om=om, ...)), idcol="biol")
  
     return(res)
@@ -338,10 +339,13 @@ setMethod("performance", signature(x="FLmse"),
         tracks <- NULL
       }
 
-      # COMPUTE on x@om      
-      # TODO: MISSING iter
-      res <- do.call(performance, c(list(x=x@om, statistics=statistics), args,
-        control_args, tracks, om=name(x@om), type=type, run=run))
+      # COMPUTE metrics
+      mets <- do.call('metrics', list(object=x@om, metrics=args$metrics))
+
+      # CALL performance(metrics)
+      res <- do.call(performance, c(list(x=mets, statistics=statistics,
+        refpts=refpts(x)), control_args, tracks, args,
+        om=name(x@om), type=type, run=run))
 
       # NAME mp if  possible
       # TODO: IF type, run missing
@@ -427,8 +431,9 @@ setMethod("performance", signature(x="FLmses"),
 
       } else {
 
-        res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
-          refpts=refpts(i), run=j, om=name(om(i))), args)), i=x, j=names(x)))
+        res <- rbindlist(Map(function(i, j) do.call(performance,
+          c(list(x=i, run=j, om=name(om(i))), args)),
+          i=x, j=names(x)))
 
         # SET mp if possible
         if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
@@ -488,14 +493,14 @@ setMethod("performance", signature(x="list"),
 
     # - list(FLmses), assumes performance is stored
     if(all(unlist(lapply(x, is, 'FLmses')))) {
-      return(rbindlist(lapply(x, function(i) performance(i))))
+      return(rbindlist(lapply(x, function(i) performance(i, ...))))
     }
          
     # ELSE assume list of FLQuants
     if(!all(unlist(lapply(x, is, 'FLQuants'))))
       stop("input list must contain objects of class FLQuants")
 
-    # DEBUG:
+    # SET list of refpts
     if(!is(refpts, "list")) {
       refpts <- lapply(setNames(nm=names(x)), function(x) refpts)
     }
@@ -503,7 +508,7 @@ setMethod("performance", signature(x="list"),
     # CALL performance(FLQuants)
     res <- data.table::rbindlist(Map(function(x, y)
       performance(x, statistics=statistics, refpts=y, ...),
-      x=x, y=refpts))#, idcol='run')
+      x=x, y=refpts), idcol='biol')
     
     return(res[])
   }
