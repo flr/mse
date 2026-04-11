@@ -10,8 +10,9 @@ library(mse)
 library(FLRef)
 
 iy <- 1960
-fy <- 2025
-ys <- seq(iy, fy)
+cy <- 2025
+fy <- 2055
+ys <- seq(iy, cy)
 its <- 100
 
 # LOAD ple4 as reference
@@ -44,7 +45,7 @@ b0 <- an(Fbrp(brp)["B0"])
 
 # CREATE rffwd control:
 control <- FLPar(Feq=0.21, Frate=0.08, Fsigma=0.10, SB0=c(Fbrp(brp)["B0"]),
-  minyear=iy + 1, maxyear=fy, its=its)
+  minyear=iy + 1, maxyear=cy, its=its)
 
 # ADD rec devs
 residuals(sr) <- rlnormar1(n=its, meanlog=0, sdlog=0.3, rho=0.1, years=ys)
@@ -57,18 +58,27 @@ plotAdvice(run)
 
 # -- OM
 
-# CREATE om
-om <- FLom(stock=run, refpts=refpts(run), sr=sr, name="PLE")
-
-# EXTEND to 2055
-om <- fwdWindow(om, end=2055,
-  deviances=rlnormar1(n=its, meanlog=0, sdlog=0.3, rho=0.1, years=seq(2020, 2055)))
-
 # GET refpts
-brps <- brp(FLBRP(as(run, 'FLStock'), sr=list(model=sr@model, params=sr@params)))
+brp <- brp(FLBRP(as(run, 'FLStock'), sr=list(model=sr@model, params=sr@params)))
+brps <- remap(refpts(brp))
 
-# ADD renamed refpts
-refpts(om) <- remap(refpts(brps))
+# R0, SB0, SBMSY, FMSY, Ftarget, SBlim, Blim, MSY
+rps <- FLPar(
+  R0=refpts(run)$R0, 
+  SB0=refpts(run)$B0,
+  SBMSY=brps$SBMSY,
+  SBlim=refpts(run)$Blim,
+  Blim=refpts(run)$Blim,
+  FMSY=refpts(run)$Fmsy,
+  Ftarget=refpts(run)$Fmsy * 0.95,
+  MSY=refpts(run)$Yeq)
+
+# CREATE om
+om <- FLom(stock=run, refpts=rps, sr=sr, name="PLE")
+
+# EXTEND to fy
+om <- fwdWindow(om, end=fy,
+  deviances=rlnormar1(n=its, meanlog=0, sdlog=0.3, rho=0.1, years=seq(iy, fy)))
 
 # -- OEM
 
@@ -93,23 +103,25 @@ idx <- survey(run, idx, stability=0.86)
 # CONSTRUCT biomass index
 idb <- as(idx, 'FLIndexBiomass')
 
-# ASSEMBLE FLindices
+# ASSEMBLE & EXTEND FLindices
 ids <- FLIndices(SUR=idx, CPUE=idb)
 
 # DEVIANCES
 devs <- list(
   stk=FLQuants(catch.n=rlnorm(100, catch.n(om) %=% 0, 0.20)),
-  idx=FLQuants(SUR=rlnormar1(100,  index.q(idx) %=% 0, 0.20,
-      years=dimnames(index(idx))$year),
-    CPUE=rlnormar1(100,  index.q(idx) %=% 0, 0.30,
-      years=dimnames(index(idx))$year))
+  idx=FLQuants(SUR=rlnormar1(100,  index.q(ids[[1]]) %=% 0, 0.20,
+      years=dimnames(index(ids[[1]]))$year),
+    CPUE=rlnormar1(100,  index.q(ids[[2]]) %=% 0, 0.30,
+      years=dimnames(index(ids[[2]]))$year))
 )
 
 # BUILD oem
 oem <- FLoem(observations=list(stk=as(run, 'FLStock'), idx=ids),
-  deviances=devs, method=sampling.oem)
+  method=sampling.oem)
 
 oem <- fwdWindow(oem, end=2055)
+
+deviances(oem) <- devs
 
 # DROP pkg refs
 nom <- FLom()
