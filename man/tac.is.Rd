@@ -15,7 +15,7 @@ tac.is(
   dtacupp = NA,
   fmin = 0,
   reuse = TRUE,
-  initac = metrics(stk, output)[, ac(iy - data_lag)],
+  initac = unitSums(metrics(stk, output)[, ac(iy - data_lag)]),
   tracking
 )
 }

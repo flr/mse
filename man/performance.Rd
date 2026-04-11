@@ -4,6 +4,7 @@
 \alias{performance}
 \alias{performance,FLQuants-method}
 \alias{performance,FLo-method}
+\alias{performance,FLombf-method}
 \alias{performance,FLmse-method}
 \alias{performance,FLmses-method}
 \alias{performance,list-method}
@@ -24,6 +25,15 @@
 )
 
 \S4method{performance}{FLo}(
+  x,
+  refpts = x@refpts,
+  statistics = mse::statistics[c("C", "F", "HR", "SB")],
+  metrics = NULL,
+  om = name(x),
+  ...
+)
+
+\S4method{performance}{FLombf}(
   x,
   refpts = x@refpts,
   statistics = mse::statistics[c("C", "F", "HR", "SB")],

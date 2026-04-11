@@ -7,12 +7,16 @@
 # Distributed under the terms of the EUPL-1.2
 
 
+# LOAD inputs
+load("inputs.rda")
+
 # -- TEST: performance(FLQuants) {{{
 
 context("performance: FLQuants method")
 
+x <- flqs
+
 test_that("performance(FLQuants) returns data.table with correct structure", {
-  x <- metrics(flom)
   result <- performance(x, statistics=statistics, refpts=refpts(flom),
     om="ple", run="r00", type="test")
   
@@ -24,7 +28,6 @@ test_that("performance(FLQuants) returns data.table with correct structure", {
 })
 
 test_that("performance(FLQuants) includes FMSY and other refpt statistics", {
-  x <- metrics(flom)
   result <- performance(x, statistics=statistics[c("FMSY", "SBMSY", "SB0", "green")],
     refpts=refpts(flom), om="ple", run="r00", type="test")
   
@@ -34,7 +37,6 @@ test_that("performance(FLQuants) includes FMSY and other refpt statistics", {
 })
 
 test_that("performance(FLQuants) computes Kobe quadrant probabilities correctly", {
-  x <- metrics(flom)
   result <- performance(x, 
     statistics=statistics[c("green", "yellow", "orange", "red")],
     refpts=refpts(flom), om="ple", run="r00", type="test")
@@ -49,7 +51,6 @@ test_that("performance(FLQuants) computes Kobe quadrant probabilities correctly"
 })
 
 test_that("performance(FLQuants) Kobe quadrants sum to approximately 1", {
-  x <- metrics(flom)
   result <- performance(x, 
     statistics=statistics[c("green", "yellow", "orange", "red")],
     refpts=refpts(flom), om="ple", run="test_sum_quadrants")
@@ -64,7 +65,6 @@ test_that("performance(FLQuants) Kobe quadrants sum to approximately 1", {
 })
 
 test_that("performance(FLQuants) with identifier arguments", {
-  x <- metrics(flom)
   result <- performance(x, statistics=statistics[c("C", "F")],
     refpts=refpts(flom), om="ple", run="r00", type="test")
   
@@ -75,7 +75,6 @@ test_that("performance(FLQuants) with identifier arguments", {
 })
 
 test_that("performance(FLQuants) returns no NA data values", {
-  x <- metrics(flom)
   result <- performance(x, statistics=statistics[1:5],
     refpts=refpts(flom), run="test_na")
   
@@ -138,8 +137,7 @@ test_that("performance(FLom) includes green statistic", {
 context("performance: FLStock method")
 
 test_that("performance(FLStock) with explicit metrics", {
-  x <- stock(flom)
-  result <- performance(x, statistics=statistics[c("C", "F")],
+  result <- performance(fls, statistics=statistics[c("C", "F")],
     metrics=list(C=catch, F=fbar), om="om00", type="test")
   
   expect_s3_class(result, "data.table")
@@ -148,8 +146,7 @@ test_that("performance(FLStock) with explicit metrics", {
 })
 
 test_that("performance(FLStock) with automatic metrics", {
-  x <- stock(flom)
-  result <- performance(x, statistics=statistics[c("C", "F")],
+  result <- performance(fls, statistics=statistics[c("C", "F")],
     om="om00", type="test")
   
   expect_s3_class(result, "data.table")
@@ -157,8 +154,7 @@ test_that("performance(FLStock) with automatic metrics", {
 })
 
 test_that("performance(FLStock) with refpt-based statistics", {
-  x <- stock(flom)
-  result <- performance(x, statistics=statistics[c("C", "F", "FMSY")],
+  result <- performance(fls, statistics=statistics[c("C", "F", "FMSY")],
     refpts=refpts(flom), om="om00", type="test")
   
   expect_s3_class(result, "data.table")
@@ -171,8 +167,7 @@ test_that("performance(FLStock) with refpt-based statistics", {
 context("performance: FLStocks method")
 
 test_that("performance(FLStocks) with explicit metrics", {
-  x <- FLStocks(A=stock(flom), B=stock(flom))
-  result <- performance(x, statistics=statistics[c("C", "F")],
+  result <- performance(flss, statistics=statistics[c("C", "F")],
     metrics=list(C=catch, F=fbar), om="om00", type="test")
   
   expect_s3_class(result, "data.table")
@@ -181,8 +176,7 @@ test_that("performance(FLStocks) with explicit metrics", {
 })
 
 test_that("performance(FLStocks) with automatic metrics", {
-  x <- FLStocks(A=stock(flom), B=stock(flom))
-  result <- performance(x, statistics=statistics[c("C", "F")],
+  result <- performance(flss, statistics=statistics[c("C", "F")],
     om="om00", type="test")
   
   expect_s3_class(result, "data.table")
@@ -190,8 +184,7 @@ test_that("performance(FLStocks) with automatic metrics", {
 })
 
 test_that("performance(FLStocks) with refpt-based statistics", {
-  x <- FLStocks(A=stock(flom), B=stock(flom))
-  result <- performance(x, statistics=statistics[c("C", "F", "FMSY")],
+  result <- performance(flss, statistics=statistics[c("C", "F", "FMSY")],
     refpts=refpts(flom), om="om00", type="test")
   
   expect_s3_class(result, "data.table")

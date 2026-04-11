@@ -9,7 +9,8 @@ importFrom("progressr",
   "handler_cli",
   "handler_rstudio",
   "handler_txtprogressbar",
-  "handlers")
+  "handlers",
+  "progressor")
 
 importFrom("ggplot2",
   "aes",
@@ -26,6 +27,12 @@ importFrom("ggplot2",
   "ylab",
   "xlim",
   "ylim")
+  
+importFrom("ggrepel",
+  "geom_label_repel")
+
+importFrom("patchwork",
+  "wrap_plots")
 
 importFrom("foreach",
   "%do%",
