@@ -702,6 +702,12 @@ setMethod("[", signature(x="FLombf"),
 
 # metrics {{{
 
+setMethod("metrics", signature(object="FLombf", metrics="NULL"),
+  function(object, metrics, named=TRUE) {
+    metrics(object, named=named)
+  }
+)
+
 setMethod("metrics", signature(object="FLombf", metrics="missing"),
   function(object, named=TRUE) {
  

@@ -706,6 +706,11 @@ setMethod("metrics", signature(object="FLom", metrics="missing"),
     return(res)
 })
 
+setMethod("metrics", signature(object="FLom", metrics="NULL"),
+  function(object, metrics) {
+    metrics(object)
+})
+
 setMethod("metrics", signature(object="FLom", metrics="list"),
   function(object, metrics) {
     FLQuants(metrics(stock(object), metrics))
