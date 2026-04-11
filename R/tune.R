@@ -125,7 +125,8 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     verbose=FALSE, ...)
 
   pmin <- performance(rmin, metrics=metrics, 
-    statistics=statistic, refpts=refpts(om), probs=NULL, years=list(unlist(years)))
+    statistics=statistic, probs=NULL, years=list(unlist(years)))
+
   obmin <- mean(pmin$data, na.rm=TRUE) - prob
 
   # PRINT result
@@ -151,7 +152,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     verbose=FALSE, ...)
   
   pmax <- performance(rmax, metrics=metrics,
-    statistic=statistic, refpts=refpts(om), probs=NULL, years=list(unlist(years)))
+    statistic=statistic, probs=NULL, years=list(unlist(years)))
   obmax <- mean(pmax$data, na.rm=TRUE) - prob
 
   # PRINT result
@@ -189,7 +190,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       verbose=FALSE, ...)
 
     pmid <- performance(rmid, metrics=metrics, 
-      statistics=statistic, refpts=refpts(om), probs=NULL, years=list(unlist(years)))
+      statistics=statistic, probs=NULL, years=list(unlist(years)))
     obmid <- mean(pmid$data, na.rm=TRUE) - prob
 
     # PRINT result
