@@ -107,10 +107,10 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
   # reuse = TRUE
   if(isTRUE(reuse) | toupper(reuse) == 'F') {
-    ftar <- c(ctrl[1,]$value * Fdevs[, ac(mys[1])])
+    ftar <- ctrl[1,]$value * Fdevs[, ac(mys[1])]
   # reuse = FALSE
   } else {
-    ftar <- c(ctrl$value * Fdevs[, ac(mys)])
+    ftar <- ctrl$value * Fdevs[, ac(mys)]
   }
 
   # TRACK Ftarget
@@ -128,14 +128,14 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     if(data_lag == 0) {
       fctrl <- fwdControl(
         # target
-        list(year=mys, quant="fbar", value=c(ftar)))
+        list(year=mys, quant="fbar", value=ftar))
     } else {
       fctrl <- fwdControl(c(
         # SET F for intermediate year(s)
         lapply(seq(dy + 1, mys[1] - 1), function(y) list(year=y,
           quant="fbar", value=c(fsq))),
         # ... and for management years
-        lapply(mys, function(y) list(year=y, quant="fbar", value=c(ftar)))))
+        lapply(mys, function(y) list(year=y, quant="fbar", value=ftar))))
     }
   # else only for my
   } else {
