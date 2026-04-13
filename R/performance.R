@@ -276,7 +276,7 @@ setMethod("performance", signature(x="FLo"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLombf"),
-  function(x, refpts=x@refpts, statistics=mse::statistics[c('C', 'F', 'HR', 'SB')],
+  function(x, statistics=mse::statistics[c('C', 'F', 'HR', 'SB')],
     metrics=NULL, om=name(x), ...) {
 
     # COMPUTE metrics, argument hides metrics method
@@ -287,8 +287,8 @@ setMethod("performance", signature(x="FLombf"),
     if(length(om) == 0)
       om <- NULL
 
-    res <- rbindlist(lapply(setNames(nm=names(metrics)), function(x) 
-      performance(metrics[[x]], refpts=refpts, statistics=statistics,
+    res <- rbindlist(lapply(setNames(nm=names(metrics)), function(i) 
+      performance(metrics[[i]], refpts=x@refpts[[i]], statistics=statistics,
         om=om, ...)), idcol="biol")
  
     return(res)
