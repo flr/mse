@@ -477,17 +477,17 @@ setMethod("fbar", signature(object="FLombf"),
 
 partialHR <- function(om) {
 
-  # C_f / sum(S_f * N * W)
-  lapply(fisheries(om), function(x) {
-    # ADD catch across sexes
-    res <- unitSums(catch(x[[1]])) /
-      # ADD N * WT * S_f across ages and units
-      unitSums(quantSums(n(biol(om)) * wt(biol(om)) * catch.sel(x[[1]])))
+  # LOOP over biols
+  res <- lapply(setNames(seq(biols(om)), nm=names(biols(om))), function(x) {
 
-    units(res) <- 'hr'
-    
-    return(res)
+    # COMPUTE C_f / sum(S_f * N * W) for f taking a biol (FCB)
+    lapply(catch(fisheries(om))[FCB(om)[,'B'] == x] /
+
+    lapply(fisheries(om)[FCB(om)[,'B'] == x], function(y)
+        unitSums(quantSums(catch.sel(y[[1]]) * n(biols(om)[[x]]) *
+           wt(biols(om)[[x]])))), setunits, 'hr')
   })
+  return(res)
 }
 
 #' hr method for FLombf
@@ -505,7 +505,7 @@ partialHR <- function(om) {
 
 setMethod("hr", signature(object="FLombf"),
   function(object) {
-    Reduce('+', partialHR(object))
+    lapply(partialHR(object), function(x) Reduce('+', x))
 })
 
 # }}}
@@ -717,16 +717,16 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
     # TODO: SET for hbar 
 
     # ADD catch & SSB by biol
-    mets <- Map(function(me, ca, sb, fb, rb) {
+    mets <- Map(function(me, ca, sb, fb, hb) {
 
       me[['SB']] <- sb
-      me[['R']] <- rb
       me[['C']] <- ca
       me[['F']] <- fb
+      me[['HR']] <- hb
 
       return(me)
 
-    }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object), rb=rec(object))
+    }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object), hb=hr(object))
 
     if(length(mets) == 1 & !named)
       return(mets[[1]])
