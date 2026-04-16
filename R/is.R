@@ -34,8 +34,8 @@
 #' @param args The MSE run arguments.
 #' @param recyrs Years to use for geometric mean recruitment if projection. Defaults to all years minus the last two.
 #' @param Fdevs Deviances on the fbar input to incorporate error and bias when MP is run using the pseudo-estimators 'perfect.sa' or 'shortcut.sa'.
-#' @param dtaclow Limit to decreases in output catch, as a proportional change (0.85 for 15%). Applied only when metric > lim, as set by 'hcr' step.
-#' @param dtacupp Limit to increases in output catch, as a proportional change (1.15 for 15%). Applied only when metric > lim, as set by 'hcr' step.
+#' @param dlow Limit to decreases in output catch, as a proportional change (0.85 for 15%). Applied only when metric > lim, as set by 'hcr' step.
+#' @param dupp Limit to increases in output catch, as a proportional change (1.15 for 15%). Applied only when metric > lim, as set by 'hcr' step.
 #' @param fmin Minimum fbar to apply when catch change limits are use.
 #' @param initac Initial catch from which to compute catch change limits. Defaults to previous observed catch.
 #' @param tracking The tracking object.
@@ -52,7 +52,7 @@
 #' plot(om, TAC.IS=run)
 
 tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
-  Fdevs=unitMeans(fbar(fut)) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0, reuse=TRUE,
+  Fdevs=unitMeans(fbar(fut)) %=% 1, dlow=NA, dupp=NA, fmin=0, reuse=TRUE,
   initac=unitSums(metrics(stk, output)[, ac(iy - data_lag)]), tracking) {
 
   # EXTRACT args
@@ -166,11 +166,11 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     prev_tac <- c(tracking[metric == "isys" & year == ay - frq, data])
 
   # APPLY upper and lower TAC limit, if not NA and only for id iters
-  if(!is.na(dtacupp)) {
-    iter(TAC, id) <- pmin(c(iter(TAC, id)), prev_tac[id] * dtacupp)
+  if(!is.na(dupp)) {
+    iter(TAC, id) <- pmin(c(iter(TAC, id)), prev_tac[id] * dupp)
   }
-  if(!is.na(dtaclow)) {
-    iter(TAC, id) <- pmax(c(iter(TAC, id)), prev_tac[id] * dtaclow)
+  if(!is.na(dlow)) {
+    iter(TAC, id) <- pmax(c(iter(TAC, id)), prev_tac[id] * dlow)
   }
 
   # CONSTRUCT fwdControl  TODO: USE frq here
