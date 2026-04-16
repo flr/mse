@@ -104,7 +104,6 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   track(tracking, "gmrec.isys", ay) <- gmnrec
 
   # ADD F deviances for 1 year
-
   # reuse = TRUE
   if(isTRUE(reuse) | toupper(reuse) == 'F') {
     ftar <- ctrl[1,]$value * Fdevs[, ac(mys[1])]
@@ -157,11 +156,14 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     TAC <- areaSums(unitSums(catch(fut)[, ac(mys)]))
   }
 
+  # TRACK initla TAC
+  track(tracking, "catch.isys", ay) <- unitMeans(TAC)
+
   # GET TAC dy / ay - 1
   if(ay == iy)
     prev_tac <- rep(c(initac), length=args$it)
   else
-    prev_tac <- c(tracking[metric == "isys" & year == ay])
+    prev_tac <- c(tracking[metric == "isys" & year == ay - frq, data])
 
   # APPLY upper and lower TAC limit, if not NA and only for id iters
   if(!is.na(dtacupp)) {
@@ -228,9 +230,6 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 #' @author Ernesto Jardim, Iago Mosqueira
 #' @seealso \code{\link{tac.is}}, \code{\link{sp.is}}, \code{\link{seasonal.is}}
 #' @keywords manip
-
-
-
 
 indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"), ...){
 
