@@ -667,8 +667,9 @@ setMethod("iter", signature(obj="FLom"),
 #' comb <- combine(iter(om, 1:50), iter(om, 51:100))
 #' all.equal(om, comb)
 
-setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
-	
+setMethod("combine", signature(x = "FLom", y = "FLom"),
+  function(x, y, ...){
+
   args <- c(list(x, y), list(...))
 
 	if(length(args) > 2) {
@@ -679,7 +680,7 @@ setMethod("combine", signature(x = "FLom", y = "FLom"), function(x, y, ...){
 
     stock(x) <- combine(stock(x), stock(y))
     sr(x) <- combine(sr(x), sr(y))
-    refpts(x) <- cbind(refpts(x), refpts(y))
+    refpts(x) <- combine(refpts(x), refpts(y))
 
     return(x)
 	}
