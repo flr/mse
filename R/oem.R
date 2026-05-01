@@ -31,9 +31,9 @@
 #'
 #' @examples
 #' # On FLom
-#' data(sol274)
+#' data(plesim)
 #' obs <- perfect.oem(stock(om), deviances=NULL, observations=NULL,
-#'   args=list(y0=1957, dy=2021), tracking=FLQuant())
+#'   args=list(y0=1960, dy=2021), tracking=FLQuant())
 
 perfect.oem <- function(stk, deviances, observations, args, tracking,
   biomass=FALSE, ...) {
@@ -133,7 +133,7 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
 #' @seealso \link{mp}
 #' @keywords function
 #' @examples
-#' data(sol274)
+#' data(plesim)
 #' # Generate samples from year 2000:2016
 #' sampling.oem(stock(om), deviances=deviances(oem),
 #'   observations=observations(oem),

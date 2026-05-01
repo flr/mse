@@ -102,7 +102,7 @@ Methods exist for various calculations based on values stored in the class:
 }
 
 \examples{
-data(sol274)
+data(plesim)
 comb <- combine(iter(om, 1:50), iter(om, 51:100))
 all.equal(om, comb)
 }

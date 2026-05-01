@@ -10,12 +10,13 @@ tac.is(
   args,
   output = "catch",
   recyrs = -2,
+  fsqyrs = 1,
   Fdevs = unitMeans(fbar(fut)) \%=\% 1,
-  dtaclow = NA,
-  dtacupp = NA,
+  dlow = NA,
+  dupp = NA,
   fmin = 0,
   reuse = TRUE,
-  initac = metrics(stk, output)[, ac(iy - data_lag)],
+  initac = unitSums(metrics(stk, output)[, ac(iy - data_lag)]),
   tracking
 )
 }
@@ -30,9 +31,9 @@ tac.is(
 
 \item{Fdevs}{Deviances on the fbar input to incorporate error and bias when MP is run using the pseudo-estimators 'perfect.sa' or 'shortcut.sa'.}
 
-\item{dtaclow}{Limit to decreases in output catch, as a proportional change (0.85 for 15\%). Applied only when metric > lim, as set by 'hcr' step.}
+\item{dlow}{Limit to decreases in output catch, as a proportional change (0.85 for 15\%). Applied only when metric > lim, as set by 'hcr' step.}
 
-\item{dtacupp}{Limit to increases in output catch, as a proportional change (1.15 for 15\%). Applied only when metric > lim, as set by 'hcr' step.}
+\item{dupp}{Limit to increases in output catch, as a proportional change (1.15 for 15\%). Applied only when metric > lim, as set by 'hcr' step.}
 
 \item{fmin}{Minimum fbar to apply when catch change limits are use.}
 
@@ -61,12 +62,12 @@ years to exclude at the end. For example, \code{c(30, 2)} will use the last 30
 years but excluding the last two, usually worst estimated.
 }
 \examples{
-data(sol274)
+data(plesim)
 # Setup control with tac.is
 control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
   hcr=mseCtrl(method=hockeystick.hcr,
-    args=list(lim=0, trigger=4.3e5, target=0.21)),
-  isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
+    args=list(lim=0, trigger=14000, target=0.18)),
+  isys=mseCtrl(method=tac.is, args=list(recyrs=-3, fnsqy=3, output='landings'))))
 # Run MP until 2025
 run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))
 # Plot run time series

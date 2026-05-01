@@ -51,12 +51,12 @@
 #'
 #' @examples
 #' # dataset contains both OM (FLom) and OEM (FLoem)
-#' data(sol274)
+#' data(plesim)
 #' # Set control: sa and hcr
 #' control <- mpCtrl(list(
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
-#'   trigger=41500, target=0.27))))
+#'   trigger=14000, target=0.18))))
 #' # Runs mp
 #' tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034))
 #' # Runs mp with triannual management
@@ -509,7 +509,7 @@ setMethod("goFish", signature(om="FLom"),
     if(exists("hcrpars")){
       # TODO
       track(tracking, "phcr", ay) <- c(hcrpars[1,])
-     }
+    }
 
     # --- hcr: Harvest Control Rule
 
@@ -522,8 +522,11 @@ setMethod("goFish", signature(om="FLom"),
       ctrl.hcr$tracking <- tracking
       ctrl.hcr$ind <- ind
 
-      # TODO REVIEW interface
-      if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
+      # ADD hcrpars to ctrl.hcr
+      if(exists("hcrpars")) {
+        hcrplist <- as(hcrpars, 'list')
+        ctrl.hcr[names(hcrplist)] <- hcrplist
+      }
 
       ctrl.hcr$ioval <- list(iv=list(t1=flsval, t2=flqsval), 
         ov=list(t1=flfval))
@@ -677,6 +680,7 @@ setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
     verbose, progress, .DEBUG) {
 
+  # CONSTANT args
   it <- args$it     # number of iterations
   y0 <- args$y0     # initial data year
   fy <- args$fy     # final year
@@ -686,30 +690,32 @@ setMethod("goFish", signature(om="FLombf"),
   dlag <- args$data_lag  # years between assessment and last data
   mlag <- args$management_lag # years between assessment and management
   frq <- args$frq   # frequency
-  bns <- args$bns <- names(biols(om))
+  bns <- args$ns <- names(biols(om))
   fns <- args$fns <- names(fisheries(om))
 
   # CHECK oem mode (byfishery)
   byfishery <- isTRUE(args(oem)$byfishery)
 
-  # TODO LOOP every module over stock
+  # GET stock if not set
   if(is.null(args$stock))
     args$stock <- seq(biols(om))
 
   # COPY ctrl
   ctrl0 <- ctrl
 
-  # go fish
+  # SET default oem deviances
   if(length(deviances(oem)) == 0)
     deviances(oem) <- rep(list(NULL), length(biols(om)))
 
   # SET progressor
   if(progress)
     p <- progressor(steps=length(vy) + 1)
+
+  # Go FISH!
   for(i in vy) {
 
-  if(.DEBUG)
-    browser()
+    if(.DEBUG)
+      browser()
 
     if(verbose) {
       cat(i, " > ")
@@ -722,7 +728,7 @@ setMethod("goFish", signature(om="FLombf"),
     # time (start)
     stim <- Sys.time()
 
-    # annual args
+    # ANNUAL args
     ay <- args$ay <- an(i)
     dy <- args$dy <- ay - dlag
     dys <- args$dys <- seq(ay - dlag - frq + 1, ay - dlag)
@@ -737,7 +743,6 @@ setMethod("goFish", signature(om="FLombf"),
       function(x) seasonMeans(unitMeans(x))), start=dy, end=dy)
     track(tracking, "B.om", ay) <- window(lapply(tsb(om),
       function(x) unitSums(x)[,,,1]), start=dy, end=dy)
-    # TODO: GET spawning season(s)
     track(tracking, "SB.om", ay) <- window(lapply(ssb(om),
       function(x) unitSums(x)[,,,1]), start=dy, end=dy)
     track(tracking, "C.om", ay) <- window(lapply(catch(om),
@@ -755,7 +760,7 @@ setMethod("goFish", signature(om="FLombf"),
     # GET OM observation
     stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
 
-    # TEST: nounit
+    # DROP units (sex, birth cohorts)
     stk <- lapply(stk, nounit)
 
     # APPLY oem across stocks
@@ -769,18 +774,21 @@ setMethod("goFish", signature(om="FLombf"),
       #  range(obs$stk, c("minfbar", "maxfbar")) 
 
       return(obs.oem)
+
     }, stk=stk, obs=observations(oem)[names(stk)],
       dev=deviances(oem)[names(stk)])
 
-    # EXTRACT oem observations TODO: CLEAN & ADD methods
+    # EXTRACT oem observations
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
 
+    # EXTRACT tracking
     tracking <- o.out[[length(o.out)]]$tracking
     
+    # GET observations
     observations(oem) <- lapply(o.out, "[[", "observations")
     
-    # TRACK oem catch
+    # TRACK oem observations
     track(tracking, "B.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) areaSums(unitSums(stock(x)))[,,,1])
     track(tracking, "SB.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
@@ -792,58 +800,36 @@ setMethod("goFish", signature(om="FLombf"),
 
     if (!is.null(ctrl0$est)) {
 
-      ctrl.est <- args(ctrl0$est)
-      ctrl.est$method <- method(ctrl0$est)
-      ctrl.est$args <- args
-      ctrl.est$step <- "est"
+      # - BY stock
+
+      ctrl.est <- list(method=ctrl0$est@method, step="est",
+        ioval = list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval)))
+
+      # REPLICATE module args if needed
+      if(!identical(names(args(ctrl0$est)), bns[args$stock]))
+        args.est <- lapply(setNames(nm=bns[args$stock]), function(x) args(ctrl0$est))
 
       # SET empty, to be replaced
-      ind <- lapply(setNames(nm=bns), function(x) FLQuants())
+      ind <- lapply(setNames(nm=bns[args$stock]), function(x) FLQuants())
 
-      # SET stocks to est on
-      if(is.null(args$stock)) {
-        args$stock <- seq(length(stk0))
-      }
+      # DISPATCH over stocks, alter args$stock, subset indices
+      out.assess <- lapply(setNames(args$stock, nm=bns[args$stock]),
+        function(x) {
+          do.call("mpDispatch", c(ctrl.est, args.est[[bns[x]]], 
+            list(args=c(args[-match("stock", names(args))], stock=x),
+            stk=stk0[[bns[x]]], idx=idx0[[bns[x]]], tracking=tracking)))
+      })
 
-      # CALL est with multiple stocks
-      if(identical(args$stock, 'all')) {
+      # EXTRACT FLStocks
+      stk0 <- FLStocks(lapply(out.assess, '[[', 'stk'))
 
-        # SET dispatch rules
-        ctrl.est$ioval <- list(iv=list(t1=flssval, t2=flival), 
-          ov=list(t1=flssval))
-        
-        # DISPATCH
-        out.assess <- do.call("mpDispatch", c(ctrl.est,
-          list(stk=stk0, idx=idx0[[1]], tracking=tracking)))
+      # EXTRACT indicators
+      ind <- lapply(out.assess, '[[', 'ind')
 
-        # EXTRACT FLStocks
-        stk0 <- out.assess$stk
+      # EXTRACT tracking, already merged
+      tracking <- out.assess[[1]][['tracking']]
 
-        # EXTRACT indicators
-        ind <- out.assess$ind
-
-        # EXTRACT tracking
-        tracking <- out.assess$tracking
-
-      # OR stock by stock
-      } else {
-
-        ctrl.est$ioval <- list(iv=list(t1=flsval, t2=flival), 
-          ov=list(t1=flsval))
- 
-        out.assess <- Map(function(x, y) {
-          do.call("mpDispatch", c(ctrl.est, list(stk=x, idx=y, tracking=tracking)))
-          }, x=stk0[args$stock], y=idx0[args$stock])
-      
-        stk0 <- FLStocks(lapply(out.assess, "[[", "stk"))
-      
-        if(!is.null(out.assess[[1]]$ind))
-          ind <- lapply(out.assess, "[[", "ind")
-        
-        tracking <- out.assess[[length(out.assess)]]$tracking
-      }
-
-      # TODO: PASS args generated at est to ctrl
+      # PASS args generated at est to ctrl
       if (!is.null(out.assess$args)) {
         args(ctrl0$est)[names(out.assess$args)] <- out.assess$args
       }
@@ -862,16 +848,17 @@ setMethod("goFish", signature(om="FLombf"),
         unitSums(areaSums(seasonSums(window(catch(x), start=dy, end=dy)))))
 
     # --- phcr: HCR parameterization
-    
-    if (!is.null(ctrl0$phcr)){
+   
+    if (!is.null(ctrl0$phcr)) {
 
       ctrl.phcr <- args(ctrl0$phcr)
       ctrl.phcr$method <- method(ctrl0$phcr) 
       ctrl.phcr$stk <- stk0
       ctrl.phcr$args <- args
+      ctrl.phcr$ind <- ind
       ctrl.phcr$tracking <- tracking
       if(exists("hcrpars")) ctrl.phcr$hcrpars <- hcrpars
-      ctrl.phcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flpval))
+      ctrl.phcr$ioval <- list(iv=list(t1=flssval), ov=list(t1=flpval))
       ctrl.phcr$step <- "phcr"
       
       out <- do.call("mpDispatch", ctrl.phcr)
@@ -880,77 +867,59 @@ setMethod("goFish", signature(om="FLombf"),
       tracking <- out$tracking
     }
 
-    # TODO REVIEW & TEST
-    if(exists("hcrpars")){
-      track(tracking, "metric.phcr", seq(ay, ay+frq-1)) <-
-        hcrpars[1, 1,, drop=TRUE]
-     }
+    # TODO: ADD tracking
 
     # --- hcr: Harvest Control Rule
     
-    if (!is.null(ctrl0$hcr)){
+    if (!is.null(ctrl0$hcr)) {
 
-      ctrl.hcr <- args(ctrl0$hcr) 
-      ctrl.hcr$method <- method(ctrl0$hcr)
+      # - BY stock
 
-      # SELECT stock for hcr
-      if(args$stock == 'all') {
-        ctrl.hcr$stk <- stk0[[1]]
-        ctrl.hcr$ind <- ind
-      } else if(length(args$stock) == 1) {
-        id <- bns[args$stock]
-        ctrl.hcr$stk <- stk0[[id]]
-        ctrl.hcr$ind <- ind[[id]]
-      } else {
-        ctrl.hcr$stk <- stk0[args$stock]
-        ctrl.hcr$ind <- ind[args$stock]
+      ctrl.hcr <- list(method=ctrl0$hcr@method, step="hcr",
+        ioval = list(iv=list(t1=flsval), ov=list(t1=flfval)))
+
+      # REPLICATE module args if needed
+      if(!identical(names(args(ctrl0$hcr)), bns[args$stock]))
+        args.hcr <- lapply(setNames(nm=bns[args$stock]), function(x) args(ctrl0$hcr))
+
+      # TODO: SEPARATE args
+
+      # DISPATCH over stocks, alter args$stock, subset indices
+      out <- lapply(setNames(args$stock, nm=bns[args$stock]),
+        function(x) {
+          do.call("mpDispatch", c(ctrl.hcr, args.hcr[[bns[x]]],
+            list(args=c(args[-match("stock", names(args))], stock=x),
+            stk=stk0[[bns[x]]], ind=ind[[bns[x]]], tracking=tracking)))
+      })
+
+      # - TODO: COMBINED stocks
+      # CALL single hcr with FLStocks and indicators as inputs
+
+      # EXTRACT fwdControls
+      ctrl <- lapply(out, '[[', 'ctrl')
+
+      # SUBSET if only one
+      if(length(ctrl) == 1)
+        ctrl <- ctrl[[1]]
+
+      # EXTRACT tracking, already merged
+      tracking <- out[[1]][['tracking']]
+
+      # PASS args generated at est to ctrl
+      if (!is.null(out.assess$args)) {
+        args(ctrl0$est)[names(out.assess$args)] <- out.assess$args
       }
-
-      ctrl.hcr$args <- args
-      ctrl.hcr$tracking <- tracking
-
-      if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
-      
-      ctrl.hcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flfval))
-      ctrl.hcr$step <- "hcr"
-      
-      out <- do.call("mpDispatch", ctrl.hcr)
-
-      ctrl <- out$ctrl
-
-      # ASSIGN biol BUG: FIX for stock='all', SET as I(1:2)?
-      if(all(is.na(ctrl$biol)))
-       ctrl$biol <- args$stock
-      
-      # COUNT targets with 'f' or 'fbar', need minAge, maxAge
-      fbis <- target(ctrl)[ctrl$quant %in% c("f", "fbar"),]
-
-      # BUG: SET fbar ages if missing
-      if(nrow(fbis) > 0) {
-        
-        # GET fbar ranges
-        frgs <- lapply(stk0, range, c("minfbar", "maxfbar"))
-        
-        # CHANGE on those missing
-        for(i in unique(fbis$biol)) {
-          fbis[fbis$biol == i, c("minAge", "maxAge")]  <- frgs[[bns[i]]]
-        }
-        # ASSIGN back into ctrl
-        target(ctrl)[ctrl$quant %in% c("f", "fbar"),] <- fbis
-      }
-
-     tracking <- out$tracking
-
     } else {
-      stop("'control' must contain an 'hcr' mseCtrl element.")
+      stop("'control' must contain an 'est' mseCtrl element.")
     }
 
+    # TODO: ADAPT to ctrl list by stock
     track(tracking, "hcr", ay, biol=args$stock) <- ctrl
     
     #----------------------------------------------------------
     # Implementation system
     #----------------------------------------------------------
-    if (!is.null(ctrl0$isys)){
+    if (!is.null(ctrl0$isys)) {
 
       ctrl.is <- args(ctrl0$isys)
       ctrl.is$method <- method(ctrl0$isys)
@@ -1077,10 +1046,8 @@ setMethod("goFish", signature(om="FLombf"),
     # invisible(gc())
   }
 
-    # SET NAs in unobserved oem years
-
-    # RETURN
-    list(om=om, tracking=tracking, oem=oem, args=args)
+  # RETURN
+  return(list(om=om, tracking=tracking, oem=oem, args=args))
   }
 ) # }}}
 

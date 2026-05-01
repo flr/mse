@@ -10,8 +10,9 @@ library(mse)
 library(FLRef)
 
 iy <- 1960
-fy <- 2025
-ys <- seq(iy, fy)
+cy <- 2025
+fy <- 2055
+ys <- seq(iy, cy)
 its <- 100
 
 # LOAD ple4 as reference
@@ -44,12 +45,12 @@ b0 <- an(Fbrp(brp)["B0"])
 
 # CREATE rffwd control:
 control <- FLPar(Feq=0.21, Frate=0.08, Fsigma=0.10, SB0=c(Fbrp(brp)["B0"]),
-  minyear=iy + 1, maxyear=fy, its=its)
+  minyear=iy + 1, maxyear=cy, its=its)
 
 # ADD rec devs
 residuals(sr) <- rlnormar1(n=its, meanlog=0, sdlog=0.3, rho=0.1, years=ys)
 
-# PROJCET forward stk history
+# PROJECT forward stk history
 run <- rffwd(stk, sr=sr, control=control, deviances=residuals(sr))
 
 # PLOT
@@ -57,25 +58,34 @@ plotAdvice(run)
 
 # -- OM
 
-# CREATE om
-om <- FLom(stock=run, refpts=refpts(run), sr=sr, name="PLE")
-
-# EXTEND to 2055
-om <- fwdWindow(om, end=2055,
-  deviances=rlnormar1(n=its, meanlog=0, sdlog=0.3, rho=0.1, years=seq(2020, 2055)))
-
 # GET refpts
-brps <- brp(FLBRP(as(run, 'FLStock'), sr=list(model=sr@model, params=sr@params)))
+brp <- brp(FLBRP(as(run, 'FLStock'), sr=list(model=sr@model, params=sr@params)))
+brps <- remap(refpts(brp))
 
-# ADD renamed refpts
-refpts(om) <- remap(refpts(brps))
+# R0, SB0, SBMSY, FMSY, Ftarget, SBlim, Blim, MSY
+rps <- FLPar(
+  R0=refpts(run)$R0, 
+  SB0=refpts(run)$B0,
+  SBMSY=brps$SBMSY,
+  SBlim=refpts(run)$Blim,
+  Blim=refpts(run)$Blim,
+  FMSY=refpts(run)$Fmsy,
+  Ftarget=refpts(run)$Fmsy * 0.95,
+  MSY=refpts(run)$Yeq)
+
+# CREATE om
+om <- FLom(stock=run, refpts=rps, sr=sr, name="PLE")
+
+# EXTEND to fy
+om <- fwdWindow(om, end=fy,
+  deviances=rlnormar1(n=its, meanlog=0, sdlog=0.3, rho=0.1, years=seq(iy, fy)))
 
 # -- OEM
 
 # GET indices
 data(ple4.indices)
 
-# BUILD pseudo-BTS
+# BUILD pseudo-IBTS
 idx <- FLIndex(name="SUR", desc="An IBTS-like survey",
   sel.pattern=expand(sel.pattern(ple4.indices[[6]])[,1],
     year=seq(1980, 2025), fill=TRUE),
@@ -93,11 +103,35 @@ idx <- survey(run, idx, stability=0.86)
 # CONSTRUCT biomass index
 idb <- as(idx, 'FLIndexBiomass')
 
+# ASSEMBLE & EXTEND FLindices
+ids <- FLIndices(SUR=idx, CPUE=idb)
+
+# DEVIANCES
+devs <- list(
+  stk=FLQuants(catch.n=rlnorm(100, catch.n(om) %=% 0, 0.20)),
+  idx=FLQuants(SUR=rlnormar1(100,  index.q(ids[[1]]) %=% 0, 0.20,
+      years=dimnames(index(ids[[1]]))$year),
+    CPUE=rlnormar1(100,  index.q(ids[[2]]) %=% 0, 0.30,
+      years=dimnames(index(ids[[2]]))$year))
+)
+
 # BUILD oem
-oem <- FLoem(observations=list(stk=run, idx=FLIndices(SUR=idx, CPUE=idb)),
+oem <- FLoem(observations=list(stk=as(run, 'FLStock'), idx=ids),
   method=sampling.oem)
 
 oem <- fwdWindow(oem, end=2055)
+
+deviances(oem) <- devs
+
+# DROP pkg refs
+nom <- FLom()
+for(i in slotNames(om)) slot(nom, i) <- slot(om, i)
+
+noem <- FLoem()
+for(i in slotNames(oem)) slot(noem, i) <- slot(oem, i)
+
+om <- nom
+oem <- noem
 
 # SAVE
 save(om, oem, file="../data/plesim.rda", compress="xz")

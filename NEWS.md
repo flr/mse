@@ -1,6 +1,14 @@
-# mse 2.4.6
+# mse 2.4.9
 
-# mse 2.4.5
+## BUG FIXES
+
+- performance() repeated the run column for certain calls
+- .combinegoFish now uses combine to merge refpts so it works if refpts has more than one row
+
+## USER-VISIBLE CHANGES
+
+- tac.is now accepts a different number of years to compute F status quo in intermediate year projection
+- Altered default metrics for plot(FLom), same as plot(FLstock)
 
 # mse 2.4.4
 

@@ -40,14 +40,7 @@
 #' @usage data(statistics)
 NULL
 
-#' @rdname mse_statistics
-mse_statistics <- function() {
-  env <- new.env()
-  do.call("data", list('statistics', package='mse', envir=env))
-  return(get('statistics', envir=env))
-}
-
-#' FLom object for North sea plaice
+#' FLom object 
 #' 
 #' Aliquam sagittis feugiat felis eget consequat. Praesent eleifend dolor massa, 
 #' vitae faucibus justo lacinia a. Cras sed erat et magna pharetra bibendum quis in 
@@ -58,6 +51,6 @@ mse_statistics <- function() {
 #' @docType data
 #' @keywords datasets
 #' @format An object of class *FLom*.
-#' @name p4om
-#' @rdname p4om
+#' @name plesim
+#' @rdname plesim
 NULL

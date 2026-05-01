@@ -53,12 +53,12 @@
 #' - decision.hcr
 #' @examples
 #' # Example dataset
-#' data(sol274)
+#' data(plesim)
 #' 
 #' # Sets up an mpCtrl using hockeystick(fbar~ssb)
 #' ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
-#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(metric="ssb", trigger=45000, 
-#'     output="fbar", target=0.27)))
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(metric="ssb", trigger=14000, 
+#'     output="fbar", target=0.18)))
 #' 
 #' plot_hockeystick.hcr(ctrl)
 #' 
@@ -66,7 +66,7 @@
 #' ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(
 #'     metric="depletion", trigger=0.40, lim=0.10,
-#'     output="fbar", target=0.27, min=0.02)))
+#'     output="fbar", target=0.18, min=0.02)))
 #' 
 #' plot_hockeystick.hcr(ctrl)
 #' 
@@ -81,9 +81,12 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   args, tracking, ...) {
 
   # EXTRACT args
-  spread(args[c('ay', 'iy', 'dy', 'mys', 'management_lag', 'it')])
+  spread(args)
+  
+  # GET biol name
+  bname <- tracking[, unique(biol)][stock]
 
-  # CHECK function args
+  # CHECK function arguments
 
   # All !NA
   if(any(is.na(c(c(lim), c(trigger), c(min), c(target)))))
@@ -119,10 +122,10 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   out[c(met < drop)] <- min
 
   # TRACK initial output
-  track(tracking, "decision.hcr", ay) <- out
+  track(tracking, "decision.hcr", year=ay, biol=stock) <- out
 
   # TRACK rule: met <= lim, 1; lim < met < trigger, 2; met >= trigger, 3
-  track(tracking, "rule.hcr", ay) <- ifelse(met < drop, 0,
+  track(tracking, "rule.hcr", year=ay, biol=args$stock) <- ifelse(met < drop, 0,
     ifelse(met <= lim, 1, ifelse(met < trigger, 2, 3)))
 
   # GET previous output value if change limited
@@ -132,10 +135,10 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
       # STOP if initial is NULL
       if(is.null(initial))
         stop("To apply 'dlow' and 'dupp' limits, 'initial' is required")
-      pre <- FLQuant(initial, iter=args$it)
+      pre <- FLQuant(c(initial), iter=args$it)
     # OR previous decision,
     } else {
-      pre <- tracking[metric == 'hcr' & year == ay - 1, data]
+      pre <- tracking[metric == 'hcr' & year == ay - 1 & biol == bname, data]
     }
   }
   
@@ -182,38 +185,52 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
 #' @params
 #' @examples
 #' data(ple4)
+#'
 #' # Set example HCR arguments
 #' args <- list(lim=1e5, trigger=4e5, target=0.25, min=0,
 #'   metric="ssb", output="fbar")
+#'
 #' # Plot hockeystick.hcr for given arguments
 #' plot_hockeystick.hcr(args)
+#'
 #' # Plot wheh 'drop' has been set
 #' args <- list(lim=0, trigger=4e5, target=0.25, min=0, drop=2e5,
 #'   metric="ssb", output="fbar")
+#'
 #' plot_hockeystick.hcr(args)
+#'
 #' # Add metric and output from FLStock
 #' plot_hockeystick.hcr(args, obs=ple4)
+#'
 #' # Superpose Kobe colours
 #' plot_hockeystick.hcr(args, kobe=TRUE)
+#'
 #' data(ple4)
+#'
 #' # Change labels
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE,
 #'   labels=c(limit="Blim", trigger="Btrigger", target="Ftarget"))
+#'
 #' # Set actual x (e.g. biomass) target.
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE, xtarget=args$trigger * 0.80)
+#'
 #' #' Add line and label for Btarget
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE, xtarget=args$trigger * 0.80) +
 #' geom_vline(xintercept=args$trigger * 0.80, linetype=3) +
 #' geom_label(x=args$trigger * 0.80, y=0.7, label="SBtarget")
+#'
 #' # ADD decade labels
 #' plot_hockeystick.hcr(args, obs=ple4, kobe=TRUE) +
 #'   geom_label(data=model.frame(metrics(ple4[, ac(seq(1957,2017, by=10))],
 #'   list(metric=ssb, output=fbar))), aes(label=year),
 #'   fill=c("white", rep("gray", 5), "orange"))
+#'
 #' # Example on relative terms where trigger < xtarget
 #' args <- list(lim=0., trigger=0.9, target=1, min=0,
 #'   metric="ssb", output="fbar")  
+#'
 #' plot_hockeystick.hcr(args, kobe=TRUE, xtarget=1) +
+#'
 #' geom_vline(xintercept=1)
 
 plot_hockeystick.hcr <- function(args, obs=NULL,
@@ -376,11 +393,11 @@ plot_hockeystick.hcr <- function(args, obs=NULL,
 #' @param control A list with the element ftrg (numeric).
 #' @examples
 #' # Example dataset
-#' data(sol274)
+#' data(plesim)
 #' 
 #' # Sets up an mpCtrl for catch ~ MSY
 #' ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
-#'   hcr = mseCtrl(method=fixedC.hcr, args=list(ctrg=11400)))
+#'   hcr = mseCtrl(method=fixedC.hcr, args=list(ctrg=1500)))
 #' 
 #' # Runs mp between 2021 and 2035
 #' run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
@@ -420,7 +437,7 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
 #' @param stk The perceived FLStock.
 #' @param control A list with the element ftrg (numeric).
 #' @examples
-#' data(sol274)
+#' data(plesim)
 #' fixedF.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
 #'   frq=1), tracking=FLQuant())
 

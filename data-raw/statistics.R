@@ -50,7 +50,7 @@ statistics <- list(
     name = "P(Yellow)", desc = "Probability of being in Kobe yellow quadrant"),
   # red
   red = list(~iterMeans(FLQuant((SB / SBMSY) < 1 & (F / FMSY) > 1)),
-    name = "P(Red)", desc = "Probabil = ity of being in Kobe red quadrant"),
+    name = "P(Red)", desc = "Probability of being in Kobe red quadrant"),
   # PSBMSY
   PSBMSY = list(~iterMeans((SB / SBMSY) >= 1), name = "P(SB>=SB[MSY])",
     desc = "Probability of SB greater or equal to SBMSY"),
@@ -95,3 +95,5 @@ statistics <- list(
   )
 
 save(statistics, file="../data/statistics.rda", compress="xz")
+
+save(statistics, file="../R/sysdata.rda", compress="xz")

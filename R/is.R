@@ -34,26 +34,26 @@
 #' @param args The MSE run arguments.
 #' @param recyrs Years to use for geometric mean recruitment if projection. Defaults to all years minus the last two.
 #' @param Fdevs Deviances on the fbar input to incorporate error and bias when MP is run using the pseudo-estimators 'perfect.sa' or 'shortcut.sa'.
-#' @param dtaclow Limit to decreases in output catch, as a proportional change (0.85 for 15%). Applied only when metric > lim, as set by 'hcr' step.
-#' @param dtacupp Limit to increases in output catch, as a proportional change (1.15 for 15%). Applied only when metric > lim, as set by 'hcr' step.
+#' @param dlow Limit to decreases in output catch, as a proportional change (0.85 for 15%). Applied only when metric > lim, as set by 'hcr' step.
+#' @param dupp Limit to increases in output catch, as a proportional change (1.15 for 15%). Applied only when metric > lim, as set by 'hcr' step.
 #' @param fmin Minimum fbar to apply when catch change limits are use.
 #' @param initac Initial catch from which to compute catch change limits. Defaults to previous observed catch.
 #' @param tracking The tracking object.
 #' @examples
-#' data(sol274)
+#' data(plesim)
 #' # Setup control with tac.is
 #' control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
 #'   hcr=mseCtrl(method=hockeystick.hcr,
-#'     args=list(lim=0, trigger=4.3e5, target=0.21)),
-#'   isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
+#'     args=list(lim=0, trigger=14000, target=0.18)),
+#'   isys=mseCtrl(method=tac.is, args=list(recyrs=-3, fnsqy=3, output='landings'))))
 #' # Run MP until 2025
 #' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))
 #' # Plot run time series
 #' plot(om, TAC.IS=run)
 
-tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
-  Fdevs=unitMeans(fbar(fut)) %=% 1, dtaclow=NA, dtacupp=NA, fmin=0, reuse=TRUE,
-  initac=metrics(stk, output)[, ac(iy - data_lag)], tracking) {
+tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2, fsqyrs=1,
+  Fdevs=unitMeans(fbar(fut)) %=% 1, dlow=NA, dupp=NA, fmin=0, reuse=TRUE,
+  initac=unitSums(metrics(stk, output)[, ac(iy - data_lag)]), tracking) {
 
   # EXTRACT args
   spread(args)
@@ -104,38 +104,37 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
   track(tracking, "gmrec.isys", ay) <- gmnrec
 
   # ADD F deviances for 1 year
-
   # reuse = TRUE
   if(isTRUE(reuse) | toupper(reuse) == 'F') {
-    ftar <- c(ctrl[1,]$value * Fdevs[, ac(mys[1])])
+    ftar <- ctrl[1,]$value * Fdevs[, ac(mys[1])]
   # reuse = FALSE
   } else {
-    ftar <- c(ctrl$value * Fdevs[, ac(mys)])
+    ftar <- ctrl$value * Fdevs[, ac(mys)]
   }
 
   # TRACK Ftarget
-  track(tracking, "fbar.isys", ay) <- ftar
+  track(tracking, "fbar.isys", ay) <- unitMeans(ftar)
 
   # FORECAST for iyrs and my IF mlag > 0,
   if(management_lag > 0) {
- 
-    # SET F for intermediate year
-    fsq <- unitMeans(fbar(stk)[, ac(dy)])
 
     # TODO: ADD TAC option
+ 
+    # SET F for intermediate year, mean dy - fsqyrs
+    fsq <- yearMeans(unitMeans(fbar(stk)[, ac(seq(dy - fsqyrs + 1, dy))]))
 
     # CONSTRUCT fwd control
     if(data_lag == 0) {
       fctrl <- fwdControl(
         # target
-        list(year=mys, quant="fbar", value=c(ftar)))
+        list(year=mys, quant="fbar", value=ftar))
     } else {
       fctrl <- fwdControl(c(
         # SET F for intermediate year(s)
         lapply(seq(dy + 1, mys[1] - 1), function(y) list(year=y,
           quant="fbar", value=c(fsq))),
         # ... and for management years
-        lapply(mys, function(y) list(year=y, quant="fbar", value=c(ftar)))))
+        lapply(mys, function(y) list(year=y, quant="fbar", value=ftar))))
     }
   # else only for my
   } else {
@@ -148,7 +147,7 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
   # ID iters where hcr set met trigger and F > fmin
   id <- tracking[metric  == "rule.hcr" & year == ay, data > 2] &
-    c(fbar(fut)[, ac(ay + management_lag)] > fmin)
+    c(unitMeans(fbar(fut)[, ac(ay + management_lag)]) > fmin)
 
   # EXTRACT catches
   if(isTRUE(reuse) | toupper(reuse) == "C") {
@@ -157,18 +156,21 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
     TAC <- areaSums(unitSums(catch(fut)[, ac(mys)]))
   }
 
+  # TRACK initla TAC
+  track(tracking, "catch.isys", ay) <- unitMeans(TAC)
+
   # GET TAC dy / ay - 1
   if(ay == iy)
     prev_tac <- rep(c(initac), length=args$it)
   else
-    prev_tac <- c(tracking[metric == "isys" & year == ay])
+    prev_tac <- c(tracking[metric == "isys" & year == ay - frq, data])
 
   # APPLY upper and lower TAC limit, if not NA and only for id iters
-  if(!is.na(dtacupp)) {
-    iter(TAC, id) <- pmin(c(iter(TAC, id)), prev_tac[id] * dtacupp)
+  if(!is.na(dupp)) {
+    iter(TAC, id) <- pmin(c(iter(TAC, id)), prev_tac[id] * dupp)
   }
-  if(!is.na(dtaclow)) {
-    iter(TAC, id) <- pmax(c(iter(TAC, id)), prev_tac[id] * dtaclow)
+  if(!is.na(dlow)) {
+    iter(TAC, id) <- pmax(c(iter(TAC, id)), prev_tac[id] * dlow)
   }
 
   # CONSTRUCT fwdControl  TODO: USE frq here
@@ -188,10 +190,46 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
 # indicator.is {{{
 
-#' indicator implementation function
+#' Indicator Implementation System Module
 #'
-#' @param stk The perceived FLStock.
-#' @param ctrl control file with HCR decision
+#' Applies the harvest control rule (HCR) decision to scale the target catch or
+#' fishing mortality based on a reference quantity (status-quo fishing mortality or catch).
+#'
+#' This implementation system (IS) function adjusts the management decision from the HCR
+#' step by multiplying it with a reference quantity computed from the stock-at-age data
+#' in the perceived stock, allowing for indicator-based management approaches. The reference
+#' quantity can be either the status-quo fishing mortality (input system) or catch (output system).
+#'
+#' @param stk The perceived FLStock object returned by the OEM module.
+#' @param ctrl The fwdControl object output by the *hcr* step, containing the HCR decision.
+#' @param args The MSE run arguments, including `sqy` (status-quo years).
+#' @param tracking The tracking object for recording module decisions and outputs.
+#' @param system Character, either "output" (default) or "input". If "output", catch is used
+#'   as reference; if "input", fishing mortality is used.
+#' @param ... Additional arguments (currently unused).
+#'
+#' @return A list containing:
+#'   \item{ctrl}{The modified fwdControl with scaled target values.}
+#'   \item{tracking}{The updated tracking object.}
+#'
+#' @details
+#' When `system="output"`, the function scales the HCR target by the mean catch from the
+#' status-quo years. When `system="input"`, it scales by the mean fishing mortality.
+#' This approach allows MPs to work with relative rather than absolute targets.
+#'
+#' @examples
+#' data(plesim)
+#' # Setup control with indicator.is using output system (catch-based)
+#' control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
+#'   hcr=mseCtrl(method=hockeystick.hcr,
+#'     args=list(lim=0, trigger=0.5, target=1.2)),
+#'   isys=mseCtrl(method=indicator.is, args=list(system="output"))))
+#' # Run MP
+#' run <- mp(om, oem, control=control, args=list(iy=2021, fy=2027))
+#'
+#' @author Ernesto Jardim, Iago Mosqueira
+#' @seealso \code{\link{tac.is}}, \code{\link{sp.is}}, \code{\link{seasonal.is}}
+#' @keywords manip
 
 indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"), ...){
 
@@ -205,7 +243,7 @@ indicator.is <- function(stk, ctrl, args, tracking, system=c("output", "input"),
 	}  	
 	# new control file
 	ctrl@target[,'quantity'] <- quantity
-	ctrl$value <- ctrl$value*vsq
+	ctrl$value <- ctrl$value * vsq
 
 	# return
 	list(ctrl = ctrl, tracking = tracking)
