@@ -45,13 +45,13 @@
 #' control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
 #'   hcr=mseCtrl(method=hockeystick.hcr,
 #'     args=list(lim=0, trigger=14000, target=0.18)),
-#'   isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
+#'   isys=mseCtrl(method=tac.is, args=list(recyrs=-3, fnsqy=3, output='landings'))))
 #' # Run MP until 2025
 #' run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))
 #' # Plot run time series
 #' plot(om, TAC.IS=run)
 
-tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
+tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2, fsqyrs=1,
   Fdevs=unitMeans(fbar(fut)) %=% 1, dlow=NA, dupp=NA, fmin=0, reuse=TRUE,
   initac=unitSums(metrics(stk, output)[, ac(iy - data_lag)]), tracking) {
 
@@ -117,11 +117,11 @@ tac.is <- function(stk, ctrl, args, output="catch", recyrs=-2,
 
   # FORECAST for iyrs and my IF mlag > 0,
   if(management_lag > 0) {
- 
-    # SET F for intermediate year
-    fsq <- unitMeans(fbar(stk)[, ac(dy)])
 
     # TODO: ADD TAC option
+ 
+    # SET F for intermediate year, mean dy - fsqyrs
+    fsq <- yearMeans(unitMeans(fbar(stk)[, ac(seq(dy - fsqyrs + 1, dy))]))
 
     # CONSTRUCT fwd control
     if(data_lag == 0) {

@@ -11,8 +11,8 @@ tac.is(
   output = "catch",
   recyrs = -2,
   Fdevs = unitMeans(fbar(fut)) \%=\% 1,
-  dtaclow = NA,
-  dtacupp = NA,
+  dlow = NA,
+  dupp = NA,
   fmin = 0,
   reuse = TRUE,
   initac = unitSums(metrics(stk, output)[, ac(iy - data_lag)]),
@@ -30,9 +30,9 @@ tac.is(
 
 \item{Fdevs}{Deviances on the fbar input to incorporate error and bias when MP is run using the pseudo-estimators 'perfect.sa' or 'shortcut.sa'.}
 
-\item{dtaclow}{Limit to decreases in output catch, as a proportional change (0.85 for 15\%). Applied only when metric > lim, as set by 'hcr' step.}
+\item{dlow}{Limit to decreases in output catch, as a proportional change (0.85 for 15\%). Applied only when metric > lim, as set by 'hcr' step.}
 
-\item{dtacupp}{Limit to increases in output catch, as a proportional change (1.15 for 15\%). Applied only when metric > lim, as set by 'hcr' step.}
+\item{dupp}{Limit to increases in output catch, as a proportional change (1.15 for 15\%). Applied only when metric > lim, as set by 'hcr' step.}
 
 \item{fmin}{Minimum fbar to apply when catch change limits are use.}
 

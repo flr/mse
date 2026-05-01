@@ -35,7 +35,6 @@
 
 \S4method{performance}{FLombf}(
   x,
-  refpts = x@refpts,
   statistics = mse::statistics[c("C", "F", "HR", "SB")],
   metrics = NULL,
   om = name(x),
