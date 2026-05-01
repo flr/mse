@@ -3,6 +3,7 @@
  BUG FIXES
 
 - performance() repeated the run column for certain calls
+- .combinegoFish now uses combine to merge refpts so it works if refpts has more than one row
 
  mse 2.4.4
 

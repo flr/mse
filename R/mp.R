@@ -509,7 +509,7 @@ setMethod("goFish", signature(om="FLom"),
     if(exists("hcrpars")){
       # TODO
       track(tracking, "phcr", ay) <- c(hcrpars[1,])
-     }
+    }
 
     # --- hcr: Harvest Control Rule
 
@@ -822,13 +822,6 @@ setMethod("goFish", signature(om="FLombf"),
 
       # EXTRACT indicators
       ind <- lapply(out.assess, '[[', 'ind')
-
-      # MERGE indicators TODO: COMBINE if needed ('+')
-      if(length(ind) == 1)
-        ind <- ind[[1]]
-      else
-        ind <- Reduce('+', ind)
-      # ind <- lapply(ind,  '[[', 1)
 
       # EXTRACT tracking, already merged
       tracking <- out.assess[[1]][['tracking']]
