@@ -34,7 +34,7 @@ brp.phcr <- function(stk, model, params, args, tracking) {
 
   rps <- refpts(brp)
 
-  hcrpars <- FLPar(sbsafe=c(rps["msy", "ssb", ]))
+  hcrpars <- FLPar(trigger=c(rps["msy", "ssb", ]))
 
   return(list(hcrpars=hcrpars, tracking=tracking))
 }

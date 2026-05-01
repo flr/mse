@@ -522,8 +522,11 @@ setMethod("goFish", signature(om="FLom"),
       ctrl.hcr$tracking <- tracking
       ctrl.hcr$ind <- ind
 
-      # TODO REVIEW interface
-      if(exists("hcrpars")) ctrl.hcr$hcrpars <- hcrpars
+      # ADD hcrpars to ctrl.hcr
+      if(exists("hcrpars")) {
+        hcrplist <- as(hcrpars, 'list')
+        ctrl.hcr[names(hcrplist)] <- hcrplist
+      }
 
       ctrl.hcr$ioval <- list(iv=list(t1=flsval, t2=flqsval), 
         ov=list(t1=flfval))

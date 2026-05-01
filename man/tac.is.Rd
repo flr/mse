@@ -10,6 +10,7 @@ tac.is(
   args,
   output = "catch",
   recyrs = -2,
+  fsqyrs = 1,
   Fdevs = unitMeans(fbar(fut)) \%=\% 1,
   dlow = NA,
   dupp = NA,
@@ -66,7 +67,7 @@ data(plesim)
 control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
   hcr=mseCtrl(method=hockeystick.hcr,
     args=list(lim=0, trigger=14000, target=0.18)),
-  isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
+  isys=mseCtrl(method=tac.is, args=list(recyrs=-3, fnsqy=3, output='landings'))))
 # Run MP until 2025
 run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))
 # Plot run time series
