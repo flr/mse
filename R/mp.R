@@ -370,7 +370,7 @@ setMethod("goFish", signature(om="FLom"),
       p(message = sprintf("year: %s", i))
 
     if(verbose){
-      cat(i, " - ")
+      cat(i, " - ")a
     }
 
     # args
@@ -385,15 +385,15 @@ setMethod("goFish", signature(om="FLom"),
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
 
-    # TRACK om, REDUCE dims
+    # TRACK om, status in ay
     track(tracking, "F.om", ay) <- unitMeans(window(fbar(om),
-      start=dy, end=dy))
+      start=ay, end=ay))
     track(tracking, "B.om", ay) <- unitSums(window(tsb(om),
-      start=dy, end=dy))
+      start=ay, end=ay))
     track(tracking, "SB.om", ay) <- unitSums(window(ssb(om),
-      start=dy, end=dy))
+      start=ay, end=ay))
     track(tracking, "C.om", ay) <- unitSums(window(catch(om),
-      start=dy, end=dy))
+      start=ay, end=ay))
     
     # --- OEM: Observation Error Model
     ctrl.oem <- args(oem)
@@ -740,13 +740,13 @@ setMethod("goFish", signature(om="FLombf"),
 
     # TRACK om
     track(tracking, "F.om", ay) <- window(lapply(fbar(om),
-      function(x) seasonMeans(unitMeans(x))), start=dy, end=dy)
+      function(x) seasonMeans(unitMeans(x))), start=ay, end=ay)
     track(tracking, "B.om", ay) <- window(lapply(tsb(om),
-      function(x) unitSums(x)[,,,1]), start=dy, end=dy)
+      function(x) unitSums(x)[,,,1]), start=ay, end=ay)
     track(tracking, "SB.om", ay) <- window(lapply(ssb(om),
-      function(x) unitSums(x)[,,,1]), start=dy, end=dy)
+      function(x) unitSums(x)[,,,1]), start=ay, end=ay)
     track(tracking, "C.om", ay) <- window(lapply(catch(om),
-      function(x) seasonSums(unitSums(x))), start=dy, end=dy)
+      function(x) seasonSums(unitSums(x))), start=ay, end=ay)
     
     # --- OEM: Observation Error Model
 
