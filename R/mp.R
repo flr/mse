@@ -370,7 +370,7 @@ setMethod("goFish", signature(om="FLom"),
       p(message = sprintf("year: %s", i))
 
     if(verbose){
-      cat(i, " - ")a
+      cat(i, " - ")
     }
 
     # args
@@ -1142,6 +1142,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
          progress=progress, verbose=FALSE)
 
       # RETURN performance
+      browser()
       if(perf)
         run <- performance(run, statistics=statistics, metrics=metrics, type=type,
           run=names[i])
