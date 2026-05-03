@@ -123,3 +123,5 @@ test_that("mps runs with two hcr arguments on multiple cores with performance", 
   expect_is(performance(tes23), "data.table")
 
 })
+
+plan(sequential)

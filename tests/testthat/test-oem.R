@@ -20,7 +20,7 @@ test_that("perfect.oem returns a list with correct structure", {
   result <- perfect.oem(stk, deviances=NULL, observations=NULL,
     args=test_args, tracking=FLQuant())
   
-  expect_is(result, "list")
+  expect_type(result, "list")
   expect_true(all(c("stk", "idx", "observations", "tracking") %in% names(result)))
 })
 
@@ -72,8 +72,6 @@ test_that("perfect.oem returns tracking object", {
 
 # TEST: perfect.oem with biomass parameter {{{
 
-context("oem: perfect.oem - biomass index")
-
 test_that("perfect.oem creates age-structured index by default", {
   stk <- stock(flom)
   result <- perfect.oem(stk, deviances=NULL, observations=NULL,
@@ -95,8 +93,6 @@ test_that("perfect.oem creates biomass index when biomass=TRUE", {
 # }}}
 
 # TEST: perfect.oem with existing observations {{{
-
-context("oem: perfect.oem - with observations")
 
 test_that("perfect.oem updates existing observations list", {
   stk <- stock(flom)
@@ -130,8 +126,6 @@ test_that("perfect.oem preserves passed observations structure", {
 # }}}
 
 # TEST: shortcut.oem {{{
-
-context("oem: shortcut.oem - basic functionality")
 
 test_that("shortcut.oem returns list with correct structure", {
   stk <- stock(flom)
@@ -179,8 +173,6 @@ test_that("shortcut.oem windows stock to correct years", {
 
 # TEST: shortcut.oem with deviances {{{
 
-context("oem: shortcut.oem - with deviances")
-
 test_that("shortcut.oem applies catch.n deviances", {
   stk <- stock(flom)
   obs <- list(stk=stk, idx=FLIndices())
@@ -225,8 +217,6 @@ test_that("shortcut.oem simplifies dimensions to match observations", {
 # }}}
 
 # TEST: sampling.oem {{{
-
-context("oem: sampling.oem - basic functionality")
 
 test_that("sampling.oem returns list with correct structure", {
   stk <- stock(flom)
@@ -301,8 +291,6 @@ test_that("sampling.oem windows stock to correct years", {
 
 # TEST: sampling.oem with deviances on stock {{{
 
-context("oem: sampling.oem - with stock deviances")
-
 test_that("sampling.oem applies catch.n deviances", {
   stk <- stock(flom)
   idx <- FLIndices(A=as(stk, 'FLIndex'))
@@ -341,8 +329,6 @@ test_that("sampling.oem updates landings/discards/catch with deviances", {
 # }}}
 
 # TEST: sampling.oem with index deviances {{{
-
-context("oem: sampling.oem - with index deviances")
 
 test_that("sampling.oem applies index deviances", {
   stk <- stock(flom)
@@ -391,8 +377,6 @@ test_that("sampling.oem handles empty index deviances list", {
 
 # TEST: sampling.oem with stability parameter {{{
 
-context("oem: sampling.oem - stability parameter")
-
 test_that("sampling.oem with stability=1 works", {
   stk <- stock(flom)
   idx <- FLIndices(A=as(stk, 'FLIndex'))
@@ -418,8 +402,6 @@ test_that("sampling.oem with stability=0.5 works", {
 
 # TEST: sampling.oem with weights parameter {{{
 
-context("oem: sampling.oem - weights parameter")
-
 test_that("sampling.oem with wts=TRUE updates weights", {
   stk <- stock(flom)
   idx <- FLIndices(A=as(stk, 'FLIndex'))
@@ -444,8 +426,6 @@ test_that("sampling.oem with wts=FALSE does not update weights", {
 # }}}
 
 # TEST: sampling.oem dimension simplification {{{
-
-context("oem: sampling.oem - dimension handling")
 
 test_that("sampling.oem simplifies dimensions to match observations", {
   stk <- stock(flom)
@@ -476,8 +456,6 @@ test_that("sampling.oem ensures no zero indices", {
 # }}}
 
 # TEST: default.oem {{{
-
-context("oem: default.oem - basic functionality")
 
 test_that("default.oem returns FLoem object", {
   result <- default.oem(flom)
@@ -518,15 +496,13 @@ test_that("default.oem observations contain FLIndices", {
 
 # TEST: OEM integration with mp workflow {{{
 
-context("oem: Integration with mp workflow")
-
 test_that("perfect.oem works in mp call", {
 
   control <- mpCtrl(
     est = mseCtrl(method=perfect.sa),
     hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.10)))
 
-  result <- mp(flom, ctrl=control, args=list(iy=2025))
+  result <- mp(flom, ctrl=control, args=list(iy=2020))
   
   expect_s4_class(result, "FLmse")
 
@@ -537,8 +513,6 @@ test_that("perfect.oem works in mp call", {
 # }}}
 
 # TEST: OEM output consistency {{{
-
-context("oem: Output consistency")
 
 test_that("perfect.oem produces consistent results", {
   stk <- stock(flom)
@@ -573,8 +547,6 @@ test_that("shortcut.oem produces consistent results", {
 
 # TEST: Error handling {{{
 
-context("oem: Error handling")
-
 test_that("sampling.oem stops with missing observations list", {
   stk <- stock(flom)
   
@@ -597,8 +569,6 @@ test_that("default.oem stops with invalid OM class", {
 # }}}
 
 # TEST: Edge cases {{{
-
-context("oem: Edge cases")
 
 test_that("perfect.oem handles single year window", {
   stk <- stock(flom)
