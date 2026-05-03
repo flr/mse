@@ -7,15 +7,6 @@
 # Distributed under the terms of the EUPL-1.2
 
 
-# dataset contains both OM (FLom) and OEM (FLoem)
-data(plesim)
-
-# Set control: sa and hcr
-control <- mpCtrl(list(
-  est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
-  trigger=10000, target=0.18))))
-
 # CHECK: RUN mps w/one hcr argument
 
 plan(sequential)

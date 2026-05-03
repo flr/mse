@@ -7,12 +7,13 @@
 # Distributed under the terms of the EUPL-1.2
 
 
+# LOAD inputs
+load("inputs.rda")
+
 # Setup basic test arguments
 test_args <- list(y0=1960, dy=2021, frq=1)
 
 # TEST: perfect.oem {{{
-
-context("oem: perfect.oem - basic functionality")
 
 test_that("perfect.oem returns a list with correct structure", {
   stk <- stock(flom)
