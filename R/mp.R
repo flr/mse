@@ -1056,8 +1056,8 @@ setMethod("goFish", signature(om="FLombf"),
 # TODO: mps(FLmse, oem=oem(), ctrl=control(), args=args(), ...)
 
 mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
-  statistics=NULL, metrics=NULL, type=character(1), names=NULL, parallel=TRUE,
-  perf=!is.null(statistics), ...) {
+  statistics=mse::statistics, metrics=NULL, type=character(1), names=NULL, 
+  parallel=TRUE, perf=FALSE, ...) {
 
   # GET ... arguments
   opts <- list(...)
@@ -1068,6 +1068,10 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   } else {
     seed <- TRUE
   }
+
+  # SET statistics to default if TRUE
+  if(isTRUE(statistics))
+    statistics <- mse::statistics
   
   # ARE opts being given?
   if(length(opts) == 0) {
@@ -1136,17 +1140,23 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       # PROGRESS
       if(!progress)
         p(message = sprintf("MP: %i / %i", i, largs))
+      else
+        message(paste("MP:", i))
 
       # CALL mp, parallel left to work along MPs
       run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
          progress=progress, verbose=FALSE)
 
-      # RETURN performance
-      browser()
+      # COMPUTE performance
+      perftab <- performance(run, statistics=statistics, metrics=metrics, type=type,
+        run=names[i])
+
+      # CHOOSE return
       if(perf)
-        run <- performance(run, statistics=statistics, metrics=metrics, type=type,
-          run=names[i])
-      
+        run <- perftab
+      else
+        performance(run) <- perftab
+
       return(run)
     }
   } else {
@@ -1182,19 +1192,23 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if(sum(done) < largs)
     warning(paste("Some calls to mp() did not run:"), seq(largs)[!done])
 
-  # RETURN performance
+  # ASSEMBLE performance
   if(perf) {
 
-    # ASSEMBLE single performance table
-    res <- rbindlist(res[done])
-
-    # ADD mp
-    res[, mp := paste(om, type, run, sep="_")]
+    perftab <- rbindlist(res[done])
     
-    return(res[])
-  }
+    perftab[, mp := paste(om, type, run, sep="_")]
+    
+    return(perftab[])
 
-  # RETURN FLmses
-  return(FLmses(res[done]))
+  } else {
+
+    perftab <- rbindlist(lapply(res[done], performance))
+    
+    # ADD mp
+    perftab[, mp := paste(om, type, run, sep="_")]
+    
+    return(FLmses(res[done], performance=perftab))
+  }
 }
 # }}}
