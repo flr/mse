@@ -1130,10 +1130,10 @@ mps <- function(om, oem=NULL, iem=NULL, control, args,
   }
 
   # LOOP over options
-  res <- foreach(i = seq(largs), .errorhandling="pass", .inorder=TRUE,
+  res <- foreach(i = seq(largs), .errorhandling="stop", .inorder=TRUE,
       .options.future=list(globals=structure(TRUE, add=c("control", "module",
       "mopts", "om", "oem", "iem", "args", "statistics", "metrics"),
-      seed=seed))) %dofuture% {
+      packages=c("mse", "FLasher", "FLCore"), seed=seed))) %dofuture% {
 
     # CREATE a copy of control for this iteration
     control_i <- control
@@ -1146,7 +1146,7 @@ mps <- function(om, oem=NULL, iem=NULL, control, args,
       p(message = sprintf("MP: %i / %i", i, largs))
 
     # CALL mp, parallel left to work along MPs
-    run <- mp(om, oem=oem, iem=iem, control=control_i, args=args, parallel=parallel,
+    run <- mp(om, oem=oem, iem=iem, control=control_i, args=args, parallel=FALSE,
        progress=progress, verbose=FALSE)
 
     # COMPUTE performance
