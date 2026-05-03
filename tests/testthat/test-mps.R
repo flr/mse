@@ -11,6 +11,12 @@
 data(plesim)
 data(statistics)
 
+# ncoresrun, number of cores used in a run from tracking$pid
+ncoresrun <- function(x) {
+  length(unique(unlist(lapply(x, function(x)
+    tracking(x)[metric == 'pid', unique(data)]))))
+}
+
 # Set control: sa and hcr
 control <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
@@ -23,7 +29,7 @@ plan(sequential)
 
 test_that("mps runs in sequential with one hcr argument", {
 
-  tes11 <- mps(om=om, ctrl=control, args=list(iy=2025, fy=2028),
+  tes11 <- mps(om=om, control=control, args=list(iy=2025, fy=2028),
     hcr=list(trigger=seq(9e3, 12e3, length=3)))
   
   # RUNS all 3 hcrs
@@ -45,7 +51,7 @@ if(os.linux()) {
 #
 test_that("mps runs with one hcr argument on multiple cores", {
   
-  tes12 <- mps(om=om, ctrl=control, args=list(iy=2025, fy=2028),
+  tes12 <- mps(om=om, control=control, args=list(iy=2025, fy=2028),
   hcr=list(trigger=seq(9e3, 16e3, length=3)))
 
   # RUNS on 3 cores
@@ -56,7 +62,7 @@ test_that("mps runs with one hcr argument on multiple cores", {
 #
 test_that("mps runs with one hcr argument on multiple cores with statistics", {
 
-  tes13 <- mps(om=om, ctrl=control, args=list(iy=2025, fy=2028),
+  tes13 <- mps(om=om, control=control, args=list(iy=2025, fy=2028),
     hcr=list(trigger=seq(12e3, 16e3, length=3)), statistics=statistics[1:4])
 
   # RUNS on 3 cores
@@ -67,7 +73,7 @@ test_that("mps runs with one hcr argument on multiple cores with statistics", {
 # CHECK: reports years in progress bar
 test_that("mps runs with one hcr argument on multiple cores with performance", {
 
-  tes14 <- mps(om=om, ctrl=control, args=list(iy=2025, fy=2028),
+  tes14 <- mps(om=om, control=control, args=list(iy=2025, fy=2028),
     hcr=list(trigger=seq(12e3, 16e3, length=4)))
 
   expect_type(performance(tes14), "data.table")
@@ -79,7 +85,7 @@ test_that("mps runs with one hcr argument on multiple cores with performance", {
 
 test_that("mps runs with two hcr arguments", {
 
-  tes20 <- mps(om=om, ctrl=control, args=list(iy=2025, fy=2028),
+  tes20 <- mps(om=om, control=control, args=list(iy=2025, fy=2028),
     hcr=list(trigger=seq(12e3, 16e3, length=3),
       lim=seq(4000, 6000, length=3)))
 
@@ -89,7 +95,7 @@ test_that("mps runs with two hcr arguments", {
 
 test_that("mps runs with two hcr arguments on multiple cores", {
   
-  tes21 <- mps(om=om, ctrl=control, args=list(iy=2025, fy=2028),
+  tes21 <- mps(om=om, control=control, args=list(iy=2025, fy=2028),
     hcr=list(trigger=seq(12e3, 16e3, length=3),
       lim=seq(4000, 6000, length=3)))
 
@@ -100,7 +106,7 @@ test_that("mps runs with two hcr arguments on multiple cores", {
 
 test_that("mps runs with two hcr arguments on multiple cores with statistics", {
 
-  tes22 <- mps(om=om, ctrl=control, args=list(iy=2025, fy=2028),
+  tes22 <- mps(om=om, control=control, args=list(iy=2025, fy=2028),
     hcr=list(trigger=seq(12e3, 16e3, length=3),
       lim=seq(4000, 6000, length=3)), statistics=statistics[1:4])
   
@@ -110,7 +116,7 @@ test_that("mps runs with two hcr arguments on multiple cores with statistics", {
 
 test_that("mps runs with two hcr arguments on multiple cores with performance", {
 
-  tes23 <- mps(om=om, ctrl=control, args=list(iy=2025, fy=2028),
+  tes23 <- mps(om=om, control=control, args=list(iy=2025, fy=2028),
     hcr=list(trigger=seq(12e3, 16e3, length=3),
       lim=seq(4000, 6000, length=3)))
 

@@ -12,8 +12,6 @@ load("inputs.rda")
 
 # -- TEST: performance(FLQuants) {{{
 
-context("performance: FLQuants method")
-
 x <- flqs
 
 test_that("performance(FLQuants) returns data.table with correct structure", {
@@ -84,8 +82,6 @@ test_that("performance(FLQuants) returns no NA data values", {
 # }}}
 
 # -- TEST: performance(FLom) {{{
-
-context("performance: FLom method")
 
 test_that("performance(FLom) with statistics and refpts", {
   result <- performance(flom, statistics=statistics, refpts=refpts(flom),
