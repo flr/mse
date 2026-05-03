@@ -1057,7 +1057,7 @@ setMethod("goFish", signature(om="FLombf"),
 
 mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   statistics=mse::statistics, metrics=NULL, type=character(1), names=NULL, 
-  parallel=TRUE, perf=FALSE, ...) {
+  perf=FALSE, ...) {
 
   # GET ... arguments
   opts <- list(...)
@@ -1117,70 +1117,46 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   message("Running mps() over module '", module, "' with ", largs,
     " argument sets.")
 
-  # LOOP over values
-  if(parallel & nbrOfWorkers() > 1) {
+  message("Running on ", nbrOfWorkers(), " nodes.")
 
-    message("Running on ", nbrOfWorkers(), " nodes.")
+  # SET parallelization
+  if(nbrOfWorkers() >= largs) {
+    parallel <- FALSE
+    progress <- TRUE
+  } else {
+    p <- progressor(steps=largs)
+    parallel <- TRUE
+    progress <- FALSE
+  }
 
-    # IF cores for all runs, progress by MP
-    if(largs > nbrOfWorkers()) {
-      p <- progressor(steps=largs)
-      progress <- FALSE
-    } else {
-      progress <- TRUE
-    }
-
-    res <- foreach(i = seq(largs), .errorhandling="pass", .inorder=FALSE,
+  res <- foreach(i = seq(largs), .errorhandling="pass", .inorder=TRUE,
       .options.future=list(globals=structure(TRUE, add=c("control", "module",
       "mopts", "om", "oem", "iem", "args"), seed=seed))) %dofuture% {
 
-      # MODIFY module args
-      args(control[[module]])[names(mopts)] <- lapply(mopts, "[", i)
+    # MODIFY module args
+    args(control[[module]])[names(mopts)] <- lapply(mopts, "[", i)
 
-      # PROGRESS
-      if(!progress)
-        p(message = sprintf("MP: %i / %i", i, largs))
-      else
-        message(paste("MP:", i))
+    # PROGRESS by mp
+    if(!progress)
+      p(message = sprintf("MP: %i / %i", i, largs))
 
-      # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
-         progress=progress, verbose=FALSE)
+    # CALL mp, parallel left to work along MPs
+    run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=parallel,
+       progress=progress, verbose=FALSE)
 
-      # COMPUTE performance
-      perftab <- performance(run, statistics=statistics, metrics=metrics, type=type,
-        run=names[i])
+    # COMPUTE performance
+    perftab <- performance(run, statistics=statistics, metrics=metrics, type=type,
+      run=names[i])
 
-      # CHOOSE return
-      if(perf)
-        run <- perftab
-      else
-        performance(run) <- perftab
+    # CHOOSE return
+    if(perf)
+      run <- perftab
+    else
+      performance(run) <- perftab
 
-      return(run)
-    }
-  } else {
-
-    res <- lapply(seq(largs), function(i) {
-
-      message(paste("MP:", i))
-
-      # MODIFY module args
-      args(control[[module]])[names(mopts)] <- lapply(mopts, '[', i)
-
-      # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=TRUE,
-         verbose=FALSE, progress=TRUE)
-
-      # RETURN performance
-      if(perf)
-        run <- performance(run, statistics=statistics, metrics=metrics, type=type,
-          run=names[i])
-
-      return(run)
-    })
+    return(run)
   }
-
+ 
   names(res) <- names
 
   # STOP or WARN if missing runs
@@ -1192,7 +1168,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if(sum(done) < largs)
     warning(paste("Some calls to mp() did not run:"), seq(largs)[!done])
 
-  # ASSEMBLE performance
+  # ASSEMBLE return object
   if(perf) {
 
     perftab <- rbindlist(res[done])
