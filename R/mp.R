@@ -1131,7 +1131,8 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   res <- foreach(i = seq(largs), .errorhandling="pass", .inorder=TRUE,
       .options.future=list(globals=structure(TRUE, add=c("control", "module",
-      "mopts", "om", "oem", "iem", "args", "statistics"), seed=seed))) %dofuture% {
+      "mopts", "om", "oem", "iem", "args", "statistics", "metrics"),
+      seed=seed))) %dofuture% {
 
     # MODIFY module args
     args(control[[module]])[names(mopts)] <- lapply(mopts, "[", i)
