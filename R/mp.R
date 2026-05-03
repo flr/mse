@@ -496,7 +496,6 @@ setMethod("goFish", signature(om="FLom"),
       ctrl.phcr$ind <- ind
       ctrl.phcr$args <- args
       ctrl.phcr$tracking <- tracking
-      if(exists("hcrpars")) ctrl.phcr$hcrpars <- hcrpars
       ctrl.phcr$ioval <- list(iv=list(t1=flsval), ov=list(t1=flpval))
       ctrl.phcr$step <- "phcr"
       
