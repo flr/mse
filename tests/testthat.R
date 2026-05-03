@@ -1,5 +1,5 @@
 library(testthat)
-library(mse)
+local_edition(3)
 
 # ncoresrun, number of cores used in a run from tracking$pid
 ncoresrun <- function(x) {
