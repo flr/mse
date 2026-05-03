@@ -1055,7 +1055,7 @@ setMethod("goFish", signature(om="FLombf"),
 
 # TODO: mps(FLmse, oem=oem(), ctrl=control(), args=args(), ...)
 
-mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
+mps <- function(om, oem=NULL, iem=NULL, control, args,
   statistics=mse::statistics, metrics=NULL, type=character(1), names=NULL, 
   perf=FALSE, ...) {
 
@@ -1136,17 +1136,17 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       seed=seed))) %dofuture% {
 
     # CREATE a copy of control for this iteration
-    ctrl_i <- control
+    control_i <- control
   
     # MODIFY the copy
-    args(ctrl_i[[module]])[names(mopts)] <- lapply(mopts, "[", i)
+    args(control_i[[module]])[names(mopts)] <- lapply(mopts, "[", i)
 
     # PROGRESS by mp
     if(!progress)
       p(message = sprintf("MP: %i / %i", i, largs))
 
-    # CALL mp, parallel left to work along MPs DEBUG: parallel=FALSE
-    run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
+    # CALL mp, parallel left to work along MPs
+    run <- mp(om, oem=oem, iem=iem, control=control_i, args=args, parallel=parallel,
        progress=progress, verbose=FALSE)
 
     # COMPUTE performance
