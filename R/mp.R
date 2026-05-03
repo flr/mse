@@ -1129,20 +1129,24 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     progress <- FALSE
   }
 
+  # LOOP over options
   res <- foreach(i = seq(largs), .errorhandling="pass", .inorder=TRUE,
       .options.future=list(globals=structure(TRUE, add=c("control", "module",
       "mopts", "om", "oem", "iem", "args", "statistics", "metrics"),
       seed=seed))) %dofuture% {
 
-    # MODIFY module args
-    args(control[[module]])[names(mopts)] <- lapply(mopts, "[", i)
+    # CREATE a copy of control for this iteration
+    ctrl_i <- control
+  
+    # MODIFY the copy
+    args(ctrl_i[[module]])[names(mopts)] <- lapply(mopts, "[", i)
 
     # PROGRESS by mp
     if(!progress)
       p(message = sprintf("MP: %i / %i", i, largs))
 
-    # CALL mp, parallel left to work along MPs
-    run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=parallel,
+    # CALL mp, parallel left to work along MPs DEBUG: parallel=FALSE
+    run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
        progress=progress, verbose=FALSE)
 
     # COMPUTE performance
