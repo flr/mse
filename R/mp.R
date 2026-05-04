@@ -1123,10 +1123,9 @@ setMethod("goFish", signature(om="FLombf"),
 #' results <- mps(om, oem = oem, ctrl = control, args = list(iy = 2021, fy = 2034),
 #'   hcr = list(trigger = c(4000, 8000, 12000)))
 #' 
-#' # With performance metrics
+#' # Returns only performance metrics
 #' results_perf <- mps(om, oem = oem, ctrl = control, args = list(iy = 2021, fy = 2034),
-#'   hcr = list(trigger = c(4000, 8000, 12000)),
-#'   statistics = statistics)
+#'   hcr = list(trigger = c(4000, 8000, 12000)), perf=TRUE)
 #' }
 
 mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
