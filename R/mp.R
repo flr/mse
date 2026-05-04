@@ -1055,7 +1055,81 @@ setMethod("goFish", signature(om="FLombf"),
 
 # TODO: mps(FLmse, oem=oem(), ctrl=control(), args=args(), ...)
 
-mps <- function(om, oem=NULL, iem=NULL, control, args,
+#' mps runs multiple Management Procedures with varying module arguments
+#'
+#' This function runs multiple variations of a Management Procedure (MP) by
+#' systematically varying the values of one or multiple arguments for a single
+#' control module. Each variation is run as a complete MP simulation under different
+#' module parameter sets.
+#'
+#' @details
+#' The function allows you to conduct sensitivity analyses or parameter sweeps
+#' by running multiple MPs where a single module's arguments are varied across
+#' a range of values. All other modules remain constant across runs.
+#'
+#' If no module arguments are provided via `...`, a single `mp()` run is executed
+#' and returned as an `FLmses` object with one element named "RUN".
+#'
+#' Parallel execution is supported when a future plan has been set up via
+#' `plan()`. The number of MPs to run is distributed across available workers.
+#' Progress reporting uses the `progressr` package if a global handler is configured.
+#'
+#' When `perf=TRUE` only the performance metrics computed for each MP run are returned
+#' as a single combined performance `data.table`.
+#'
+#' @param om The operating model, an object of class *FLom* or *FLombf*.
+#' @param oem The observation error model, an object of class *FLoem*. 
+#'   Optional, defaults to `perfect.oem()` if not provided.
+#' @param iem The implementation error model, an object of class *FLiem*.
+#'   Optional.
+#' @param control A control structure for the MP runs, an object of class *mpCtrl*.
+#' @param ctrl Alias for `control`. If both are provided, `control` takes precedence.
+#' @param args MSE arguments, *list*. Must contain 'iy' (intermediate/starting year).
+#'   Other standard elements: 'fy' (final year), 'y0' (first data year), 'nsqy',
+#'   'data_lag', 'management_lag', 'frq' (frequency), 'vy' (year vector).
+#' @param statistics Optional. A list or vector of statistic names to compute
+#'   performance metrics. If provided, `perf` is automatically set to `TRUE`.
+#' @param metrics Optional. A list or vector of metric names for performance
+#'   evaluation.
+#' @param type Optional. A label of the type of MP being run to use in the 
+#'   perfoamnce table.
+#' @param names Optional. A character vector of custom names for each MP run.
+#'   If not provided, names are auto-generated from module arguments.
+#'   If a single name is provided, it is prefixed to auto-generated names.
+#' @param parallel Logical or numeric. If `TRUE` (default), use all available
+#'   workers set via `plan()`. If numeric, use that many cores.
+#' @param perf Logical. If `TRUE`, compute and return performance metrics.
+#'   Defaults to `TRUE` if `statistics` is provided, `FALSE` otherwise.
+#' @param ... Named module arguments to vary. Only one module name is allowed.
+#'   Arguments are passed as lists or vectors and recycled to equal length.
+#'   Example: `hcr = list(lim = c(0.1, 0.2), trigger = c(40000, 50000))`.
+#'
+#' @return
+#' If `perf=FALSE`, default: An object of class *FLmses* containing the results
+#' of each MP run as objects of class *FLmse*.
+#' If `perf=TRUE`: A `data.table` combining performance metrics from all MP runs,
+#'   with an 'mp' column identifying each run.
+#'
+#' @examples
+#' \dontrun{
+#' # Run sensitivity analysis on HCR trigger points
+#' data(plesim)
+#' control <- mpCtrl(list(
+#'   est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
+#'   trigger=10000, target=0.18))))
+#' 
+#' # Vary HCR trigger across values
+#' results <- mps(om, oem = oem, ctrl = control, args = list(iy = 2021, fy = 2034),
+#'   hcr = list(trigger = c(4000, 8000, 12000)))
+#' 
+#' # With performance metrics
+#' results_perf <- mps(om, oem = oem, ctrl = control, args = list(iy = 2021, fy = 2034),
+#'   hcr = list(trigger = c(4000, 8000, 12000)),
+#'   statistics = statistics)
+#' }
+
+mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   statistics=mse::statistics, metrics=NULL, type=character(1), names=NULL, 
   perf=FALSE, ...) {
 
