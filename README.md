@@ -33,5 +33,5 @@ You are welcome to:
 
 - Submit suggestions and bug-reports at: <https://github.com/flr/mse/issues>
 - Send a pull request on: <https://github.com/flr/mse/>
-- Authors: Iago Mosqueira, WUR. Ernesto Jardim, IPMA.
+- Authors: Iago Mosqueira, WMR. Ernesto Jardim, IPMA.
 - Maintainer: Iago Mosqueira, WMR.
