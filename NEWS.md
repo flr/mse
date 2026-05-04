@@ -10,6 +10,7 @@
 - tac.is now accepts a different number of years to compute F status quo in intermediate year projection
 - Altered default metrics for plot(FLom), same as plot(FLstock)
 - tracking for om (F.om, Sb.om, B.om abnd C.om) now reflect the advice year value (ay)
+- mps has a clearer interface and dispatch for parallelization
 
 # mse 2.4.4
 
