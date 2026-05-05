@@ -208,9 +208,9 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
     # SET 0s to min / 2
     index(res)[index(res) == 0] <- c(min(index(res)[index(res) > 0] / 2))
     
-    # ASSIGN observations
-    # TODO: ONLY if index not available
-    x[, dyrs] <- res
+    # ASSIGN observations, ONLY if index not available
+    if(args$dy > args$iy)
+      x[, dyrs] <- res
  
     return(window(x, end=dy))
 
