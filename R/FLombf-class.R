@@ -505,7 +505,7 @@ partialHR <- function(om) {
 
 setMethod("hr", signature(object="FLombf"),
   function(object) {
-    lapply(partialHR(object), function(x) Reduce('+', x))
+    FLQuants(lapply(partialHR(object), function(x) Reduce('+', x)))
 })
 
 # }}}
@@ -713,8 +713,6 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
  
     # CALL for metrics by biol
     mets <- lapply(biols(object), metrics)
-
-    # TODO: SET for hbar 
 
     # ADD catch & SSB by biol
     mets <- Map(function(me, ca, sb, fb, hb) {

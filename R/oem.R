@@ -183,9 +183,10 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   
   # --- IDX
 
+  # EXTRACT observations
   idx <- observations$idx
 
-  # CHOOSE indices to be updated (maxyear >= dy)
+  # CHOOSE indices to be updated (maxyear > dy)
   upi <- unlist(lapply(idx, function(x) unname(dims(x)$maxyear) > args$dy))
 
   if(is.null(deviances$idx) | length(deviances$idx) == 0) {
@@ -216,8 +217,8 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
 
   }, x=idx[upi], y=deviances$idx[upi], z=rep(stability, length(idx))[upi])
 
+  # ASSIGN idx to observations
   for(i in seq(idx[upi])) {
-    yrs <- intersect(dyrs, dimnames(idx[upi][[i]])$year)
     observations$idx[upi][[i]][, dyrs] <- idx[upi][[i]][, dyrs]
   }
 
