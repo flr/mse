@@ -359,8 +359,8 @@ setMethod("goFish", signature(om="FLom"),
 
   for(i in vy) {
 
-  if(.DEBUG)
-    browser()
+   if(isTRUE(.DEBUG) | i %in% as.character(.DEBUG))
+      browser()
 
     # time (start)
     stim <- Sys.time()
@@ -504,8 +504,6 @@ setMethod("goFish", signature(om="FLom"),
       tracking <- out$tracking
       hcrpars <- out$hcrpars
     }
-
-    browser()
 
     # --- hcr: Harvest Control Rule
 
@@ -711,7 +709,7 @@ setMethod("goFish", signature(om="FLombf"),
   # Go FISH!
   for(i in vy) {
 
-    if(.DEBUG)
+    if(isTRUE(.DEBUG) | i %in% as.character(.DEBUG))
       browser()
 
     if(verbose) {
@@ -784,7 +782,7 @@ setMethod("goFish", signature(om="FLombf"),
     
     # GET observations
     observations(oem) <- lapply(o.out, "[[", "observations")
-    
+
     # TRACK oem observations
     track(tracking, "B.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) areaSums(unitSums(stock(x)))[,,,1])
