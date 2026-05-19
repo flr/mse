@@ -501,14 +501,11 @@ setMethod("goFish", signature(om="FLom"),
       
       out <- do.call("mpDispatch", ctrl.phcr)
       
-      hcrpars <- out$hcrpars
       tracking <- out$tracking
+      hcrpars <- out$hcrpars
     }
 
-    if(exists("hcrpars")){
-      # TODO
-      track(tracking, "phcr", ay) <- c(hcrpars[1,])
-    }
+    browser()
 
     # --- hcr: Harvest Control Rule
 
@@ -523,8 +520,9 @@ setMethod("goFish", signature(om="FLom"),
 
       # ADD hcrpars to ctrl.hcr
       if(exists("hcrpars")) {
-        hcrplist <- as(hcrpars, 'list')
-        ctrl.hcr[names(hcrplist)] <- hcrplist
+        ctrl.hcr$hcrpars <- hcrpars
+        #hcrplist <- as(hcrpars, 'list')
+        #ctrl.hcr[names(hcrplist)] <- hcrplist
       }
 
       ctrl.hcr$ioval <- list(iv=list(t1=flsval, t2=flqsval), 
@@ -1052,7 +1050,92 @@ setMethod("goFish", signature(om="FLombf"),
 
 # mps {{{
 
-# TODO: mps(FLmse, oem=oem(), ctrl=control(), args=args(), ...)
+#' Run Multiple Management Procedure Scenarios
+#'
+#' Executes multiple runs of a Management Procedure (MP) by iterating over a
+#' grid of values for a single module's arguments. This allows systematic
+#' exploration of parameter sensitivity or scenario comparisons, optionally in
+#' parallel. When no extra options are provided, a single MP run is returned as
+#' an \code{FLmses} object. When options are given, results are either collected
+#' as an \code{FLmses} or, if \code{statistics} are provided, combined into a
+#' single \code{data.table} of performance statistics.
+#'
+#' @param om An \code{FLom} object representing the Operating Model.
+#' @param oem An \code{FLoem} object for the Observation Error Model. Defaults
+#'   to \code{NULL}, in which case \code{perfect.oem} is used internally by
+#'   \code{mp()}.
+#' @param iem An \code{FLiem} object for the Implementation Error Model.
+#'   Defaults to \code{NULL}.
+#' @param control An \code{mpCtrl} object defining the MP modules and their
+#'   arguments. Can also be passed as \code{ctrl}.
+#' @param ctrl Alias for \code{control}; either may be used.
+#' @param args A list of MSE run arguments, including at minimum \code{iy}
+#'   (the initial projection year). May also contain \code{seed} to set a
+#'   random seed for reproducibility.
+#' @param statistics A list of performance statistic functions to be passed to
+#'   \code{performance()}. Required when \code{perf = TRUE}.
+#' @param metrics A list of metric functions passed to \code{performance()}.
+#'   Defaults to \code{NULL}.
+#' @param type Character string specifying the type of performance output.
+#'   Passed to \code{performance()}. Defaults to \code{character(1)}.
+#' @param names Optional character vector of names for the runs. If a single
+#'   string is given, it is prepended to the auto-generated names. If
+#'   \code{NULL}, names are constructed automatically from the module name,
+#'   argument name(s), and rounded values.
+#' @param parallel Logical. Should individual MP runs be parallelised using
+#'   \code{future}/\code{doFuture}? Defaults to \code{TRUE}. Ignored if only
+#'   one worker is available.
+#' @param perf Logical. Should performance statistics be computed and returned
+#'   instead of the full \code{FLmse} objects? Defaults to \code{TRUE} when
+#'   \code{statistics} is not \code{NULL}.
+#' @param ... A single named argument corresponding to a module present in
+#'   \code{control}, whose value is a named list of argument vectors to iterate
+#'   over. Only one module may be varied per call (e.g.
+#'   \code{hcr = list(Ftarget = c(0.2, 0.3, 0.4))}). Passing more than one
+#'   named element will raise an error.
+#'
+#' @return If \code{perf = FALSE} (or \code{statistics = NULL}), an
+#'   \code{FLmses} object containing one \code{FLmse} result per parameter set.
+#'   If \code{perf = TRUE}, a single \code{data.table} combining performance
+#'   statistics across all runs, with additional columns for the varied
+#'   argument values and an \code{mp} identifier column.
+#'
+#' @details
+#' The function iterates over all combinations of the supplied module argument
+#' values. Arguments of unequal length are recycled to the length of the
+#' longest. Auto-generated run names take the form
+#' \code{<module>_<arg>_<value>} for a single argument, or
+#' \code{<arg1>-<arg2>_<i>} for multiple arguments.
+#'
+#' Parallel execution relies on \code{\link[future]{nbrOfWorkers}} and
+#' \code{doFuture::\%dofuture\%}. Progress is reported either per-MP or
+#' per-iteration depending on whether the number of runs exceeds the number
+#' of workers.
+#'
+#' Runs that fail are excluded from the output with a warning; if all runs
+#' fail, an error is raised.
+#'
+#' @seealso \code{\link{mp}}, \code{\link{performance}}, \code{\link{mpCtrl}},
+#'   \code{\link{FLmses}}
+#'
+#' @examples
+#' \dontrun{
+#' data(plesim)
+#' control <- mpCtrl(list(
+#'   est = mseCtrl(method = perfect.sa),
+#'   hcr = mseCtrl(method = catchSSB.hcr, args = list(Ftarget = 0.3, Btrigger = 0))
+#' ))
+#'
+#' # Run over a grid of Ftarget values, returning performance statistics
+#' res <- mps(om, oem = oem, control = control, args = list(iy = 2021),
+#'   statistics = statistics,
+#'   hcr = list(Ftarget = c(0.2, 0.3, 0.4)))
+#'
+#' # Run without performance statistics, returning FLmses
+#' res <- mps(om, oem = oem, control = control, args = list(iy = 2021),
+#'   hcr = list(Ftarget = c(0.2, 0.3, 0.4)))
+#' }
+#' @author Iago Mosqueira (WMR)
 
 mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   statistics=NULL, metrics=NULL, type=character(1), names=NULL, parallel=TRUE,
@@ -1141,11 +1224,13 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
          progress=progress, verbose=FALSE)
 
       # RETURN performance
-      browser()
-      if(perf)
+      if(perf) {
+        # COMPUTE performance
         run <- performance(run, statistics=statistics, metrics=metrics, type=type,
           run=names[i])
-      
+        # COMBINE with mopts
+        run <- run[, cbind(.SD, as.data.table(lapply(mopts, "[", i)))]
+      }
       return(run)
     }
   } else {
@@ -1162,10 +1247,13 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
          verbose=FALSE, progress=TRUE)
 
       # RETURN performance
-      if(perf)
+      if(perf) {
+        # COMPUTE performance
         run <- performance(run, statistics=statistics, metrics=metrics, type=type,
           run=names[i])
-
+        # COMBINE with mopts
+        run <- run[, cbind(.SD, as.data.table(lapply(mopts, "[", i)))]
+      }
       return(run)
     })
   }
@@ -1180,7 +1268,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   if(sum(done) < largs)
     warning(paste("Some calls to mp() did not run:"), seq(largs)[!done])
-
+  
   # RETURN performance
   if(perf) {
 

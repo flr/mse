@@ -101,8 +101,7 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
 #' @seealso
 #' [statistics], [refpts()], [metrics()]
 #'
-#' @author
-#' Iago Mosqueira (WMR)
+#' @author Iago Mosqueira (WMR)
 #'
 #' @keywords utilities
 #' @name performance
