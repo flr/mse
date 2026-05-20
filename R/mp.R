@@ -308,7 +308,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     oem <- FLoem()
   else
     if(window)
-      oem <- window(lst0$oem, start=iy, end=an(vy[length(vy)]) + frq)
+      oem <- window(lst0$oem, start=iy - 1, end=an(vy[length(vy)]) + frq)
     else
       oem <- lst0$oem
 
