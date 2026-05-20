@@ -100,26 +100,36 @@ idx <- FLIndex(name="SUR", desc="An IBTS-like survey",
 # CONSTRUCT at-age survey
 idx <- survey(run, idx, stability=0.86)
 
+index(idx)
+
 # CONSTRUCT biomass index
 idb <- as(idx, 'FLIndexBiomass')
 
 # ASSEMBLE & EXTEND FLindices
 ids <- FLIndices(SUR=idx, CPUE=idb)
 
-# DEVIANCES
-devs <- list(
-  stk=FLQuants(catch.n=rlnorm(100, catch.n(om) %=% 0, 0.20)),
-  idx=FLQuants(SUR=rlnormar1(100,  index.q(ids[[1]]) %=% 0, 0.20,
-      years=dimnames(index(ids[[1]]))$year),
-    CPUE=rlnormar1(100,  index.q(ids[[2]]) %=% 0, 0.30,
-      years=dimnames(index(ids[[2]]))$year))
-)
+# RECOMPUTE Qs
+iqs <- computeQ(ids, run, FLQuants(lapply(ids, index)))
+
+index.q(ids[[1]]) <- expand(quantMeans(yearMeans(iqs[[1]])),
+  year=seq(1980, 2025), fill=TRUE)
+
+index.q(ids[[2]]) <- iqs[[2]]
 
 # BUILD oem
 oem <- FLoem(observations=list(stk=as(run, 'FLStock'), idx=ids),
   method=sampling.oem)
 
 oem <- fwdWindow(oem, end=2055)
+
+# DEVIANCES
+devs <- list(
+  stk=FLQuants(catch.n=rlnorm(100, catch.n(om) %=% 0, 0.20)),
+  idx=FLQuants(SUR=rlnormar1(100, catch(om) %=% 0, 0.20,
+      years=dimnames(catch(om))$year),
+    CPUE=rlnormar1(100, catch(om) %=% 0, 0.30,
+      years=dimnames(catch(om))$year))
+)
 
 deviances(oem) <- devs
 
