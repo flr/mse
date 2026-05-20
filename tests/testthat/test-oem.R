@@ -8,7 +8,7 @@
 
 
 # Setup basic test arguments
-test_args <- list(y0=1960, dy=2021, frq=1)
+test_args <- list(y0=1960, iy=2020, dy=2021, dys=2021, frq=1)
 
 # TEST: perfect.oem {{{
 
