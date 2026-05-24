@@ -42,11 +42,10 @@ simplified to match the dimensions of that present in the \emph{observations}
 slot.
 }
 \examples{
-data(sol274)
-# Generate samples from year 2000:2016
+data(plesim)
 sampling.oem(stock(om), deviances=deviances(oem),
   observations=observations(oem),
-  args=list(y0=2000, dy=2021, frq=1), tracking=FLQuant())
+  args=list(y0=2000, iy=2020, dy=2021, dys=2021, frq=1), tracking=FLQuant())
 }
 \seealso{
 \link{mp}

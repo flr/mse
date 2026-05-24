@@ -25,7 +25,7 @@ as precise as the OEM observation.
 }
 \examples{
 # Example dataset
-data(sol274)
+data(plesim)
 
 # Sets up an mpCtrl for catch ~ MSY
 ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),

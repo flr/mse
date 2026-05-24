@@ -12,20 +12,20 @@ DEFINITION
 }
 \examples{
 # Example dataset
-data(sol274)
+data(plesim)
 
 # Sets up an mpCtrl using hockeystick(fbar~ssb)
 ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=hockeystick.hcr, args=list(metric="ssb", trigger=45000, 
-    output="fbar", target=0.27)))
+  hcr = mseCtrl(method=hockeystick.hcr, args=list(metric="ssb", trigger=14000, 
+    output="fbar", target=0.18)))
 
 # Runs mp between 2021 and 2035
 run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
 
 # Alters the value for the 'trigger' HCR argument
-run02 <- mp(om, control=setcontrol(ctrl, hcr=list(trigger=25000)),
+run02 <- mp(om, control=setcontrol(ctrl, hcr=list(trigger=15000)),
   args=list(iy=2021, fy=2035))
 
 # Plots results
-plot(om, list(T45k=run, T25k=run02))
+plot(om, list(T14k=run, T15k=run02))
 }

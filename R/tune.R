@@ -44,16 +44,16 @@
 #' @param maxit Maximum number of iterations, defaults to 12.
 #' @examples
 #' # dataset contains both OM (FLom) and OEM (FLoem)
-#' data(sol274)
+#' data(plesim)
 #' # choose sa and hcr
 #' control <- mpCtrl(list(
 #'   est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
-#'   trigger=41500, target=0.27))))
+#'   trigger=14000, target=0.18))))
 #' # load statistics
 #' data(statistics)
 #' tun <- tunebisect(om, oem=oem, control=control, args=list(iy=2021, fy=2035),
-#' tune=list(target=c(0.15, 0.35)),
+#' tune=list(target=c(0.12, 0.32)),
 #' metrics=list(SB=ssb), statistic=statistics['PSBMSY'], years=2025:2034)
 #' # Plot tuned MP
 #' plot(om, tun)
@@ -125,7 +125,8 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     verbose=FALSE, ...)
 
   pmin <- performance(rmin, metrics=metrics, 
-    statistics=statistic, refpts=refpts(om), probs=NULL, years=list(unlist(years)))
+    statistics=statistic, probs=NULL, years=list(unlist(years)))
+
   obmin <- mean(pmin$data, na.rm=TRUE) - prob
 
   # PRINT result
@@ -151,7 +152,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     verbose=FALSE, ...)
   
   pmax <- performance(rmax, metrics=metrics,
-    statistic=statistic, refpts=refpts(om), probs=NULL, years=list(unlist(years)))
+    statistic=statistic, probs=NULL, years=list(unlist(years)))
   obmax <- mean(pmax$data, na.rm=TRUE) - prob
 
   # PRINT result
@@ -189,7 +190,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       verbose=FALSE, ...)
 
     pmid <- performance(rmid, metrics=metrics, 
-      statistics=statistic, refpts=refpts(om), probs=NULL, years=list(unlist(years)))
+      statistics=statistic, probs=NULL, years=list(unlist(years)))
     obmid <- mean(pmid$data, na.rm=TRUE) - prob
 
     # PRINT result

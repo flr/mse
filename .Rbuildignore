@@ -7,3 +7,4 @@ paper
 data-raw
 man-roxygen
 ^\.github$
+_pkgdown.yaml

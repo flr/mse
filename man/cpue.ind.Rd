@@ -43,7 +43,7 @@ Three elements are added to the \code{tracking} table:
 \examples{
 data(plesim)
 # MP control with CPUE: catch ~ weighted 4-year mean CPUE
-ctrl <- mpCtrl(est=mseCtrl(method=cpue.ind, args=list(index=2)),
+ctrl <- mpCtrl(est=mseCtrl(method=cpue.ind, args=list(index=1)),
   hcr=mseCtrl(method=hockeystick.hcr, args=list(metric="wmean",
   trigger=2000, output="catch", target=1.25e5)))
 

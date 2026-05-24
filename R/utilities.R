@@ -82,8 +82,7 @@ combinations <- function(...) {
 # decisions {{{
 
 #' @examples
-#' data(sol274)
-#' 
+#' data(plesim)
 
 decisions <- function(x, years=dimnames(tracking(x))$year, iter=NULL) {
 

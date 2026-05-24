@@ -81,7 +81,8 @@ setMethod("plot", signature(x="FLo", y="fwdControl"),
 # FLom, list {{{
 
 setMethod("plot", signature(x="FLom", y="list"),
-  function(x, y, ..., window=TRUE, metrics=NULL) {
+  function(x, y, ..., window=TRUE,
+    metrics=list(Rec=rec, SSB=ssb, Catch=catch, F=fbar)){
 
     # WINDOW om
     if(isTRUE(window))
@@ -97,13 +98,9 @@ setMethod("plot", signature(x="FLom", y="list"),
     args <- list(...)
 
     # COMPUTE metrics
-    if(is.null(metrics))
-      mets <- lapply(c(list(OM=x), y), metrics)
-    else
-      mets <- lapply(c(list(OM=x), y), metrics, metrics=metrics)
+    mets <- lapply(c(list(OM=x), y), metrics, metrics=metrics)
 
     # PLOT
-    args$metrics <- NULL
     do.call(plotListFLQuants, c(list(x=mets), args))
   }
 )

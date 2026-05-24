@@ -1,4 +1,4 @@
 library(testthat)
 library(mse)
 
-# test_check("mse")
+test_check("mse")

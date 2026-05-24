@@ -31,9 +31,9 @@
 #'
 #' @examples
 #' # On FLom
-#' data(sol274)
+#' data(plesim)
 #' obs <- perfect.oem(stock(om), deviances=NULL, observations=NULL,
-#'   args=list(y0=1957, dy=2021), tracking=FLQuant())
+#'   args=list(y0=1960, dy=2021), tracking=FLQuant())
 
 perfect.oem <- function(stk, deviances, observations, args, tracking,
   biomass=FALSE, ...) {
@@ -133,19 +133,17 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
 #' @seealso \link{mp}
 #' @keywords function
 #' @examples
-#' data(sol274)
-#' # Generate samples from year 2000:2016
+#' data(plesim)
+# Generate samples from year 2000:2016
 #' sampling.oem(stock(om), deviances=deviances(oem),
 #'   observations=observations(oem),
-#'   args=list(y0=2000, dy=2021, frq=1), tracking=FLQuant())
+#'   args=list(y0=2000, iy=2020, dy=2021, dys=2021, frq=1), tracking=FLQuant())
 
 sampling.oem <- function(stk, deviances, observations, stability=1,
   wts=TRUE, args, tracking) {
 
-  # DIMENSIONS
-  y0 <- ac(args$y0)
-  dy <- ac(args$dy)
-  dyrs <- ac(seq(args$dy - args$frq + 1, args$dy))
+  spread(args)
+  dys <- ac(dys)
 
   # CHECK inputs
   # if(!any(!c("stk", "idx") %in% names(deviances)))
@@ -166,27 +164,27 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
 
   if(!is.null(deviances$stk)) {
 
-    # APPLY deviances and ASSIGN to stk slots in dyrs
+    # APPLY deviances and ASSIGN to stk slots in dys
     for(i in names(deviances$stk)) {
-      slot(stk, i)[, dyrs] <-
-      do.call(i, list(object=stk))[, dyrs] %*% deviances$stk[[i]][, dyrs] + 1e-8
+      slot(stk, i)[, dys] <-
+      do.call(i, list(object=stk))[, dys] %*% deviances$stk[[i]][, dys] + 1e-8
     }
 
     # COMPUTE aggregated slots
-    landings(stk)[, dyrs] <- computeLandings(stk[, dyrs])
-    discards(stk)[, dyrs] <- computeDiscards(stk[, dyrs])
-    catch(stk)[, dyrs] <- computeCatch(stk[, dyrs])
+    landings(stk)[, dys] <- computeLandings(stk[, dys])
+    discards(stk)[, dys] <- computeDiscards(stk[, dys])
+    catch(stk)[, dys] <- computeCatch(stk[, dys])
   }
 
   # STORE for shortcut 
-  # observations$stk[, dyrs] <- stk[, dyrs]
+  # observations$stk[, dys] <- stk[, dys]
   
   # --- IDX
 
+  # EXTRACT observations
   idx <- observations$idx
-
-  # CHOOSE indices to be updated (maxyear >= dy)
-  upi <- unlist(lapply(idx, function(x) unname(dims(x)$maxyear) > args$dy))
+  # CHOOSE indices to be updated (maxyear > dy)
+  upi <- unlist(lapply(idx, function(x) unname(dims(x)$maxyear) > dy))
 
   if(is.null(deviances$idx) | length(deviances$idx) == 0) {
     deviances$idx <- lapply(observations$idx, function(x) index.q(x) %=% 1)
@@ -195,30 +193,30 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   # APPLY survey() to stk + index (x), devs.q (y), stability(z)
   idx[upi] <- Map(function(x, y, z) {
 
-    dyrs <- intersect(dyrs, dimnames(y)$year)
+    dys <- intersect(dys, dimnames(y)$year)
 
     # CREATE survey obs
-    res <- survey(stk[, dyrs], x[, dyrs], sel=sel.pattern(x)[, dyrs],
-      index.q=index.q(x)[, dyrs] %*% y[, dyrs], stability=z)
+    res <- survey(stk[, dys], x[, dys], sel=sel.pattern(x)[, dys],
+      index.q=index.q(x)[, dys] %*% y[, dys], stability=z)
 
     # ENSURE no zeroes coming, maybe from high Fs
-    if(sum(index(res)[, dyrs]) == 0)
-      index(res)[, dyrs] <- sqrt(.Machine$double.eps)
+    if(sum(index(res)[, dys]) == 0)
+      index(res)[, dys] <- sqrt(.Machine$double.eps)
 
     # SET 0s to min / 2
     index(res)[index(res) == 0] <- c(min(index(res)[index(res) > 0] / 2))
     
-    # ASSIGN observations
-    # TODO: ONLY if index not available
-    x[, dyrs] <- res
+    # ASSIGN observations, ONLY if index not available
+    if(dy > iy)
+      x[, dys] <- res
  
     return(window(x, end=dy))
 
   }, x=idx[upi], y=deviances$idx[upi], z=rep(stability, length(idx))[upi])
 
+  # ASSIGN idx to observations
   for(i in seq(idx[upi])) {
-    yrs <- intersect(dyrs, dimnames(idx[upi][[i]])$year)
-    observations$idx[upi][[i]][, dyrs] <- idx[upi][[i]][, dyrs]
+    observations$idx[upi][[i]][, dys] <- idx[upi][[i]][, dys]
   }
 
   # -- POST-PROCESS
@@ -240,10 +238,10 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   if(!wts) slots <- slots[1:8]
   
   for(i in slots)
-    slot(obs, i)[, dyrs] <- slot(stk, i)[, dyrs]
+    slot(obs, i)[, dys] <- slot(stk, i)[, dys]
   
   # STORE in OEM observations
-  observations$stk[,dyrs] <- obs[,dyrs]
+  observations$stk[,dys] <- obs[,dys]
 
   # RETURN stk from obs, only update observed 'slots'
   list(stk=obs, idx=idx, observations=observations, tracking=tracking)
