@@ -132,30 +132,12 @@ variable. These constraints can be applied either unconditionally
 
 ``` r
 # Example dataset
-data(sol274)
-#> Warning: namespace ‘patchwork’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘dplyr’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘TMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘remotes’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘shiny’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘htmlwidgets’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘xtable’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLAssess’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLSRTMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
+data(plesim)
 
 # Sets up an mpCtrl using hockeystick(fbar~ssb)
 ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
-  hcr = mseCtrl(method=hockeystick.hcr, args=list(metric="ssb", trigger=45000, 
-    output="fbar", target=0.27)))
+  hcr = mseCtrl(method=hockeystick.hcr, args=list(metric="ssb", trigger=14000, 
+    output="fbar", target=0.18)))
 
 plot_hockeystick.hcr(ctrl)
 #> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
@@ -168,7 +150,7 @@ plot_hockeystick.hcr(ctrl)
 ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=hockeystick.hcr, args=list(
     metric="depletion", trigger=0.40, lim=0.10,
-    output="fbar", target=0.27, min=0.02)))
+    output="fbar", target=0.18, min=0.02)))
 
 plot_hockeystick.hcr(ctrl)
 

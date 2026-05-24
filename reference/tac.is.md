@@ -12,12 +12,13 @@ tac.is(
   args,
   output = "catch",
   recyrs = -2,
+  fsqyrs = 1,
   Fdevs = unitMeans(fbar(fut)) %=% 1,
-  dtaclow = NA,
-  dtacupp = NA,
+  dlow = NA,
+  dupp = NA,
   fmin = 0,
   reuse = TRUE,
-  initac = metrics(stk, output)[, ac(iy - data_lag)],
+  initac = unitSums(metrics(stk, output)[, ac(iy - data_lag)]),
   tracking
 )
 ```
@@ -46,12 +47,12 @@ tac.is(
   Deviances on the fbar input to incorporate error and bias when MP is
   run using the pseudo-estimators 'perfect.sa' or 'shortcut.sa'.
 
-- dtaclow:
+- dlow:
 
   Limit to decreases in output catch, as a proportional change (0.85 for
   15%). Applied only when metric \> lim, as set by 'hcr' step.
 
-- dtacupp:
+- dupp:
 
   Limit to increases in output catch, as a proportional change (1.15 for
   15%). Applied only when metric \> lim, as set by 'hcr' step.
@@ -91,30 +92,12 @@ usually worst estimated.
 ## Examples
 
 ``` r
-data(sol274)
-#> Warning: namespace ‘patchwork’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘dplyr’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘TMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘remotes’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘shiny’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘htmlwidgets’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘xtable’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLAssess’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLSRTMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
+data(plesim)
 # Setup control with tac.is
 control <- mpCtrl(list(est=mseCtrl(method=perfect.sa),
   hcr=mseCtrl(method=hockeystick.hcr,
-    args=list(lim=0, trigger=4.3e5, target=0.21)),
-  isys=mseCtrl(method=tac.is, args=list(recyrs=-3, output='landings'))))
+    args=list(lim=0, trigger=14000, target=0.18)),
+  isys=mseCtrl(method=tac.is, args=list(recyrs=-3, fnsqy=3, output='landings'))))
 # Run MP until 2025
 run <- mp(om, oem, ctrl=control, args=list(iy=2021, fy=2027))
 #> 2021  - 2022  - 2023  - 2024  - 2025  - 2026  - 

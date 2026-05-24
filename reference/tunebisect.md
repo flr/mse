@@ -113,45 +113,35 @@ Algorithm", Numerical Analysis (10th ed.), Cenage Learning, ISBN
 
 ``` r
 # dataset contains both OM (FLom) and OEM (FLoem)
-data(sol274)
-#> Warning: namespace ‘patchwork’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘dplyr’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘TMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘remotes’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘shiny’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘htmlwidgets’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘xtable’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLAssess’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLSRTMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
+data(plesim)
 # choose sa and hcr
 control <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
-  trigger=41500, target=0.27))))
+  trigger=14000, target=0.18))))
 # load statistics
 data(statistics)
 tun <- tunebisect(om, oem=oem, control=control, args=list(iy=2021, fy=2035),
-tune=list(target=c(0.15, 0.35)),
+tune=list(target=c(0.12, 0.32)),
 metrics=list(SB=ssb), statistic=statistics['PSBMSY'], years=2025:2034)
-#> [1] target: 0.15
-#> [1] diff: 0.46, prob: 0.96
-#> [2] target: 0.35
-#> [2] diff: -0.11, prob: 0.39
-#> [3] target: 0.25
-#> [3] diff: 0.28, prob: 0.78
-#> [4] target: 0.3
-#> [4] diff: 0.079, prob: 0.58
-#> [5] target: 0.325
-#> [5] diff: -0.004, prob: 0.5
+#> [1] target: 0.12
+#> [1] diff: 0.33, prob: 0.83
+#> [2] target: 0.32
+#> [2] diff: -0.5, prob: 0.002
+#> [3] target: 0.22
+#> [3] diff: -0.11, prob: 0.39
+#> [4] target: 0.17
+#> [4] diff: 0.25, prob: 0.75
+#> [5] target: 0.195
+#> [5] diff: 0.13, prob: 0.63
+#> [6] target: 0.208
+#> [6] diff: 0.014, prob: 0.51
+#> [7] target: 0.214
+#> [7] diff: -0.053, prob: 0.45
+#> [8] target: 0.211
+#> [8] diff: -0.017, prob: 0.48
+#> [9] target: 0.209
+#> [9] diff: -0.006, prob: 0.49
 # Plot tuned MP
 plot(om, tun)
 ```

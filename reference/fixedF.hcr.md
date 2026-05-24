@@ -22,25 +22,7 @@ fixedF.hcr(stk, ftrg, args, tracking)
 ## Examples
 
 ``` r
-data(sol274)
-#> Warning: namespace ‘patchwork’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘dplyr’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘TMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘remotes’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘shiny’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘htmlwidgets’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘xtable’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLAssess’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLSRTMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
+data(plesim)
 fixedF.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
   frq=1), tracking=FLQuant())
 #> $ctrl

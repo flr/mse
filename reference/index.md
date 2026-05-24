@@ -73,7 +73,7 @@
   : Predicted index of abundance from abundance estimates
 
 - [`indicator.is()`](https://flrproject.org/mse/reference/indicator.is.md)
-  : indicator implementation function
+  : Indicator Implementation System Module
 
 - [`initiate()`](https://flrproject.org/mse/reference/initiate.md) :
   Initializes a population for a given virgin biomass.
@@ -107,6 +107,9 @@
 - [`mpDispatch()`](https://flrproject.org/mse/reference/mpDispatch.md) :
   Title
 
+- [`mps()`](https://flrproject.org/mse/reference/mps.md) : Run Multiple
+  Management Procedure Scenarios
+
 - [`initialize(`*`<mseCtrl>`*`)`](https://flrproject.org/mse/reference/mseCtrl-class.md)
   [`method()`](https://flrproject.org/mse/reference/mseCtrl-class.md)
   [`` `method<-`() ``](https://flrproject.org/mse/reference/mseCtrl-class.md)
@@ -116,9 +119,6 @@
   [`exists()`](https://flrproject.org/mse/reference/mseCtrl-class.md) :
 
   S4 class `mseCtrl`
-
-- [`p4om`](https://flrproject.org/mse/reference/p4om.md) : FLom object
-  for North sea plaice
 
 - [`partialHR()`](https://flrproject.org/mse/reference/partialHR.md) :
   hr
@@ -130,11 +130,17 @@
   A perfect 'estimate' of abundances, catches and harvest.
 
 - [`performance(`*`<FLQuants>`*`)`](https://flrproject.org/mse/reference/performance.md)
+  [`performance(`*`<FLo>`*`)`](https://flrproject.org/mse/reference/performance.md)
+  [`performance(`*`<FLombf>`*`)`](https://flrproject.org/mse/reference/performance.md)
+  [`performance(`*`<FLmse>`*`)`](https://flrproject.org/mse/reference/performance.md)
+  [`performance(`*`<FLmses>`*`)`](https://flrproject.org/mse/reference/performance.md)
+  [`performance(`*`<list>`*`)`](https://flrproject.org/mse/reference/performance.md)
   [`performance(`*`<FLStock>`*`)`](https://flrproject.org/mse/reference/performance.md)
   [`performance(`*`<FLStocks>`*`)`](https://flrproject.org/mse/reference/performance.md)
-  [`performance(`*`<FLom>`*`)`](https://flrproject.org/mse/reference/performance.md)
-  [`performance(`*`<list>`*`)`](https://flrproject.org/mse/reference/performance.md)
-  : Compute performance statistics
+  : Compute Performance Statistics for Management Procedure Evaluation
+
+- [`plesim`](https://flrproject.org/mse/reference/plesim.md) : FLom
+  object
 
 - [`sampling.oem()`](https://flrproject.org/mse/reference/sampling.oem.md)
   : sampling.oem

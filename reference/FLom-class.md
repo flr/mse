@@ -122,26 +122,20 @@ The FLR Team
 ## Examples
 
 ``` r
-data(sol274)
-#> Warning: namespace ‘patchwork’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘dplyr’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘TMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘remotes’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘shiny’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘htmlwidgets’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘xtable’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLAssess’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLSRTMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
+data(plesim)
 comb <- combine(iter(om, 1:50), iter(om, 51:100))
 all.equal(om, comb)
-#> [1] "Attributes: < Component “refpts”: Attributes: < Component “dim”: names for target but not for current > >"
+#>  [1] "Attributes: < Component “sr”: Attributes: < Component “fitted”: Attributes: < Component “dim”: Mean relative difference: 99 > > >"                        
+#>  [2] "Attributes: < Component “sr”: Attributes: < Component “fitted”: Numeric: lengths (98, 9800) differ > >"                                                   
+#>  [3] "Attributes: < Component “sr”: Attributes: < Component “params”: Attributes: < Component “dim”: Mean relative difference: 1 > > >"                         
+#>  [4] "Attributes: < Component “sr”: Attributes: < Component “params”: Numeric: lengths (3, 6) differ > >"                                                       
+#>  [5] "Attributes: < Component “sr”: Attributes: < Component “rec”: Attributes: < Component “dim”: Mean relative difference: 99 > > >"                           
+#>  [6] "Attributes: < Component “sr”: Attributes: < Component “rec”: Numeric: lengths (98, 9800) differ > >"                                                      
+#>  [7] "Attributes: < Component “sr”: Attributes: < Component “ssb”: Attributes: < Component “dim”: Mean relative difference: 99 > > >"                           
+#>  [8] "Attributes: < Component “sr”: Attributes: < Component “ssb”: Numeric: lengths (98, 9800) differ > >"                                                      
+#>  [9] "Attributes: < Component “sr”: Attributes: < Component “vcov”: Lengths: 4, 8 > >"                                                                          
+#> [10] "Attributes: < Component “sr”: Attributes: < Component “vcov”: Attributes: < Component “dim”: Numeric: lengths (2, 3) differ > > >"                        
+#> [11] "Attributes: < Component “sr”: Attributes: < Component “vcov”: Attributes: < Component “dimnames”: names for current but not for target > > >"             
+#> [12] "Attributes: < Component “sr”: Attributes: < Component “vcov”: Attributes: < Component “dimnames”: Length mismatch: comparison on first 2 components > > >"
+#> [13] "Attributes: < Component “sr”: Attributes: < Component “vcov”: target is matrix, current is array > >"                                                     
 ```

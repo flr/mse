@@ -106,30 +106,12 @@ The `args` list controls the timing of the simulation and its elements:
 
 ``` r
 # dataset contains both OM (FLom) and OEM (FLoem)
-data(sol274)
-#> Warning: namespace ‘patchwork’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘dplyr’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘TMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘remotes’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘shiny’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘htmlwidgets’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘xtable’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLAssess’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
-#> Warning: namespace ‘FLSRTMB’ is not available and has been replaced
-#> by .GlobalEnv when processing object ‘om’
+data(plesim)
 # Set control: sa and hcr
 control <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=hockeystick.hcr, args=list(lim=0,
-  trigger=41500, target=0.27))))
+  trigger=14000, target=0.18))))
 # Runs mp
 tes <- mp(om, oem=oem, ctrl=control, args=list(iy=2021, fy=2034))
 #> 2021  - 2022  - 2023  - 2024  - 2025  - 2026  - 2027  - 2028  - 2029  - 2030  - 2031  - 2032  - 2033  - 
