@@ -237,3 +237,11 @@ selectMetric <- function(metric="missing", stk, ind, ...) {
   return(met)
 }
 # }}}
+
+# setmethod {{{
+
+setmethod <- function(x, method) {
+  method(x) <- method
+  return(x)
+})
+# }}}

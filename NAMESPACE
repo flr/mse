@@ -106,6 +106,7 @@ export(
   "selectMetric",
   "setcontrol",
   "setdeviances",
+  "setmethod",
   "shortcut.oem",
   "simulator",
   "sp.is",

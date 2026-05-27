@@ -344,7 +344,7 @@ setMethod("performance", signature(x="FLmse"),
       # CALL performance(metrics)
       res <- do.call(performance, c(list(x=mets, statistics=statistics,
         refpts=refpts(x)), control_args, tracks, args,
-        om=name(x@om), type=type, run=run))
+        om=unname(name(x@om)), type=type, run=run))
 
       # NAME mp if  possible
       # TODO: IF type, run missing
