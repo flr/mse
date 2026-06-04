@@ -864,6 +864,60 @@ setMethod("combine", signature(x = "FLombf", y = "FLombf"), function(x, y, ...){
 })
 # }}}
 
+# append {{{
+
+#' Append two FLombf objects along the year dimension
+#'
+#' Joins two \code{FLombf} objects along the year axis: the first object is
+#' windowed to \code{after}, and the second from \code{after + 1} to its last
+#' year. The two windowed pieces are then combined using \code{FLCore::append}
+#' on the underlying \code{FLBiols} and \code{FLFisheries} slots.
+#'
+#' @param x An \code{FLombf} object, used up to year \code{after}.
+#' @param values An \code{FLombf} object, used from year \code{after + 1}.
+#' @param after Integer year. The last year taken from \code{x}. Defaults to
+#'   the last year of \code{x}.
+#'
+#' @return A new \code{FLombf} object spanning the years of \code{x} up to
+#'   \code{after} joined with the years of \code{values} from \code{after + 1}.
+#'
+#' @examples
+#' # Split an FLombf at year 2020 and re-join
+#' om1 <- window(om, end=2020)
+#' om2 <- window(om, start=2021)
+#' om3 <- append(om1, om2, after=2020)
+#'
+#' @rdname FLombf-class
+#' @aliases append,FLombf,FLombf-method
+
+setMethod("append", signature(x="FLombf", values="FLombf"),
+  function(x, values, after=dims(x)$maxyear) {
+
+    after <- as.integer(after)
+
+    # WINDOW x up to 'after'
+    x <- window(x, end=after)
+
+    # WINDOW values from 'after + 1'
+    values <- window(values, start=after + 1L)
+
+    # APPEND biols
+    biols(x) <- FLBiols(Map(append, x=biols(x), values=biols(values)))
+
+    # APPEND fisheries: each FLFishery, then each FLCatch within
+    fisheries(x) <- FLFisheries(Map(function(fx, fv) {
+      # APPEND the FLFishery-level slots (effort, etc.)
+      out <- append(fx, fv)
+      # APPEND every FLCatch within the fishery
+      out@.Data <- Map(append, x=fx@.Data, values=fv@.Data)
+      names(out) <- names(fx)
+      return(out)
+    }, fx=fisheries(x), fv=fisheries(values)))
+
+    return(x)
+  }
+) # }}}
+
 # deviances {{{
 
 setMethod("deviances", signature(object="FLombf"),
