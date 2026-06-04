@@ -281,6 +281,8 @@ setMethod("performance", signature(x="FLombf"),
     # COMPUTE metrics, argument hides metrics method
     if(is.null(metrics))
       metrics <- metrics(x)
+    else
+      metrics <- metrics(x, metrics=metrics)
 
     # SET NULL name if missing
     if(length(om) == 0)

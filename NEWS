@@ -1,3 +1,9 @@
+ mse 2.5.0
+
+ NEW FEATURES
+
+- `append(FLombf, FLombf, after)` method to join two operating models at a year boundary.
+
  mse 2.4.9
 
  BUG FIXES
