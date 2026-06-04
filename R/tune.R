@@ -60,7 +60,7 @@
 
 tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
   tune, prob=0.5, tol=0.01, maxit=12, years=ac(seq(args$iy + 1, args$fy - 1)),
-  verbose=TRUE, ...) {
+  verbose=TRUE, window=TRUE, ...) {
 
   # CALL recursively if multiple prob
   if(length(prob) > 1) {
@@ -82,8 +82,9 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     }
   }
   
-  # args
-  args$fy <- if(is.null(args$fy)) dims(om)$maxyear else args$fy
+  # KEEP fy, set args$fy to end of tuning
+  fy <- if(is.null(args$fy)) dims(om)$maxyear else args$fy
+  args$fy <- years[length(years)]
 
   # CHECK years
   if(!all(unique(unlist(years)) %in% seq(args$iy, args$fy)))
@@ -122,7 +123,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       unlist(cmin$hcr@args[names(tune)])))
 
   rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
-    verbose=FALSE, ...)
+    verbose=FALSE, window=FALSE, ...)
 
   pmin <- performance(rmin, metrics=metrics, 
     statistics=statistic, probs=NULL, years=list(unlist(years)))
@@ -135,8 +136,21 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       format(mean(pmin$data, na.rm=TRUE), digits=2)))
 
   # CHECK cmin result
-  if(isTRUE(all.equal(obmin, 0, tolerance=tol)))
+  if(isTRUE(all.equal(obmin, 0, tolerance=tol))) {
+      
+      # RUN to fy if not already
+      if(fy > args$fy) {
+
+        # REASSIGN fy to original fy for final run
+        args$iy <- args$fy
+        args$fy <- fy
+
+        # CONTINUE running until fy
+        rmin <- mp(om(rmin), oem=oem(rmin), ctrl=cmin, args=args, scenario=paste0("min"),
+          verbose=FALSE, window=window, ...)
+      }
     return(rmin)
+  }
   
   # --- RUN at max
 
@@ -149,7 +163,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       unlist(cmax$hcr@args[names(tune)])))
 
   rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
-    verbose=FALSE, ...)
+    verbose=FALSE, window=FALSE,...)
   
   pmax <- performance(rmax, metrics=metrics,
     statistic=statistic, probs=NULL, years=list(unlist(years)))
@@ -161,8 +175,21 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       format(mean(pmax$data, na.rm=TRUE), digits=2)))
   
   # CHECK cmax result
-  if(isTRUE(all.equal(obmax, 0, tolerance=tol)))
+  if(isTRUE(all.equal(obmax, 0, tolerance=tol))) {
+
+    # RUN to fy if not already
+      if(fy > args$fy) {
+
+        # REASSIGN fy to original fy for final run
+        args$iy <- args$fy
+        args$fy <- fy
+
+        # CONTINUE running until fy
+        rmax <- mp(om(rmax), oem=oem(rmax), ctrl=cmax, args=args, scenario=paste0("max"),
+          verbose=FALSE, window=window, ...)
+      }
     return(rmax)
+  }
 
   # CHECK range includes 0
   # TODO: PROPOSE wider range, min * 0.5, max * 1.5, and restart (recursive?).
@@ -187,7 +214,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
         format(unlist(cmid$hcr@args[names(tune)]), digits=3)))
 
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
-      verbose=FALSE, ...)
+      verbose=FALSE, window=FALSE, ...)
 
     pmid <- performance(rmid, metrics=metrics, 
       statistics=statistic, probs=NULL, years=list(unlist(years)))
@@ -200,6 +227,18 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
   
     # CHECK and RETURN cmid result
     if(isTRUE(all.equal(obmid, 0, tolerance=tol))) {
+
+      # RUN to fy if not already
+      if(fy > args$fy) {
+
+        # REASSIGN fy to original fy for final run
+        args$iy <- args$fy
+        args$fy <- fy
+
+        # CONTINUE running until fy
+        rmid <- mp(om(rmid), oem=oem(rmid), ctrl=cmid, args=args, scenario=paste0("mid"),
+          verbose=FALSE, window=window, ...)
+      }
       return(rmid)
     }
 
