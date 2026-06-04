@@ -891,7 +891,7 @@ setMethod("combine", signature(x = "FLombf", y = "FLombf"), function(x, y, ...){
 #' @aliases append,FLombf,FLombf-method
 
 setMethod("append", signature(x="FLombf", values="FLombf"),
-  function(x, values, after=dims(x)$maxyear) {
+  function(x, values, after=dims(values)$minyear) {
 
     after <- as.integer(after)
 
