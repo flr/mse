@@ -754,3 +754,14 @@ setReplaceMethod("deviances", signature(object="FLom", value="FLQuant"),
     return(object)
   })
 # }}}
+
+# append  {{{
+setMethod("append", signature(x="FLom", values="FLom"),
+  function(x, values, after=dims(values)$minyear) {
+
+    stock(x) <- append(stock(x), stock(values), after=after)
+
+    return(x)
+  }
+)
+# }}}
