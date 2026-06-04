@@ -308,3 +308,15 @@ setMethod("dims", signature(obj="FLmse"),
     dims(om(obj))
   }
 ) # }}}
+
+setMethod("window", signature(x="FLmse"),
+  function(x, start=dims(x)$minyear, end=dims(x)$maxyear) {
+
+    om(x) <- window(om(x),  start=start, end=end)
+    oem(x) <- window(oem(x), start=start, end=end)
+
+    tracking(x) <- tracking(x)[year <= start | year >= end]
+
+    return(x)
+  }
+) # }}}
