@@ -326,7 +326,7 @@ setReplaceMethod("method", signature(object="mpCtrl", value="function"),
 
 #' @rdname mpCtrl-class
 #' @aliases args<-,mpCtrl-method
-setReplaceMethod("args", signature(object="mpCtrl", value="function"),
+setReplaceMethod("args", signature(object="mpCtrl", value="ANY"),
   function(object, element, value) {
     object[[element]]@args <- value
     return(object)

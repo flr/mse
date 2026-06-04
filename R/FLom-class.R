@@ -128,13 +128,16 @@ setMethod("initialize", "FLom",
 setValidity("FLom",
   function(object) {
     # stk and sr must be compatible
-	sd <- dim(object@stock)
-	rd <- dim(object@sr@residuals)
-    if (!all.equal(sd[-1], rd[-1])) "Stock and stock recruitment residuals must have the same dimensions." else TRUE
-	# recruitment must be the same age
-	sd <- dimnames(object@stock@stock.n)$age[1]
-    rd <- dimnames(object@sr@residuals)$age[1]
-    if (!all.equal(sd, rd)) "Stock and stock recruitment residuals must use the recruitment age." else TRUE
+	  sd <- dim(object@stock)
+	  rd <- dim(object@sr@residuals)
+    if (!all.equal(sd[-1], rd[-1]))
+      "Stock and stock recruitment residuals must have the same dimensions."
+    else TRUE
+	  # recruitment must be the same age
+	  sd <- dimnames(object@stock@stock.n)$age[1]
+      rd <- dimnames(object@sr@residuals)$age[1]
+      if (!all.equal(sd, rd)) "Stock and stock recruitment residuals must use the recruitment age." 
+      else TRUE
 })
 # }}}
 

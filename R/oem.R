@@ -215,7 +215,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   }, x=idx[upi], y=deviances$idx[upi], z=rep(stability, length(idx))[upi])
 
   # ASSIGN idx to observations
-  for(i in seq(idx[upi])) {
+  for(i in seq_along(idx[upi])) {
     observations$idx[upi][[i]][, dys] <- idx[upi][[i]][, dys]
   }
 
@@ -275,6 +275,6 @@ default.oem <- function(om) {
   }
   
   # method is perfect.oem
-  return(FLoem(method=perfect.oem, observations=obs))
+  return(FLoem(method=perfect.oem, observations=obs, deviances=devs))
 }
 # }}}

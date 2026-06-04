@@ -94,7 +94,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     stop("Years for statistic computation 'years' outside of 'args' year range (iy:fy).")
 
   # CHECK that tune names match args(control$hcr)
-  if(!names(tune) %in% formalArgs(method(control$hcr)))
+  if(!all(names(tune) %in% formalArgs(method(control$hcr))))
     stop("Element in tune must be a argument of method(control$hcr).")
 
   # CHECK length(tune)  == 1
@@ -179,7 +179,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     verbose=FALSE, window=FALSE,...)
   
   pmax <- performance(rmax, metrics=metrics,
-    statistic=statistic, probs=NULL, years=list(unlist(years)))
+    statistics=statistic, probs=NULL, years=list(unlist(years)))
   obmax <- mean(pmax$data, na.rm=TRUE) - prob
 
   # PRINT result

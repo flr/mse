@@ -33,6 +33,7 @@ year. The two windowed pieces are then combined using \code{FLCore::append}
 on the underlying \code{FLBiols} and \code{FLFisheries} slots.
 }
 \examples{
+data(plesim)
 # Split an FLombf at year 2020 and re-join
 om1 <- window(om, end=2020)
 om2 <- window(om, start=2021)

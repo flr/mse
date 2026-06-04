@@ -126,15 +126,6 @@ setMethod("performance", signature(x="FLQuants"),
     refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
     om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
 
-    # TODO: CHECK statistics are all valid
-
-    # CHECK x /refpts names cover all required by statistics
-    stats.names <- unique(unlist(lapply(statistics,
-      function(x) all.vars(x[[1]][[2]]))))
-
-    # DROP functions
-    stats.names <- stats.names[!unlist(lapply(stats.names, exists))]
-
     # GET names in refpts and metrics, plus FLQuant dimnames
     valid.names <- c(dimnames(refpts)$params, names(x),
       c("age", "year", "unit", "season", "area"))

@@ -882,6 +882,7 @@ setMethod("combine", signature(x = "FLombf", y = "FLombf"), function(x, y, ...){
 #'   \code{after} joined with the years of \code{values} from \code{after + 1}.
 #'
 #' @examples
+#' data(plesim)
 #' # Split an FLombf at year 2020 and re-join
 #' om1 <- window(om, end=2020)
 #' om2 <- window(om, start=2021)

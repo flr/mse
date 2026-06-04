@@ -307,7 +307,7 @@ split.is <- function(stk, ctrl, split, quant=unique(ctrl$quant)[1],
   split <- unlist(split) / sum(unlist(split))
 
   # SPLIT
-  ctrl <- fwdControl(lapply(seq(split), function(f)
+  ctrl <- fwdControl(lapply(seq_along(split), function(f)
     list(fishery=f, catch=1, year=ctrl$year, quant=ac(ctrl$quant),
       value=ctrl$value * split[f])))
 

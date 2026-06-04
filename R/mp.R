@@ -961,7 +961,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.tm$args <- args #sqy <- sqy
       ctrl.tm$tracking <- tracking
       ctrl.tm$ioval <- list(iv=list(t1=flsval), ov=list(t1=flqval))
-      ctrl.ym$step <- "tm"
+      ctrl.tm$step <- "tm"
       
       out <- do.call("mpDispatch", ctrl.tm)
       
