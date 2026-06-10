@@ -490,6 +490,17 @@ partialHR <- function(om) {
   return(res)
 }
 
+.CbyBF <- function(om) {
+
+  # LOOP over biols
+  res <- lapply(setNames(seq(biols(om)), nm=names(biols(om))), function(x) {
+
+    # COMPUTE C_f / sum(S_f * N * W) for f taking a biol (FCB)
+    catch(fisheries(om))[FCB(om)[,'B'] == x]
+  })
+  return(res)
+}
+
 #' hr method for FLombf
 #'
 #' @rdname hr
@@ -503,9 +514,32 @@ partialHR <- function(om) {
 #'   harvest rates across fisheries.
 #' @examples
 
-setMethod("hr", signature(object="FLombf"),
+setMethod("hr", signature(object="FLombf"), 
   function(object) {
-    lapply(partialHR(object), function(x) Reduce('+', x))
+
+  res <- lapply(setNames(seq(biols(object)), nm = names(biols(object))),
+
+    function(x) {
+    
+    fcb_x <- FCB(object)[FCB(object)[,'B'] == x, , drop = FALSE]
+    
+    # Total catch across fisheries taking this biol
+    total_catch <- Reduce('+',
+      catch(fisheries(object))[fcb_x[,'F']])  # sum C_f
+    
+    # Sum of available biomass across fisheries
+    total_selB <- Reduce('+',
+      lapply(fisheries(object)[fcb_x[,'F']], function(f)
+        unitSums(quantSums(
+          catch.sel(f[[1]]) * n(biols(object)[[x]]) * wt(biols(object)[[x]])
+        ))
+      ))
+    setunits(total_catch / total_selB, 'hr')
+  })
+
+  res <- FLQuants(res)
+
+  return(res)
 })
 
 # }}}
@@ -709,14 +743,12 @@ setMethod("metrics", signature(object="FLombf", metrics="NULL"),
 )
 
 setMethod("metrics", signature(object="FLombf", metrics="missing"),
-  function(object, named=TRUE) {
+  function(object, named=TRUE, ...) {
  
-    # CALL for metrics by biol
+    # CALL for metrics by biol (B, R)
     mets <- lapply(biols(object), metrics)
 
-    # TODO: SET for hbar 
-
-    # ADD catch & SSB by biol
+    # ADD catch, SSB, Fbar and HR by biol
     mets <- Map(function(me, ca, sb, fb, hb) {
 
       me[['SB']] <- sb
@@ -728,6 +760,21 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
 
     }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object), hb=hr(object))
 
+    # ADD ...
+    extra <- list(...)
+
+    # TODO: UGLY hack, FIX!
+    if(length(extra) > 0) {
+    
+      ext <- metrics(object, extra)
+
+      for(i in names(ext)) {
+        mets[[i]] <- c(mets[[i]], ext[[i]])
+        mets[[i]] <- FLQuants(mets[[i]])
+      }
+    }
+
+    # TODO: CHECK
     if(length(mets) == 1 & !named)
       return(mets[[1]])
 
