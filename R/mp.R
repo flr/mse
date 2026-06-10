@@ -244,7 +244,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     # LOOP and combine
     lst0 <- foreach(j=its, 
       .combine=.combinegoFish,
-      .multicombine=TRUE, 
+      .multicombine=FALSE, 
       .errorhandling = "remove", 
       .options.future=list(seed=seed, globals=structure(TRUE,
         add=c("ctrl", "module", "om", "oem", "iem", "args"),

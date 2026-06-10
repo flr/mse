@@ -273,10 +273,10 @@ setMethod("performance", signature(x="FLombf"),
     if(is.null(metrics))
       metrics <- metrics(x)
     else
-      metrics <- metrics(x, metrics=metrics)
+      metrics <- do.call("metrics", c(list(object=x), metrics))
 
     # SET NULL name if missing
-    if(length(om) == 0)
+    if(length(om) == 0L)
       om <- NULL
 
     res <- rbindlist(lapply(setNames(nm=names(metrics)), function(i) 
@@ -307,6 +307,7 @@ setMethod("performance", signature(x="FLmse"),
   function(x, statistics=.validStatistics(om(x)), om=name(x@om), control=FALSE,
     type="MP", run="1", ...) {
 
+    # GET arguments
     args <- list(...)
 
     res <- attr(x, 'performance')
