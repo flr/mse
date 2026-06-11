@@ -761,8 +761,8 @@ setMethod("goFish", signature(om="FLombf"),
     # APPLY oem across stocks
     o.out <- Map(function(stk, dev, obs) {
 
-      obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
-        observations=obs, tracking=tracking)))
+      obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk,
+        deviances=dev, observations=obs, tracking=tracking)))
 
       # TODO: PICK UP fbar range from observations
       # range(obs.oem$stk, c("minfbar", "maxfbar")) <- 

@@ -236,9 +236,11 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
 
   # UPDATE wts or only catches?
   if(!wts) slots <- slots[1:8]
-  
+
   for(i in slots)
     slot(obs, i)[, dys] <- slot(stk, i)[, dys]
+
+  units(obs) <- units(stk)
   
   # STORE in OEM observations
   observations$stk[,dys] <- obs[,dys]
