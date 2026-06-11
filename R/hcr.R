@@ -383,6 +383,312 @@ plot_hockeystick.hcr <- function(args, obs=NULL,
 }
 # }}}
 
+# doubletop.hcr {{{
+
+#' Double-top Harvest Control Rule
+#'
+#' A harvest control rule with two flat top levels (a double-top shape), defined
+#' by two hockey-stick ramps that rise to two successive target levels.
+#'
+#' @details
+#' This function implements a double-top shaped HCR. The output rises linearly
+#' from `min` at `lim` to `target` at `trigger` (first ramp), stays flat at
+#' `target` between `trigger` and `lim2`, then rises linearly again from
+#' `target` at `lim2` to `target2` at `trigger2` (second ramp), and stays
+#' flat at `target2` above `trigger2`. The shape is:
+#'
+#' ```
+#' target2 ________________________________
+#'          /
+#' target  /____________|
+#'          /
+#'  min ___/
+#'      lim  trigger  lim2  trigger2
+#' ```
+#'
+#' The optional `drop` argument forces the output to `min` when the metric
+#' falls below `drop`. All `dlow`/`dupp` interannual constraints available in
+#' `hockeystick.hcr` are also supported.
+#'
+#' @param stk The 'oem' observation or SA estimation, an FLStock object.
+#' @param ind Possible indicators returned by the 'est' step, FLQuants.
+#' @param lim The lower threshold of the stock metric, below which output equals
+#'   `min`, numeric or FLQuant.
+#' @param trigger The metric value at which output first reaches `target`,
+#'   numeric or FLQuant.
+#' @param target The first flat-top output level, numeric or FLQuant.
+#' @param lim2 The metric value at which the second ramp begins (output starts
+#'   rising from `target` toward `target2`), numeric or FLQuant.
+#' @param trigger2 The metric value at which output reaches `target2`,
+#'   numeric or FLQuant.
+#' @param target2 The second (higher) flat-top output level, numeric or FLQuant.
+#' @param min Numeric. The minimum allowable control value.
+#' @param drop Numeric. Metric threshold below which output is forced to `min`.
+#' @param metric The stock metric to use (e.g. `"ssb"`), character or function.
+#' @param output Character. The output control variable (e.g. `"fbar"`).
+#' @param dlow A limit for the decrease in the output variable, numeric.
+#' @param dupp A limit for the increase in the output variable, numeric.
+#' @param all If `TRUE`, `dupp` and `dlow` limits are applied unconditionally.
+#' @param initial Initial value of 'output' for `dlow`/`dupp` limits at `iy`.
+#' @param args A list containing dimensionality arguments, passed on by mp().
+#' @param tracking An FLQuant used for tracking.
+#'
+#' @return A list with elements 'ctrl' (fwdControl) and 'tracking'.
+#' @examples
+#' data(plesim)
+#'
+#' # Double-top HCR: first plateau at F=0.18 (SSB 8000-14000),
+#' # second plateau at F=0.22 (SSB > 20000)
+#' ctrl <- mpCtrl(
+#'   est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=doubletop.hcr,
+#'     args=list(metric="ssb", lim=4000, trigger=8000, target=0.18,
+#'               lim2=14000, trigger2=20000, target2=0.22, output="fbar")))
+#'
+#' plot_doubletop.hcr(ctrl)
+
+doubletop.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
+  lim2, trigger2, target2,
+  metric="ssb", output="fbar", dlow=NULL, dupp=NULL, all=TRUE, initial=NULL,
+  args, tracking, ...) {
+
+  # EXTRACT args
+  spread(args)
+
+  # GET biol name
+  bname <- tracking[, unique(biol)][stock]
+
+  # CHECK function arguments
+  if(any(is.na(c(c(lim), c(trigger), c(min), c(target),
+                  c(lim2), c(trigger2), c(target2)))))
+    stop("All arguments must not be NA")
+  if(any(c(c(lim), c(trigger), c(min), c(target),
+            c(lim2), c(trigger2), c(target2)) < 0))
+    stop("All arguments must be positive")
+  if(any(lim > trigger))
+    stop("'lim' must be smaller or equal to 'trigger'")
+  if(any(trigger > lim2))
+    stop("'trigger' must be smaller or equal to 'lim2'")
+  if(any(lim2 > trigger2))
+    stop("'lim2' must be smaller or equal to 'trigger2'")
+  if(any(min > target))
+    stop("'min' must be smaller or equal to 'target'")
+  if(any(target > target2))
+    stop("'target' must be smaller or equal to 'target2'")
+
+  # COMPUTE metric
+  met <- window(selectMetric(metric, stk, ind, ...), start=dy, end=dy)
+
+  # TRACK metric
+  track(tracking, "metric.hcr", ay) <- met
+
+  # APPLY double-top rule
+  out <- c(ifelse(met <= lim, min,
+    ifelse(met < trigger,
+      # First ramp: min -> target
+      (met - lim) * ((target - min) / (trigger - lim)) + min,
+    ifelse(met <= lim2,
+      # First flat top
+      target,
+    ifelse(met < trigger2,
+      # Second ramp: target -> target2
+      (met - lim2) * ((target2 - target) / (trigger2 - lim2)) + target,
+    # Second flat top
+    target2)))))
+
+  # APPLY drop to min
+  out[c(met < drop)] <- min
+
+  # TRACK initial output
+  track(tracking, "decision.hcr", year=ay, biol=stock) <- out
+
+  # TRACK rule: 0=drop, 1=below lim, 2=first ramp, 3=first top,
+  #             4=second ramp, 5=second top
+  track(tracking, "rule.hcr", year=ay, biol=args$stock) <- ifelse(met < drop, 0,
+    ifelse(met <= lim, 1,
+    ifelse(met < trigger, 2,
+    ifelse(met <= lim2, 3,
+    ifelse(met < trigger2, 4, 5)))))
+
+  # GET previous output value if change limited
+  if(!is.null(dupp) | !is.null(dlow)) {
+    if(ay == iy) {
+      if(is.null(initial))
+        stop("To apply 'dlow' and 'dupp' limits, 'initial' is required")
+      pre <- FLQuant(c(initial), iter=args$it)
+    } else {
+      pre <- tracking[metric == 'hcr' & year == ay - 1 & biol == bname, data]
+    }
+  }
+
+  # APPLY limits
+  if(!is.null(dupp)) {
+    if(all) {
+      out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
+    } else {
+      out[out > pre * dupp & met < trigger] <- pre[out > pre * dupp & met <
+        trigger] * dupp
+    }
+  }
+
+  if(!is.null(dlow)) {
+    if(all) {
+      out[out < pre * dlow] <- pre[out < pre * dlow] * dlow
+    } else {
+      out[out < pre * dlow & met < trigger] <- pre[out < pre * dlow & met <
+        trigger] * dlow
+    }
+  }
+
+  # CONTROL
+  ctrl <- fwdControl(
+    c(lapply(mys, function(x) list(quant=output, value=c(out), year=x)))
+  )
+
+  # SET fbar ages
+  if(output %in% c("f", "fbar")) {
+    ctrl$minAge <- range(stk, "minfbar")
+    ctrl$maxAge <- range(stk, "maxfbar")
+  }
+
+  list(ctrl=ctrl, tracking=tracking)
+}
+# }}}
+
+# plot_doubletop.hcr {{{
+
+#' @rdname doubletop.hcr
+#' @param args A list of HCR arguments, or an mseCtrl / mpCtrl object.
+#' @param obs Optional FLStock, FLQuants, or FLQuant of observations to overlay.
+#' @param kobe Logical. If TRUE, overlay Kobe-style background colours.
+#' @param xtarget x-axis position used to divide Kobe yellow/green regions.
+#' @param alpha Transparency for Kobe background polygons and observation points.
+#' @param labels Named character vector of axis labels.
+#'
+#' @examples
+#' # Plot a double-top HCR
+#' args <- list(lim=1e5, trigger=3e5, target=0.20,
+#'              lim2=4e5, trigger2=6e5, target2=0.30, min=0,
+#'              metric="ssb", output="fbar")
+#' plot_doubletop.hcr(args)
+
+plot_doubletop.hcr <- function(args, obs=NULL,
+  kobe=FALSE, xtarget=NULL, alpha=0.3,
+  labels=c(lim="lim", trigger="trigger", min="min", target="target",
+           lim2="lim2", trigger2="trigger2", target2="target2", drop="drop")) {
+
+  # EXTRACT args from mpCtrl
+  if(is(args, "mseCtrl"))
+    args <- args(args)
+  else if(is(args, "mpCtrl"))
+    args <- args(args$hcr)
+
+  # ASSIGN defaults for missing args
+  if(!"lim" %in% names(args))   args$lim  <- 0
+  if(!"min" %in% names(args))   args$min  <- 0
+  if(!"drop" %in% names(args))  args$drop <- 0
+  if(!"metric" %in% names(args)) metric <- "ssb"
+  if(!"output" %in% names(args)) output <- "fbar"
+
+  # SET args
+  spread(lapply(args, c))
+
+  # GET plot limits
+  xlim <- max(trigger2) * 1.50
+  ylim <- max(target2)  * 1.50
+
+  # SET met values
+  met <- seq(0, xlim, length=200)
+
+  # COMPUTE double-top output
+  out <- ifelse(met <= lim, min,
+    ifelse(met < trigger,
+      (met - lim) * ((target - min) / (trigger - lim)) + min,
+    ifelse(met <= lim2,
+      target,
+    ifelse(met < trigger2,
+      (met - lim2) * ((target2 - target) / (trigger2 - lim2)) + target,
+    target2))))
+
+  # APPLY drop to min
+  out[met < c(args$drop)] <- min
+
+  # LABELS as list
+  labels <- as.list(labels)
+
+  # DATA
+  dat <- data.frame(metric=met, output=out)
+
+  p <- ggplot(dat, aes(x=metric, y=output)) +
+    coord_cartesian(ylim=c(0, ylim), clip="off") +
+    # TARGET2
+    annotate("segment", x=0, xend=trigger2 * 1.25, y=target2, yend=target2,
+      linetype=2) +
+    annotate("label", x=0, y=target2 + ylim / 40, label=labels$target2,
+      hjust="left", vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+    # TARGET
+    annotate("segment", x=0, xend=lim2 * 1.25, y=target, yend=target,
+      linetype=2) +
+    annotate("label", x=0, y=target + ylim / 40, label=labels$target,
+      hjust="left", vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+    # MIN
+    annotate("label", x=0, y=min + ylim / 40, label=labels$min,
+      hjust="left", vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+    # LIM
+    annotate("segment", x=lim, xend=lim, y=min + ylim / 10, yend=min,
+      linetype=2) +
+    annotate("label", x=lim, y=min + ylim / 10, label=labels$lim,
+      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+    # TRIGGER
+    annotate("segment", x=trigger, xend=trigger, y=0, yend=target,
+      linetype=2) +
+    annotate("label", x=trigger, y=min + ylim / 10, label=labels$trigger,
+      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+    # LIM2
+    annotate("segment", x=lim2, xend=lim2, y=target + ylim / 10, yend=target,
+      linetype=2) +
+    annotate("label", x=lim2, y=target + ylim / 10, label=labels$lim2,
+      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+    # TRIGGER2
+    annotate("segment", x=trigger2, xend=trigger2, y=0, yend=target2,
+      linetype=2) +
+    annotate("label", x=trigger2, y=min + ylim / 10, label=labels$trigger2,
+      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+    # HCR line
+    geom_line(size=1)
+
+  # ADD drop annotation
+  if(!is.null(args$drop) & args$drop != 0) {
+    ydrop <- dat$output[which.min(abs(dat$metric - drop)) + 1]
+    p <- p + annotate("label", x=drop, y=ydrop + ylim / 30, label=labels$drop,
+      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5)
+  }
+
+  # OBS
+  if(!is.null(obs)) {
+    if(is.FLStock(obs)) {
+      obs <- model.frame(metrics(obs,
+        list(metric=get(metric), output=get(output))))
+      if(length(unique(obs$iter)) == 1)
+        p <- p + geom_point(data=obs, alpha=alpha) +
+          geom_path(data=obs, alpha=alpha) +
+          geom_label(data=subset(obs, year %in% c(min(year), max(year))),
+            aes(label=year), fill=c('gray', 'white'), alpha=1)
+      else
+        p <- p + geom_point(data=obs, alpha=alpha)
+    } else if(is(obs, 'FLQuants')) {
+      obs <- data.frame(metric=obs$metric, output=obs$output)
+      p <- p + geom_point(data=obs, colour="red", size=3)
+    } else if(is(obs, 'FLQuant')) {
+      obs <- data.frame(metric=obs, output=0)
+      p <- p + geom_point(data=obs, colour="red", size=3)
+    }
+  }
+
+  return(p)
+}
+# }}}
+
 # fixedC.hcr {{{
 
 #' A fixed target C
