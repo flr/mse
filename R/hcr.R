@@ -584,11 +584,11 @@ plot_doubletop.hcr <- function(args, obs=NULL,
     args <- args(args$hcr)
 
   # ASSIGN defaults for missing args
-  if(!"lim" %in% names(args))   args$lim  <- 0
-  if(!"min" %in% names(args))   args$min  <- 0
-  if(!"drop" %in% names(args))  args$drop <- 0
-  if(!"metric" %in% names(args)) metric <- "ssb"
-  if(!"output" %in% names(args)) output <- "fbar"
+  if(!"lim" %in% names(args))    args$lim    <- 0
+  if(!"min" %in% names(args))    args$min    <- 0
+  if(!"drop" %in% names(args))   args$drop   <- 0
+  if(!"metric" %in% names(args)) args$metric <- "ssb"
+  if(!"output" %in% names(args)) args$output <- "fbar"
 
   # SET args
   spread(lapply(args, c))
