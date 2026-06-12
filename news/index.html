@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.10</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,6 +31,23 @@
       <small>Source: <a href="https://github.com/flr/mse/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.4.10" id="mse-2410">mse 2.4.10<a class="anchor" aria-label="anchor" href="#mse-2410"></a></h2>
+<div class="section level3">
+<h3 id="new-features-2-4-10">NEW FEATURES<a class="anchor" aria-label="anchor" href="#new-features-2-4-10"></a></h3>
+<ul><li>
+<code>append(FLombf, FLombf, after)</code> method to join two operating models at a year boundary.</li>
+<li>
+<code>append(FLom, FLom, after)</code> method to join two operating models at a year boundary.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="user-visible-changes-2-4-10">USER-VISIBLE CHANGES<a class="anchor" aria-label="anchor" href="#user-visible-changes-2-4-10"></a></h3>
+<ul><li>
+<code>tunebisect</code> runs mp in search only to the end of years. Once tuning prob is reached, the mp is run until the set fy in args or the end of om.</li>
+<li>
+<code>tunebisect</code> now accepts the window argument to return the complete om and oem objects.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.4.9" id="mse-249">mse 2.4.9<a class="anchor" aria-label="anchor" href="#mse-249"></a></h2>
 <div class="section level3">

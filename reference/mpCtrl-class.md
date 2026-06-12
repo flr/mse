@@ -98,7 +98,7 @@ args(name)
 # S4 method for class 'mpCtrl,function'
 method(object, element) <- value
 
-# S4 method for class 'mpCtrl,function'
+# S4 method for class 'mpCtrl,ANY'
 args(object, element) <- value
 
 # S4 method for class 'mpCtrl,character'

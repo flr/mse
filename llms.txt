@@ -88,6 +88,10 @@ You are welcome to:
   [`` `oem<-`( ``*`<FLmse>`*`,`*`<FLoem>`*`)`](https://flrproject.org/mse/reference/FLom-class.md)
   : A class for an operating model (OM)
 
+- [`FLombf()`](https://flrproject.org/mse/reference/FLombf-class.md)
+  [`append(`*`<FLombf>`*`,`*`<FLombf>`*`)`](https://flrproject.org/mse/reference/FLombf-class.md)
+  : Append two FLombf objects along the year dimension
+
 - [`cpue.ind()`](https://flrproject.org/mse/reference/cpue.ind.md) :
   Computes CPUE-based Indicators of changes in Stock Abundance
 
@@ -142,7 +146,7 @@ You are welcome to:
   [`method(`*`<mpCtrl>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
   [`args(`*`<mpCtrl>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
   [`` `method<-`( ``*`<mpCtrl>`*`,`*`<function>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
-  [`` `args<-`( ``*`<mpCtrl>`*`,`*`<function>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
+  [`` `args<-`( ``*`<mpCtrl>`*`,`*`<ANY>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
   [`debug(`*`<mpCtrl>`*`,`*`<character>`*`)`](https://flrproject.org/mse/reference/mpCtrl-class.md)
   :
 
