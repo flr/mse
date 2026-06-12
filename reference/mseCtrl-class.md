@@ -104,7 +104,7 @@ ctl
 #> Method:
 #> function (stk, args, alpha) 
 #> ssb(stk) * alpha
-#> <environment: 0x55c55c94ee38>
+#> <environment: 0x562260abc228>
 #> Arguments:
 #> $alpha
 #> [1] 0.5
@@ -112,7 +112,7 @@ ctl
 method(ctl)
 #> function (stk, args, alpha) 
 #> ssb(stk) * alpha
-#> <environment: 0x55c55c94ee38>
+#> <environment: 0x562260abc228>
 method(ctl) <- function(stk, args, beta) ssb(stk) * beta
 args(ctl)
 #> $alpha
