@@ -128,15 +128,15 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
   rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
     verbose=FALSE, window=FALSE, ...)
 
-  pmin <- performance(rmin, metrics=metrics, 
-    statistics=statistic, probs=NULL, years=list(unlist(years)))
+  pmin <- performance(rmin, metrics=metrics, statistics=statistic, probs=NULL,
+    years=list(unlist(years)))[year %in% years, mean(data, na.rm=TRUE)]
 
-  obmin <- mean(pmin$data, na.rm=TRUE) - prob
+  obmin <- pmin - prob
 
   # PRINT result
   if(verbose)
     message(paste0("[1] diff: ", format(obmin, digits=2), ", prob: ",
-      format(mean(pmin$data, na.rm=TRUE), digits=2)))
+      format(pmin, digits=2)))
 
   # CHECK cmin result
   if(isTRUE(all.equal(obmin, 0, tolerance=tol))) {
@@ -178,14 +178,15 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
   rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
     verbose=FALSE, window=FALSE,...)
   
-  pmax <- performance(rmax, metrics=metrics,
-    statistics=statistic, probs=NULL, years=list(unlist(years)))
-  obmax <- mean(pmax$data, na.rm=TRUE) - prob
+  pmax <- performance(rmax, metrics=metrics, statistics=statistic, probs=NULL,
+    years=list(unlist(years)))[year %in% years, mean(data, na.rm=TRUE)]
+
+  obmax <- pmax - prob
 
   # PRINT result
   if(verbose)
     message(paste0("[2] diff: ", format(obmax, digits=2), ", prob: ",
-      format(mean(pmax$data, na.rm=TRUE), digits=2)))
+      format(pmax, digits=2)))
   
   # CHECK cmax result
   if(isTRUE(all.equal(obmax, 0, tolerance=tol))) {
@@ -239,14 +240,15 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
       verbose=FALSE, window=FALSE, ...)
 
-    pmid <- performance(rmid, metrics=metrics, 
-      statistics=statistic, probs=NULL, years=list(unlist(years)))
-    obmid <- mean(pmid$data, na.rm=TRUE) - prob
+    pmid <- performance(rmid, metrics=metrics, statistics=statistic, probs=NULL,
+      years=list(unlist(years)))[year %in% years, mean(data, na.rm=TRUE)]
+
+    obmid <- pmid - prob
 
     # PRINT result
     if(verbose)
       message(paste0("[", count + 2, "] diff: ", format(obmid, digits=2),
-        ", prob: ", format(mean(pmid$data, na.rm=TRUE), digits=2)))
+        ", prob: ", format(pmid, digits=2)))
   
     # CHECK and RETURN cmid result
     if(isTRUE(all.equal(obmid, 0, tolerance=tol))) {
