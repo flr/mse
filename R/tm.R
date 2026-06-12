@@ -1,5 +1,5 @@
-# is.R - DESC
-# mse/R/is.R
+# tm,.R - DESC
+# mse/R/tm.R
 
 # Copyright European Union, 2018
 # Author: Ernesto Jardim (EC JRC) <ernesto.jardim@ec.europa.eu>

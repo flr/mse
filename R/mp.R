@@ -244,7 +244,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     # LOOP and combine
     lst0 <- foreach(j=its, 
       .combine=.combinegoFish,
-      .multicombine=TRUE, 
+      .multicombine=FALSE, 
       .errorhandling = "remove", 
       .options.future=list(seed=seed, globals=structure(TRUE,
         add=c("ctrl", "module", "om", "oem", "iem", "args"),
@@ -757,12 +757,12 @@ setMethod("goFish", signature(om="FLombf"),
 
     # DROP units (sex, birth cohorts)
     stk <- lapply(stk, nounit)
-
+    
     # APPLY oem across stocks
     o.out <- Map(function(stk, dev, obs) {
 
-      obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk, deviances=dev,
-        observations=obs, tracking=tracking)))
+      obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk,
+        deviances=dev, observations=obs, tracking=tracking)))
 
       # TODO: PICK UP fbar range from observations
       # range(obs.oem$stk, c("minfbar", "maxfbar")) <- 
@@ -787,7 +787,7 @@ setMethod("goFish", signature(om="FLombf"),
     track(tracking, "B.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) areaSums(unitSums(stock(x)))[,,,1])
     track(tracking, "SB.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
-      function(x) areaSums(unitSums(stock(x)))[,,,1])
+      function(x) areaSums(unitSums(ssb(x)))[,,,1])
     track(tracking, "C.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) seasonSums(areaSums(unitSums(catch(x)))))
 
@@ -961,7 +961,7 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.tm$args <- args #sqy <- sqy
       ctrl.tm$tracking <- tracking
       ctrl.tm$ioval <- list(iv=list(t1=flsval), ov=list(t1=flqval))
-      ctrl.ym$step <- "tm"
+      ctrl.tm$step <- "tm"
       
       out <- do.call("mpDispatch", ctrl.tm)
       

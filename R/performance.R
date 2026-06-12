@@ -126,15 +126,6 @@ setMethod("performance", signature(x="FLQuants"),
     refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
     om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
 
-    # TODO: CHECK statistics are all valid
-
-    # CHECK x /refpts names cover all required by statistics
-    stats.names <- unique(unlist(lapply(statistics,
-      function(x) all.vars(x[[1]][[2]]))))
-
-    # DROP functions
-    stats.names <- stats.names[!unlist(lapply(stats.names, exists))]
-
     # GET names in refpts and metrics, plus FLQuant dimnames
     valid.names <- c(dimnames(refpts)$params, names(x),
       c("age", "year", "unit", "season", "area"))
@@ -281,9 +272,11 @@ setMethod("performance", signature(x="FLombf"),
     # COMPUTE metrics, argument hides metrics method
     if(is.null(metrics))
       metrics <- metrics(x)
+    else
+      metrics <- do.call("metrics", c(list(object=x), metrics))
 
     # SET NULL name if missing
-    if(length(om) == 0)
+    if(length(om) == 0L)
       om <- NULL
 
     res <- rbindlist(lapply(setNames(nm=names(metrics)), function(i) 
@@ -314,6 +307,7 @@ setMethod("performance", signature(x="FLmse"),
   function(x, statistics=.validStatistics(om(x)), om=name(x@om), control=FALSE,
     type="MP", run="1", ...) {
 
+    # GET arguments
     args <- list(...)
 
     res <- attr(x, 'performance')

@@ -490,6 +490,17 @@ partialHR <- function(om) {
   return(res)
 }
 
+.CbyBF <- function(om) {
+
+  # LOOP over biols
+  res <- lapply(setNames(seq(biols(om)), nm=names(biols(om))), function(x) {
+
+    # COMPUTE C_f / sum(S_f * N * W) for f taking a biol (FCB)
+    catch(fisheries(om))[FCB(om)[,'B'] == x]
+  })
+  return(res)
+}
+
 #' hr method for FLombf
 #'
 #' @rdname hr
@@ -503,9 +514,32 @@ partialHR <- function(om) {
 #'   harvest rates across fisheries.
 #' @examples
 
-setMethod("hr", signature(object="FLombf"),
+setMethod("hr", signature(object="FLombf"), 
   function(object) {
-    lapply(partialHR(object), function(x) Reduce('+', x))
+
+  res <- lapply(setNames(seq(biols(object)), nm = names(biols(object))),
+
+    function(x) {
+    
+    fcb_x <- FCB(object)[FCB(object)[,'B'] == x, , drop = FALSE]
+    
+    # Total catch across fisheries taking this biol
+    total_catch <- Reduce('+',
+      catch(fisheries(object))[fcb_x[,'F']])  # sum C_f
+    
+    # Sum of available biomass across fisheries
+    total_selB <- Reduce('+',
+      lapply(fisheries(object)[fcb_x[,'F']], function(f)
+        unitSums(quantSums(
+          catch.sel(f[[1]]) * n(biols(object)[[x]]) * wt(biols(object)[[x]])
+        ))
+      ))
+    setunits(total_catch / total_selB, 'hr')
+  })
+
+  res <- FLQuants(res)
+
+  return(res)
 })
 
 # }}}
@@ -709,14 +743,12 @@ setMethod("metrics", signature(object="FLombf", metrics="NULL"),
 )
 
 setMethod("metrics", signature(object="FLombf", metrics="missing"),
-  function(object, named=TRUE) {
+  function(object, named=TRUE, ...) {
  
-    # CALL for metrics by biol
+    # CALL for metrics by biol (B, R)
     mets <- lapply(biols(object), metrics)
 
-    # TODO: SET for hbar 
-
-    # ADD catch & SSB by biol
+    # ADD catch, SSB, Fbar and HR by biol
     mets <- Map(function(me, ca, sb, fb, hb) {
 
       me[['SB']] <- sb
@@ -728,6 +760,21 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
 
     }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object), hb=hr(object))
 
+    # ADD ...
+    extra <- list(...)
+
+    # TODO: UGLY hack, FIX!
+    if(length(extra) > 0) {
+    
+      ext <- metrics(object, extra)
+
+      for(i in names(ext)) {
+        mets[[i]] <- c(mets[[i]], ext[[i]])
+        mets[[i]] <- FLQuants(mets[[i]])
+      }
+    }
+
+    # TODO: CHECK
     if(length(mets) == 1 & !named)
       return(mets[[1]])
 
@@ -863,6 +910,61 @@ setMethod("combine", signature(x = "FLombf", y = "FLombf"), function(x, y, ...){
 	}
 })
 # }}}
+
+# append {{{
+
+#' Append two FLombf objects along the year dimension
+#'
+#' Joins two \code{FLombf} objects along the year axis: the first object is
+#' windowed to \code{after}, and the second from \code{after + 1} to its last
+#' year. The two windowed pieces are then combined using \code{FLCore::append}
+#' on the underlying \code{FLBiols} and \code{FLFisheries} slots.
+#'
+#' @param x An \code{FLombf} object, used up to year \code{after}.
+#' @param values An \code{FLombf} object, used from year \code{after + 1}.
+#' @param after Integer year. The last year taken from \code{x}. Defaults to
+#'   the last year of \code{x}.
+#'
+#' @return A new \code{FLombf} object spanning the years of \code{x} up to
+#'   \code{after} joined with the years of \code{values} from \code{after + 1}.
+#'
+#' @examples
+#' data(plesim)
+#' # Split an FLombf at year 2020 and re-join
+#' om1 <- window(om, end=2020)
+#' om2 <- window(om, start=2021)
+#' om3 <- append(om1, om2, after=2020)
+#'
+#' @rdname FLombf-class
+#' @aliases append,FLombf,FLombf-method
+
+setMethod("append", signature(x="FLombf", values="FLombf"),
+  function(x, values, after=dims(values)$minyear) {
+
+    after <- as.integer(after)
+
+    # WINDOW x up to 'after'
+    x <- window(x, end=after)
+
+    # WINDOW values from 'after + 1'
+    values <- window(values, start=after + 1L)
+
+    # APPEND biols
+    biols(x) <- FLBiols(Map(append, x=biols(x), values=biols(values)))
+
+    # APPEND fisheries: each FLFishery, then each FLCatch within
+    fisheries(x) <- FLFisheries(Map(function(fx, fv) {
+      # APPEND the FLFishery-level slots (effort, etc.)
+      out <- append(fx, fv)
+      # APPEND every FLCatch within the fishery
+      out@.Data <- Map(append, x=fx@.Data, values=fv@.Data)
+      names(out) <- names(fx)
+      return(out)
+    }, fx=fisheries(x), fv=fisheries(values)))
+
+    return(x)
+  }
+) # }}}
 
 # deviances {{{
 

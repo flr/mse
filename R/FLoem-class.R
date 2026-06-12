@@ -66,7 +66,7 @@ setValidity("FLoem",
 	obs <- names(object@observations)
 	dev <- names(object@deviances)
   
-  if (!all.equal(obs, dev))
+  if (!isTRUE(all.equal(obs, dev)))
     "Observations and deviances names must match."
   else
     TRUE
@@ -344,7 +344,7 @@ setMethod("window", signature(x="FLoem"),
 
     # observations
     observations(x) <- rapply(observations(x), window,
-      classes=c("FLStock", "FLstockR", "FLIndex", "FLIndexBiomass"),
+      classes=c("FLStock", "FLStockR", "FLIndex", "FLIndexBiomass"),
       how="replace", ...)
 
     # deviances

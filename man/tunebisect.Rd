@@ -17,6 +17,7 @@ tunebisect(
   maxit = 12,
   years = ac(seq(args$iy + 1, args$fy - 1)),
   verbose = TRUE,
+  window = TRUE,
   ...
 )
 }

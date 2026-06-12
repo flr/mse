@@ -127,6 +127,7 @@ exportClasses(
 
 exportMethods(
   "[",
+  "append",
   "args",
   "args<-",
   "biol",

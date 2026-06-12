@@ -43,7 +43,7 @@
 \alias{args,mpCtrl-method}
 \alias{method<-,mpCtrl,function-method}
 \alias{method<-,mpCtrl-method}
-\alias{args<-,mpCtrl,function-method}
+\alias{args<-,mpCtrl,ANY-method}
 \alias{args<-,mpCtrl-method}
 \alias{debug,mpCtrl,character-method}
 \title{S4 class \code{mpCtrl}}
@@ -112,7 +112,7 @@ tm(object) <- value
 
 \S4method{method}{mpCtrl,function}(object, element) <- value
 
-\S4method{args}{mpCtrl,function}(object, element) <- value
+\S4method{args}{mpCtrl,ANY}(object, element) <- value
 
 \S4method{debug}{mpCtrl,character}(fun, text)
 }

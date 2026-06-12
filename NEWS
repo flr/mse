@@ -1,3 +1,15 @@
+ mse 2.4.10
+
+ NEW FEATURES
+
+- `append(FLombf, FLombf, after)` method to join two operating models at a year boundary.
+- `append(FLom, FLom, after)` method to join two operating models at a year boundary.
+
+ USER-VISIBLE CHANGES
+
+- `tunebisect` runs mp in search only to the end of years. Once tuning prob is reached, the mp is run until the set fy in args or the end of om.
+- `tunebisect` now accepts the window argument to return the complete om and oem objects.
+
  mse 2.4.9
 
  BUG FIXES

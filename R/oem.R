@@ -215,7 +215,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
   }, x=idx[upi], y=deviances$idx[upi], z=rep(stability, length(idx))[upi])
 
   # ASSIGN idx to observations
-  for(i in seq(idx[upi])) {
+  for(i in seq_along(idx[upi])) {
     observations$idx[upi][[i]][, dys] <- idx[upi][[i]][, dys]
   }
 
@@ -236,9 +236,11 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
 
   # UPDATE wts or only catches?
   if(!wts) slots <- slots[1:8]
-  
+
   for(i in slots)
     slot(obs, i)[, dys] <- slot(stk, i)[, dys]
+
+  units(obs) <- units(stk)
   
   # STORE in OEM observations
   observations$stk[,dys] <- obs[,dys]
@@ -275,6 +277,6 @@ default.oem <- function(om) {
   }
   
   # method is perfect.oem
-  return(FLoem(method=perfect.oem, observations=obs))
+  return(FLoem(method=perfect.oem, observations=obs, deviances=devs))
 }
 # }}}

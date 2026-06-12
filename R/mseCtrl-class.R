@@ -116,7 +116,7 @@ setMethod("show", signature(object = "mseCtrl"),
 
 #' @rdname mseCtrl-class
 #' @aliases exists,mseCtrl-method
-setGeneric("exists")
+setGeneric("exists", useAsDefault = exists)
 
 #' @rdname mseCtrl-class
 #' @examples
@@ -139,7 +139,7 @@ setMethod("debug", signature(fun="mseCtrl", text="missing"),
 
 setMethod("undebug", signature(fun="mseCtrl", signature="missing"),
   function(fun) {
-    debug(fun@method)
+    undebug(fun@method)
   }
 )
 # }}}
