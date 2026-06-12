@@ -757,7 +757,7 @@ setMethod("goFish", signature(om="FLombf"),
 
     # DROP units (sex, birth cohorts)
     stk <- lapply(stk, nounit)
-
+    
     # APPLY oem across stocks
     o.out <- Map(function(stk, dev, obs) {
 
@@ -787,7 +787,7 @@ setMethod("goFish", signature(om="FLombf"),
     track(tracking, "B.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) areaSums(unitSums(stock(x)))[,,,1])
     track(tracking, "SB.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
-      function(x) areaSums(unitSums(stock(x)))[,,,1])
+      function(x) areaSums(unitSums(ssb(x)))[,,,1])
     track(tracking, "C.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) seasonSums(areaSums(unitSums(catch(x)))))
 
