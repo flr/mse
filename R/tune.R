@@ -83,12 +83,6 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     }
   }
   
-  # KEEP fy and iy, set args$fy to end of tuning
-  fy <- if(is.null(args$fy)) dims(om)$maxyear else args$fy
-  args$fy <- years[length(years)]
-
-  iy <- args$iy
-
   # CHECK years
   if(!all(unique(unlist(years)) %in% seq(args$iy, args$fy)))
     stop("Years for statistic computation 'years' outside of 'args' year range (iy:fy).")
@@ -140,28 +134,6 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
 
   # CHECK cmin result
   if(isTRUE(all.equal(obmin, 0, tolerance=tol))) {
-      
-      # RUN to fy if not already
-      if(fy > args$fy) {
-
-        # REASSIGN fy to original fy for final run
-
-        args$iy <- args$fy
-        args$fy <- fy
-        vy <- args(rmin)$vy
-
-        # CONTINUE running until fy
-        rmin <- mp(om(rmin), oem=oem(rmin), ctrl=cmin, args=args, 
-          scenario=paste0("min"), verbose=FALSE, window=FALSE, ...)
-
-        # SET full args
-        args(rmin)$iy <- iy
-        args(rmin)$vy <- unique(c(vy, args(rmin)$vy))
-
-        if(window) {
-          rmin <- window(rmin, start=iy - 1, end=fy)
-        }
-      }
     return(rmin)
   }
   
@@ -190,28 +162,6 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
   
   # CHECK cmax result
   if(isTRUE(all.equal(obmax, 0, tolerance=tol))) {
-
-      # RUN to fy if not already
-      if(fy > args$fy) {
-
-        # REASSIGN fy to original fy for final run
-
-        args$iy <- args$fy
-        args$fy <- fy
-        vy <- args(rmax)$vy
-
-        # CONTINUE running until fy
-        rmax <- mp(om(rmax), oem=oem(rmax), ctrl=cmax, args=args, 
-          scenario=paste0("max"), verbose=FALSE, window=FALSE, ...)
-
-        # SET full args
-        args(rmax)$iy <- iy
-        args(rmax)$vy <- unique(c(vy, args(rmax)$vy))
-
-        if(window) {
-          rmax <- window(rmax, start=iy - 1, end=fy)
-        }
-      }
     return(rmax)
   }
 
@@ -252,28 +202,6 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
   
     # CHECK and RETURN cmid result
     if(isTRUE(all.equal(obmid, 0, tolerance=tol))) {
-
-      # RUN to fy if not already
-      if(fy > args$fy) {
-
-        # REASSIGN fy to original fy for final run
-
-        args$iy <- args$fy
-        args$fy <- fy
-        vy <- args(rmid)$vy
-
-        # CONTINUE running until fy
-        rmid <- mp(om(rmid), oem=oem(rmid), ctrl=cmid, args=args, 
-          scenario=paste0("mid"), verbose=FALSE, window=FALSE, ...)
-
-        # SET full args
-        args(rmid)$iy <- iy
-        args(rmid)$vy <- unique(c(vy, args(rmid)$vy))
-
-        if(window) {
-          rmid <- window(rmid, start=iy - 1, end=fy)
-        }
-      }
       return(rmid)
     }
 

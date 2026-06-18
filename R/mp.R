@@ -1199,7 +1199,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     message("Running on ", nbrOfWorkers(), " nodes.")
 
     # IF cores for all runs, progress by MP
-    if(largs > nbrOfWorkers()) {
+    if(largs >= nbrOfWorkers()) {
       p <- progressor(steps=largs)
       progress <- FALSE
     } else {
