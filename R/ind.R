@@ -191,8 +191,8 @@ cpues.ind <- function(stk, idx, refyrs, nyears=4, indices=names(idx),
     slope <- FLQuant(slope$data, dimnames=dimnames(mean), units="")
     
     # TRACK
-    track(tracking, "mean.ind", year=ay, biol=stock) <- mean
-    track(tracking, "slope.ind", year=ay, biol=stock) <- slope
+    track(tracking, "mean.ind", year=ay, biol=args$stock) <- mean
+    track(tracking, "slope.ind", year=ay, biol=args$stock) <- slope
 
     # ASSEMBLE ind
     ind <- FLQuants(ind=ind, mean=mean, slope=slope)

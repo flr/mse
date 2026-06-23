@@ -196,9 +196,10 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if (!missing(tracking))
     metric <- c(metric, tracking)
 
-  # GET names of biols / stock
+  # GET names of biols & stock(s)
   bnames <- if(is(om, "FLombf")) names(biols(om)) else name(stock(om))
-  
+  bnames <- unique(c(bnames, args$stock))
+
   # BUILD data.table
   tracking <- do.call(CJ, list(biol=bnames,
     metric=c(metric, steps[steps %in% names(ctrl)], "fb", "fwd", "time", "pid"),
@@ -764,9 +765,9 @@ setMethod("goFish", signature(om="FLombf"),
       obs.oem <- do.call("mpDispatch", c(ctrl.oem, list(stk=stk,
         deviances=dev, observations=obs, tracking=tracking)))
 
-      # TODO: PICK UP fbar range from observations
+      # TODO: PICK UP fbar range from observation biol
       # range(obs.oem$stk, c("minfbar", "maxfbar")) <- 
-      #  range(obs$stk, c("minfbar", "maxfbar")) 
+      #   range(obs$stk, c("minfbar", "maxfbar")) 
 
       return(obs.oem)
 
@@ -783,6 +784,14 @@ setMethod("goFish", signature(om="FLombf"),
     # GET observations
     observations(oem) <- lapply(o.out, "[[", "observations")
 
+    # TEST: Reduce
+    if(length(args$stock) == 1 & length(bns) > 1) {
+      stk0 <- FLStocks(Reduce("h2toh1", stk0))
+      names(stk0) <- args$stock
+      idx0 <- list(FLIndices(Reduce("c", idx0)))
+      names(idx0) <- args$stock
+    }
+
     # TRACK oem observations
     track(tracking, "B.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
       function(x) areaSums(unitSums(stock(x)))[,,,1])
@@ -795,7 +804,53 @@ setMethod("goFish", signature(om="FLombf"),
 
     if (!is.null(ctrl0$est)) {
 
-      # - BY stock
+      # SET empty ind
+      ind <- lapply(setNames(nm=names(stk0)), function(x) FLQuants())
+
+      # - OEM 1 stock
+
+      if(length(stk0) == 1) {
+
+        nms <- names(stk0)
+
+        # ASSEMBLE call: method, step, stk, idx, args, tracking, ioval + ctrl$args
+        ctrl.est <- c(list(method=ctrl0$est@method, step="est",
+          stk=stk0[[1]], idx=idx0[[1]], args=args, tracking=tracking,
+          ioval = list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval))),
+          args(ctrl0$est))
+        
+        # DISPATCH
+        out.assess <- tryCatch(do.call("mpDispatch", ctrl.est),
+          # ERROR in whole set of iters
+          error = function(e){
+            message("Call to est method failed, check inputs")
+            print(e)
+          }
+        )
+
+      # EXTRACT FLStocks
+      stk0 <- FLStocks(out.assess$stk)
+      names(stk0) <- nms
+
+      # EXTRACT indicators
+      ind <- list(out.assess$ind)
+      names(ind) <- nms
+
+      # EXTRACT tracking, already merged
+      tracking <- out.assess[['tracking']]
+
+      # PASS args generated at est to ctrl
+      if (!is.null(out.assess$args)) {
+        args(ctrl0$est)[names(out.assess$args)] <- out.assess$args
+      }
+
+      # - OEM N stocks
+      
+      } else {
+
+        # MP 1 stock
+        # MP N stocks
+
       ctrl.est <- list(method=ctrl0$est@method, step="est",
         ioval = list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval)))
 
@@ -827,6 +882,7 @@ setMethod("goFish", signature(om="FLombf"),
       if (!is.null(out.assess$args)) {
         args(ctrl0$est)[names(out.assess$args)] <- out.assess$args
       }
+    }
     } else {
       stop("'control' must contain an 'est' mseCtrl element.")
     }
@@ -867,6 +923,30 @@ setMethod("goFish", signature(om="FLombf"),
     
     if (!is.null(ctrl0$hcr)) {
 
+
+      if(length(stk0) == 1) {
+
+        # ASSEMBLE call: method, step, stk, idx, args, tracking, ioval + ctrl$args
+        ctrl.hcr <- c(list(method=ctrl0$hcr@method, step="hcr",
+          stk=stk0[[1]], ind=ind[[1]], args=args, tracking=tracking,
+          ioval = list(iv=list(t1=flsval), ov=list(t1=flfval))),
+          args(ctrl0$hcr))
+ 
+        # DISPATCH
+        out.hcr <- tryCatch(do.call("mpDispatch", ctrl.hcr),
+          # ERROR in whole set of iters
+          error = function(e){
+            message("Call to hcr method failed, check inputs")
+            print(e)
+          }
+        )
+
+        # EXTRACT outputs
+        ctrl <- out.hcr$ctrl
+        tracking <- out.hcr$tracking
+      
+      } else {
+
       # - BY stock
 
       ctrl.hcr <- list(method=ctrl0$hcr@method, step="hcr",
@@ -886,8 +966,6 @@ setMethod("goFish", signature(om="FLombf"),
             stk=stk0[[bns[x]]], ind=ind[[bns[x]]], tracking=tracking)))
       })
 
-      # - TODO: COMBINED stocks
-
       # CALL single hcr with FLStocks and indicators as inputs
 
       # EXTRACT fwdControls
@@ -904,6 +982,7 @@ setMethod("goFish", signature(om="FLombf"),
       if (!is.null(out.assess$args)) {
         args(ctrl0$est)[names(out.assess$args)] <- out.assess$args
       }
+    }
     } else {
       stop("'control' must contain an 'est' mseCtrl element.")
     }
@@ -920,13 +999,17 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.is$method <- method(ctrl0$isys)
       ctrl.is$ctrl <- ctrl
 
+      # DEBUG:
+      ctrl.is$stk <- stk0[[1]]
+
+
       # SELECT stock for hcr
-      if(args$stock == 'all')
-        ctrl.is$stk <- stk0
-      else if(length(args$stock) == 1)
-        ctrl.is$stk <- stk0[[bns[args$stock]]]
-      else
-        ctrl.is$stk <- stk0
+#      if(args$stock == 'all')
+#        ctrl.is$stk <- stk0
+#      else if(length(args$stock) == 1)
+#        ctrl.is$stk <- stk0[[bns[args$stock]]]
+#     else
+#        ctrl.is$stk <- stk0
 
       ctrl.is$args <- args #ay <- ay
       ctrl.is$tracking <- tracking
@@ -998,7 +1081,7 @@ setMethod("goFish", signature(om="FLombf"),
     # fleet dynamics/behaviour
     #==========================================================
     #cat("fb\n")
-    if (!is.null(ctrl0$fb)){
+    if (!is.null(ctrl0$fb)) {
 
       ctrl.fb <- args(ctrl0$fb)
       ctrl.fb$method <- method(ctrl0$fb)

@@ -86,6 +86,8 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   # GET biol name
   bname <- tracking[, unique(biol)][stock]
 
+  bname <- 1
+
   # CHECK function arguments
 
   # All !NA
