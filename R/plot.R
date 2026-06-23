@@ -187,7 +187,10 @@ setMethod("plot", signature(x="FLombf", y="list"),
 
     # BUG: LIMIT F
     mses <- lapply(mses, function(x) {
-      harvest(x[[1]])[harvest(x[[1]]) > 4]  <- 4
+      x <- lapply(x, function(i) {
+        harvest(i)[harvest(i) > 4]  <- 4
+        return(i)
+      })
       return(x)
     })
 

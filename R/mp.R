@@ -888,6 +888,7 @@ setMethod("goFish", signature(om="FLombf"),
       })
 
       # - TODO: COMBINED stocks
+
       # CALL single hcr with FLStocks and indicators as inputs
 
       # EXTRACT fwdControls
@@ -1142,6 +1143,37 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # GET ... arguments
   opts <- list(...)
 
+  # PARSING a single module
+  if(length(opts) > 1)
+    stop("mps() can only alter a single module, called for: ", names(opts))
+
+  # PARSE options on first element (module)
+  module <- names(opts)[[1]]
+ 
+  # DO options refer to control elements?
+  if(!module %in% names(control))
+    stop("options refer to modules not present in control")
+
+  # ARE opts being given?
+  if(length(opts) == 0) {
+    return(FLmses(RUN=mp(om=om, oem=oem, iem=iem, control=control, args=args,
+      parallel=parallel)))
+  }
+
+  # CONVERT opts if by run to by arg
+  .opts_by_arg <- function(x) {
+    args <- unique(unlist(lapply(x, names)))
+    lapply(setNames(nm=args), function(a) unlist(lapply(x, `[[`, a)))
+  }
+
+  if(!all(names(opts[[1]]) %in% formalArgs(method(control[[module]])))) {
+    
+    if(is.null(names))
+      names <- names(opts[[1]])
+    
+    opts[[1]] <- .opts_by_arg(opts[[1]])
+  }
+
   # SET seed
   if (!is.null(args$seed)) {
     seed <- args$seed
@@ -1149,23 +1181,6 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     seed <- TRUE
   }
   
-  # ARE opts being given?
-  if(length(opts) == 0) {
-    return(FLmses(RUN=mp(om=om, oem=oem, iem=iem, control=control, args=args,
-      parallel=parallel)))
-  }
-
-  # PARSING a single module
-  if(length(opts) > 1)
-    stop("mps() can only alter a single module, called for: ", names(opts))
-  
-  # DO options refer to control elements?
-  if(!names(opts) %in% names(control))
-    stop("options refer to modules not present in control")
-
-  # PARSE options on first element (module)
-  module <- names(opts)[[1]]
-
   # MAX number of values
   largs <- max(unlist(lapply(opts[[module]], length)))
  

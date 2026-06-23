@@ -8,7 +8,7 @@
 
 
 # LOAD inputs
-load("inputs.rda")
+load("inputs.rda", verbose=TRUE)
 
 # -- TEST: performance(FLQuants) {{{
 
@@ -206,6 +206,26 @@ test_that("performance(FLmse) with statistics", {
 
 test_that("performance(FLmse) with default statistics", {
   result <- performance(flmse, run="r00", type="test")
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+})
+
+test_that("performance(FLmse) with metrics", {
+  result <- performance(flmse, statistics=statistics['green'],
+    run="r00", type="test", metrics=list(SB=ssb, F=fbar))
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+
+  result <- performance(flmse, statistics=statistics['green'],
+    run="r00", type="test", metrics=list(SB=ssb, F=function(x) fbar(x, 1, 3)))
+  
+  expect_s3_class(result, "data.table")
+  expect_true(nrow(result) > 0)
+
+  result <- performance(flmse, statistics=statistics['green'],
+    run="r00", type="test", F=function(x) fbar(x, 1, 3))
   
   expect_s3_class(result, "data.table")
   expect_true(nrow(result) > 0)

@@ -82,14 +82,196 @@ cpue.ind <- function(stk, idx, index=1, nyears=5, args, tracking) {
 
 # cpues.ind {{{
 
-cpues.ind <- function(stk, idx, nyears=5, index=1, args, tracking) {
+#' Compute a CPUE-based indicator for use in empirical harvest control rules
+#'
+#' @description
+#' `cpues.ind` computes a relative abundance indicator from one or more CPUE
+#' or survey indices (`idx`), to be used by empirical indicator (`ind`)
+#' modules in an `mse` Management Strategy Evaluation loop. Indices are first
+#' restricted to a recent window of `nyears`, rescaled by dividing by their
+#' mean over a set of reference years (`refyrs`), and then combined across
+#' indices, using `weights`, with one of three methods: a weighted rescaled
+#' mean (`"mean"`), a weighted mean of standardized z-scores on the log scale
+#' (`"zscore"`), or a weighted mean of smoothed, rescaled indices
+#' (`"smooth"`). For `combine = "mean"`, the function additionally computes
+#' the mean level and log-linear slope of the combined indicator over the
+#' recent window.
+#'
+#' @details
+#' `cpues.ind` is designed to be called inside an `mse` indicator (`ind`)
+#' module, and expects `args` to contain at least the current assessment
+#' year (`ay`) and last data year (`dy`), unpacked internally via
+#' `mse::spread`. The mean (and, for `combine = "mean"`, the slope) of the
+#' indicator is stored in `tracking` under `"mean.ind"` and `"slope.ind"`.
+#'
+#' Combination across indices is done by the `weighted.mean` method for
+#' `FLQuants`, which by default excludes `NA` values from both the weighted
+#' sum and the sum of weights, so indices missing in a given year do not
+#' bias the result towards zero or dilute the contribution of the indices
+#' that do have data.
+#'
+#' @param stk An `FLStock` object, returned unmodified in the output list.
+#' @param idx An `FLIndices` object with the CPUE or survey indices from
+#' which the indicator is computed.
+#' @param refyrs Reference years used to rescale (`"mean"`, `"smooth"`) or
+#' standardize (`"zscore"`) each index.
+#' @param nyears Number of recent years, ending in `dy`, over which the
+#' indicator is computed. `numeric`, defaults to 4.
+#' @param indices Names of the elements of `idx` to use. Defaults to
+#' `names(idx)`, i.e. all indices in `idx`.
+#' @param combine Method used to combine the rescaled indices into a single
+#' indicator, one of `"mean"`, `"zscore"` or `"smooth"`.
+#' @param weights Weights applied to each index, used by all three `combine`
+#' methods, passed on to `weighted.mean`. Defaults to equal weights,
+#' `numeric` of length `length(indices)`.
+#' @param enp.mult Smoothing parameter passed to `smooth_index` as
+#' `enp.mult`, only used when `combine = "smooth"`. Defaults to 0.2.
+#' @param args A `list` of MSE loop arguments, e.g. `ay` (assessment year)
+#' and `dy` (last data year), unpacked using `mse::spread`.
+#' @param tracking An `mse` tracking object (`FLQuant`) used to store the
+#' computed indicator(s) for later inspection.
+#'
+#' @return A `list` with three elements:
+#' \item{stk}{The input `FLStock`, unchanged.}
+#' \item{ind}{An `FLQuants` with the combined indicator(s): `ind`, `mean`
+#' and `slope` for `combine = "mean"`; `mean` only for `combine = "zscore"`
+#' or `combine = "smooth"`.}
+#' \item{tracking}{The updated tracking object.}
+#'
+#' @author Iago Mosqueira (WMR), FLR Team.
+#' @seealso \link[mse]{mp}, \link{weighted.mean}, \link{smooth_index},
+#' \link{zscore}
+#' @keywords methods
+#' @examples
+#' \dontrun{
+#' data(ple4)
+#' data(ple4.indices)
+#'
+#' args <- list(ay=2017, dy=2017)
+#' tracking <- FLQuant()
+#'
+#' out <- cpues.ind(stk=ple4, idx=ple4.indices, refyrs=2005:2010,
+#'   nyears=4, combine="mean", weights=c(1, 2), args=args,
+#'   tracking=tracking)
+#' }
 
-  # CALL cpue.ind
-  mets <- lapply(setNames(index, nm=names(idx[index])), function(x)
-    cpue.ind(stk, idx, nyears=nyears, index=x, args, tracking))
+cpues.ind <- function(stk, idx, refyrs, nyears=4, indices=names(idx),
+  combine=c("mean", "zscore", "smooth"), weights=rep(1, length(indices)),
+  enp.mult=0.2, args, tracking) {
 
-  ind <- lapply(mets, function(x) x$ind$index)
+  # ARGS
+  spread(args)
+  # FIND start
+  start <- dy - nyears + 1
+  # SUBSET idx
+  idx <- idx[indices]
   
-  return(list(stk=stk, ind=ind, tracking=mets[[1]]$tracking))
+  # CHECK refyrs are available in idx
+  lapply(idx, function(i) {
+    if(!all(refyrs %in% dimnames(index(i))$year))
+      stop(paste0("Reference years 'refyrs' must be present in all indices in 'idx'."))
+  })
 
-} # }}}
+  # COMBINE
+  if (combine == "mean") {
+
+    # DIVIDE by ref mean and TRIM
+    inds <- window(FLQuants(lapply(idx, function(i) index(i) %/%
+      yearMeans(index(i)[, ac(refyrs)]))), start=start, end=dy)
+    
+    # WEIGHTED average of rescaled indices, NA-aware
+    ind <- FLQuant(weighted.mean(inds, weights), units="")
+    
+    # COMPUTE mean
+    mean <- expand(yearMeans(ind), year=dy)
+    
+    # COMPUTE slope
+    dat <- data.table(as.data.frame(ind))
+    slope <- dat[, .(data=coef(lm(log(data + 1e-22) ~ year))[2]), by=iter]
+    slope <- FLQuant(slope$data, dimnames=dimnames(mean), units="")
+    
+    # TRACK
+    track(tracking, "mean.ind", year=ay, biol=stock) <- mean
+    track(tracking, "slope.ind", year=ay, biol=stock) <- slope
+
+    # ASSEMBLE ind
+    ind <- FLQuants(ind=ind, mean=mean, slope=slope)
+
+  # combine = "zscore"
+  } else if(combine == "zscore") {
+    
+    # ZSCORE standardisation of log(indices)
+    inds <- window(FLQuants(lapply(idx, zscore, refyrs=refyrs)),
+      start=start, end=dy)
+    
+    # WEIGHTED mean of non-NA indices, back-transformed
+    zmean <- expand(yearMeans(exp(weighted.mean(inds, weights))), year=dy)
+    
+    # TRACK
+    track(tracking, "mean.ind", year=ay, biol=stock) <- zmean
+    
+    ind <- FLQuants(mean=zmean)
+
+  # combine = "smooth"
+  } else if (combine == "smooth") {
+    
+    inds <- window(FLQuants(lapply(idx, function(i) {
+     smi <- smooth_index(index(i), enp.mult=enp.mult)
+     smi %/% yearMeans(smi[, refyrs])
+    })), start=start, end=dy)
+
+    # WEIGHTED average of smoothed, rescaled indices, NA-aware
+    ind <- weighted.mean(inds, weights)
+    
+    # mean
+    smooth <- expand(yearMeans(ind), year=dy)
+
+    # TRACK
+    track(tracking, "mean.ind", year=ay, biol=stock) <- smooth
+    
+    ind <- FLQuants(mean=smooth)
+  }
+  return(list(stk=stk, ind=ind, tracking=tracking))
+}
+# }}}
+
+# smooth_index {{{
+smooth_index <- function(x, enp.mult=0.2) {
+
+  x[x==0]<-1e3
+  
+  dat <- data.table(as.data.frame(x, drop=TRUE))
+  dat <- dat[!is.na(data)]
+
+  dat[, enptarget:=sum(!is.na(data)) * enp.mult, by=iter]
+
+  dat[, data:=exp(predict(loess(log(data)~year,
+    enp.target=unique(enptarget)))), by=iter]
+
+  return(as.FLQuant(dat[, .(year, iter, data, age='all')]))
+}
+# }}}
+
+# zscore {{{
+
+zscore <- function(i, refyrs=dimnames(i)$year, sample_sd=FALSE,
+  years_sd) {
+  
+  # LOG index
+  li <- log(window(index(i), start=min(dims(i)$minyear, min(an(refyrs))),
+    end=max(dims(i)$maxyear, max(an(refyrs)))))
+
+  # REF years mean
+  rmu <- yearMeans(li[, ac(refyrs)])
+
+  # COMPUTE sd
+  if(sample_sd)
+    lsd <- sqrt(log(1 + yearMeans((index.var(i) / index(i))^2)))
+  else
+    # lsd <- sqrt(yearVars(li[, refyrs]))
+    lsd <- sqrt(yearVars(li))
+  
+  return(((li %-% rmu) %/% lsd)[, dimnames(i)$year])
+}
+
+# }}}

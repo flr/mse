@@ -9,8 +9,6 @@ fwd.om(om, ctrl, ...)
 \arguments{
 \item{ctrl}{the fwdControl object with objectives and constraints}
 
-\item{...}{}
-
 \item{object}{the OM as a FLStock}
 }
 \description{

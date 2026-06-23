@@ -171,7 +171,7 @@ performance(mse, run="r00", type="test")
 performance(mse, statistics=statistics[c("SBMSY", "FMSY")], run="r00", type="test")
 }
 \seealso{
-\link{statistics}, \code{\link[=refpts]{refpts()}}, \code{\link[FLCore:metrics]{FLCore::metrics()}}
+\link{statistics}, \code{\link[=refpts]{refpts()}}, \code{\link[FLCore:metrics]{metrics()}}
 }
 \author{
 Iago Mosqueira (WMR)

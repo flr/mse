@@ -94,25 +94,23 @@ setMethod("c", "FLmses",
     # PARSE args
     args <- list(...)
 
-    # IF args not all FLmse, RETURN list
-    cls <- unlist(lapply(args, is, 'FLmse'))
-    if(!all(cls)) {
-      return(c(unclass(x), args))
-    }
+    # CONVERT FLmses elements to lists
+    id <- vapply(args, is, logical(1), 'FLmse')
 
-    # GET arg names
-    argnms <- sys.call()
-    nams <- as.character(argnms)[-1]
+    if(any(id))
+      args[id] <- Map(function(val, nm)
+        setNames(list(val), nm), args[id], names(args[id]))
 
-    # .Data
-    data <- c(x@.Data, unlist(lapply(args, "slot", ".Data")))
+    # AND FLmses too
+    id <- vapply(args, is, logical(1), 'FLmses')
 
-    names(data) <- unlist(c(list(names(x)), lapply(args, names)))
+    if(any(id))
+      args[id] <- lapply(args[id], unclass)
+
+    res <- c(unclass(x), Reduce('c', args))
 
     # MERGE performance, ADD run and
-    perf <- rbindlist(c(list(performance(x)), lapply(args, performance)))
-
-    res <- FLmses(data, performance=perf)
+    res <- FLmses(res)
 
     return(res)
   })

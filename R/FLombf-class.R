@@ -312,38 +312,6 @@ setMethod("ssb", signature(object="FLombf"),
 setMethod("tsb", signature(object="FLombf"),
   function(object, biol=NULL) {
 
-    res <- FLQuants(Map(tsb, biols(object),
-      f=harvest(object)))
-    
-    return(res)
-  }
-)
-
-setMethod("tb", signature(object="FLombf"),
-  function(object, biol=NULL) {
-
-    res <- FLQuants(Map(tb, biols(object),
-      f=harvest(object)))
-    
-    return(res)
-  }
-)
-# }}}
-
-# rec, tsb {{{
-
-setMethod("rec", signature(object="FLombf"),
-  function(object, biol=NULL) {
-    
-    res <- FLQuants(lapply(biols(object), rec))
-
-    return(res)
-  }
-)
-
-setMethod("tsb", signature(object="FLombf"),
-  function(object, biol=NULL) {
-
     res <- FLQuants(mapply(tsb, biols(object),
       f=harvest(object), SIMPLIFY=FALSE))
     
@@ -360,6 +328,21 @@ setMethod("tb", signature(object="FLombf"),
     return(res)
   }
 )
+
+# }}}
+
+# rec {{{
+
+setMethod("rec", signature(object="FLombf"),
+  function(object, biol=NULL) {
+    
+    res <- FLQuants(lapply(biols(object), rec))
+
+    return(res)
+  }
+)
+
+
 # }}}
 
 # harvest, partialF, computeHarvest {{{
