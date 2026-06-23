@@ -796,7 +796,6 @@ setMethod("goFish", signature(om="FLombf"),
     if (!is.null(ctrl0$est)) {
 
       # - BY stock
-
       ctrl.est <- list(method=ctrl0$est@method, step="est",
         ioval = list(iv=list(t1=flsval, t2=flival), ov=list(t1=flsval)))
 
