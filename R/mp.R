@@ -746,6 +746,22 @@ setMethod("goFish", signature(om="FLombf"),
     
     # --- OEM: Observation Error Model
 
+    # GET OM observation
+    stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
+
+    # DROP units (sex, birth cohorts)
+    stk <- lapply(stk, nounit)
+
+    # GET stk to observations dims
+    ons <- names(observations(oem))
+
+    # IF om > 1 BUT oem == 1
+    if(length(ons) == 1 & length(bns) > 1) {
+      stk <- FLStocks(Reduce("+", stk))
+      names(stk) <- ons
+      args$stock <- ons
+    }
+
     # COMMON elements
     ctrl.oem <- args(oem)
     ctrl.oem$method <- method(oem)
@@ -753,11 +769,6 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
 
-    # GET OM observation
-    stk <- window(stock(om, full=TRUE, byfishery=byfishery), end=dy)
-
-    # DROP units (sex, birth cohorts)
-    stk <- lapply(stk, nounit)
     
     # APPLY oem across stocks
     o.out <- Map(function(stk, dev, obs) {
@@ -783,14 +794,6 @@ setMethod("goFish", signature(om="FLombf"),
     
     # GET observations
     observations(oem) <- lapply(o.out, "[[", "observations")
-
-    # TEST: Reduce
-    if(length(args$stock) == 1 & length(bns) > 1) {
-      stk0 <- FLStocks(Reduce("h2toh1", stk0))
-      names(stk0) <- args$stock
-      idx0 <- list(FLIndices(Reduce("c", idx0)))
-      names(idx0) <- args$stock
-    }
 
     # TRACK oem observations
     track(tracking, "B.obs", ay) <- lapply(window(stk0, start=dy, end=dy),
