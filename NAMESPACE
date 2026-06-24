@@ -223,4 +223,5 @@ exportMethods(
   "tracking",
   "tracking<-",
   "undebug",
+  "vb",
   "wt")
