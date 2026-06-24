@@ -65,7 +65,10 @@ FLmse <- setClass("FLmse",
     oem="FLoem",
     # TODO args vs. mpargs
 		args="list"
-	)
+	),
+  prototype=prototype(
+    tracking=data.table()
+  )
 )
 
 #' @rdname FLmse-class

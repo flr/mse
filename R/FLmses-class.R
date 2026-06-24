@@ -94,6 +94,13 @@ setMethod("c", "FLmses",
     # PARSE args
     args <- list(...)
 
+  # CONVERT FLo elements to list(FLmses)
+    id <- vapply(args, is, logical(1), 'FLo')
+
+    if(any(id))
+      args[id] <- Map(function(val, nm)
+        setNames(list(FLmse(om=val)), nm), args[id], names(args[id]))
+
     # CONVERT FLmses elements to lists
     id <- vapply(args, is, logical(1), 'FLmse')
 
