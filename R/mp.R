@@ -752,16 +752,6 @@ setMethod("goFish", signature(om="FLombf"),
     # DROP units (sex, birth cohorts)
     stk <- lapply(stk, nounit)
 
-    # GET stk to observations dims
-    ons <- names(observations(oem))
-
-    # IF om > 1 BUT oem == 1
-    if(length(ons) == 1 & length(bns) > 1) {
-      stk <- FLStocks(Reduce("+", stk))
-      names(stk) <- ons
-      args$stock <- ons
-    }
-
     # COMMON elements
     ctrl.oem <- args(oem)
     ctrl.oem$method <- method(oem)
@@ -769,7 +759,6 @@ setMethod("goFish", signature(om="FLombf"),
     ctrl.oem$ioval <- list(iv=list(t1=flsval), ov=list(t1=flsval, t2=flival))
     ctrl.oem$step <- "oem"
 
-    
     # APPLY oem across stocks
     o.out <- Map(function(stk, dev, obs) {
 
@@ -789,6 +778,17 @@ setMethod("goFish", signature(om="FLombf"),
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
 
+    # WARNING: MERGE observations
+    if(!args$stock %in% bns & length(args$stock) == 1) {
+
+      # TODO: USE store observations$stk
+      stk0 <- FLStocks(Reduce("+", stk0))
+      names(stk0) <- args$stock
+
+      idx0 <- list(FLIndices(Reduce("c", idx0)))
+      names(idx0) <- args$stock
+    }
+
     # EXTRACT tracking
     tracking <- o.out[[length(o.out)]]$tracking
     
@@ -807,7 +807,7 @@ setMethod("goFish", signature(om="FLombf"),
 
     if (!is.null(ctrl0$est)) {
 
-      # SET empty ind
+      # CHECK: SET empty ind
       ind <- lapply(setNames(nm=names(stk0)), function(x) FLQuants())
 
       # - OEM 1 stock
@@ -887,7 +887,7 @@ setMethod("goFish", signature(om="FLombf"),
       }
     }
     } else {
-      stop("'control' must contain an 'est' mseCtrl element.")
+      stop("'control' must contain an 'est' mseCtrl element, see 'perfect.sa'.")
     }
 
     # TRACK est
@@ -926,7 +926,7 @@ setMethod("goFish", signature(om="FLombf"),
     
     if (!is.null(ctrl0$hcr)) {
 
-
+      # ONE MP stock
       if(length(stk0) == 1) {
 
         # ASSEMBLE call: method, step, stk, idx, args, tracking, ioval + ctrl$args
@@ -948,44 +948,43 @@ setMethod("goFish", signature(om="FLombf"),
         ctrl <- out.hcr$ctrl
         tracking <- out.hcr$tracking
       
+      # MORE than one MP stock
       } else {
 
-      # - BY stock
+        # - BY stock
 
-      ctrl.hcr <- list(method=ctrl0$hcr@method, step="hcr",
-        ioval = list(iv=list(t1=flsval), ov=list(t1=flfval)))
+        ctrl.hcr <- list(method=ctrl0$hcr@method, step="hcr",
+          ioval = list(iv=list(t1=flsval), ov=list(t1=flfval)))
 
-      # REPLICATE module args if needed
-      if(!identical(names(args(ctrl0$hcr)), bns[args$stock]))
-        args.hcr <- lapply(setNames(nm=bns[args$stock]), function(x) args(ctrl0$hcr))
+        # REPLICATE module args if needed
+        if(!identical(names(args(ctrl0$hcr)), bns[args$stock]))
+          args.hcr <- lapply(setNames(nm=bns[args$stock]), function(x) args(ctrl0$hcr))
 
-      # TODO: SEPARATE args
+        # TODO: SEPARATE args
 
-      # DISPATCH over stocks, alter args$stock, subset indices
-      out <- lapply(setNames(args$stock, nm=bns[args$stock]),
-        function(x) {
-          do.call("mpDispatch", c(ctrl.hcr, args.hcr[[bns[x]]],
-            list(args=c(args[-match("stock", names(args))], stock=x),
-            stk=stk0[[bns[x]]], ind=ind[[bns[x]]], tracking=tracking)))
-      })
+        # DISPATCH over stocks, alter args$stock, subset indices
+        out <- lapply(setNames(args$stock, nm=bns[args$stock]),
+          function(x) {
+            do.call("mpDispatch", c(ctrl.hcr, args.hcr[[bns[x]]],
+              list(args=c(args[-match("stock", names(args))], stock=x),
+              stk=stk0[[bns[x]]], ind=ind[[bns[x]]], tracking=tracking)))
+        })
 
-      # CALL single hcr with FLStocks and indicators as inputs
+        # EXTRACT fwdControls
+        ctrl <- lapply(out, '[[', 'ctrl')
 
-      # EXTRACT fwdControls
-      ctrl <- lapply(out, '[[', 'ctrl')
+        # SUBSET if only one
+        if(length(ctrl) == 1)
+          ctrl <- ctrl[[1]]
 
-      # SUBSET if only one
-      if(length(ctrl) == 1)
-        ctrl <- ctrl[[1]]
+        # EXTRACT tracking, already merged
+        tracking <- out[[1]][['tracking']]
 
-      # EXTRACT tracking, already merged
-      tracking <- out[[1]][['tracking']]
-
-      # PASS args generated at est to ctrl
-      if (!is.null(out.assess$args)) {
-        args(ctrl0$est)[names(out.assess$args)] <- out.assess$args
+        # PASS args generated at est to ctrl
+        if (!is.null(out.assess$args)) {
+          args(ctrl0$est)[names(out.assess$args)] <- out.assess$args
+        }
       }
-    }
     } else {
       stop("'control' must contain an 'est' mseCtrl element.")
     }
