@@ -10,6 +10,10 @@
 - `tunebisect` runs mp in search only to the end of years. Once tuning prob is reached, the mp is run until the set fy in args or the end of om.
 - `tunebisect` now accepts the window argument to return the complete om and oem objects.
 
+## BUG FIXES
+
+- Class definition for FLmse needed a prototype call for tracking slot, as data.table is a S3 class.
+
 # mse 2.4.9
 
 ## BUG FIXES
