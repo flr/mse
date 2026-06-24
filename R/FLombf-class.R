@@ -331,6 +331,45 @@ setMethod("tb", signature(object="FLombf"),
 
 # }}}
 
+# vb {{{
+
+setMethod("vb", signature(x = "FLombf"),
+  function(x, ...) {
+
+    fcb  <- FCB(x)
+    bios <- biols(x)
+    fish <- fisheries(x)
+
+    # unique biol indices in FCB
+    biol_ids <- unique(fcb[, "B"])
+
+    out <- lapply(biol_ids, function(b) {
+
+      bio <- bios[[b]]
+      n   <- n(bio)
+      wt  <- wt(bio)
+
+      # all fishery/catch rows that work on this biol
+      rows <- fcb[fcb[, "B"] == b, , drop = FALSE]
+
+      # sum sel*F across fisheries/catches for this biol
+      fsel <- Reduce("+", lapply(seq_len(nrow(rows)), function(i) {
+        f <- rows[i, "F"]
+        c <- rows[i, "C"]
+        catch.sel(fish[[f]][[c]])
+      }))
+
+      # vb = sum_age( sel * F * N * Wt )  -- vulnerable biomass
+      quantSums(fsel * n * wt)
+    })
+
+    names(out) <- names(bios)[biol_ids]
+    FLQuants(out)
+  }
+)
+
+# }}}
+
 # rec {{{
 
 setMethod("rec", signature(object="FLombf"),
