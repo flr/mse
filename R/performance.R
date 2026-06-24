@@ -304,16 +304,20 @@ setMethod("performance", signature(x="FLombf"),
 #' performance(mse, statistics=statistics[c("SBMSY", "FMSY")], run="r00", type="test")
 
 setMethod("performance", signature(x="FLmse"),
-  function(x, statistics=.validStatistics(om(x)), om=name(x@om), control=FALSE,
+  function(x, statistics=.validStatistics(om(x)), om=name(x@om), control=TRUE,
     type="MP", run="1", ...) {
 
-    # GET arguments
+    # GET arguments (metrics)
     args <- list(...)
 
-    res <- attr(x, 'performance')
+    # SEPARATE functions and values
+    fid <- sapply(args, is, 'function')
 
     # IF no extra args, return 'performance' attribute ...
-    if(length(args) == 0 & !is.null(res)) {
+    
+    res <- attr(x, 'performance')
+    
+    if(missing(statistics) & !is.null(res)) {
 
       return(res)
 
@@ -333,7 +337,16 @@ setMethod("performance", signature(x="FLmse"),
       }
 
       # COMPUTE metrics
-      mets <- do.call('metrics', list(object=x@om, metrics=args$metrics))
+      mets <- do.call("metrics", c(list(object=x@om), args[fid]))
+
+      # ADD non-function args to mets
+      if(is(mets, "FLQuants")) {
+        mets <- FLQuants(c(mets, args[!fid]))
+      } else {
+        mets <- lapply(setNames(nm=names(mets)), function(i) {
+          FLQuants(c(mets[[i]], lapply(args[!fid], "[[", i)))
+        })
+      }
 
       # CALL performance(metrics)
       res <- do.call(performance, c(list(x=mets, statistics=statistics,
@@ -341,7 +354,6 @@ setMethod("performance", signature(x="FLmse"),
         om=unname(name(x@om)), type=type, run=run))
 
       # NAME mp if  possible
-      # TODO: IF type, run missing
       if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
         res[, mp:=paste(om, type, run, sep="_")]
 
