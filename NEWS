@@ -4,11 +4,12 @@
 
 - `append(FLombf, FLombf, after)` method to join two operating models at a year boundary.
 - `append(FLom, FLom, after)` method to join two operating models at a year boundary.
+- - `vb(FLonmbf)` method computes for each biol using corresponding fisheries.
 
  USER-VISIBLE CHANGES
 
-- `tunebisect` runs mp in search only to the end of years. Once tuning prob is reached, the mp is run until the set fy in args or the end of om.
 - `tunebisect` now accepts the window argument to return the complete om and oem objects.
+- `performance(FLmse)` handles metrics as formulas or values in ...
 
  BUG FIXES
 
