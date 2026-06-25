@@ -41,12 +41,8 @@ test_that("performance(FLQuants) computes Kobe quadrant probabilities correctly"
     statistics=statistics[c("green", "yellow", "orange", "red")],
     refpts=refpts(flom), om="ple", run="r00", type="test")
   
-  # Check probabilities are between 0 and 1
   expect_true(all(result$data >= 0 & result$data <= 1))
-  
-  # Verify green/yellow/orange/red are in results
   expect_true(all(c("green", "yellow", "orange", "red") %in% result$statistic))
-  
   expect_true(all(!is.na(result$data)))
 })
 
@@ -58,8 +54,6 @@ test_that("performance(FLQuants) Kobe quadrants sum to approximately 1", {
   if(nrow(result) > 0) {
     result_wide <- data.table::dcast(result, iter + year ~ statistic, value.var = "data")
     result_wide[, quadrant_sum := green + yellow + orange + red]
-    
-    # All sums should be approximately 1 (allowing for numerical precision)
     expect_true(all(abs(result_wide$quadrant_sum - 1.0) < 0.01))
   }
 })
@@ -78,8 +72,7 @@ test_that("performance(FLQuants) returns no NA data values", {
   result <- performance(x, statistics=statistics[1:5],
     refpts=refpts(flom), run="test_na")
   
-  na_count <- sum(is.na(result$data))
-  expect_equal(na_count, 0)
+  expect_equal(sum(is.na(result$data)), 0)
 })
 # }}}
 
@@ -127,7 +120,6 @@ test_that("performance(FLom) includes green statistic", {
     refpts=refpts(flom), run="test_green")
   
   expect_true("green" %in% result$statistic)
-  # Green should be probability (0-1)
   expect_true(all(result$data >= 0 & result$data <= 1))
 })
 # }}}
@@ -230,6 +222,7 @@ test_that("performance(FLmse) with metrics", {
   expect_s3_class(result, "data.table")
   expect_true(nrow(result) > 0)
 })
+# }}}
 
 # -- TEST: performance(FLmses) {{{
 
@@ -270,77 +263,7 @@ test_that("performance(list(FLo)) includes run identifiers", {
 })
 # }}}
 
-# -- TEST: performance(list) - list(FLmse, FLo)
-
-context("performance: list(FLmse, FLo) method")
-
-test_that("performance(list(FLmse, FLo)) handles mixed FLmses and FLom", {
-  x <- c(flmses, A=flom)
-  result <- performance(x, statistics=statistics, type="test")
-  
-  expect_s3_class(result, "data.table")
-  expect_true(nrow(result) > 0)
-})
-# }}}
-
-# -- TEST: performance(FLmses) {{{
-
-context("performance: FLmses method")
-
-test_that("performance(FLmses) with statistics", {
-  result <- performance(flmses, statistics=statistics, type="test")
-  
-  expect_s3_class(result, "data.table")
-  expect_true(nrow(result) > 0)
-})
-
-test_that("performance(FLmses) with default statistics", {
-  result <- performance(flmses, type="test")
-  
-  expect_s3_class(result, "data.table")
-  expect_true(nrow(result) > 0)
-})
-
-# -- TEST: performance(FLmses) {{{
-
-context("performance: FLmses method")
-
-test_that("performance(FLmses) with statistics", {
-  result <- performance(flmses, statistics=statistics, type="test")
-  
-  expect_s3_class(result, "data.table")
-  expect_true(nrow(result) > 0)
-})
-
-test_that("performance(FLmses) with default statistics", {
-  result <- performance(flmses, type="test")
-  
-  expect_s3_class(result, "data.table")
-  expect_true(nrow(result) > 0)
-})
-# }}}
-
-# -- TEST: performance(list) - list(FLo) {{{
-
-context("performance: list(FLo) method")
-
-test_that("performance(list(FLo)) handles multiple FLom objects", {
-  x <- list(A=flom, B=flom)
-  result <- performance(x, statistics=statistics, type="test")
-  
-  expect_s3_class(result, "data.table")
-  expect_true(nrow(result) > 0)
-})
-
-test_that("performance(list(FLo)) includes run identifiers", {
-  x <- list(A=flom, B=flom)
-  result <- performance(x, statistics=statistics[1:3], type="test")
-  
-  expect_true("run" %in% colnames(result))
-})
-# }}}
-
-# -- TEST: performance(list) - list(FLmse, FLo)
+# -- TEST: performance(list) - list(FLmse, FLo) {{{
 
 context("performance: list(FLmse, FLo) method")
 
@@ -398,7 +321,6 @@ test_that("performance computes FMSY correctly", {
     refpts=refpts(flom), run="test_fmsy")
   
   expect_true("FMSY" %in% result$statistic)
-  # F/FMSY should be positive
   expect_true(all(result$data > 0))
   expect_true(all(!is.na(result$data)))
 })
@@ -409,7 +331,6 @@ test_that("performance computes SBMSY correctly", {
     refpts=refpts(flom), run="test_sbmsy")
   
   expect_true("SBMSY" %in% result$statistic)
-  # SB/SBMSY should be positive
   expect_true(all(result$data > 0))
 })
 
@@ -419,7 +340,6 @@ test_that("performance computes SB0 correctly", {
     refpts=refpts(flom), run="test_sb0")
   
   expect_true("SB0" %in% result$statistic)
-  # SB/SB0 should be positive
   expect_true(all(result$data >= 0))
 })
 
@@ -429,7 +349,6 @@ test_that("performance computes green quadrant probability", {
     refpts=refpts(flom), run="test_green_prob")
   
   expect_true("green" %in% result$statistic)
-  # Green should be probability (0-1)
   expect_true(all(result$data >= 0 & result$data <= 1))
 })
 
@@ -439,7 +358,6 @@ test_that("performance computes orange quadrant probability", {
     refpts=refpts(flom), run="test_orange_prob")
   
   expect_true("orange" %in% result$statistic)
-  # Orange should be probability (0-1)
   expect_true(all(result$data >= 0 & result$data <= 1))
 })
 
@@ -449,7 +367,6 @@ test_that("performance computes red quadrant probability", {
     refpts=refpts(flom), run="test_red_prob")
   
   expect_true("red" %in% result$statistic)
-  # Red should be probability (0-1)
   expect_true(all(result$data >= 0 & result$data <= 1))
 })
 
@@ -459,7 +376,6 @@ test_that("performance computes yellow quadrant probability", {
     refpts=refpts(flom), run="test_yellow_prob")
   
   expect_true("yellow" %in% result$statistic)
-  # Yellow should be probability (0-1)
   expect_true(all(result$data >= 0 & result$data <= 1))
 })
 # }}}
@@ -477,14 +393,11 @@ test_that("Kobe quadrants (green, orange, red, yellow) sum to 1", {
   if(nrow(result) > 0) {
     result_wide <- data.table::dcast(result, iter + year ~ statistic, value.var = "data")
     result_wide[, quadrant_sum := green + orange + red + yellow]
-    
-    # All sums should be approximately 1
     expect_true(all(abs(result_wide$quadrant_sum - 1.0) < 0.01))
   }
 })
 
 test_that("performance Kobe statistics are internally consistent across inputs", {
-  # Test with different input types (FLQuants vs FLom)
   x <- metrics(flom)
   result1 <- performance(x, statistics=statistics[c("green")],
     refpts=refpts(flom), run="test_kobe_consistency1")
@@ -492,7 +405,6 @@ test_that("performance Kobe statistics are internally consistent across inputs",
   result2 <- performance(x, statistics=statistics[c("green")],
     refpts=refpts(flom), run="test_kobe_consistency2")
   
-  # Both should produce valid probabilities
   expect_true(all(result1$data >= 0 & result1$data <= 1))
   expect_true(all(result2$data >= 0 & result2$data <= 1))
 })
@@ -542,8 +454,7 @@ test_that("performance output has required columns", {
   result <- performance(flom, statistics=statistics[1:5], refpts=refpts(flom),
     run="test_structure")
   
-  required_cols <- c("statistic", "year", "name", "desc", "data", "iter")
-  expect_true(all(required_cols %in% colnames(result)))
+  expect_true(all(c("statistic", "year", "name", "desc", "data", "iter") %in% colnames(result)))
 })
 
 test_that("performance output is a data.table", {
@@ -599,7 +510,6 @@ test_that("performance stops if statistics not unique", {
     regex = "unique"
   )
 })
-
 # }}}
 
 # -- TEST: Data Consistency and Reproducibility {{{
@@ -615,7 +525,6 @@ test_that("performance produces consistent results on repeated calls", {
   result2 <- performance(flom, statistics=statistics[1:5],
     refpts=refpts(flom), run="consistency2")
   
-  # Data values should be identical
   expect_equal(result1$data, result2$data)
 })
 
@@ -627,7 +536,6 @@ test_that("performance identifiers can be controlled", {
   result2 <- performance(x, statistics=statistics[1:3],
     refpts=refpts(flom), om="OM2", run="run2", type="MP2")
   
-  # om, run, type should differ
   expect_false(identical(result1$om, result2$om))
   expect_false(identical(result1$run, result2$run))
   expect_false(identical(result1$type, result2$type))
@@ -655,7 +563,6 @@ test_that("performance handles statistics with default descriptions", {
   result <- performance(x, statistics=minimal_stats, refpts=refpts(flom),
     run="minimal_stat")
   
-  # Should add desc based on name
   expect_true(all(!is.na(result$desc)))
 })
 # }}}
