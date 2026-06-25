@@ -143,7 +143,7 @@ setReplaceMethod("$", signature(x="FLmses", value="FLmse"),
 
 setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
   function(x, i, drop=FALSE) {
-    
+
     # GET 
     if(is.numeric(i)) {
       i <- names(x)[i]
@@ -152,7 +152,8 @@ setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
     # SUBSET in list, need to unclass
     x@.Data <- unclass(x)[i]
     
-    performance(x) <- x@performance[run %in% i,]
+    if(nrow(performance(x)) > 0)
+      performance(x) <- x@performance[run %in% i,]
 
     return(x)
   }

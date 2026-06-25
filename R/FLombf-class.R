@@ -771,16 +771,18 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
     mets <- lapply(biols(object), metrics)
 
     # ADD catch, SSB, Fbar and HR by biol
-    mets <- Map(function(me, ca, sb, fb, hb) {
+    mets <- Map(function(me, ca, sb, fb, hb, vb) {
 
       me[['SB']] <- sb
       me[['C']] <- ca
       me[['F']] <- fb
       me[['HR']] <- hb
+      me[['VB']] <- vb
 
       return(me)
 
-    }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object), hb=hr(object))
+    }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object),
+      hb=hr(object), vb=vb(object))
 
     # ADD ...
     extra <- list(...)
