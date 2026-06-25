@@ -304,17 +304,17 @@ setMethod("performance", signature(x="FLombf"),
 #' performance(mse, statistics=statistics[c("SBMSY", "FMSY")], run="r00", type="test")
 
 setMethod("performance", signature(x="FLmse"),
-  function(x, statistics=.validStatistics(om(x)), om=name(x@om), control=TRUE,
-    type="MP", run="1", ...) {
+  function(x, statistics=.validStatistics(om(x)), metrics=NULL, 
+    years=dimnames(om(x))$year, om=name(x@om), type="MP", run="1",
+    control=TRUE, ...) {
 
-    # GET arguments (metrics)
+    # GET arguments (extra metrics)
     args <- list(...)
 
     # SEPARATE functions and values
     fid <- sapply(args, is, 'function')
 
     # IF no extra args, return 'performance' attribute ...
-    
     res <- attr(x, 'performance')
     
     if(missing(statistics) & !is.null(res)) {
@@ -324,7 +324,7 @@ setMethod("performance", signature(x="FLmse"),
     } else {
 
       # GET hcr args
-      control_args <- Filter(is.numeric, args(control(x)$hcr))
+      hcrargs <- Filter(is.numeric, args(control(x)$hcr))
 
       # GET tracking elements as FLQuants
       if(length(tracking(x)) > 0) {
@@ -336,21 +336,45 @@ setMethod("performance", signature(x="FLmse"),
         tracks <- NULL
       }
 
-      # COMPUTE metrics
-      mets <- do.call("metrics", c(list(object=x@om), args[fid]))
-
-      # ADD non-function args to mets
-      if(is(mets, "FLQuants")) {
-        mets <- FLQuants(c(mets, args[!fid]))
+      # GET refpts
+      rps <- refpts(x)
+      if(is(rps, "FLPar")) {
+         vars_rps <- dimnames(rps)$params
       } else {
-        mets <- lapply(setNames(nm=names(mets)), function(i) {
-          FLQuants(c(mets[[i]], lapply(args[!fid], "[[", i)))
-        })
+         vars_rps <- unique(unlist(lapply(rps, function(i) dimnames(i)$params)))
+      }
+
+      # GET standard metrics
+      mets <- metrics(x, metrics=metrics)
+
+      # ADD non-function args
+      mets <- .merge(mets, args[!fid])
+
+      # GET current metrics names
+      nms_mets <- if(is(mets, "FLQuants")) names(mets) else names(mets[[1]])
+
+      # IDENTIFY required formula elements
+      needed <- unique(unlist(lapply(statistics, function(s)
+        all.vars(s[[1]][[2]]))))
+
+      # LIST those in tracks, hcrargs, refpts and metrics
+      known <- c(names(tracks), names(hcrargs), vars_rps, nms_mets)
+
+      # IDENTIFY extra needed calls, ignores builtins()
+      extra <- sapply(needed[!needed %in% c(known, builtins())], exists)
+
+      # COMPUTE extra and add to mets
+      if(length(extra > 0)) {
+        extras <- lapply(setNames(nm=names(extra)[extra]), function(i)
+          do.call(i, list(om(x))))
+
+        # ADD extras
+        mets <- .merge(mets, extras)
       }
 
       # CALL performance(metrics)
       res <- do.call(performance, c(list(x=mets, statistics=statistics,
-        refpts=refpts(x)), control_args, tracks, args,
+        refpts=refpts(x)), hcrargs, tracks,
         om=unname(name(x@om)), type=type, run=run))
 
       # NAME mp if  possible
@@ -418,27 +442,30 @@ setMethod("performance", signature(x="FLmses"),
 
     args <- list(...)
 
-    # RETURN slot if no other args
+    # RETURN performance slot if no other args
     if(length(args) == 0)
       return(slot(x, 'performance'))
+    # COMPUTE
     else {
-      
+      # SET statistics if missing
       if(!"statistics" %in% names(args)) {
         args$statistics <- .validStatistics(om(x[[1]]))
       }
 
+      # SET years if missing
       if(!"years" %in% names(args)) {
         args$years <- dimnames(om(x[[1]]))$year[-1]
       }
 
+      # LAPPLY over args if FLmses
       if(all(unlist(lapply(args, is, "FLmses")))) {
         return(rbindlist(c(list(performance(x)), lapply(args, performance))))
 
+      # CALL on each FLmse in FLmses
       } else {
-
-        res <- rbindlist(Map(function(i, j) do.call(performance,
-          c(list(x=i, run=j, om=name(om(i))), args)),
-          i=x, j=names(x)))
+        res <- rbindlist(Map(function(i, j){
+          do.call(performance, c(list(x=i, run=j, om=name(om(i))), args))
+        }, i=x, j=names(x)), fill=TRUE)
 
         # SET mp if possible
         if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
@@ -476,7 +503,7 @@ setMethod("performance", signature(x="list"),
       # TODO: ADD om if missing, via idcol or :=, DROP Map
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
         statistics=statistics, years=years, run=j),
-        list(...))), i=x, j=names(x)))
+        list(...))), i=x, j=names(x)), fill=TRUE)
 
       return(res[])
     }
@@ -511,7 +538,7 @@ setMethod("performance", signature(x="list"),
     }
      
     # CALL performance(FLQuants)
-    res <- data.table::rbindlist(Map(function(x, y)
+    res <- rbindlist(Map(function(x, y)
       performance(x, statistics=statistics, refpts=y, ...),
       x=x, y=refpts), idcol='biol')
     
@@ -548,3 +575,22 @@ setMethod("performance", signature(x="FLStocks"),
     return(res[]) 
   })
 # }}}
+
+# .functions {{{
+
+# .merge, twist y and merge to x
+
+.merge <- function(x, y) {
+  if(length(y) == 0)
+    return(x)
+  if(!is.list(x))
+    x <- c(x, y)
+  else {
+    y <- setNames(lapply(names(x), function(i)
+      lapply(y, `[[`, i)), names(x))
+    x <- Map(function(x, y) FLQuants(c(x,y)), x, y)
+  }
+  return(x)
+}
+# }}}
+
