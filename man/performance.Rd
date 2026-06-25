@@ -44,10 +44,12 @@
 \S4method{performance}{FLmse}(
   x,
   statistics = .validStatistics(om(x)),
+  metrics = NULL,
+  years = dimnames(om(x))$year,
   om = name(x@om),
-  control = FALSE,
   type = "MP",
   run = "1",
+  control = TRUE,
   ...
 )
 
