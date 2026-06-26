@@ -44,8 +44,8 @@ setMethod("initialize", "mseCtrl",
              method, args) {
       if (!missing(method))
         .Object@method <- switch(class(method),
-          "function"=method,
-          "character"=get(method))
+          "function"=stamp.fun(method),
+          "character"=stamp.fun(get(method)))
       if (!missing(args)) .Object@args <- args
       .Object <- callNextMethod(.Object, ...)
       .Object
@@ -72,7 +72,7 @@ setGeneric("method<-", function(object, ..., value) standardGeneric("method<-"))
 #' @examples
 #' method(ctl) <- function(stk, args, beta) ssb(stk) * beta
 setReplaceMethod("method", signature("mseCtrl", "function"), function(object, value){
-	object@method <- value
+	object@method <- stamp.fun(value)
 	object
 })
 
@@ -110,6 +110,18 @@ setMethod("show", signature(object = "mseCtrl"),
 
     cat("Arguments:\n")
     print(object@args)
+ }) # }}}
+
+# summary {{{
+#' @rdname mseCtrl-class
+setMethod("summary", signature(object = "mseCtrl"),
+  function(object)
+  {
+    cat("Method: ", sprintf("%s", find_original_name(object@method)), "\n")
+
+    cat("Arguments:\n")
+    .print_args(object@args)
+
  }) # }}}
 
 # exists {{{

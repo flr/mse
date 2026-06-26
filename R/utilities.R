@@ -37,28 +37,103 @@ setMethod("merge", signature(x="FLQuant", y="data.table"),
 
 # find.original.name {{{
 
-find.original.name <- function(fun) {
+find_original_name <- function(fun) {
+
+  # CHECK input
+  if(!is.function(fun))
+    stop("Input must be a function")
+
+  # RETURN cached attribute, works across save & load
+  nm <- attr(fun, ".name")
+  if(!is.null(nm) && nzchar(nm))
+    return(nm)
 
   # 'NULL' function
   if(is.null(formals(fun)))
-     if(is.null(do.call(fun, args=list())))
-       return("NULL")
-  
-  ns <- environment(fun)
-  objects <- ls(envir = ns)
-  
-  if(isNamespace(ns))
-    name <- getNamespaceName(ns)
-  else
-    name <- environmentName(ns)
+    if(is.null(tryCatch(do.call(fun, args=list()), error=function(e) NA)))
+      return("NULL")
 
-  for (i in objects) {
-    if (identical(fun, get(i, envir = environment(fun)))) {
-        return(paste(name, i, sep="::"))                   
+  fun_body    <- body(fun)
+  fun_formals <- formals(fun)
+
+  # FUNCTIONS to match function body and formals
+  .match_strict <- function(obj)
+    is.function(obj) &&
+    identical(body(obj),    fun_body) &&
+    identical(formals(obj), fun_formals)
+
+  .match_body <- function(obj)
+    is.function(obj) &&
+    identical(body(obj), fun_body)
+
+  # FUNCTION to search a namespace
+  .search_ns <- function(ns, pkg) {
+    objs <- ls(envir=ns, all.names=TRUE)
+    for(i in objs) {
+      obj <- tryCatch(get(i, envir=ns, inherits=FALSE), error=function(e) NULL)
+      if(!is.null(obj) && .match_strict(obj))
+        return(paste(pkg, i, sep="::"))
     }
+    for(i in objs) {
+      obj <- tryCatch(get(i, envir=ns, inherits=FALSE), error=function(e) NULL)
+      if(!is.null(obj) && .match_body(obj))
+        return(paste(pkg, i, sep="::"))
+    }
+    NULL
   }
+
+  # GET environment of function
+  ns <- environment(fun)
+
+  # SEARCH the global environment
+  objs <- setdiff(ls(envir = .GlobalEnv, all.names = TRUE), ".Last.value")
+
+  for(i in objs) {
+    obj <- tryCatch(get(i, envir = .GlobalEnv, inherits = FALSE),
+                    error = function(e) NULL)
+    if(!is.null(obj) && .match_strict(obj))
+      return(paste(".GlobalEnv", i, sep = "::"))
+  }
+
+  for(i in objs) {
+    obj <- tryCatch(get(i, envir = .GlobalEnv, inherits = FALSE),
+                    error = function(e) NULL)
+    if(!is.null(obj) && .match_body(obj))
+      return(paste(".GlobalEnv", i, sep = "::"))
+  }
+
+  # SEARCH current namespace
+  if(isNamespace(ns)) {
+    hit <- .search_ns(ns, getNamespaceName(ns))
+    if(!is.null(hit)) return(hit)
+  }
+
+  # SEARCH deserialised namespace
+  pkg_guess <- sub("^package:", "", environmentName(ns))
+  if(nchar(pkg_guess) > 0 && pkg_guess %in% loadedNamespaces()) {
+    hit <- .search_ns(asNamespace(pkg_guess), pkg_guess)
+    if(!is.null(hit)) return(hit)
+  }
+
+  # SCAN all loaded namespaces
+  for(pkg in loadedNamespaces()) {
+    hit <- .search_ns(asNamespace(pkg), pkg)
+    if(!is.null(hit)) return(hit)
+  }
+
   return("NULL")
 }
+# }}}
+
+# stamp.fun {{{
+
+stamp.fun <- function(fun) {
+  if(!is.null(attr(fun, ".name")))
+    return(fun)
+  attr(fun, ".name") <- find_original_name(fun)
+  fun
+}
+
 # }}}
 
 # combinations {{{
@@ -76,76 +151,6 @@ combinations <- function(...) {
   names(combs) <- names(args)
 
   return(combs)
-}
-# }}}
-
-# decisions {{{
-
-#' @examples
-#' data(plesim)
-
-decisions <- function(x, years=dimnames(tracking(x))$year, iter=NULL) {
-
-  # EXTRACT tracking and args
-  trac <- tracking(x)
-  args <- args(x)
-
-  # USE year as numeric
-  years <- as.numeric(years)
-
-  # SET iters if not given
-  if(is.null(iter))
-    iter <- seq(dims(x)$iter)
-
-  # FUNCTION to compute table along years
-  .table <- function(d) {
-
-    its <- dims(d)$iter
-    dmns <- dimnames(d)
-
-    if(its == 1) {
-      data.frame(metric=dmns$metric, year=dmns$year, value=prettyNum(d))
-    } else {
-      data.frame(metric=dmns$metric, year=dmns$year,
-        value=sprintf("%s (%s)", 
-          prettyNum(apply(d, 1:5, median, na.rm=TRUE)),
-          prettyNum(apply(d, 1:5, mad, na.rm=TRUE))))
-    }
-  }
-
-  # COMPUTE tables
-  res <- lapply(years, function(y) {
-
-    # GET advice, data and management years
-    ay  <-  y
-    dy <- ay - args$data_lag
-    my  <- ay + args$management_lag
-
-    # SET metrics to extract
-
-    # data
-    dmet <- c("SB.om", "SB.obs", "SB.est", "met.hcr")
-    dmet <- dmet[dmet %in% dimnames(trac)$metric]
-
-    # advice
-    amet <- c("decision.hcr", "fbar.hcr", "hcr", "fbar.isys", "isys",
-      "fwd", "C.om")
-
-    amet <- amet[amet %in% dimnames(trac)$metric]
-
-    # SUBSET metrics from tracking
-    dout <- trac[dmet, ac(dy),,,, iter]
-    aout <- trac[amet, ac(ay),,,, iter]
-
-    # COMPUTE diff metrics
-    mout <- trac["SB.om", ac(my),,,,iter] / trac["SB.om", ac(ay),,,,iter]
-    dimnames(mout)$metric <- "diff(SB.om)"
-
-    # BIND into single table
-    rbind(.table(dout), .table(aout), .table(mout))      
-  })
-
-  do.call(cbind, res)
 }
 # }}}
 
@@ -243,5 +248,50 @@ selectMetric <- function(metric="missing", stk, ind, ...) {
 setmethod <- function(x, method) {
   method(x) <- method
   return(x)
+}
+# }}}
+
+# .print_args {{{
+.print_args <- function(x, width = getOption("width")) {
+
+  fmt <- function(obj) {
+
+    ## Character scalar
+    if (is.character(obj) && length(obj) == 1)
+      return(sprintf("'%s'", obj))
+
+    if (is.character(obj) && length(obj) > 1)
+      return(paste(unname(obj), collapse = ", "))
+
+    ## Numeric scalar (named or unnamed)
+    if (is.numeric(obj) && length(obj) == 1)
+      return(format(unname(obj), trim = TRUE))
+
+    ## Other atomic scalars
+    if (is.atomic(obj) && length(obj) == 1)
+      return(as.character(unname(obj)))
+
+    ## Numeric vectors
+    if (is.numeric(obj) && is.null(dim(obj)))
+      return(paste(format(unname(obj), trim = TRUE), collapse = " "))
+
+    ## Everything else
+    cl <- paste(class(obj), collapse = "/")
+
+    if (!is.null(dim(obj)))
+      return(sprintf("<%s [%s]>", cl, paste(dim(obj), collapse = "x")))
+
+    sprintf("<%s len=%d>", cl, length(obj))
+  }
+
+  items <- mapply(function(nm, obj)
+    sprintf("%s: %s", nm, fmt(obj)),
+    names(x), x,
+    USE.NAMES = FALSE)
+
+  cat(paste(strwrap(paste(items, collapse = "; "), width = width),
+    collapse = "\n"), "\n")
+
+  invisible(x)
 }
 # }}}
