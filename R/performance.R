@@ -178,22 +178,23 @@ setMethod("performance", signature(x="FLQuants"),
     # COERCE refpts to list
     refpts_lst <- lapply(as(refpts, 'list'), identity)
 
-    # Map over years and statistics
+    # MAP over years
     res <- data.table::rbindlist(Map(function(i, ni) {
 
       if(any(unlist(lapply(statistics, '[[', 'is_change'))) & length(i) == 1) {
-        i_change <- seq(an(i) - 1, an(i))
-        x_i_change <- lapply(x, '[', j=ac(i_change))
-        inp_change <- c(x_i_change, lapply(refpts_lst, rep,
-          each=length(i_change)), dots)
+        i_use <- seq(an(i) - 1, an(i))
+        x_i <- lapply(x, '[', j=ac(i_use))
+        inp_change <- c(x_i, lapply(refpts_lst, rep, each=length(i_use)), dots)
+        x_i <- lapply(x, '[', j=ac(i))
+        inp_base <- c(x_i, lapply(refpts_lst, rep, each=length(i)), dots)
+      } else {
+        x_i <- lapply(x, '[', j=ac(i))
+        inp_base <- c(x_i, lapply(refpts_lst, rep, each=length(i)), dots)
+        inp_change <- inp_base  # never used but avoids unbound variable
       }
 
-      x_i <- lapply(x, '[', j=ac(i))
-
-      inp_base <- c(x_i, lapply(refpts_lst, rep, each=length(i)), list(...))
-
       data.table::rbindlist(lapply(statistics, function(j) {
-
+        
         inp <- if(j$is_change & length(i) == 1) inp_change else inp_base
 
         if(j$computable) {
@@ -422,9 +423,9 @@ setMethod("performance", signature(x="FLmse"),
   }
 )
 
-setMethod('performance<-', signature(x='FLmse', value="data.frame"),
+setReplaceMethod('performance', signature(x='FLmse', value="data.frame"),
   function(x, value){
-    attr(x, "performance") <- value
+    attr(x, "performance") <- .compactDT(value)
     return(x)
 })
 
@@ -476,9 +477,9 @@ setMethod("performance", signature(x="FLmses"),
 
 # performance<-(FLmse, data.table)
 
-setMethod('performance<-', signature(x='FLmses', value="data.frame"),
+setReplaceMethod('performance', signature(x='FLmses', value="data.frame"),
   function(x, value){
-    slot(x, 'performance') <- data.table(value)
+    slot(x, 'performance') <- .compactDT(data.table(value))
     return(x)
 })
 
@@ -588,6 +589,24 @@ setMethod("performance", signature(x="FLStocks"),
     x <- Map(function(x, y) FLQuants(c(x,y)), x, y)
   }
   return(x)
+}
+
+# .compactDT
+
+.compactDT <- function(x) {
+
+  # FACTOR character columns
+  chr_cols <- names(x)[sapply(x, is.character)]
+  if(length(chr_cols) > 0)
+    x[, (chr_cols) := lapply(.SD, as.factor), .SDcols=chr_cols]
+  
+  # INTEGER year and iter
+  if("year" %in% names(x))
+    x[, year := as.integer(year)]
+  if("iter" %in% names(x))
+    x[, iter := as.integer(iter)]
+
+  return(invisible(x))
 }
 # }}}
 

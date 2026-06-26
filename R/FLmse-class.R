@@ -312,6 +312,7 @@ setMethod("dims", signature(obj="FLmse"),
   }
 ) # }}}
 
+# window {{{
 setMethod("window", signature(x="FLmse"),
   function(x, start=dims(x)$minyear, end=dims(x)$maxyear) {
 

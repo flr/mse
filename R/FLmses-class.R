@@ -30,7 +30,7 @@ setMethod("FLmses", signature(object="FLmse", performance="ANY"),
 
     args <- c(object, list(...))
 
-    return(FLmses(args, performance=data.table(performance)))
+    return(FLmses(args, performance=.compactDT(data.table(performance))))
 
   }
 )
@@ -39,7 +39,7 @@ setMethod("FLmses", signature(object="list", performance="data.frame"),
   function(object, performance) {
 
     res <- FLmses(object)
-    performance(res) <- data.table(performance)
+    performance(res) <- .compactDT(data.table(performance))
 
     return(res)
   }
