@@ -75,7 +75,6 @@ export(
   "combinations",
   "cpue.ind",
   "cpues.ind",
-  "decisions",
   "default.oem",
   "deplete",
   "effortlimit.fb",
