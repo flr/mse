@@ -126,10 +126,13 @@ setMethod("performance", signature(x="FLQuants"),
     refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
     om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
 
+    # GET extra args
+    dots <- list(...)
+    
     # GET names in refpts and metrics, plus FLQuant dimnames
     valid.names <- c(dimnames(refpts)$params, names(x),
-      c("age", "year", "unit", "season", "area"))
-    
+      c("age", "year", "unit", "season", "area"), names(dots))
+
     # CREATE years list
     if(!is.list(years))
       years <- setNames(as.list(years), nm=as.character(years))
@@ -160,72 +163,66 @@ setMethod("performance", signature(x="FLQuants"),
     if(length(names(statistics)) != length(unique(names(statistics))))
       stop("'statistics' must have unique names.")
 
-    # ADD name as desc if missing
+    # ADD name as desc if missing, separate expr and flag change and computability
     statistics <- lapply(statistics, function(x) {
       if(is.null(x$desc)) x$desc <- x$name
+
+      x$expr <- x[names(x) == ""][[1]][[2]]
+      x$vars <- all.vars(x$expr)
+      x$is_change <- grepl("change|variability|difference", x$desc)
+      x$computable <- all(sapply(x$vars, function(v) exists(v) | v %in% valid.names))
+      
       return(x)
     })
 
-    # LOOP over years
+    # COERCE refpts to list
+    refpts_lst <- lapply(as(refpts, 'list'), identity)
+
+    # Map over years and statistics
     res <- data.table::rbindlist(Map(function(i, ni) {
 
-      # LOOP over statistics
+      if(any(unlist(lapply(statistics, '[[', 'is_change'))) & length(i) == 1) {
+        i_change <- seq(an(i) - 1, an(i))
+        x_i_change <- lapply(x, '[', j=ac(i_change))
+        inp_change <- c(x_i_change, lapply(refpts_lst, rep,
+          each=length(i_change)), dots)
+      }
+
+      x_i <- lapply(x, '[', j=ac(i))
+
+      inp_base <- c(x_i, lapply(refpts_lst, rep, each=length(i)), list(...))
+
       data.table::rbindlist(lapply(statistics, function(j) {
 
-        # ADD previous year when 1 used and stats is for change
-        if(grepl("change|variability|difference", j$desc) & length(i) == 1) {
-          i <- seq(an(i) - 1, an(i))
-        }
+        inp <- if(j$is_change & length(i) == 1) inp_change else inp_base
 
-        # ASSEMBLE inputs
-        inp <- c(lapply(x, '[' , j=ac(i)),
-          # REPEAT refpts by year because recycling goes year first
-          lapply(lapply(as(refpts, 'list'), function(x)
-            x[!is.na(x)]), rep, each=length(i)), list(...))
-
-        # EVAL statistic if names match with existing object (function) or in inp
-        if(all(unlist(lapply(all.vars(j[names(j) == ""][[1]][[2]]), function(x)
-          exists(x) | x %in% names(inp))))) {
-
-          res <- data.table(as.data.frame(eval(j[names(j) == ""][[1]][[2]], inp),
-            drop=FALSE))
-
-          # COMPUTE mean and LABEL
+        if(j$computable) {
+          
+          res <- as.data.table(as.data.frame(eval(j$expr, inp), drop=FALSE))
+            setkeyv(res, c("age", "unit", "season", "area", "iter"))
+          
           res <- res[, .(data=mean(data), year=ni), by=.(age, unit, season, area, iter)]
 
-          return(res[, .(age, unit, season, area, iter, data)])
-          
+          return(res)
+
         } else {
-
-          # WARN and return empty
           warning(paste0("statistic '", j$name, "' could not be computed, check metrics or tracking."))
-
           return(NULL)
         }
-      }), idcol="statistic", fill=TRUE)[,c("statistic", "data", "iter")]
+      }), idcol="statistic", fill=TRUE)[, c("statistic", "data", "iter")]
     }, i=years, ni=names(years)), idcol="year")
 
     # SET year as numeric, TODO:combine with periods
-    if(!any(is.na(suppressWarnings(as.numeric(res[, year])))))
+    if(!any(is.na(suppressWarnings(as.numeric(names(years))))))
       res[, year := as.numeric(year)]
 
-    # Set DT keys
-    setkey(res, statistic, year)
-    
-    # ADD statistic name(s) &description(s)
-    inds <- lapply(statistics, '[[', 'name')
-    descs <- lapply(statistics, '[[', 'desc')
+    # ADD statistic name(s) & description(s)
+    names <- sapply(statistics, '[[', 'name')
+    descs <- sapply(statistics, '[[', 'desc')
+    res[, name := names[statistic]]
+    res[, desc := descs[statistic]]
 
-    inds <- data.table(statistic=names(inds), name=unlist(inds), desc=unlist(descs))
-    setkey(inds, statistic)
-
-    # MERGE
-    res <- merge(res, inds, by='statistic')
-    
-    # CREATE empty cols
-    set(res, j=c('om', 'type', 'run', 'mp'), value=as.list(rep(character(1), 4)))
-
-    # ASSIGN names (om, type, run, mp)
+    # CREATE and ASSIGN cols
     set(res, j=c('om', 'type', 'run', 'mp'), value=list(om, type, run, mp))
 
     return(res[])
