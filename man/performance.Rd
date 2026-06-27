@@ -49,7 +49,7 @@
   om = name(x@om),
   type = "MP",
   run = "1",
-  control = TRUE,
+  control = FALSE,
   ...
 )
 

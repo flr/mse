@@ -226,6 +226,9 @@ setMethod("performance", signature(x="FLQuants"),
     # CREATE and ASSIGN cols
     set(res, j=c('om', 'type', 'run', 'mp'), value=list(om, type, run, mp))
 
+    # SET to standard colorder
+    .setOrder(res) 
+
     return(res[])
   }
 )
@@ -254,7 +257,13 @@ setMethod("performance", signature(x="FLo"),
     if(length(om) == 0)
       om <- NULL
 
-    return(performance(metrics, refpts=refpts, statistics=statistics, om=om, ...))
+    # COMPUTE on metrics
+    res <- performance(metrics, refpts=refpts, statistics=statistics, om=om, ...)
+
+    # SET to standard colorder
+    .setOrder(res) 
+
+    return(res[])
   }
 )
 # }}}
@@ -277,9 +286,13 @@ setMethod("performance", signature(x="FLombf"),
     if(length(om) == 0L)
       om <- NULL
 
+    # COMPUTE
     res <- rbindlist(lapply(setNames(nm=names(metrics)), function(i) 
       performance(metrics[[i]], refpts=x@refpts[[i]], statistics=statistics,
         om=om, ...)), idcol="biol")
+
+    # SET to standard colorder
+    .setOrder(res) 
  
     return(res)
   }
@@ -304,7 +317,7 @@ setMethod("performance", signature(x="FLombf"),
 setMethod("performance", signature(x="FLmse"),
   function(x, statistics=.validStatistics(om(x)), metrics=NULL, 
     years=dimnames(om(x))$year, om=name(x@om), type="MP", run="1",
-    control=TRUE, ...) {
+    control=FALSE, ...) {
 
     # GET arguments (extra metrics)
     args <- list(...)
@@ -317,7 +330,7 @@ setMethod("performance", signature(x="FLmse"),
     
     if(missing(statistics) & !is.null(res)) {
 
-      return(res)
+      return(res[])
 
     } else {
 
@@ -417,6 +430,9 @@ setMethod("performance", signature(x="FLmse"),
       else
         setcolorder(res, c("om", "statistic", "name", "desc", "year",
           "iter", "data", "type", "run", "mp"))
+
+      # SET to stanadrd colorder
+      .setOrder(res) 
 
       return(res[])
     }
@@ -551,11 +567,17 @@ setMethod("performance", signature(x="list"),
 
 setMethod("performance", signature(x="FLStock"),
   function(x, statistics, metrics=list(R=rec, SB=ssb, B=tsb, C=catch, L=landings,
-      D=discards, F=fbar, HR=hr), ...) {
+    D=discards, F=fbar, HR=hr), ...) {
 
-      flqs <- metrics(x, metrics=metrics)
+    flqs <- metrics(x, metrics=metrics)
 
-    return(performance(flqs, statistics=statistics, ...)[])
+    # COMPUTE
+    res <- performance(flqs, statistics=statistics, ...)
+
+    # SET to standard colorder
+    .setOrder(res) 
+
+    return(res[])
   }
 )
 # }}}
@@ -575,6 +597,17 @@ setMethod("performance", signature(x="FLStocks"),
 # }}}
 
 # .functions {{{
+
+# . setOrder
+.setOrder <- function(res) {
+
+  standard <- c('om', 'biol', 'mp', 'year', 'statistic', 'name', 'iter',
+    'data', 'type', 'run', 'label', 'desc')
+
+  present <- intersect(standard, colnames(res))
+
+  setcolorder(res, present)
+} 
 
 # .merge, twist y and merge to x
 
