@@ -201,7 +201,7 @@ setMethod("performance", signature(x="FLQuants"),
           
           res <- as.data.table(as.data.frame(eval(j$expr, inp), drop=FALSE))
             setkeyv(res, c("age", "unit", "season", "area", "iter"))
-          
+
           res <- res[, .(data=mean(data), year=ni), by=.(age, unit, season, area, iter)]
 
           return(res)
@@ -385,7 +385,7 @@ setMethod("performance", signature(x="FLmse"),
 
       # CALL performance(metrics)
       res <- do.call(performance, c(list(x=mets, statistics=statistics,
-        refpts=refpts(x)), hcrargs, tracks,
+        refpts=refpts(x)), hcrargs, tracks, years=years,
         om=unname(name(x@om)), type=type, run=run))
 
       # NAME mp if  possible
@@ -431,7 +431,7 @@ setMethod("performance", signature(x="FLmse"),
         setcolorder(res, c("om", "statistic", "name", "desc", "year",
           "iter", "data", "type", "run", "mp"))
 
-      # SET to stanadrd colorder
+      # SET to standard colorder
       .setOrder(res) 
 
       return(res[])
