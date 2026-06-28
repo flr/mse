@@ -888,19 +888,19 @@ setMethod("propagate", signature(object="FLombf"),
 
 # iter {{{
 setMethod("iter", signature(obj="FLombf"),
-  function(obj, iter) {
+  function(obj, i) {
 
     # biols
-    biols(obj) <- lapply(biols(obj), 'iter', iter)
+    biols(obj) <- lapply(biols(obj), 'iter', i)
 
     # fisheries
-    fisheries(obj) <- lapply(fisheries(obj), 'iter', iter)
+    fisheries(obj) <- lapply(fisheries(obj), 'iter', i)
 
     # refpts
-    obj@refpts <- FLPars(lapply(obj@refpts, 'iter', iter))
+    obj@refpts <- FLPars(lapply(obj@refpts, 'iter', i))
 
     # projection
-    projection(obj) <- iter(projection(obj), iter)
+    projection(obj) <- iter(projection(obj), i)
 
     return(obj)
   }

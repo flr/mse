@@ -158,11 +158,11 @@ setMethod("undebug", signature(fun="mseCtrl", signature="missing"),
 
 # iter (mseCtrl) {{{
 setMethod("iter", signature(obj = "mseCtrl"),
-  function(obj, iter) {
+  function(obj, i) {
   
   args(obj) <- lapply(obj@args, function(x) {
 			if(is(x, "FLQuant") | is(x, "FLQuants") | is(x, 'FLPar'))
-        FLCore::iter(x, iter)
+        FLCore::iter(x, i)
       else
         x
 		})
