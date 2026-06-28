@@ -128,7 +128,7 @@ setMethod("performance", signature(x="FLQuants"),
 
     # GET extra args
     dots <- list(...)
-    
+
     # GET names in refpts and metrics, plus FLQuant dimnames
     valid.names <- c(dimnames(refpts)$params, names(x),
       c("age", "year", "unit", "season", "area"), names(dots))
@@ -320,10 +320,10 @@ setMethod("performance", signature(x="FLmse"),
     control=FALSE, ...) {
 
     # GET arguments (extra metrics)
-    args <- list(...)
+    dots <- list(...)
 
     # SEPARATE functions and values
-    fid <- sapply(args, is, 'function')
+    fid <- sapply(dots, is, 'function')
 
     # IF no extra args, return 'performance' attribute ...
     res <- attr(x, 'performance')
@@ -359,7 +359,7 @@ setMethod("performance", signature(x="FLmse"),
       mets <- metrics(x, metrics=metrics)
 
       # ADD non-function args
-      mets <- .merge(mets, args[!fid])
+      mets <- .merge(mets, dots[!fid])
 
       # GET current metrics names
       nms_mets <- if(is(mets, "FLQuants")) names(mets) else names(mets[[1]])
@@ -375,7 +375,7 @@ setMethod("performance", signature(x="FLmse"),
       extra <- sapply(needed[!needed %in% c(known, builtins())], exists)
 
       # COMPUTE extra and add to mets
-      if(length(extra > 0)) {
+      if(any(extra)) {
         extras <- lapply(setNames(nm=names(extra)[extra]), function(i)
           do.call(i, list(om(x))))
 
@@ -550,11 +550,11 @@ setMethod("performance", signature(x="list"),
     if(!is(refpts, "list")) {
       refpts <- lapply(setNames(nm=names(x)), function(x) refpts)
     }
-     
+
     # CALL performance(FLQuants)
-    res <- rbindlist(Map(function(x, y)
-      performance(x, statistics=statistics, refpts=y, ...),
-      x=x, y=refpts), idcol='biol')
+    res <- rbindlist(Map(function(x, y) {
+      performance(x, statistics=statistics, refpts=y, ...)
+    }, x=x, y=refpts), idcol='biol')
     
     return(res[])
   }
@@ -642,4 +642,3 @@ setMethod("performance", signature(x="FLStocks"),
   return(invisible(x))
 }
 # }}}
-
