@@ -127,12 +127,8 @@ setMethod("c", "FLmses",
 # $<- {{{
 setReplaceMethod("$", signature(x="FLmses", value="FLmse"),
 	function(x, name, value) {
-
-    nms <- names(x)
     
-    x@.Data[[as.character(name)]] <- value
-
-    names(x@.Data) <- c(nms, name)
+    x[[as.character(name)]] <- value
 
     return(x)
   }
