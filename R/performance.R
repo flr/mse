@@ -458,7 +458,7 @@ setMethod("performance", signature(x="FLmses"),
 
     # RETURN performance slot if no other args
     if(length(args) == 0)
-      return(slot(x, 'performance'))
+      return(slot(x, 'performance')[])
     # COMPUTE
     else {
       # SET statistics if missing
@@ -642,3 +642,14 @@ setMethod("performance", signature(x="FLStocks"),
   return(invisible(x))
 }
 # }}}
+
+.validDT <- function(x) {
+
+  if(!is.data.table(x))
+    stop("input must be a data.table")
+  
+  if(!all(c("statistic", "year", "data") %in% colnames(x)))
+    stop("data.table must contain columns: statistic, year, data")
+  
+  return(TRUE)
+}

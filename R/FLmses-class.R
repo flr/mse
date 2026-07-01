@@ -46,17 +46,18 @@ setMethod("FLmses", signature(object="list", performance="data.frame"),
 )
 
 setMethod("FLmses", signature(object="list", performance="missing"),
- function(object, statistics="missing", years="missing", metrics="missing", type="NA") {
+ function(object, statistics="missing", years="missing", metrics="missing",
+          type="NA", ...) {
 
     # COMPUTE performance IF statistics
     if(!missing(statistics)) {
       # AND for years
       if(!missing(years)) {
         perf <- performance(object, statistics=statistics, years=years,
-          metrics=metrics, type=type)
+          metrics=metrics, type=type, ...)
       } else {
         perf <- performance(object, statistics=statistics,
-          metrics=metrics, type=type)
+          metrics=metrics, type=type, ...)
       }
     } else {
 
@@ -114,10 +115,11 @@ setMethod("c", "FLmses",
     if(any(id))
       args[id] <- lapply(args[id], unclass)
 
+    per  <- rbindlist(c(list(performance(x)), lapply(args, 'performance')))
     res <- c(unclass(x), Reduce('c', args))
 
     # MERGE performance, ADD run and
-    res <- FLmses(res)
+    res <- FLmses(res, performance=per)
 
     return(res)
   })
