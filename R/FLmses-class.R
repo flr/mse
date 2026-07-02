@@ -95,7 +95,7 @@ setMethod("c", "FLmses",
     # PARSE args
     args <- list(...)
 
-  # CONVERT FLo elements to list(FLmses)
+    # CONVERT FLo elements to list(FLmses)
     id <- vapply(args, is, logical(1), 'FLo')
 
     if(any(id))
@@ -109,12 +109,7 @@ setMethod("c", "FLmses",
       args[id] <- Map(function(val, nm)
         setNames(list(val), nm), args[id], names(args[id]))
 
-    # AND FLmses too
-    id <- vapply(args, is, logical(1), 'FLmses')
-
-    if(any(id))
-      args[id] <- lapply(args[id], unclass)
-
+    # ASSEMBLE perfomance tables
     per  <- rbindlist(c(list(performance(x)), lapply(args, 'performance')))
     res <- c(unclass(x), Reduce('c', args))
 

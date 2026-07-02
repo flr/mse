@@ -452,7 +452,7 @@ setReplaceMethod('performance', signature(x='FLmse', value="data.frame"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLmses"),
-  function(x, ...) {
+  function(x, type=NULL, ...) {
 
     args <- list(...)
 
@@ -480,6 +480,17 @@ setMethod("performance", signature(x="FLmses"),
         res <- rbindlist(Map(function(i, j){
           do.call(performance, c(list(x=i, run=j, om=name(om(i))), args))
         }, i=x, j=names(x)), fill=TRUE)
+
+        # ADD type
+        if(!is.null(type)) {
+          if(is(type, "data.table")) {
+            col <- colnames(type)[colnames(type) != "type"][1]
+            res[type, type := i.type, on = col]
+          } else if(is(type, "character")) {
+            res[, type := type]
+          }
+          res[, mp:=paste(om, type, run, sep="_")]
+        }
 
         # SET mp if possible
         if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
