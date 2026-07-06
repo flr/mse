@@ -312,38 +312,6 @@ setMethod("ssb", signature(object="FLombf"),
 setMethod("tsb", signature(object="FLombf"),
   function(object, biol=NULL) {
 
-    res <- FLQuants(Map(tsb, biols(object),
-      f=harvest(object)))
-    
-    return(res)
-  }
-)
-
-setMethod("tb", signature(object="FLombf"),
-  function(object, biol=NULL) {
-
-    res <- FLQuants(Map(tb, biols(object),
-      f=harvest(object)))
-    
-    return(res)
-  }
-)
-# }}}
-
-# rec, tsb {{{
-
-setMethod("rec", signature(object="FLombf"),
-  function(object, biol=NULL) {
-    
-    res <- FLQuants(lapply(biols(object), rec))
-
-    return(res)
-  }
-)
-
-setMethod("tsb", signature(object="FLombf"),
-  function(object, biol=NULL) {
-
     res <- FLQuants(mapply(tsb, biols(object),
       f=harvest(object), SIMPLIFY=FALSE))
     
@@ -360,6 +328,60 @@ setMethod("tb", signature(object="FLombf"),
     return(res)
   }
 )
+
+# }}}
+
+# vb {{{
+
+setMethod("vb", signature(x = "FLombf"),
+  function(x, ...) {
+
+    fcb  <- FCB(x)
+    bios <- biols(x)
+    fish <- fisheries(x)
+
+    # unique biol indices in FCB
+    biol_ids <- unique(fcb[, "B"])
+
+    out <- lapply(biol_ids, function(b) {
+
+      bio <- bios[[b]]
+      n   <- n(bio)
+      wt  <- wt(bio)
+
+      # all fishery/catch rows that work on this biol
+      rows <- fcb[fcb[, "B"] == b, , drop = FALSE]
+
+      # sum sel*F across fisheries/catches for this biol
+      fsel <- Reduce("+", lapply(seq_len(nrow(rows)), function(i) {
+        f <- rows[i, "F"]
+        c <- rows[i, "C"]
+        catch.sel(fish[[f]][[c]])
+      }))
+
+      # vb = sum_age( sel * F * N * Wt )  -- vulnerable biomass
+      quantSums(fsel * n * wt)
+    })
+
+    names(out) <- names(bios)[biol_ids]
+    FLQuants(out)
+  }
+)
+
+# }}}
+
+# rec {{{
+
+setMethod("rec", signature(object="FLombf"),
+  function(object, biol=NULL) {
+    
+    res <- FLQuants(lapply(biols(object), rec))
+
+    return(res)
+  }
+)
+
+
 # }}}
 
 # harvest, partialF, computeHarvest {{{
@@ -749,16 +771,18 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
     mets <- lapply(biols(object), metrics)
 
     # ADD catch, SSB, Fbar and HR by biol
-    mets <- Map(function(me, ca, sb, fb, hb) {
+    mets <- Map(function(me, ca, sb, fb, hb, vb) {
 
       me[['SB']] <- sb
       me[['C']] <- ca
       me[['F']] <- fb
       me[['HR']] <- hb
+      me[['VB']] <- vb
 
       return(me)
 
-    }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object), hb=hr(object))
+    }, me=mets, ca=catch(object), sb=ssb(object), fb=fbar(object),
+      hb=hr(object), vb=vb(object))
 
     # ADD ...
     extra <- list(...)
@@ -864,19 +888,19 @@ setMethod("propagate", signature(object="FLombf"),
 
 # iter {{{
 setMethod("iter", signature(obj="FLombf"),
-  function(obj, iter) {
+  function(obj, i) {
 
     # biols
-    biols(obj) <- lapply(biols(obj), 'iter', iter)
+    biols(obj) <- lapply(biols(obj), 'iter', i)
 
     # fisheries
-    fisheries(obj) <- lapply(fisheries(obj), 'iter', iter)
+    fisheries(obj) <- lapply(fisheries(obj), 'iter', i)
 
     # refpts
-    obj@refpts <- FLPars(lapply(obj@refpts, 'iter', iter))
+    obj@refpts <- FLPars(lapply(obj@refpts, 'iter', i))
 
     # projection
-    projection(obj) <- iter(projection(obj), iter)
+    projection(obj) <- iter(projection(obj), i)
 
     return(obj)
   }

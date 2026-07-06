@@ -19,6 +19,7 @@
 \alias{args<--methods}
 \alias{args<-,mseCtrl,list-method}
 \alias{show,mseCtrl-method}
+\alias{summary,mseCtrl-method}
 \alias{exists}
 \alias{exists,mseCtrl-method}
 \title{S4 class \code{mseCtrl}}
@@ -42,6 +43,8 @@ args(object, ...) <- value
 \S4method{args}{mseCtrl,list}(object) <- value
 
 \S4method{show}{mseCtrl}(object)
+
+\S4method{summary}{mseCtrl}(object)
 
 exists(
   x,

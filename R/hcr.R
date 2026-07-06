@@ -86,6 +86,8 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   # GET biol name
   bname <- tracking[, unique(biol)][stock]
 
+  bname <- 1
+
   # CHECK function arguments
 
   # All !NA
@@ -124,7 +126,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
   # TRACK initial output
   track(tracking, "decision.hcr", year=ay, biol=stock) <- out
 
-  # TRACK rule: met <= lim, 1; lim < met < trigger, 2; met >= trigger, 3
+  # TRACK rule: met <= lim, 1; lim < met < trigger, 2; met >= trigger, 3 (healthy)
   track(tracking, "rule.hcr", year=ay, biol=args$stock) <- ifelse(met < drop, 0,
     ifelse(met <= lim, 1, ifelse(met < trigger, 2, 3)))
 
@@ -234,7 +236,7 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
 #' geom_vline(xintercept=1)
 
 plot_hockeystick.hcr <- function(args, obs=NULL,
-  kobe=FALSE, xtarget=args$trigger, alpha=0.3,
+  kobe=FALSE, xtarget=args$trigger, alpha=0.3, xlim=max(trigger) * 1.50,
   labels=c(lim="limit", trigger="trigger", min="min", target="target", drop="drop")) {
   
   # EXTRACT args from mpCtrl
@@ -259,7 +261,6 @@ plot_hockeystick.hcr <- function(args, obs=NULL,
   spread(lapply(args, c))
 
   # GET plot limits
-  xlim <- max(trigger) * 1.50
   ylim <- max(target) * 1.50
 
   # SET met values
@@ -279,9 +280,6 @@ plot_hockeystick.hcr <- function(args, obs=NULL,
   # APPLY drop to min
   out[c(met < c(args$drop))] <- min
 
-  # LABELS as list
-  labels <- as.list(labels)
- 
   # DATA
   # TODO: ADD 'set'
   dat <- data.frame(metric=met, output=out)
@@ -292,22 +290,34 @@ plot_hockeystick.hcr <- function(args, obs=NULL,
     # TARGET
     annotate("segment", x=0, xend=trigger * 1.25, y=target, yend=target,
       linetype=2) +
-    annotate("label", x=0, y=target + ylim / 40, label=labels$target, 
-      hjust="left", vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
-    # MIN
-    annotate("label", x=0, y=min + ylim / 40, label=labels$min, hjust="left", 
-      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
     # LIMIT
     annotate("segment", x=lim, xend=lim, y=min + ylim / 10, yend=min, linetype=2) +
-    annotate("label", x=lim, y=min + ylim / 10, label=labels$lim, vjust="bottom", 
-      parse=TRUE, fill=flpalette[2], alpha=0.5) +
     # TRIGGER
     annotate("segment", x=trigger, xend=trigger, y=0, yend=target,
       linetype=2) +
-    annotate("label", x=trigger, y=min + ylim / 10, label=labels$trigger, 
-      vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
     # HCR line
     geom_line(size=1)
+
+  # ADD labels
+  if(!is.null(labels)) {
+  
+    # LABELS as list
+      labels <- as.list(labels)
+ 
+    p <- p +
+      # TARGET
+      annotate("label", x=0, y=target + ylim / 40, label=labels$target, 
+        hjust="left", vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+      # MIN
+      annotate("label", x=0, y=min + ylim / 40, label=labels$min, hjust="left", 
+        vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5) +
+      # LIMIT
+      annotate("label", x=lim, y=min + ylim / 10, label=labels$lim, vjust="bottom", 
+        parse=TRUE, fill=flpalette[2], alpha=0.5) +
+      # TRIGGER
+      annotate("label", x=trigger, y=min + ylim / 10, label=labels$trigger, 
+        vjust="bottom", parse=TRUE, fill=flpalette[2], alpha=0.5)
+  }
 
   # ADD drop
   if(!is.null(args$drop) & args$drop != 0) {

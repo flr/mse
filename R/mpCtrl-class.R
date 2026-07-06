@@ -240,7 +240,7 @@ setMethod("show", signature(object = "mpCtrl"),
       cat(paste("Module: ", modname), "\n")
       
       # method
-      cat(paste("  method:", find.original.name(method(mod))), "\n")
+      cat(paste("  method:", find_original_name(method(mod))), "\n")
       
       # args
       cat(paste("  args:"), "\n")
@@ -273,11 +273,11 @@ setMethod("show", signature(object = "mpCtrl"),
 # iters {{{
 
 #' @rdname mpCtrl-class
-setMethod("iters", signature(object = "mpCtrl"), function(object, iter){
+setMethod("iters", signature(object = "mpCtrl"), function(object, i){
 
 	ctrl <- lapply(object, function(x) {
 		lst0 <- lapply(x@args, function(y){
-			if(is(y, "FLQuant")) FLCore::iter(y, iter) else y	
+			if(is(y, "FLQuant")) FLCore::iter(y, i) else y	
 		})
 		args(x) <- lst0
 		x
@@ -288,8 +288,8 @@ setMethod("iters", signature(object = "mpCtrl"), function(object, iter){
 # iter {{{
 
 #' @rdname mpCtrl-class
-setMethod("iter", signature(obj = "mpCtrl"), function(obj, iter){
-  ctrl <- lapply(obj, iter, iter=iter)
+setMethod("iter", signature(obj = "mpCtrl"), function(obj, i){
+  ctrl <- lapply(obj, iter, i=iter)
   return(mpCtrl(ctrl))
 }) # }}}
 

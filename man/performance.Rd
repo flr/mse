@@ -44,10 +44,12 @@
 \S4method{performance}{FLmse}(
   x,
   statistics = .validStatistics(om(x)),
+  metrics = NULL,
+  years = dimnames(om(x))$year,
   om = name(x@om),
-  control = FALSE,
   type = "MP",
   run = "1",
+  control = FALSE,
   ...
 )
 
@@ -171,7 +173,7 @@ performance(mse, run="r00", type="test")
 performance(mse, statistics=statistics[c("SBMSY", "FMSY")], run="r00", type="test")
 }
 \seealso{
-\link{statistics}, \code{\link[=refpts]{refpts()}}, \code{\link[FLCore:metrics]{FLCore::metrics()}}
+\link{statistics}, \code{\link[=refpts]{refpts()}}, \code{\link[FLCore:metrics]{metrics()}}
 }
 \author{
 Iago Mosqueira (WMR)

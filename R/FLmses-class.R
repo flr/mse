@@ -30,7 +30,7 @@ setMethod("FLmses", signature(object="FLmse", performance="ANY"),
 
     args <- c(object, list(...))
 
-    return(FLmses(args, performance=data.table(performance)))
+    return(FLmses(args, performance=.compactDT(data.table(performance))))
 
   }
 )
@@ -39,24 +39,25 @@ setMethod("FLmses", signature(object="list", performance="data.frame"),
   function(object, performance) {
 
     res <- FLmses(object)
-    performance(res) <- data.table(performance)
+    performance(res) <- .compactDT(data.table(performance))
 
     return(res)
   }
 )
 
 setMethod("FLmses", signature(object="list", performance="missing"),
- function(object, statistics="missing", years="missing", metrics="missing", type="NA") {
+ function(object, statistics="missing", years="missing", metrics="missing",
+          type="NA", ...) {
 
     # COMPUTE performance IF statistics
     if(!missing(statistics)) {
       # AND for years
       if(!missing(years)) {
         perf <- performance(object, statistics=statistics, years=years,
-          metrics=metrics, type=type)
+          metrics=metrics, type=type, ...)
       } else {
         perf <- performance(object, statistics=statistics,
-          metrics=metrics, type=type)
+          metrics=metrics, type=type, ...)
       }
     } else {
 
@@ -94,25 +95,26 @@ setMethod("c", "FLmses",
     # PARSE args
     args <- list(...)
 
-    # IF args not all FLmse, RETURN list
-    cls <- unlist(lapply(args, is, 'FLmse'))
-    if(!all(cls)) {
-      return(c(unclass(x), args))
-    }
+    # CONVERT FLo elements to list(FLmses)
+    id <- vapply(args, is, logical(1), 'FLo')
 
-    # GET arg names
-    argnms <- sys.call()
-    nams <- as.character(argnms)[-1]
+    if(any(id))
+      args[id] <- Map(function(val, nm)
+        setNames(list(FLmse(om=val)), nm), args[id], names(args[id]))
 
-    # .Data
-    data <- c(x@.Data, unlist(lapply(args, "slot", ".Data")))
+    # CONVERT FLmses elements to lists
+    id <- vapply(args, is, logical(1), 'FLmse')
 
-    names(data) <- unlist(c(list(names(x)), lapply(args, names)))
+    if(any(id))
+      args[id] <- Map(function(val, nm)
+        setNames(list(val), nm), args[id], names(args[id]))
+
+    # ASSEMBLE perfomance tables
+    per  <- rbindlist(c(list(performance(x)), lapply(args, 'performance')))
+    res <- c(unclass(x), Reduce('c', args))
 
     # MERGE performance, ADD run and
-    perf <- rbindlist(c(list(performance(x)), lapply(args, performance)))
-
-    res <- FLmses(data, performance=perf)
+    res <- FLmses(res, performance=per)
 
     return(res)
   })
@@ -122,12 +124,8 @@ setMethod("c", "FLmses",
 # $<- {{{
 setReplaceMethod("$", signature(x="FLmses", value="FLmse"),
 	function(x, name, value) {
-
-    nms <- names(x)
     
-    x@.Data[[as.character(name)]] <- value
-
-    names(x@.Data) <- c(nms, name)
+    x[[as.character(name)]] <- value
 
     return(x)
   }
@@ -138,7 +136,7 @@ setReplaceMethod("$", signature(x="FLmses", value="FLmse"),
 
 setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
   function(x, i, drop=FALSE) {
-    
+
     # GET 
     if(is.numeric(i)) {
       i <- names(x)[i]
@@ -147,7 +145,8 @@ setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
     # SUBSET in list, need to unclass
     x@.Data <- unclass(x)[i]
     
-    performance(x) <- x@performance[run %in% i,]
+    if(nrow(performance(x)) > 0)
+      performance(x) <- x@performance[run %in% i,]
 
     return(x)
   }

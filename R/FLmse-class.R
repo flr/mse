@@ -65,7 +65,10 @@ FLmse <- setClass("FLmse",
     oem="FLoem",
     # TODO args vs. mpargs
 		args="list"
-	)
+	),
+  prototype=prototype(
+    tracking=data.table()
+  )
 )
 
 #' @rdname FLmse-class
@@ -228,7 +231,7 @@ setMethod("summary", signature(object="FLmse"),
 
     for(i in names(control)) {
       cat(paste0(i, ":"), "\n")
-      cat("\tMethod: ", find.original.name(method(control[[i]])), "\n")
+      cat("\tMethod: ", find_original_name(method(control[[i]])), "\n")
     }
 
     # oem
@@ -287,15 +290,15 @@ setMethod("time", signature(x="FLmse"),
 
 # iter {{{
 setMethod("iter", signature(obj="FLmse"),
-  function(obj, iter) {
+  function(obj, i) {
 
     # OM
-    om(obj) <- iter(om(obj), iter)
+    om(obj) <- iter(om(obj), i)
     # OEM
-    oem(obj) <- iter(oem(obj), iter)
+    oem(obj) <- iter(oem(obj), i)
     # tracking
     tra <- slot(obj, "tracking")
-    slot(obj, "tracking") <- tra[eval(tra[, iter %in% ..iter]),]
+    slot(obj, "tracking") <- tra[eval(tra[, i %in% ..iter]),]
 
     return(obj)
   }
@@ -309,6 +312,7 @@ setMethod("dims", signature(obj="FLmse"),
   }
 ) # }}}
 
+# window {{{
 setMethod("window", signature(x="FLmse"),
   function(x, start=dims(x)$minyear, end=dims(x)$maxyear) {
 

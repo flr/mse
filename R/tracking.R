@@ -18,7 +18,7 @@ setReplaceMethod("track", signature(object="data.table", value="numeric"),
     nos <- object[, length(unique(iter))] * length(year)
 
     # GET biol name
-    bion <- ifelse(is.numeric(biol), object[, unique(biol)][biol], stock)
+    bion <- ifelse(is.numeric(biol), object[, unique(biol)][biol], biol)
 
     # ASSIGN
     object[eval(object[, biol == bion & year %in% ..year & metric == step]),
@@ -38,7 +38,7 @@ setReplaceMethod("track", signature(object="data.table", value="FLQuant"),
     object <- .addMetricDT(object, step)
 
     # GET biol name
-    bion <- ifelse(is.numeric(biol), object[, unique(biol)][biol], stock)
+    bion <- ifelse(is.numeric(biol), object[, unique(biol)][biol], biol)
 
     # ASSIGN
     object[eval(object[, biol == bion & year %in% ..year & metric == step]),
@@ -63,7 +63,7 @@ setReplaceMethod("track", signature(object="data.table", value="fwdControl"),
     }
 
     # GET biol name
-    bion <- ifelse(is.numeric(biol), object[, unique(biol)][biol], stock)
+    bion <- ifelse(is.numeric(biol), object[, unique(biol)][biol], biol)
 
     # SUBSET first year
     value <- value[value$year == min(value$year),]

@@ -552,7 +552,7 @@ setMethod("summary", signature(object="FLom"),
     # projection
     cat("projection: \n")
     cat("  method: ")
-    cat(find.original.name(method(projection(object))), "\n")
+    cat(find_original_name(method(projection(object))), "\n")
 
     # fleetBehaviour
 
@@ -643,16 +643,16 @@ setMethod("fwd", signature(object="FLom", fishery="ANY", control="missing"),
 # iter {{{
 
 setMethod("iter", signature(obj="FLom"),
-  function(obj, iter) {
+  function(obj, i) {
 
     # stock
-    stock(obj) <- iter(stock(obj), iter)
+    stock(obj) <- iter(stock(obj), i)
     
     # refpts
-    refpts(obj) <- iter(refpts(obj), iter)
+    refpts(obj) <- iter(refpts(obj), i)
 
     # sr
-    sr(obj) <- iter(sr(obj), iter)
+    sr(obj) <- iter(sr(obj), i)
 
     # fleeBehaviour
 

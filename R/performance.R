@@ -38,6 +38,62 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
   return(statistics[valid])
 }
 
+# . setOrder
+.setOrder <- function(res) {
+
+  standard <- c('om', 'biol', 'mp', 'year', 'statistic', 'name', 'iter',
+    'data', 'type', 'run', 'label', 'desc')
+
+  present <- intersect(standard, colnames(res))
+
+  setcolorder(res, present)
+} 
+
+# .merge, twist y and merge to x
+
+.merge <- function(x, y) {
+  if(length(y) == 0)
+    return(x)
+  if(!is.list(x))
+    x <- c(x, y)
+  else {
+    y <- setNames(lapply(names(x), function(i)
+      lapply(y, `[[`, i)), names(x))
+    x <- Map(function(x, y) FLQuants(c(x,y)), x, y)
+  }
+  return(x)
+}
+
+# .compactDT
+
+.compactDT <- function(x) {
+
+  # FACTOR character columns
+  chr_cols <- names(x)[sapply(x, is.character)]
+  if(length(chr_cols) > 0)
+    x[, (chr_cols) := lapply(.SD, as.factor), .SDcols=chr_cols]
+  
+  # INTEGER year and iter
+  if("year" %in% names(x))
+    x[, year := as.integer(year)]
+  if("iter" %in% names(x))
+    x[, iter := as.integer(iter)]
+
+  return(invisible(x))
+}
+
+# .validDT
+.validDT <- function(x) {
+
+  if(!is.data.table(x))
+    stop("input must be a data.table")
+  
+  if(!all(c("statistic", "year", "data") %in% colnames(x)))
+    stop("data.table must contain columns: statistic, year, data")
+  
+  return(TRUE)
+}
+
 # }}}
 
 # performance {{{
@@ -126,10 +182,13 @@ setMethod("performance", signature(x="FLQuants"),
     refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
     om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
 
+    # GET extra args
+    dots <- list(...)
+
     # GET names in refpts and metrics, plus FLQuant dimnames
     valid.names <- c(dimnames(refpts)$params, names(x),
-      c("age", "year", "unit", "season", "area"))
-    
+      c("age", "year", "unit", "season", "area"), names(dots))
+
     # CREATE years list
     if(!is.list(years))
       years <- setNames(as.list(years), nm=as.character(years))
@@ -160,73 +219,71 @@ setMethod("performance", signature(x="FLQuants"),
     if(length(names(statistics)) != length(unique(names(statistics))))
       stop("'statistics' must have unique names.")
 
-    # ADD name as desc if missing
+    # ADD name as desc if missing, separate expr and flag change and computability
     statistics <- lapply(statistics, function(x) {
       if(is.null(x$desc)) x$desc <- x$name
+
+      x$expr <- x[names(x) == ""][[1]][[2]]
+      x$vars <- all.vars(x$expr)
+      x$is_change <- grepl("change|variability|difference", x$desc)
+      x$computable <- all(sapply(x$vars, function(v) exists(v) | v %in% valid.names))
+      
       return(x)
     })
 
-    # LOOP over years
+    # COERCE refpts to list
+    refpts_lst <- lapply(as(refpts, 'list'), identity)
+
+    # MAP over years
     res <- data.table::rbindlist(Map(function(i, ni) {
 
-      # LOOP over statistics
+      if(any(unlist(lapply(statistics, '[[', 'is_change'))) & length(i) == 1) {
+        i_use <- seq(an(i) - 1, an(i))
+        x_i <- lapply(x, '[', j=ac(i_use))
+        inp_change <- c(x_i, lapply(refpts_lst, rep, each=length(i_use)), dots)
+        x_i <- lapply(x, '[', j=ac(i))
+        inp_base <- c(x_i, lapply(refpts_lst, rep, each=length(i)), dots)
+      } else {
+        x_i <- lapply(x, '[', j=ac(i))
+        inp_base <- c(x_i, lapply(refpts_lst, rep, each=length(i)), dots)
+        inp_change <- inp_base  # never used but avoids unbound variable
+      }
+
       data.table::rbindlist(lapply(statistics, function(j) {
+        
+        inp <- if(j$is_change & length(i) == 1) inp_change else inp_base
 
-        # ADD previous year when 1 used and stats is for change
-        if(grepl("change|variability|difference", j$desc) & length(i) == 1) {
-          i <- seq(an(i) - 1, an(i))
-        }
+        if(j$computable) {
+          
+          res <- as.data.table(as.data.frame(eval(j$expr, inp), drop=FALSE))
+            setkeyv(res, c("age", "unit", "season", "area", "iter"))
 
-        # ASSEMBLE inputs
-        inp <- c(lapply(x, '[' , j=ac(i)),
-          # REPEAT refpts by year because recycling goes year first
-          lapply(lapply(as(refpts, 'list'), function(x)
-            x[!is.na(x)]), rep, each=length(i)), list(...))
-
-        # EVAL statistic if names match with existing object (function) or in inp
-        if(all(unlist(lapply(all.vars(j[names(j) == ""][[1]][[2]]), function(x)
-          exists(x) | x %in% names(inp))))) {
-
-          res <- data.table(as.data.frame(eval(j[names(j) == ""][[1]][[2]], inp),
-            drop=FALSE))
-
-          # COMPUTE mean and LABEL
           res <- res[, .(data=mean(data), year=ni), by=.(age, unit, season, area, iter)]
 
-          return(res[, .(age, unit, season, area, iter, data)])
-          
+          return(res)
+
         } else {
-
-          # WARN and return empty
           warning(paste0("statistic '", j$name, "' could not be computed, check metrics or tracking."))
-
           return(NULL)
         }
-      }), idcol="statistic", fill=TRUE)[,c("statistic", "data", "iter")]
+      }), idcol="statistic", fill=TRUE)[, c("statistic", "data", "iter")]
     }, i=years, ni=names(years)), idcol="year")
 
     # SET year as numeric, TODO:combine with periods
-    if(!any(is.na(suppressWarnings(as.numeric(res[, year])))))
+    if(!any(is.na(suppressWarnings(as.numeric(names(years))))))
       res[, year := as.numeric(year)]
 
-    # Set DT keys
-    setkey(res, statistic, year)
-    
-    # ADD statistic name(s) &description(s)
-    inds <- lapply(statistics, '[[', 'name')
-    descs <- lapply(statistics, '[[', 'desc')
+    # ADD statistic name(s) & description(s)
+    names <- sapply(statistics, '[[', 'name')
+    descs <- sapply(statistics, '[[', 'desc')
+    res[, name := names[statistic]]
+    res[, desc := descs[statistic]]
 
-    inds <- data.table(statistic=names(inds), name=unlist(inds), desc=unlist(descs))
-    setkey(inds, statistic)
-
-    # MERGE
-    res <- merge(res, inds, by='statistic')
-    
-    # CREATE empty cols
-    set(res, j=c('om', 'type', 'run', 'mp'), value=as.list(rep(character(1), 4)))
-
-    # ASSIGN names (om, type, run, mp)
+    # CREATE and ASSIGN cols
     set(res, j=c('om', 'type', 'run', 'mp'), value=list(om, type, run, mp))
+
+    # SET to standard colorder
+    .setOrder(res) 
 
     return(res[])
   }
@@ -256,7 +313,13 @@ setMethod("performance", signature(x="FLo"),
     if(length(om) == 0)
       om <- NULL
 
-    return(performance(metrics, refpts=refpts, statistics=statistics, om=om, ...))
+    # COMPUTE on metrics
+    res <- performance(metrics, refpts=refpts, statistics=statistics, om=om, ...)
+
+    # SET to standard colorder
+    .setOrder(res) 
+
+    return(res[])
   }
 )
 # }}}
@@ -279,9 +342,13 @@ setMethod("performance", signature(x="FLombf"),
     if(length(om) == 0L)
       om <- NULL
 
+    # COMPUTE
     res <- rbindlist(lapply(setNames(nm=names(metrics)), function(i) 
       performance(metrics[[i]], refpts=x@refpts[[i]], statistics=statistics,
         om=om, ...)), idcol="biol")
+
+    # SET to standard colorder
+    .setOrder(res) 
  
     return(res)
   }
@@ -304,23 +371,27 @@ setMethod("performance", signature(x="FLombf"),
 #' performance(mse, statistics=statistics[c("SBMSY", "FMSY")], run="r00", type="test")
 
 setMethod("performance", signature(x="FLmse"),
-  function(x, statistics=.validStatistics(om(x)), om=name(x@om), control=FALSE,
-    type="MP", run="1", ...) {
+  function(x, statistics=.validStatistics(om(x)), metrics=NULL, 
+    years=dimnames(om(x))$year, om=name(x@om), type="MP", run="1",
+    control=FALSE, ...) {
 
-    # GET arguments
-    args <- list(...)
+    # GET arguments (extra metrics)
+    dots <- list(...)
 
-    res <- attr(x, 'performance')
+    # SEPARATE functions and values
+    fid <- sapply(dots, is, 'function')
 
     # IF no extra args, return 'performance' attribute ...
-    if(length(args) == 0 & !is.null(res)) {
+    res <- attr(x, 'performance')
+    
+    if(missing(statistics) & !is.null(res)) {
 
-      return(res)
+      return(res[])
 
     } else {
 
       # GET hcr args
-      control_args <- Filter(is.numeric, args(control(x)$hcr))
+      hcrargs <- Filter(is.numeric, args(control(x)$hcr))
 
       # GET tracking elements as FLQuants
       if(length(tracking(x)) > 0) {
@@ -332,16 +403,48 @@ setMethod("performance", signature(x="FLmse"),
         tracks <- NULL
       }
 
-      # COMPUTE metrics
-      mets <- do.call('metrics', list(object=x@om, metrics=args$metrics))
+      # GET refpts
+      rps <- refpts(x)
+      if(is(rps, "FLPar")) {
+         vars_rps <- dimnames(rps)$params
+      } else {
+         vars_rps <- unique(unlist(lapply(rps, function(i) dimnames(i)$params)))
+      }
+
+      # GET standard metrics
+      mets <- metrics(x, metrics=metrics)
+
+      # ADD non-function args
+      mets <- .merge(mets, dots[!fid])
+
+      # GET current metrics names
+      nms_mets <- if(is(mets, "FLQuants")) names(mets) else names(mets[[1]])
+
+      # IDENTIFY required formula elements
+      needed <- unique(unlist(lapply(statistics, function(s)
+        all.vars(s[[1]][[2]]))))
+
+      # LIST those in tracks, hcrargs, refpts and metrics
+      known <- c(names(tracks), names(hcrargs), vars_rps, nms_mets)
+
+      # IDENTIFY extra needed calls, ignores builtins()
+      extra <- sapply(needed[!needed %in% c(known, builtins())], exists)
+
+      # COMPUTE extra and add to mets
+      if(any(extra)) {
+        extras <- lapply(setNames(nm=names(extra)[extra]), function(i)
+          do.call(i, list(om(x))))
+
+        # ADD extras
+        mets <- .merge(mets, extras)
+      }
 
       # CALL performance(metrics)
       res <- do.call(performance, c(list(x=mets, statistics=statistics,
-        refpts=refpts(x)), control_args, tracks, args,
+        refpts=refpts(x)), hcrargs, tracks, years=years,
         om=unname(name(x@om)), type=type, run=run))
 
       # NAME mp if  possible
-      # TODO: IF type, run missing
       if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
         res[, mp:=paste(om, type, run, sep="_")]
 
@@ -384,14 +487,17 @@ setMethod("performance", signature(x="FLmse"),
         setcolorder(res, c("om", "statistic", "name", "desc", "year",
           "iter", "data", "type", "run", "mp"))
 
+      # SET to standard colorder
+      .setOrder(res) 
+
       return(res[])
     }
   }
 )
 
-setMethod('performance<-', signature(x='FLmse', value="data.frame"),
+setReplaceMethod('performance', signature(x='FLmse', value="data.frame"),
   function(x, value){
-    attr(x, "performance") <- value
+    attr(x, "performance") <- .compactDT(value)
     return(x)
 })
 
@@ -402,31 +508,45 @@ setMethod('performance<-', signature(x='FLmse', value="data.frame"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLmses"),
-  function(x, ...) {
+  function(x, type=NULL, ...) {
 
     args <- list(...)
 
-    # RETURN slot if no other args
+    # RETURN performance slot if no other args
     if(length(args) == 0)
-      return(slot(x, 'performance'))
+      return(slot(x, 'performance')[])
+    # COMPUTE
     else {
-      
+      # SET statistics if missing
       if(!"statistics" %in% names(args)) {
         args$statistics <- .validStatistics(om(x[[1]]))
       }
 
+      # SET years if missing
       if(!"years" %in% names(args)) {
         args$years <- dimnames(om(x[[1]]))$year[-1]
       }
 
+      # LAPPLY over args if FLmses
       if(all(unlist(lapply(args, is, "FLmses")))) {
         return(rbindlist(c(list(performance(x)), lapply(args, performance))))
 
+      # CALL on each FLmse in FLmses
       } else {
+        res <- rbindlist(Map(function(i, j){
+          do.call(performance, c(list(x=i, run=j, om=name(om(i))), args))
+        }, i=x, j=names(x)), fill=TRUE)
 
-        res <- rbindlist(Map(function(i, j) do.call(performance,
-          c(list(x=i, run=j, om=name(om(i))), args)),
-          i=x, j=names(x)))
+        # ADD type
+        if(!is.null(type)) {
+          if(is(type, "data.table")) {
+            col <- colnames(type)[colnames(type) != "type"][1]
+            res[type, type := i.type, on = col]
+          } else if(is(type, "character")) {
+            res[, type := type]
+          }
+          res[, mp:=paste(om, type, run, sep="_")]
+        }
 
         # SET mp if possible
         if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
@@ -440,9 +560,9 @@ setMethod("performance", signature(x="FLmses"),
 
 # performance<-(FLmse, data.table)
 
-setMethod('performance<-', signature(x='FLmses', value="data.frame"),
+setReplaceMethod('performance', signature(x='FLmses', value="data.frame"),
   function(x, value){
-    slot(x, 'performance') <- data.table(value)
+    slot(x, 'performance') <- .compactDT(data.table(value))
     return(x)
 })
 
@@ -464,7 +584,7 @@ setMethod("performance", signature(x="list"),
       # TODO: ADD om if missing, via idcol or :=, DROP Map
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
         statistics=statistics, years=years, run=j),
-        list(...))), i=x, j=names(x)))
+        list(...))), i=x, j=names(x)), fill=TRUE)
 
       return(res[])
     }
@@ -497,11 +617,11 @@ setMethod("performance", signature(x="list"),
     if(!is(refpts, "list")) {
       refpts <- lapply(setNames(nm=names(x)), function(x) refpts)
     }
-     
+
     # CALL performance(FLQuants)
-    res <- data.table::rbindlist(Map(function(x, y)
-      performance(x, statistics=statistics, refpts=y, ...),
-      x=x, y=refpts), idcol='biol')
+    res <- rbindlist(Map(function(x, y) {
+      performance(x, statistics=statistics, refpts=y, ...)
+    }, x=x, y=refpts), idcol='biol')
     
     return(res[])
   }
@@ -514,11 +634,17 @@ setMethod("performance", signature(x="list"),
 
 setMethod("performance", signature(x="FLStock"),
   function(x, statistics, metrics=list(R=rec, SB=ssb, B=tsb, C=catch, L=landings,
-      D=discards, F=fbar, HR=hr), ...) {
+    D=discards, F=fbar, HR=hr), ...) {
 
-      flqs <- metrics(x, metrics=metrics)
+    flqs <- metrics(x, metrics=metrics)
 
-    return(performance(flqs, statistics=statistics, ...)[])
+    # COMPUTE
+    res <- performance(flqs, statistics=statistics, ...)
+
+    # SET to standard colorder
+    .setOrder(res) 
+
+    return(res[])
   }
 )
 # }}}
@@ -536,3 +662,5 @@ setMethod("performance", signature(x="FLStocks"),
     return(res[]) 
   })
 # }}}
+
+

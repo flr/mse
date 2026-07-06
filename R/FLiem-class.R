@@ -25,16 +25,16 @@ setMethod("initialize", "FLiem",
 
 #' @rdname FLiem-class
 setMethod("iter", signature(obj = "FLiem"),
-  function(obj, iter) {
+  function(obj, i) {
 
   args(obj) <- lapply(obj@args, function(x) {
-			if(is(x, "FLQuant")) FLCore::iter(x, iter) else x
+			if(is(x, "FLQuant")) FLCore::iter(x, i) else x
 		})
 
 	do.call(class(obj), list(obj))
 })
 
 setMethod("iter", signature(obj = "NULL"),
-  function(obj, iter) {
+  function(obj, i) {
     return(NULL)
   })

@@ -41,7 +41,7 @@ A list containing named elements, each of which represents a specific statistic.
 \usage{
 data(statistics)
 
-statistics
+data(statistics)
 }
 \description{
 A list containing a large number of performance statistics:
@@ -54,7 +54,7 @@ management objectives of interest.
 \details{
 Performance statistics are used by the \code{\link[=performance]{performance()}} method to compute time series,
 or aggregates along time, of quantities of interest related to the result of applying
-a particular management procedure to an operating model. They combione \code{\link[FLCore:metrics]{FLCore::metrics()}}
+a particular management procedure to an operating model. They combione \code{\link[FLCore:metrics]{metrics()}}
 computed from the projected stocks, populations and fisheries, with biological,
 economic or other reference points, but can also use the results of calculations and
 decisions carried out by the MP.
@@ -62,7 +62,7 @@ decisions carried out by the MP.
 Of the three elements in the list used to define each statistic, the first unnamed
 element, of class 'formula' is the one evaluated by \code{\link[=performance]{performance()}}. The formula is
 evaluated with access to the reference points of the OM, contained in the \code{refpts}
-slot, a set of \link[FLCore:metrics]{FLCore::metrics} obtained from the projected OM, the contents of the
+slot, a set of \link[FLCore:metrics]{metrics} obtained from the projected OM, the contents of the
 \link{tracking} table with decisions and outputs from the MP internal calcultions, as well
 as any function available in the workspace.
 
