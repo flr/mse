@@ -119,13 +119,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       unlist(cmin$hcr@args[names(tune)])))
 
   rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
-<<<<<<< HEAD
     verbose=FALSE, window=window, ...)
-||||||| f95a011
-    verbose=FALSE, window=FALSE, ...)
-=======
-    verbose=FALSE, window=window)
->>>>>>> devel
 
   pmin <- performance(rmin, metrics=metrics, statistics=statistic,
     years=list(unlist(years)), ...)[year %in% years, mean(data, na.rm=TRUE)]
@@ -153,13 +147,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       unlist(cmax$hcr@args[names(tune)])))
 
   rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
-<<<<<<< HEAD
     verbose=FALSE, window=window,...)
-||||||| f95a011
-    verbose=FALSE, window=FALSE,...)
-=======
-    verbose=FALSE, window=window)
->>>>>>> devel
   
   pmax <- performance(rmax, metrics=metrics, statistics=statistic,
     years=list(unlist(years)), ...)[year %in% years, mean(data, na.rm=TRUE)]
@@ -199,13 +187,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
         format(unlist(cmid$hcr@args[names(tune)]), digits=3)))
 
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
-<<<<<<< HEAD
       verbose=FALSE, window=window, ...)
-||||||| f95a011
-      verbose=FALSE, window=FALSE, ...)
-=======
-      verbose=FALSE, window=window)
->>>>>>> devel
 
     pmid <- performance(rmid, metrics=metrics, statistics=statistic,
       years=list(unlist(years)), ...)[year %in% years, mean(data, na.rm=TRUE)]

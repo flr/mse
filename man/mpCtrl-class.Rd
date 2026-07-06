@@ -102,9 +102,9 @@ tm(object) <- value
 
 \S4method{show}{mpCtrl}(object)
 
-\S4method{iters}{mpCtrl}(object, iter)
+\S4method{iters}{mpCtrl}(object, i)
 
-\S4method{iter}{mpCtrl}(obj, iter)
+\S4method{iter}{mpCtrl}(obj, i)
 
 \S4method{method}{mpCtrl}(object, element)
 

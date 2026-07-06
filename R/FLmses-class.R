@@ -113,8 +113,11 @@ setMethod("c", "FLmses",
     per  <- rbindlist(c(list(performance(x)), lapply(args, 'performance')))
     res <- c(unclass(x), Reduce('c', args))
 
-    # MERGE performance, ADD run and
-    res <- FLmses(res, performance=per)
+    # MERGE performance, if available
+    if(nrow(per) > 0)
+      res <- FLmses(res, performance=per)
+    else
+      res <- FLmses(res)
 
     return(res)
   })

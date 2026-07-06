@@ -191,8 +191,7 @@ cpues.ind <- function(stk, idx, refyrs, nyears=4, indices=names(idx),
     slope <- FLQuant(slope$data, dimnames=dimnames(mean), units="")
     
     # TRACK
-<<<<<<< HEAD
-    track(tracking, "mean.ind", year=ay, biol=stock) <- mean
+   track(tracking, "mean.ind", year=ay, biol=stock) <- mean
     track(tracking, "slope.ind", year=ay, biol=stock) <- slope
 
     # ASSEMBLE ind
@@ -233,53 +232,7 @@ cpues.ind <- function(stk, idx, refyrs, nyears=4, indices=names(idx),
     ind <- FLQuants(mean=smooth)
   }
   return(list(stk=stk, ind=ind, tracking=tracking))
-}
-||||||| f95a011
 } # }}}
-=======
-    track(tracking, "mean.ind", year=ay, biol=args$stock) <- mean
-    track(tracking, "slope.ind", year=ay, biol=args$stock) <- slope
-
-    # ASSEMBLE ind
-    ind <- FLQuants(ind=ind, mean=mean, slope=slope)
-
-  # combine = "zscore"
-  } else if(combine == "zscore") {
-    
-    # ZSCORE standardisation of log(indices)
-    inds <- window(FLQuants(lapply(idx, zscore, refyrs=refyrs)),
-      start=start, end=dy)
-    
-    # WEIGHTED mean of non-NA indices, back-transformed
-    zmean <- expand(yearMeans(exp(weighted.mean(inds, weights))), year=dy)
-    
-    # TRACK
-    track(tracking, "mean.ind", year=ay, biol=stock) <- zmean
-    
-    ind <- FLQuants(mean=zmean)
-
-  # combine = "smooth"
-  } else if (combine == "smooth") {
-    
-    inds <- window(FLQuants(lapply(idx, function(i) {
-     smi <- smooth_index(index(i), enp.mult=enp.mult)
-     smi %/% yearMeans(smi[, refyrs])
-    })), start=start, end=dy)
-
-    # WEIGHTED average of smoothed, rescaled indices, NA-aware
-    ind <- weighted.mean(inds, weights)
-    
-    # mean
-    smooth <- expand(yearMeans(ind), year=dy)
-
-    # TRACK
-    track(tracking, "mean.ind", year=ay, biol=stock) <- smooth
-    
-    ind <- FLQuants(mean=smooth)
-  }
-  return(list(stk=stk, ind=ind, tracking=tracking))
-}
-# }}}
 
 # smooth_index {{{
 smooth_index <- function(x, enp.mult=0.2) {
@@ -319,6 +272,4 @@ zscore <- function(i, refyrs=dimnames(i)$year, sample_sd=FALSE,
   
   return(((li %-% rmu) %/% lsd)[, dimnames(i)$year])
 }
-
->>>>>>> devel
 # }}}

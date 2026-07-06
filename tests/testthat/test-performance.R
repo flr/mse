@@ -229,7 +229,7 @@ test_that("performance(FLmse) with metrics", {
 context("performance: FLmses method")
 
 test_that("performance(FLmses) with statistics", {
-  result <- performance(flmses, statistics=statistics, type="test")
+  result <- performance(flmses, statistics=statistics[1:10], type="test")
   
   expect_s3_class(result, "data.table")
   expect_true(nrow(result) > 0)

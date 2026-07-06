@@ -11,7 +11,7 @@
 \usage{
 \S4method{initialize}{FLiem}(.Object, ...)
 
-\S4method{iter}{FLiem}(obj, iter)
+\S4method{iter}{FLiem}(obj, i)
 }
 \arguments{
 \item{...}{additional argument list that might never be used}

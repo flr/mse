@@ -180,7 +180,8 @@ NULL
 setMethod("performance", signature(x="FLQuants"),
   function(x, statistics=mse::statistics[c("C", "F", "SB", "AAVC")],
     refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
-    om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
+    om=character(0), type=character(0), run=character(0),
+    mp=paste(c(om, type, run), collapse="_"), ...) {
 
     # GET extra args
     dots <- list(...)
@@ -513,7 +514,7 @@ setMethod("performance", signature(x="FLmses"),
     args <- list(...)
 
     # RETURN performance slot if no other args
-    if(length(args) == 0)
+    if(length(args) == 0 & nrow(slot(x, 'performance')) > 0)
       return(slot(x, 'performance')[])
     # COMPUTE
     else {
@@ -568,7 +569,7 @@ setReplaceMethod('performance', signature(x='FLmses', value="data.frame"),
 
 # }}}
 
-# performance(list) FLmse / FLQuants {{{
+# performance(list) FLmse / FLmses / FLQuants {{{
 
 #' @rdname performance
 
@@ -606,7 +607,8 @@ setMethod("performance", signature(x="list"),
 
     # - list(FLmses), assumes performance is stored
     if(all(unlist(lapply(x, is, 'FLmses')))) {
-      return(rbindlist(lapply(x, function(i) performance(i, ...))))
+      return(rbindlist(lapply(x, function(i)
+        performance(i, statistics=statistics, ...))))
     }
          
     # ELSE assume list of FLQuants
