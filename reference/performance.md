@@ -55,7 +55,7 @@ performance(
 )
 
 # S4 method for class 'FLmses'
-performance(x, type = NULL, ...)
+performance(x, ...)
 
 # S4 method for class 'list'
 performance(

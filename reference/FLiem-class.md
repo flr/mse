@@ -10,7 +10,7 @@ error model of the MSE.
 initialize(.Object, ...)
 
 # S4 method for class 'FLiem'
-iter(obj, i)
+iter(obj, iter)
 ```
 
 ## Arguments
