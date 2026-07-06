@@ -38,6 +38,62 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
   return(statistics[valid])
 }
 
+# . setOrder
+.setOrder <- function(res) {
+
+  standard <- c('om', 'biol', 'mp', 'year', 'statistic', 'name', 'iter',
+    'data', 'type', 'run', 'label', 'desc')
+
+  present <- intersect(standard, colnames(res))
+
+  setcolorder(res, present)
+} 
+
+# .merge, twist y and merge to x
+
+.merge <- function(x, y) {
+  if(length(y) == 0)
+    return(x)
+  if(!is.list(x))
+    x <- c(x, y)
+  else {
+    y <- setNames(lapply(names(x), function(i)
+      lapply(y, `[[`, i)), names(x))
+    x <- Map(function(x, y) FLQuants(c(x,y)), x, y)
+  }
+  return(x)
+}
+
+# .compactDT
+
+.compactDT <- function(x) {
+
+  # FACTOR character columns
+  chr_cols <- names(x)[sapply(x, is.character)]
+  if(length(chr_cols) > 0)
+    x[, (chr_cols) := lapply(.SD, as.factor), .SDcols=chr_cols]
+  
+  # INTEGER year and iter
+  if("year" %in% names(x))
+    x[, year := as.integer(year)]
+  if("iter" %in% names(x))
+    x[, iter := as.integer(iter)]
+
+  return(invisible(x))
+}
+
+# .validDT
+.validDT <- function(x) {
+
+  if(!is.data.table(x))
+    stop("input must be a data.table")
+  
+  if(!all(c("statistic", "year", "data") %in% colnames(x)))
+    stop("data.table must contain columns: statistic, year, data")
+  
+  return(TRUE)
+}
+
 # }}}
 
 # performance {{{
@@ -607,60 +663,4 @@ setMethod("performance", signature(x="FLStocks"),
   })
 # }}}
 
-# .functions {{{
 
-# . setOrder
-.setOrder <- function(res) {
-
-  standard <- c('om', 'biol', 'mp', 'year', 'statistic', 'name', 'iter',
-    'data', 'type', 'run', 'label', 'desc')
-
-  present <- intersect(standard, colnames(res))
-
-  setcolorder(res, present)
-} 
-
-# .merge, twist y and merge to x
-
-.merge <- function(x, y) {
-  if(length(y) == 0)
-    return(x)
-  if(!is.list(x))
-    x <- c(x, y)
-  else {
-    y <- setNames(lapply(names(x), function(i)
-      lapply(y, `[[`, i)), names(x))
-    x <- Map(function(x, y) FLQuants(c(x,y)), x, y)
-  }
-  return(x)
-}
-
-# .compactDT
-
-.compactDT <- function(x) {
-
-  # FACTOR character columns
-  chr_cols <- names(x)[sapply(x, is.character)]
-  if(length(chr_cols) > 0)
-    x[, (chr_cols) := lapply(.SD, as.factor), .SDcols=chr_cols]
-  
-  # INTEGER year and iter
-  if("year" %in% names(x))
-    x[, year := as.integer(year)]
-  if("iter" %in% names(x))
-    x[, iter := as.integer(iter)]
-
-  return(invisible(x))
-}
-# }}}
-
-.validDT <- function(x) {
-
-  if(!is.data.table(x))
-    stop("input must be a data.table")
-  
-  if(!all(c("statistic", "year", "data") %in% colnames(x)))
-    stop("data.table must contain columns: statistic, year, data")
-  
-  return(TRUE)
-}
