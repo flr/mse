@@ -36,6 +36,9 @@ args(object) <- value
 # S4 method for class 'mseCtrl'
 show(object)
 
+# S4 method for class 'mseCtrl'
+summary(object)
+
 exists(
   x,
   where = -1,
@@ -104,7 +107,9 @@ ctl
 #> Method:
 #> function (stk, args, alpha) 
 #> ssb(stk) * alpha
-#> <environment: 0x55f3bbdd5b48>
+#> <environment: 0x556a2303fc60>
+#> attr(,".name")
+#> [1] "NULL"
 #> Arguments:
 #> $alpha
 #> [1] 0.5
@@ -112,7 +117,9 @@ ctl
 method(ctl)
 #> function (stk, args, alpha) 
 #> ssb(stk) * alpha
-#> <environment: 0x55f3bbdd5b48>
+#> <environment: 0x556a2303fc60>
+#> attr(,".name")
+#> [1] "NULL"
 method(ctl) <- function(stk, args, beta) ssb(stk) * beta
 args(ctl)
 #> $alpha

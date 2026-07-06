@@ -18,8 +18,6 @@ fwd.om(om, ctrl, ...)
 
   the fwdControl object with objectives and constraints
 
-- ...:
-
 - object:
 
   the OM as a FLStock

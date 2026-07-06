@@ -7,7 +7,3 @@ Title
 ``` r
 mpDispatch(ioval, ..., step)
 ```
-
-## Arguments
-
-- step:

@@ -12,7 +12,7 @@ made of those most relevant to the management objectives of interest.
 ``` r
 data(statistics)
 
-statistics
+data(statistics)
 ```
 
 ## Format
@@ -132,7 +132,7 @@ Performance statistics are used by the
 method to compute time series, or aggregates along time, of quantities
 of interest related to the result of applying a particular management
 procedure to an operating model. They combione
-[`FLCore::metrics()`](http://flrproject.org/FLCore/reference/metrics.md)
+[`metrics()`](http://flrproject.org/FLCore/reference/metrics.md)
 computed from the projected stocks, populations and fisheries, with
 biological, economic or other reference points, but can also use the
 results of calculations and decisions carried out by the MP.
@@ -142,8 +142,8 @@ first unnamed element, of class 'formula' is the one evaluated by
 [`performance()`](https://flrproject.org/mse/reference/performance.md).
 The formula is evaluated with access to the reference points of the OM,
 contained in the `refpts` slot, a set of
-[FLCore::metrics](http://flrproject.org/FLCore/reference/metrics.md)
-obtained from the projected OM, the contents of the
+[metrics](http://flrproject.org/FLCore/reference/metrics.md) obtained
+from the projected OM, the contents of the
 [tracking](https://flrproject.org/mse/reference/FLmse-class.md) table
 with decisions and outputs from the MP internal calcultions, as well as
 any function available in the workspace.

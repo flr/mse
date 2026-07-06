@@ -15,7 +15,7 @@ management objectives of interest."><meta property="og:image" content="https://f
 
     <a class="navbar-brand me-2" href="../index.html">mse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.11.9019</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,7 @@ management objectives of interest.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">statistics</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">statistics</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">statistics</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -132,14 +132,14 @@ management objectives of interest.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Performance statistics are used by the <code><a href="performance.html">performance()</a></code> method to compute time series,
 or aggregates along time, of quantities of interest related to the result of applying
-a particular management procedure to an operating model. They combione <code><a href="http://flrproject.org/FLCore/reference/metrics.html" class="external-link">FLCore::metrics()</a></code>
+a particular management procedure to an operating model. They combione <code><a href="http://flrproject.org/FLCore/reference/metrics.html" class="external-link">metrics()</a></code>
 computed from the projected stocks, populations and fisheries, with biological,
 economic or other reference points, but can also use the results of calculations and
 decisions carried out by the MP.</p>
 <p>Of the three elements in the list used to define each statistic, the first unnamed
 element, of class 'formula' is the one evaluated by <code><a href="performance.html">performance()</a></code>. The formula is
 evaluated with access to the reference points of the OM, contained in the <code>refpts</code>
-slot, a set of <a href="http://flrproject.org/FLCore/reference/metrics.html" class="external-link">FLCore::metrics</a> obtained from the projected OM, the contents of the
+slot, a set of <a href="http://flrproject.org/FLCore/reference/metrics.html" class="external-link">metrics</a> obtained from the projected OM, the contents of the
 <a href="FLmse-class.html">tracking</a> table with decisions and outputs from the MP internal calcultions, as well
 as any function available in the workspace.</p>
 <p>The statistics currently included are:</p><dl><dt>SB</dt>

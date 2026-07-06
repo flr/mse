@@ -51,6 +51,10 @@
 - [`cpue.ind()`](https://flrproject.org/mse/reference/cpue.ind.md) :
   Computes CPUE-based Indicators of changes in Stock Abundance
 
+- [`cpues.ind()`](https://flrproject.org/mse/reference/cpues.ind.md) :
+  Compute a CPUE-based indicator for use in empirical harvest control
+  rules
+
 - [`debug()`](https://flrproject.org/mse/reference/debug-mse.md)
   [`undebug(`*`<mseCtrl>`*`,`*`<missing>`*`)`](https://flrproject.org/mse/reference/debug-mse.md)
   [`undebug(`*`<mpCtrl>`*`,`*`<character>`*`)`](https://flrproject.org/mse/reference/debug-mse.md)
@@ -120,6 +124,7 @@
   [`args()`](https://flrproject.org/mse/reference/mseCtrl-class.md)
   [`` `args<-`() ``](https://flrproject.org/mse/reference/mseCtrl-class.md)
   [`show(`*`<mseCtrl>`*`)`](https://flrproject.org/mse/reference/mseCtrl-class.md)
+  [`summary(`*`<mseCtrl>`*`)`](https://flrproject.org/mse/reference/mseCtrl-class.md)
   [`exists()`](https://flrproject.org/mse/reference/mseCtrl-class.md) :
 
   S4 class `mseCtrl`

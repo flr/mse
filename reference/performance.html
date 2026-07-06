@@ -13,7 +13,7 @@ defined by formulas that reference metrics and reference points."><meta property
 
     <a class="navbar-brand me-2" href="../index.html">mse</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.11.9019</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,15 +83,17 @@ defined by formulas that reference metrics and reference points.</p>
 <span><span class="fu">performance</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  statistics <span class="op">=</span> <span class="fu">.validStatistics</span><span class="op">(</span><span class="fu"><a href="FLmse-class.html">om</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  metrics <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  years <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="fu"><a href="FLmse-class.html">om</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">year</span>,</span>
 <span>  om <span class="op">=</span> <span class="fu">name</span><span class="op">(</span><span class="va">x</span><span class="op">@</span><span class="va">om</span><span class="op">)</span>,</span>
-<span>  control <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"MP"</span>,</span>
 <span>  run <span class="op">=</span> <span class="st">"1"</span>,</span>
+<span>  control <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'FLmses'</span></span>
-<span><span class="fu">performance</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">performance</span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'list'</span></span>
 <span><span class="fu">performance</span><span class="op">(</span></span>
@@ -206,7 +208,7 @@ e.g., <code>~yearMeans(SB/SB0)</code></p></li>
 </ol></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><a href="statistics.html">statistics</a>, <code>refpts()</code>, <code><a href="http://flrproject.org/FLCore/reference/metrics.html" class="external-link">FLCore::metrics()</a></code></p></div>
+    <div class="dont-index"><p><a href="statistics.html">statistics</a>, <code>refpts()</code>, <code><a href="http://flrproject.org/FLCore/reference/metrics.html" class="external-link">metrics()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -221,63 +223,61 @@ e.g., <code>~yearMeans(SB/SB0)</code></p></li>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">metrics</span><span class="op">(</span><span class="va">om</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">performance</span><span class="op">(</span><span class="va">x</span>, statistics<span class="op">=</span><span class="va">statistics</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SB"</span>, <span class="st">"SBMSY"</span>, <span class="st">"F"</span>, <span class="st">"FMSY"</span><span class="op">)</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>  refpts<span class="op">=</span><span class="fu">refpts</span><span class="op">(</span><span class="va">om</span><span class="op">)</span>, om<span class="op">=</span><span class="st">"ple"</span>, run<span class="op">=</span><span class="st">"r00"</span>, type<span class="op">=</span><span class="st">"test"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;statistic&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        statistic  year       data   iter       name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;char&gt; &lt;num&gt;      &lt;num&gt; &lt;char&gt;     &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     1:         F  1961 0.01196100      1          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     2:         F  1961 0.01284771      2          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     3:         F  1961 0.01183134      3          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     4:         F  1961 0.01279693      4          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     5:         F  1961 0.01054540      5          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ---                                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37996:     SBMSY  2055 0.00000000     96 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37997:     SBMSY  2055 0.00000000     97 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37998:     SBMSY  2055 0.00000000     98 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37999:     SBMSY  2055 0.00000000     99 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38000:     SBMSY  2055 0.00000000    100 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                      desc     om   type    run           mp</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                    &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;       &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     1:                  Fishing mortality    ple   test    r00 ple_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     2:                  Fishing mortality    ple   test    r00 ple_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     3:                  Fishing mortality    ple   test    r00 ple_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     4:                  Fishing mortality    ple   test    r00 ple_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     5:                  Fishing mortality    ple   test    r00 ple_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ---                                                                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37996: Spawnwer biomass relative to SBMSY    ple   test    r00 ple_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37997: Spawnwer biomass relative to SBMSY    ple   test    r00 ple_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37998: Spawnwer biomass relative to SBMSY    ple   test    r00 ple_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37999: Spawnwer biomass relative to SBMSY    ple   test    r00 ple_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38000: Spawnwer biomass relative to SBMSY    ple   test    r00 ple_test_r00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            om           mp  year statistic     name   iter         data   type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;       &lt;char&gt; &lt;num&gt;    &lt;char&gt;   &lt;char&gt; &lt;char&gt;        &lt;num&gt; &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     1:    ple ple_test_r00  1961        SB   SB (t)      1 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     2:    ple ple_test_r00  1961        SB   SB (t)     10 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     3:    ple ple_test_r00  1961        SB   SB (t)    100 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     4:    ple ple_test_r00  1961        SB   SB (t)     11 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     5:    ple ple_test_r00  1961        SB   SB (t)     12 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ---                                                                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37996:    ple ple_test_r00  2055      FMSY F/F[MSY]     95     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37997:    ple ple_test_r00  2055      FMSY F/F[MSY]     96     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37998:    ple ple_test_r00  2055      FMSY F/F[MSY]     97     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37999:    ple ple_test_r00  2055      FMSY F/F[MSY]     98     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38000:    ple ple_test_r00  2055      FMSY F/F[MSY]     99     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           run                               desc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;                             &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     1:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     2:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     3:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     4:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     5:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ---                                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37996:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37997:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37998:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37999:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38000:    r00 Fishing mortality relative to FMSY</span>
 <span class="r-in"><span><span class="co"># Compute on OM, name taken from slot</span></span></span>
 <span class="r-in"><span><span class="fu">performance</span><span class="op">(</span><span class="va">om</span>, statistics<span class="op">=</span><span class="va">statistics</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SB"</span>, <span class="st">"SBMSY"</span>, <span class="st">"F"</span>, <span class="st">"FMSY"</span><span class="op">)</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>  run<span class="op">=</span><span class="st">"r00"</span>, type<span class="op">=</span><span class="st">"test"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;statistic&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        statistic  year       data   iter       name</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           &lt;char&gt; &lt;num&gt;      &lt;num&gt; &lt;char&gt;     &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     1:         F  1961 0.01196100      1          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     2:         F  1961 0.01284771      2          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     3:         F  1961 0.01183134      3          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     4:         F  1961 0.01279693      4          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     5:         F  1961 0.01054540      5          F</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ---                                             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37996:     SBMSY  2055 0.00000000     96 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37997:     SBMSY  2055 0.00000000     97 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37998:     SBMSY  2055 0.00000000     98 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37999:     SBMSY  2055 0.00000000     99 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38000:     SBMSY  2055 0.00000000    100 SB/SB[MSY]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                      desc     om   type    run           mp</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                    &lt;char&gt; &lt;char&gt; &lt;char&gt; &lt;char&gt;       &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     1:                  Fishing mortality    PLE   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     2:                  Fishing mortality    PLE   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     3:                  Fishing mortality    PLE   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     4:                  Fishing mortality    PLE   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     5:                  Fishing mortality    PLE   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    ---                                                                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37996: Spawnwer biomass relative to SBMSY    PLE   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37997: Spawnwer biomass relative to SBMSY    PLE   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37998: Spawnwer biomass relative to SBMSY    PLE   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 37999: Spawnwer biomass relative to SBMSY    PLE   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38000: Spawnwer biomass relative to SBMSY    PLE   test    r00 PLE_test_r00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            om           mp  year statistic     name   iter         data   type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;       &lt;char&gt; &lt;num&gt;    &lt;char&gt;   &lt;char&gt; &lt;char&gt;        &lt;num&gt; &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     1:    PLE PLE_test_r00  1961        SB   SB (t)      1 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     2:    PLE PLE_test_r00  1961        SB   SB (t)     10 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     3:    PLE PLE_test_r00  1961        SB   SB (t)    100 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     4:    PLE PLE_test_r00  1961        SB   SB (t)     11 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     5:    PLE PLE_test_r00  1961        SB   SB (t)     12 39511.679303   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ---                                                                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37996:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     95     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37997:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     96     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37998:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     97     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37999:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     98     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38000:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     99     4.301398   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           run                               desc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;                             &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     1:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     2:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     3:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     4:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     5:    r00                    Spawner biomass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ---                                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37996:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37997:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37998:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37999:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38000:    r00 Fishing mortality relative to FMSY</span>
 <span class="r-in"><span><span class="co"># Setup an example MSE</span></span></span>
 <span class="r-in"><span><span class="va">control</span> <span class="op">&lt;-</span> <span class="fu"><a href="mpCtrl-class.html">mpCtrl</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  est <span class="op">=</span> <span class="fu"><a href="mseCtrl-class.html">mseCtrl</a></span><span class="op">(</span>method<span class="op">=</span><span class="va">perfect.sa</span><span class="op">)</span>,</span></span>
@@ -288,61 +288,61 @@ e.g., <code>~yearMeans(SB/SB0)</code></p></li>
 <span class="r-in"><span><span class="co"># Compute performance using all default statistics, data(statistics)</span></span></span>
 <span class="r-in"><span><span class="fu">performance</span><span class="op">(</span><span class="va">mse</span>, run<span class="op">=</span><span class="st">"r00"</span>, type<span class="op">=</span><span class="st">"test"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;mp, type, statistic, year&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           om statistic      name                                         desc</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;    &lt;char&gt;    &lt;char&gt;                                       &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    1:    PLE         C     C (t)                                        Catch</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2:    PLE         C     C (t)                                        Catch</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3:    PLE         C     C (t)                                        Catch</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    4:    PLE         C     C (t)                                        Catch</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    5:    PLE         C     C (t)                                        Catch</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                                        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7880:    PLE    yellow P(Yellow) Probability of being in Kobe yellow quadrant</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7881:    PLE    yellow P(Yellow) Probability of being in Kobe yellow quadrant</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7882:    PLE    yellow P(Yellow) Probability of being in Kobe yellow quadrant</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7883:    PLE    yellow P(Yellow) Probability of being in Kobe yellow quadrant</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7884:    PLE    yellow P(Yellow) Probability of being in Kobe yellow quadrant</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        year   iter      data   type    run           mp</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;num&gt; &lt;char&gt;     &lt;num&gt; &lt;char&gt; &lt;char&gt;       &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    1:  2025      1 1261.1080   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2:  2025      2  918.0387   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3:  2025      3 1753.5147   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    4:  2025      4  966.0628   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    5:  2025      5 1670.4657   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7880:  2026      1    0.8900   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7881:  2027      1    0.8700   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7882:  2028      1    0.7800   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7883:  2029      1    0.7400   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7884:  2030      1    0.7200   test    r00 PLE_test_r00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           om           mp  year statistic      name   iter     data   type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;       &lt;char&gt; &lt;num&gt;    &lt;char&gt;    &lt;char&gt; &lt;char&gt;    &lt;num&gt; &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    1:    PLE PLE_test_r00  2025         C     C (t)      1 1261.108   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2:    PLE PLE_test_r00  2025         C     C (t)     10 1303.160   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3:    PLE PLE_test_r00  2025         C     C (t)    100 1703.979   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    4:    PLE PLE_test_r00  2025         C     C (t)     11 1402.612   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    5:    PLE PLE_test_r00  2025         C     C (t)     12 1453.531   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7880:    PLE PLE_test_r00  2026    yellow P(Yellow)      1    0.890   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7881:    PLE PLE_test_r00  2027    yellow P(Yellow)      1    0.870   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7882:    PLE PLE_test_r00  2028    yellow P(Yellow)      1    0.780   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7883:    PLE PLE_test_r00  2029    yellow P(Yellow)      1    0.740   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7884:    PLE PLE_test_r00  2030    yellow P(Yellow)      1    0.720   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          run                                         desc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;                                       &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    1:    r00                                        Catch</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2:    r00                                        Catch</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3:    r00                                        Catch</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    4:    r00                                        Catch</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    5:    r00                                        Catch</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7880:    r00 Probability of being in Kobe yellow quadrant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7881:    r00 Probability of being in Kobe yellow quadrant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7882:    r00 Probability of being in Kobe yellow quadrant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7883:    r00 Probability of being in Kobe yellow quadrant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7884:    r00 Probability of being in Kobe yellow quadrant</span>
 <span class="r-in"><span><span class="co"># or select a few of them</span></span></span>
 <span class="r-in"><span><span class="fu">performance</span><span class="op">(</span><span class="va">mse</span>, statistics<span class="op">=</span><span class="va">statistics</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SBMSY"</span>, <span class="st">"FMSY"</span><span class="op">)</span><span class="op">]</span>, run<span class="op">=</span><span class="st">"r00"</span>, type<span class="op">=</span><span class="st">"test"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;mp, type, statistic, year&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           om statistic       name                               desc  year</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;    &lt;char&gt;     &lt;char&gt;                             &lt;char&gt; &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    1:    PLE      FMSY   F/F[MSY] Fishing mortality relative to FMSY  2025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2:    PLE      FMSY   F/F[MSY] Fishing mortality relative to FMSY  2025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3:    PLE      FMSY   F/F[MSY] Fishing mortality relative to FMSY  2025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    4:    PLE      FMSY   F/F[MSY] Fishing mortality relative to FMSY  2025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    5:    PLE      FMSY   F/F[MSY] Fishing mortality relative to FMSY  2025</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1196:    PLE     SBMSY SB/SB[MSY] Spawnwer biomass relative to SBMSY  2030</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1197:    PLE     SBMSY SB/SB[MSY] Spawnwer biomass relative to SBMSY  2030</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1198:    PLE     SBMSY SB/SB[MSY] Spawnwer biomass relative to SBMSY  2030</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1199:    PLE     SBMSY SB/SB[MSY] Spawnwer biomass relative to SBMSY  2030</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1200:    PLE     SBMSY SB/SB[MSY] Spawnwer biomass relative to SBMSY  2030</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         iter      data   type    run           mp</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;     &lt;num&gt; &lt;char&gt; &lt;char&gt;       &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    1:      1 1.2704782   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2:      2 0.6337901   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3:      3 1.9340616   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    4:      4 0.7763312   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    5:      5 1.9102496   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1196:     96 0.7036977   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1197:     97 0.9568992   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1198:     98 1.1840236   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1199:     99 0.9837542   test    r00 PLE_test_r00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1200:    100 1.0491322   test    r00 PLE_test_r00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           om           mp  year statistic       name   iter      data   type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;       &lt;char&gt; &lt;num&gt;    &lt;char&gt;     &lt;char&gt; &lt;char&gt;     &lt;num&gt; &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    1:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]      1 1.2704782   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]     10 1.6370809   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]    100 1.2342225   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    4:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]     11 1.4703439   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    5:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]     12 1.5022282   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                                                       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1196:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     95 0.6511697   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1197:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     96 0.7036977   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1198:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     97 0.9568992   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1199:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     98 1.1840236   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1200:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     99 0.9837542   test</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          run                               desc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;                             &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    1:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    4:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    5:    r00 Fishing mortality relative to FMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ---                                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1196:    r00 Spawnwer biomass relative to SBMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1197:    r00 Spawnwer biomass relative to SBMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1198:    r00 Spawnwer biomass relative to SBMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1199:    r00 Spawnwer biomass relative to SBMSY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1200:    r00 Spawnwer biomass relative to SBMSY</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
