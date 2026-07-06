@@ -53,7 +53,7 @@
   ...
 )
 
-\S4method{performance}{FLmses}(x, ...)
+\S4method{performance}{FLmses}(x, type = NULL, ...)
 
 \S4method{performance}{list}(
   x,
