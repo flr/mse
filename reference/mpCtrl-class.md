@@ -84,10 +84,10 @@ tm(object) <- value
 show(object)
 
 # S4 method for class 'mpCtrl'
-iters(object, iter)
+iters(object, i)
 
 # S4 method for class 'mpCtrl'
-iter(obj, iter)
+iter(obj, i)
 
 # S4 method for class 'mpCtrl'
 method(object, element)
