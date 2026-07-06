@@ -513,8 +513,8 @@ setMethod("performance", signature(x="FLmses"),
 
     args <- list(...)
 
-    # RETURN performance slot if no other args
-    if(length(args) == 0 & nrow(slot(x, 'performance')) > 0)
+    # RETURN performance slot if exists AND statistics not provided
+    if(!"statistics" %in% names(args) & nrow(slot(x, 'performance')) > 0)
       return(slot(x, 'performance')[])
     # COMPUTE
     else {
@@ -575,14 +575,61 @@ setReplaceMethod('performance', signature(x='FLmses', value="data.frame"),
 
 setMethod("performance", signature(x="list"),
   function(x, statistics, refpts=FLPar(),
-    years=seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear), ...) {
+    years="missing", ...) {
 
-    # - list(FLom | FLombf)
+    # - list(FLmses), return existing table only if statistics not provided
+    if(all(unlist(lapply(x, is, 'FLmses')))) {
+      if(missing(statistics)) {
+        return(rbindlist(lapply(x, performance), idcol='om'))
+      } else {
+        # Compute with provided statistics
+        if(missing(years))
+          return(rbindlist(lapply(x, function(i) 
+            performance(i, statistics=statistics, ...)), idcol='om'))
+        else
+          return(rbindlist(lapply(x, function(i) 
+            performance(i, statistics=statistics, years=years, ...)), idcol='om'))
+      }
+    }
+
+    # - list(FLQuants), handle early before checking years
+    if(all(unlist(lapply(x, is, 'FLQuants')))) {
+      
+      # SET years default from first element if missing
+      if(missing(years))
+        years <- seq(dims(x[[1]][[1]])$minyear + 1, dims(x[[1]][[1]])$maxyear)
+      
+      # SET list of refpts
+      if(!is(refpts, "list")) {
+        refpts <- lapply(setNames(nm=names(x)), function(x) refpts)
+      }
+
+      # CALL performance(FLQuants)
+      res <- rbindlist(Map(function(x, y) {
+        performance(x, statistics=statistics, refpts=y, ...)
+      }, x=x, y=refpts), idcol='biol')
+      
+      return(res[])
+    }
+ 
+    # SET years default from first element if missing (for non-FLQuants)
+    if(missing(years))
+      years <- seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear)
+
+    # - list(mse), return existing table if no statistics, otherwise compute
+    if(all(unlist(lapply(x, is, 'FLmse')))) {
+      flmses <- FLmses(x)
+      if(missing(statistics) && nrow(performance(flmses)) > 0)
+        return(performance(flmses)[])
+      else
+        return(performance(flmses, statistics=statistics, years=years, ...)[])
+    }
+
+    # - list(FLom | FLombf), compute performance
     if(all(unlist(lapply(x, is, 'FLo')))) {
       if(missing(statistics))
         statistics <- mse::statistics[c('C', 'F', 'SB')]
 
-      # TODO: ADD om if missing, via idcol or :=, DROP Map
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
         statistics=statistics, years=years, run=j),
         list(...))), i=x, j=names(x)), fill=TRUE)
@@ -598,34 +645,15 @@ setMethod("performance", signature(x="list"),
         else
           return(i)
       })
+      # Recurse with coerced list
+      if(missing(statistics))
+        return(performance(x, years=years, ...))
+      else
+        return(performance(x, statistics=statistics, years=years, ...))
     }
 
-    # - list(mse) | FLmses
-    if(all(unlist(lapply(x, is, 'FLmse')))) {
-      return(performance(FLmses(x), statistics=statistics, years=years, ...)[])
-    }
-
-    # - list(FLmses), assumes performance is stored
-    if(all(unlist(lapply(x, is, 'FLmses')))) {
-      return(rbindlist(lapply(x, function(i)
-        performance(i, statistics=statistics, ...))))
-    }
-         
-    # ELSE assume list of FLQuants
-    if(!all(unlist(lapply(x, is, 'FLQuants'))))
-      stop("input list must contain objects of class FLQuants")
-
-    # SET list of refpts
-    if(!is(refpts, "list")) {
-      refpts <- lapply(setNames(nm=names(x)), function(x) refpts)
-    }
-
-    # CALL performance(FLQuants)
-    res <- rbindlist(Map(function(x, y) {
-      performance(x, statistics=statistics, refpts=y, ...)
-    }, x=x, y=refpts), idcol='biol')
-    
-    return(res[])
+    # Should not reach here
+    stop("input list must contain objects of supported classes (FLmses, FLmse, FLo, or FLQuants)")
   }
 ) 
 # }}}
