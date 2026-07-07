@@ -457,10 +457,12 @@ setMethod("performance", signature(x="FLmses"),
     args <- list(...)
 
     # RETURN performance slot if no other args
-    if(length(args) == 0)
+    if(length(args) == 0) {
       return(slot(x, 'performance')[])
+
     # COMPUTE
-    else {
+    } else {
+
       # SET statistics if missing
       if(!"statistics" %in% names(args)) {
         args$statistics <- .validStatistics(om(x[[1]]))
