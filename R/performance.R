@@ -619,7 +619,7 @@ setMethod("performance", signature(x="list"),
       # CALL performance(FLQuants)
       res <- rbindlist(Map(function(x, y) {
         performance(x, statistics=statistics, refpts=y, ...)
-      }, x=x, y=refpts))
+      }, x=x, y=refpts), idcol='biol')
       
       return(res[])
     }
