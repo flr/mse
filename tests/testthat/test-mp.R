@@ -6,8 +6,11 @@
 #
 # Distributed under the terms of the EUPL-1.2
 
-# LOAD plesim data
-data(plesim)
+# LOAD plesim data 
+# Use local() to avoid name collision between om() generic and om data object
+local({
+  data(plesim, envir = parent.env(environment()))
+})
 
 # -- SHORT TESTS {{{
 
@@ -26,7 +29,7 @@ test_that("mp() runs with minimal arguments", {
   
   expect_s4_class(result, "FLmse")
   expect_s4_class(om(result), "FLom")
-  expect_s4_class(tracking(result), "data.table")
+  expect_s3_class(tracking(result), "data.table")
 })
 
 test_that("mp() returns correct structure", {

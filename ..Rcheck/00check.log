@@ -1,0 +1,15 @@
+* using log directory ‘/home/mosqu003/Active/mse_FLR/mse_devel/..Rcheck’
+* using R version 4.6.1 (2026-06-24)
+* using platform: x86_64-pc-linux-gnu
+* R was compiled by
+    gcc (Debian 14.2.0-19) 14.2.0
+    GNU Fortran (Debian 14.2.0-19) 14.2.0
+* running under: Debian GNU/Linux 13 (trixie)
+* using session charset: UTF-8
+* current time: 2026-07-07 05:31:59 UTC
+* using options ‘--no-tests --no-manual --no-build-vignettes’
+* checking for file ‘./DESCRIPTION’ ... ERROR
+Required fields missing or empty:
+  ‘Author’ ‘Maintainer’
+* DONE
+Status: 1 ERROR

@@ -68,6 +68,10 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
 
 .compactDT <- function(x) {
 
+  # RETURN early if no rows
+  if(nrow(x) == 0)
+    return(invisible(x))
+
   # FACTOR character columns
   chr_cols <- names(x)[sapply(x, is.character)]
   if(length(chr_cols) > 0)
@@ -512,12 +516,18 @@ setMethod("performance", signature(x="FLmses"),
   function(x, type=NULL, ...) {
 
     args <- list(...)
+    
+    # RETURN empty data.table if x is empty
+    if(length(x) == 0) {
+      return(data.table())
+    }
 
     # RETURN performance slot if exists AND statistics not provided
-    if(!"statistics" %in% names(args) & nrow(slot(x, 'performance')) > 0)
+    if(!"statistics" %in% names(args) & nrow(slot(x, 'performance')) > 0) {
       return(slot(x, 'performance')[])
+
     # COMPUTE
-    else {
+    } else {
       # SET statistics if missing
       if(!"statistics" %in% names(args)) {
         args$statistics <- .validStatistics(om(x[[1]]))
@@ -577,18 +587,20 @@ setMethod("performance", signature(x="list"),
   function(x, statistics, refpts=FLPar(),
     years="missing", ...) {
 
-    # - list(FLmses), return existing table only if statistics not provided
+    # - list(FLmses)
     if(all(unlist(lapply(x, is, 'FLmses')))) {
+
       if(missing(statistics)) {
-        return(rbindlist(lapply(x, performance), idcol='om'))
+        return(rbindlist(lapply(x, performance)))
+      
       } else {
-        # Compute with provided statistics
+        # COMPUTE
         if(missing(years))
           return(rbindlist(lapply(x, function(i) 
-            performance(i, statistics=statistics, ...)), idcol='om'))
+            performance(i, statistics=statistics, ...))))
         else
           return(rbindlist(lapply(x, function(i) 
-            performance(i, statistics=statistics, years=years, ...)), idcol='om'))
+            performance(i, statistics=statistics, years=years, ...))))
       }
     }
 
@@ -619,10 +631,7 @@ setMethod("performance", signature(x="list"),
     # - list(mse), return existing table if no statistics, otherwise compute
     if(all(unlist(lapply(x, is, 'FLmse')))) {
       flmses <- FLmses(x)
-      if(missing(statistics) && nrow(performance(flmses)) > 0)
-        return(performance(flmses)[])
-      else
-        return(performance(flmses, statistics=statistics, years=years, ...)[])
+      return(performance(flmses, statistics=statistics, years=years, ...)[])
     }
 
     # - list(FLom | FLombf), compute performance
