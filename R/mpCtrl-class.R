@@ -289,7 +289,7 @@ setMethod("iters", signature(object = "mpCtrl"), function(object, i){
 
 #' @rdname mpCtrl-class
 setMethod("iter", signature(obj = "mpCtrl"), function(obj, i){
-  ctrl <- lapply(obj, iter, i=iter)
+  ctrl <- lapply(obj, iter, i=i)
   return(mpCtrl(ctrl))
 }) # }}}
 
