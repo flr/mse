@@ -554,7 +554,7 @@ setMethod("performance", signature(x="FLmses"),
             col <- colnames(type)[colnames(type) != "type"][1]
             res[type, type := i.type, on = col]
           } else if(is(type, "character")) {
-            res[, type := type]
+            res[, type := ..type]
           }
           res[, mp:=paste(om, type, run, sep="_")]
         }
