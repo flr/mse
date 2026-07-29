@@ -1228,6 +1228,12 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # GET ... arguments
   opts <- list(...)
+ 
+  # ARE opts being given?
+  if(length(opts) == 0) {
+    return(FLmses(RUN=mp(om=om, oem=oem, iem=iem, control=control, args=args,
+      parallel=parallel)))
+  }
 
   # PARSING a single module
   if(length(opts) > 1)
@@ -1240,13 +1246,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   if(!module %in% names(control))
     stop("options refer to modules not present in control")
 
-  # ARE opts being given?
-  if(length(opts) == 0) {
-    return(FLmses(RUN=mp(om=om, oem=oem, iem=iem, control=control, args=args,
-      parallel=parallel)))
-  }
-
-  # CONVERT opts if by run to by arg
+   # CONVERT opts if by run to by arg
   .opts_by_arg <- function(x) {
     args <- unique(unlist(lapply(x, names)))
     lapply(setNames(nm=args), function(a) unlist(lapply(x, `[[`, a)))

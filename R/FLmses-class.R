@@ -100,7 +100,7 @@ setMethod("c", "FLmses",
 
     if(any(id))
       args[id] <- Map(function(val, nm)
-        setNames(list(FLmse(om=val)), nm), args[id], names(args[id]))
+       setNames(list(FLmse(om=val)), nm), args[id], names(args[id]))
 
     # CONVERT FLmses elements to lists
     id <- vapply(args, is, logical(1), 'FLmse')
@@ -109,12 +109,33 @@ setMethod("c", "FLmses",
       args[id] <- Map(function(val, nm)
         setNames(list(val), nm), args[id], names(args[id]))
 
-    # ASSEMBLE perfomance tables
-    per  <- rbindlist(c(list(performance(x)), lapply(args, 'performance')))
+    # ASSEMBLE performance table from args
+    perf <- lapply(args, function(a) {
+
+      if(is.list(a) && length(a) == 1 && is(a[[1]], 'FLmse'))
+       performance(a[[1]])
+
+      else if(is(a, 'FLmse'))
+       performance(a)
+      
+      else if(is(a, 'FLmses'))
+       performance(a)
+      
+      else
+       data.table()
+    })
+
+    # MERGE performance tables
+    perf <- rbindlist(c(list(performance(x)), perf), fill=TRUE)
+    
+    # CONCATENATE x and args
     res <- c(unclass(x), Reduce('c', args))
 
-    # MERGE performance, ADD run and
-    res <- FLmses(res, performance=per)
+    # BUILD FLmses
+    if(nrow(perf) > 0)
+      res <- FLmses(res, performance=perf)
+    else
+      res <- FLmses(res)
 
     return(res)
   })
@@ -145,8 +166,11 @@ setMethod("[", signature(x="FLmses", i="ANY", j="missing", drop="ANY"),
     # SUBSET in list, need to unclass
     x@.Data <- unclass(x)[i]
     
-    if(nrow(performance(x)) > 0)
-      performance(x) <- x@performance[run %in% i,]
+    if(nrow(performance(x)) > 0) {
+      # Subset performance data.table - avoid name conflicts with future::run
+      perf <- performance(x)
+      performance(x) <- perf[perf$run %in% i, ]
+    }
 
     return(x)
   }

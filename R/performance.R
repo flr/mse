@@ -38,6 +38,66 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
   return(statistics[valid])
 }
 
+# . setOrder
+.setOrder <- function(res) {
+
+  standard <- c('om', 'biol', 'mp', 'year', 'statistic', 'name', 'iter',
+    'data', 'type', 'run', 'label', 'desc')
+
+  present <- intersect(standard, colnames(res))
+
+  setcolorder(res, present)
+} 
+
+# .merge, twist y and merge to x
+
+.merge <- function(x, y) {
+  if(length(y) == 0)
+    return(x)
+  if(!is.list(x))
+    x <- c(x, y)
+  else {
+    y <- setNames(lapply(names(x), function(i)
+      lapply(y, `[[`, i)), names(x))
+    x <- Map(function(x, y) FLQuants(c(x,y)), x, y)
+  }
+  return(x)
+}
+
+# .compactDT
+
+.compactDT <- function(x) {
+
+  # RETURN early if no rows
+  if(nrow(x) == 0)
+    return(invisible(x))
+
+  # FACTOR character columns
+  chr_cols <- names(x)[sapply(x, is.character)]
+  if(length(chr_cols) > 0)
+    x[, (chr_cols) := lapply(.SD, as.factor), .SDcols=chr_cols]
+  
+  # INTEGER year and iter
+  if("year" %in% names(x))
+    x[, year := as.integer(year)]
+  if("iter" %in% names(x))
+    x[, iter := as.integer(iter)]
+
+  return(invisible(x))
+}
+
+# .validDT
+.validDT <- function(x) {
+
+  if(!is.data.table(x))
+    stop("input must be a data.table")
+  
+  if(!all(c("statistic", "year", "data") %in% colnames(x)))
+    stop("data.table must contain columns: statistic, year, data")
+  
+  return(TRUE)
+}
+
 # }}}
 
 # performance {{{
@@ -124,7 +184,8 @@ NULL
 setMethod("performance", signature(x="FLQuants"),
   function(x, statistics=mse::statistics[c("C", "F", "SB", "AAVC")],
     refpts=FLPar(), years=setNames(nm=dimnames(x[[1]])$year[-1]),
-    om=NULL, type=NULL, run=NULL, mp=paste(c(om, type, run), collapse="_"), ...) {
+    om=character(0), type=character(0), run=character(0),
+    mp=paste(c(om, type, run), collapse="_"), ...) {
 
     # GET extra args
     dots <- list(...)
@@ -455,14 +516,17 @@ setMethod("performance", signature(x="FLmses"),
   function(x, type=NULL, ...) {
 
     args <- list(...)
+    
+    # RETURN empty data.table if x is empty
+    if(length(x) == 0) {
+      return(data.table())
+    }
 
-    # RETURN performance slot if no other args
-    if(length(args) == 0) {
+    # RETURN performance slot if exists AND statistics not provided
+    if(!"statistics" %in% names(args) & nrow(slot(x, 'performance')) > 0) {
       return(slot(x, 'performance')[])
-
     # COMPUTE
     } else {
-
       # SET statistics if missing
       if(!"statistics" %in% names(args)) {
         args$statistics <- .validStatistics(om(x[[1]]))
@@ -489,7 +553,7 @@ setMethod("performance", signature(x="FLmses"),
             col <- colnames(type)[colnames(type) != "type"][1]
             res[type, type := i.type, on = col]
           } else if(is(type, "character")) {
-            res[, type := type]
+            res[, type := ..type]
           }
           res[, mp:=paste(om, type, run, sep="_")]
         }
@@ -514,20 +578,66 @@ setReplaceMethod('performance', signature(x='FLmses', value="data.frame"),
 
 # }}}
 
-# performance(list) FLmse / FLQuants {{{
+# performance(list) FLmse / FLmses / FLQuants {{{
 
 #' @rdname performance
 
 setMethod("performance", signature(x="list"),
   function(x, statistics, refpts=FLPar(),
-    years=seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear), ...) {
+    years="missing", ...) {
 
-    # - list(FLom | FLombf)
+    # - list(FLmses)
+    if(all(unlist(lapply(x, is, 'FLmses')))) {
+
+      if(missing(statistics)) {
+        return(rbindlist(lapply(x, performance)))
+      
+      } else {
+        # COMPUTE
+        if(missing(years))
+          return(rbindlist(lapply(x, function(i) 
+            performance(i, statistics=statistics, ...))))
+        else
+          return(rbindlist(lapply(x, function(i) 
+            performance(i, statistics=statistics, years=years, ...))))
+      }
+    }
+
+    # - list(FLQuants), handle early before checking years
+    if(all(unlist(lapply(x, is, 'FLQuants')))) {
+      
+      # SET years default from first element if missing
+      if(missing(years))
+        years <- seq(dims(x[[1]][[1]])$minyear + 1, dims(x[[1]][[1]])$maxyear)
+      
+      # SET list of refpts
+      if(!is(refpts, "list")) {
+        refpts <- lapply(setNames(nm=names(x)), function(x) refpts)
+      }
+
+      # CALL performance(FLQuants)
+      res <- rbindlist(Map(function(x, y) {
+        performance(x, statistics=statistics, refpts=y, ...)
+      }, x=x, y=refpts), idcol='biol')
+      
+      return(res[])
+    }
+ 
+    # SET years default from first element if missing (for non-FLQuants)
+    if(missing(years))
+      years <- seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear)
+
+    # - list(mse), return existing table if no statistics, otherwise compute
+    if(all(unlist(lapply(x, is, 'FLmse')))) {
+      flmses <- FLmses(x)
+      return(performance(flmses, statistics=statistics, years=years, ...)[])
+    }
+
+    # - list(FLom | FLombf), compute performance
     if(all(unlist(lapply(x, is, 'FLo')))) {
       if(missing(statistics))
         statistics <- mse::statistics[c('C', 'F', 'SB')]
 
-      # TODO: ADD om if missing, via idcol or :=, DROP Map
       res <- rbindlist(Map(function(i, j) do.call(performance, c(list(x=i,
         statistics=statistics, years=years, run=j),
         list(...))), i=x, j=names(x)), fill=TRUE)
@@ -543,33 +653,15 @@ setMethod("performance", signature(x="list"),
         else
           return(i)
       })
+      # Recurse with coerced list
+      if(missing(statistics))
+        return(performance(x, years=years, ...))
+      else
+        return(performance(x, statistics=statistics, years=years, ...))
     }
 
-    # - list(mse) | FLmses
-    if(all(unlist(lapply(x, is, 'FLmse')))) {
-      return(performance(FLmses(x), statistics=statistics, years=years, ...)[])
-    }
-
-    # - list(FLmses), assumes performance is stored
-    if(all(unlist(lapply(x, is, 'FLmses')))) {
-      return(rbindlist(lapply(x, function(i) performance(i, ...))))
-    }
-         
-    # ELSE assume list of FLQuants
-    if(!all(unlist(lapply(x, is, 'FLQuants'))))
-      stop("input list must contain objects of class FLQuants")
-
-    # SET list of refpts
-    if(!is(refpts, "list")) {
-      refpts <- lapply(setNames(nm=names(x)), function(x) refpts)
-    }
-
-    # CALL performance(FLQuants)
-    res <- rbindlist(Map(function(x, y) {
-      performance(x, statistics=statistics, refpts=y, ...)
-    }, x=x, y=refpts), idcol='biol')
-    
-    return(res[])
+    # Should not reach here
+    stop("input list must contain objects of supported classes (FLmses, FLmse, FLo, or FLQuants)")
   }
 ) 
 # }}}
@@ -609,60 +701,4 @@ setMethod("performance", signature(x="FLStocks"),
   })
 # }}}
 
-# .functions {{{
 
-# . setOrder
-.setOrder <- function(res) {
-
-  standard <- c('om', 'biol', 'mp', 'year', 'statistic', 'name', 'iter',
-    'data', 'type', 'run', 'label', 'desc')
-
-  present <- intersect(standard, colnames(res))
-
-  setcolorder(res, present)
-} 
-
-# .merge, twist y and merge to x
-
-.merge <- function(x, y) {
-  if(length(y) == 0)
-    return(x)
-  if(!is.list(x))
-    x <- c(x, y)
-  else {
-    y <- setNames(lapply(names(x), function(i)
-      lapply(y, `[[`, i)), names(x))
-    x <- Map(function(x, y) FLQuants(c(x,y)), x, y)
-  }
-  return(x)
-}
-
-# .compactDT
-
-.compactDT <- function(x) {
-
-  # FACTOR character columns
-  chr_cols <- names(x)[sapply(x, is.character)]
-  if(length(chr_cols) > 0)
-    x[, (chr_cols) := lapply(.SD, as.factor), .SDcols=chr_cols]
-  
-  # INTEGER year and iter
-  if("year" %in% names(x))
-    x[, year := as.integer(year)]
-  if("iter" %in% names(x))
-    x[, iter := as.integer(iter)]
-
-  return(invisible(x))
-}
-# }}}
-
-.validDT <- function(x) {
-
-  if(!is.data.table(x))
-    stop("input must be a data.table")
-  
-  if(!all(c("statistic", "year", "data") %in% colnames(x)))
-    stop("data.table must contain columns: statistic, year, data")
-  
-  return(TRUE)
-}

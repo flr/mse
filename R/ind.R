@@ -191,8 +191,8 @@ cpues.ind <- function(stk, idx, refyrs, nyears=4, indices=names(idx),
     slope <- FLQuant(slope$data, dimnames=dimnames(mean), units="")
     
     # TRACK
-    track(tracking, "mean.ind", year=ay, biol=args$stock) <- mean
-    track(tracking, "slope.ind", year=ay, biol=args$stock) <- slope
+   track(tracking, "mean.ind", year=ay, biol=stock) <- mean
+    track(tracking, "slope.ind", year=ay, biol=stock) <- slope
 
     # ASSEMBLE ind
     ind <- FLQuants(ind=ind, mean=mean, slope=slope)
@@ -232,8 +232,7 @@ cpues.ind <- function(stk, idx, refyrs, nyears=4, indices=names(idx),
     ind <- FLQuants(mean=smooth)
   }
   return(list(stk=stk, ind=ind, tracking=tracking))
-}
-# }}}
+} # }}}
 
 # smooth_index {{{
 smooth_index <- function(x, enp.mult=0.2) {
@@ -273,5 +272,4 @@ zscore <- function(i, refyrs=dimnames(i)$year, sample_sd=FALSE,
   
   return(((li %-% rmu) %/% lsd)[, dimnames(i)$year])
 }
-
 # }}}
