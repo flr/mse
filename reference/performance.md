@@ -15,9 +15,9 @@ performance(
   statistics = mse::statistics[c("C", "F", "SB", "AAVC")],
   refpts = FLPar(),
   years = setNames(nm = dimnames(x[[1]])$year[-1]),
-  om = NULL,
-  type = NULL,
-  run = NULL,
+  om = character(0),
+  type = character(0),
+  run = character(0),
   mp = paste(c(om, type, run), collapse = "_"),
   ...
 )
@@ -58,13 +58,7 @@ performance(
 performance(x, type = NULL, ...)
 
 # S4 method for class 'list'
-performance(
-  x,
-  statistics,
-  refpts = FLPar(),
-  years = seq(dims(x[[1]])$minyear + 1, dims(x[[1]])$maxyear),
-  ...
-)
+performance(x, statistics, refpts = FLPar(), years = "missing", ...)
 
 # S4 method for class 'FLStock'
 performance(
