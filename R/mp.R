@@ -318,6 +318,42 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   # tracking
   tracking <- lst0$tracking[!is.na(data),]
 
+  # SET metric factor levels in goFish flow order
+  metric_order <- c(
+    # om
+    "B.om", "SB.om", "C.om", "F.om",
+    # oem
+    "B.obs", "SB.obs", "C.obs",
+    # est
+    "B.est", "SB.est", "C.est", "F.est", "conv.est",
+    # Indicators added by est (dynamic, will be after est metrics)
+    # phcr
+    "metric.hcr",
+    # hcr
+    "hcr",
+    # iem
+    "iem",
+    # isys
+    "isys",
+    # tm
+    "tm",
+    # fb
+    "fb",
+    # om projection
+    "fwd",
+    # internal
+    "time", "pid"
+  )
+  
+  # ADD any user-defined or module-added metrics not in the standard list
+  # These will appear after the standard metrics in the order they appear
+  current_metrics <- unique(tracking$metric)
+  extra_metrics <- setdiff(current_metrics, metric_order)
+  metric_order <- c(metric_order, extra_metrics)
+  
+  # SET as ordered factor
+  tracking[, metric := factor(metric, levels = metric_order, ordered = TRUE)]
+
   # END year print
   if(verbose) cat("\n")
 
@@ -1127,6 +1163,42 @@ setMethod("goFish", signature(om="FLombf"),
 
     # invisible(gc())
   }
+
+  # SET metric factor levels in goFish flow order
+  metric_order <- c(
+    # om
+    "B.om", "SB.om", "C.om", "F.om",
+    # oem
+    "B.obs", "SB.obs", "C.obs",
+    # est
+    "B.est", "SB.est", "C.est", "F.est", "conv.est",
+    # Indicators added by est (dynamic, will be after est metrics)
+    # phcr
+    "metric.hcr",
+    # hcr
+    "hcr",
+    # iem
+    "iem",
+    # isys
+    "isys",
+    # tm
+    "tm",
+    # fb
+    "fb",
+    # om projection
+    "fwd",
+    # internal
+    "time", "pid"
+  )
+  
+  # ADD any user-defined or module-added metrics not in the standard list
+  # These will appear after the standard metrics in the order they appear
+  current_metrics <- unique(tracking$metric)
+  extra_metrics <- setdiff(current_metrics, metric_order)
+  metric_order <- c(metric_order, extra_metrics)
+  
+  # SET as ordered factor
+  tracking[, metric := factor(metric, levels = metric_order, ordered = TRUE)]
 
   # RETURN
   return(list(om=om, tracking=tracking, oem=oem, args=args))
