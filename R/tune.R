@@ -119,7 +119,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       unlist(cmin$hcr@args[names(tune)])))
 
   rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
-    verbose=FALSE, window=window, ...)
+    verbose=FALSE, window=window)
 
   pmin <- performance(rmin, metrics=metrics, statistics=statistic,
     years=list(unlist(years)), ...)[year %in% years, mean(data, na.rm=TRUE)]
@@ -147,7 +147,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       unlist(cmax$hcr@args[names(tune)])))
 
   rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
-    verbose=FALSE, window=window,...)
+    verbose=FALSE, window=window)
   
   pmax <- performance(rmax, metrics=metrics, statistics=statistic,
     years=list(unlist(years)), ...)[year %in% years, mean(data, na.rm=TRUE)]
@@ -187,7 +187,7 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
         format(unlist(cmid$hcr@args[names(tune)]), digits=3)))
 
     rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
-      verbose=FALSE, window=window, ...)
+      verbose=FALSE, window=window)
 
     pmid <- performance(rmid, metrics=metrics, statistics=statistic,
       years=list(unlist(years)), ...)[year %in% years, mean(data, na.rm=TRUE)]
