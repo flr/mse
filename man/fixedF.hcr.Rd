@@ -2,21 +2,70 @@
 % Please edit documentation in R/hcr.R
 \name{fixedF.hcr}
 \alias{fixedF.hcr}
-\title{A fixed target F}
+\title{Fixed Fishing Mortality Harvest Control Rule}
 \usage{
-fixedF.hcr(stk, ftrg, args, tracking)
+fixedF.hcr(
+  stk,
+  ftrg,
+  ages = range(stock(stk))[c("minfbar", "maxfbar")],
+  args,
+  tracking
+)
 }
 \arguments{
-\item{stk}{The perceived FLStock.}
+\item{stk}{The 'oem' observation or SA estimation, an FLStock object.}
 
-\item{control}{A list with the element ftrg (numeric).}
+\item{ftrg}{The target fishing mortality value, numeric or FLQuant. If numeric,
+the value is replicated across all iterations and management years.}
+
+\item{ages}{A vector of length 2 specifying the minimum and maximum ages over
+which F is averaged (fbar range), numeric. Defaults to minfbar and maxfbar from
+the \emph{stk} FLStock range.}
+
+\item{args}{A list containing dimensionality arguments, passed on by mp(). Must
+include elements: ay (advice year), it (number of iterations), mys (management
+years vector).}
+
+\item{tracking}{An FLQuant used for tracking indicators, intermediate values,
+and decisions during MP evaluation.}
+}
+\value{
+A list containing elements 'ctrl' (a fwdControl object) and 'tracking'.
 }
 \description{
-No matter what get F = ftrg
-The control argument is a list of parameters used by the HCR.
+A simple harvest control rule that sets fishing mortality (F) to a fixed target
+value regardless of stock status or other indicators.
+}
+\details{
+This HCR implements a constant fishing mortality strategy where the target F
+is directly applied. The function is useful for testing  fixed harvest strategies
+or as a baseline reference in MSE comparisons. The target
+F can be specified as either a single numeric value (applied across all iterations
+and years) or as an FLQuant object with possible year and iteration structure.
 }
 \examples{
+# Example dataset
 data(plesim)
-fixedF.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
-  frq=1), tracking=FLQuant())
+
+# Sets up an mpCtrl for fixed F at Fmsy
+ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.18)))
+
+# Runs mp between 2021 and 2035
+run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
+
+# Plot results
+plot(om, run)
+
+# Check output
+fbar(run)
+
+# Using FLQuant for time-varying F
+ftrg_var <- FLQuant(seq(0.1, 0.3, length=10), dimnames=list(year=2021:2030))
+ctrl2 <- mpCtrl(est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=ftrg_var)))
+
+# Example using function directly
+fixedF.hcr(stock(om), ftrg=0.13, args=list(ay=2017, it=100, 
+  mys=2018:2020), tracking=FLQuant())
 }

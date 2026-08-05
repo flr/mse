@@ -520,7 +520,7 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
 #' fixedF.hcr(stock(om), ftrg=0.13, args=list(ay=2017, it=100, 
 #'   mys=2018:2020), tracking=FLQuant())
 
-fixedF.hcr <- function(stk, ftrg, ages=range(stock(stk_om))[c('minfbar', 'maxfbar')],
+fixedF.hcr <- function(stk, ftrg, ages=range(stock(stk))[c('minfbar', 'maxfbar')],
   args, tracking){
 
   # PARSE FLQuant

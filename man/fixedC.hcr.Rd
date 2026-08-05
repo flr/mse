@@ -2,27 +2,60 @@
 % Please edit documentation in R/hcr.R
 \name{fixedC.hcr}
 \alias{fixedC.hcr}
-\title{A fixed target C}
+\title{Fixed Catch Harvest Control Rule}
 \usage{
 fixedC.hcr(stk, ctrg, args, tracking)
 }
 \arguments{
-\item{stk}{The perceived FLStock.}
+\item{stk}{The 'oem' observation or SA estimation, an FLStock object.}
 
-\item{control}{A list with the element ftrg (numeric).}
+\item{ctrg}{The target catch value, numeric or FLQuant. If numeric,
+the value is replicated across all iterations and management years.}
+
+\item{args}{A list containing dimensionality arguments, passed on by mp(). Must
+include elements: ay (advice year), it (number of iterations), mys (management
+years vector).}
+
+\item{tracking}{An FLQuant used for tracking indicators, intermediate values,
+and decisions during MP evaluation.}
+}
+\value{
+A list containing elements 'ctrl' (a fwdControl object) and 'tracking'.
 }
 \description{
-No matter what get C = Ctrg
-The control argument is a list of parameters used by the HCR.
+A simple harvest control rule that sets total catch to a fixed target
+value regardless of stock status or other indicators.
+}
+\details{
+This HCR implements a constant catch strategy where the target catch
+is directly applied. The function is useful for testing fixed harvest strategies
+or as a baseline reference in MSE comparisons. The target
+catch can be specified as either a single numeric value (applied across all iterations
+and years) or as an FLQuant object with possible year and iteration structure.
 }
 \examples{
 # Example dataset
 data(plesim)
 
-# Sets up an mpCtrl for catch ~ MSY
+# Sets up an mpCtrl for fixed catch at MSY level
 ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
   hcr = mseCtrl(method=fixedC.hcr, args=list(ctrg=1500)))
 
 # Runs mp between 2021 and 2035
 run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
+
+# Plot results
+plot(om, run)
+
+# Check output
+catch(run)
+
+# Using FLQuant for time-varying catch
+ctrg_var <- FLQuant(seq(1000, 2000, length=10), dimnames=list(year=2021:2030))
+ctrl2 <- mpCtrl(est = mseCtrl(method=perfect.sa),
+  hcr = mseCtrl(method=fixedC.hcr, args=list(ctrg=ctrg_var)))
+
+# Example using function directly
+fixedC.hcr(stock(om), ctrg=1500, args=list(ay=2017, it=100, 
+  mys=2018:2020), tracking=FLQuant())
 }
