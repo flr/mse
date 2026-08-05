@@ -395,79 +395,148 @@ plot_hockeystick.hcr <- function(args, obs=NULL,
 
 # fixedC.hcr {{{
 
-#' A fixed target C
+#' Fixed Catch Harvest Control Rule
 #'
-#' No matter what get C = Ctrg
-#' The control argument is a list of parameters used by the HCR.
-#' @param stk The perceived FLStock.
-#' @param control A list with the element ftrg (numeric).
+#' A simple harvest control rule that sets total catch to a fixed target 
+#' value regardless of stock status or other indicators.
+#'
+#' @details 
+#' This HCR implements a constant catch strategy where the target catch 
+#' is directly applied. The function is useful for testing fixed harvest strategies
+#' or as a baseline reference in MSE comparisons. The target 
+#' catch can be specified as either a single numeric value (applied across all iterations 
+#' and years) or as an FLQuant object with possible year and iteration structure.
+#'
+#' @param stk The 'oem' observation or SA estimation, an FLStock object.
+#' @param ctrg The target catch value, numeric or FLQuant. If numeric, 
+#' the value is replicated across all iterations and management years.
+#' @param args A list containing dimensionality arguments, passed on by mp(). Must 
+#' include elements: ay (advice year), it (number of iterations), mys (management 
+#' years vector).
+#' @param tracking An FLQuant used for tracking indicators, intermediate values, 
+#' and decisions during MP evaluation.
+#'
+#' @return A list containing elements 'ctrl' (a fwdControl object) and 'tracking'.
+#'
 #' @examples
 #' # Example dataset
 #' data(plesim)
 #' 
-#' # Sets up an mpCtrl for catch ~ MSY
+#' # Sets up an mpCtrl for fixed catch at MSY level
 #' ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
 #'   hcr = mseCtrl(method=fixedC.hcr, args=list(ctrg=1500)))
 #' 
 #' # Runs mp between 2021 and 2035
 #' run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
+#' 
+#' # Plot results
+#' plot(om, run)
+#'
+#' # Check output
+#' catch(run)
+#' 
+#' # Using FLQuant for time-varying catch
+#' ctrg_var <- FLQuant(seq(1000, 2000, length=10), dimnames=list(year=2021:2030))
+#' ctrl2 <- mpCtrl(est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=fixedC.hcr, args=list(ctrg=ctrg_var)))
+#' 
+#' # Example using function directly
+#' fixedC.hcr(stock(om), ctrg=1500, args=list(ay=2017, it=100, 
+#'   mys=2018:2020), tracking=FLQuant())
 
 fixedC.hcr <- function(stk, ctrg, args, tracking){
-  
-  # args
-	ay <- args$ay
-  mlag <- args$management_lag
-  frq <- args$frq
 
   # PARSE FLQuant
   if(is(ctrg, 'FLQuant')) {
     # EXPAND iters
     ctrg <- propagate(ctrg, args$it)
-    # TODO: EXPAND years, if needed
-    ctrg <- c(ctrg[, ac(seq(ay + mlag, ay + frq))])
+    # EXPAND years, if needed
+    ctrg <- expand(ctrg, year=args$mys)[, ac(args$mys)]
   } else {
     # REPLICATE for iters and years
     ctrg <- rep(rep(ctrg, args$it)[seq(args$it)], length(args$mys))
   }
 
 	# create control object
-  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="catch", value=c(ctrg))
+  ctrl <- fwdControl(year=args$mys, quant="fbar", value=c(ctrg))
 
 	# return
 	list(ctrl=ctrl, tracking=tracking)
+}
 
-} # }}}
+# }}}
 
 # fixedF.hcr {{{
 
-#' A fixed target F
+#' Fixed Fishing Mortality Harvest Control Rule
 #'
-#' No matter what get F = ftrg
-#' The control argument is a list of parameters used by the HCR.
-#' @param stk The perceived FLStock.
-#' @param control A list with the element ftrg (numeric).
+#' A simple harvest control rule that sets fishing mortality (F) to a fixed target 
+#' value regardless of stock status or other indicators.
+#'
+#' @details 
+#' This HCR implements a constant fishing mortality strategy where the target F 
+#' is directly applied. The function is useful for testing  fixed harvest strategies
+#' or as a baseline reference in MSE comparisons. The target 
+#' F can be specified as either a single numeric value (applied across all iterations 
+#' and years) or as an FLQuant object with possible year and iteration structure.
+#'
+#' @param stk The 'oem' observation or SA estimation, an FLStock object.
+#' @param ftrg The target fishing mortality value, numeric or FLQuant. If numeric, 
+#' the value is replicated across all iterations and management years.
+#' @param ages A vector of length 2 specifying the minimum and maximum ages over 
+#' which F is averaged (fbar range), numeric. Defaults to minfbar and maxfbar from 
+#' the *stk* FLStock range.
+#' @param args A list containing dimensionality arguments, passed on by mp(). Must 
+#' include elements: ay (advice year), it (number of iterations), mys (management 
+#' years vector).
+#' @param tracking An FLQuant used for tracking indicators, intermediate values, 
+#' and decisions during MP evaluation.
+#'
+#' @return A list containing elements 'ctrl' (a fwdControl object) and 'tracking'.
+#'
 #' @examples
+#' # Example dataset
 #' data(plesim)
-#' fixedF.hcr(stock(om), ftrg=0.13, args=list(ay=2017, management_lag=1,
-#'   frq=1), tracking=FLQuant())
+#' 
+#' # Sets up an mpCtrl for fixed F at Fmsy
+#' ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=0.18)))
+#' 
+#' # Runs mp between 2021 and 2035
+#' run <- mp(om, control=ctrl, args=list(iy=2021, fy=2035))
+#' 
+#' # Plot results
+#' plot(om, run)
+#'
+#' # Check output
+#' fbar(run)
+#' 
+#' # Using FLQuant for time-varying F
+#' ftrg_var <- FLQuant(seq(0.1, 0.3, length=10), dimnames=list(year=2021:2030))
+#' ctrl2 <- mpCtrl(est = mseCtrl(method=perfect.sa),
+#'   hcr = mseCtrl(method=fixedF.hcr, args=list(ftrg=ftrg_var)))
+#' 
+#' # Example using function directly
+#' fixedF.hcr(stock(om), ftrg=0.13, args=list(ay=2017, it=100, 
+#'   mys=2018:2020), tracking=FLQuant())
 
-fixedF.hcr <- function(stk, ftrg, args, tracking){
-  
-  # args
-	ay <- args$ay
-  mlag <- args$management_lag
-  frq <- args$frq
+fixedF.hcr <- function(stk, ftrg, ages=range(stock(stk_om))[c('minfbar', 'maxfbar')],
+  args, tracking){
 
   # PARSE FLQuant
   if(is(ftrg, 'FLQuant')) {
     # EXPAND iters
     ftrg <- propagate(ftrg, args$it)
+    # EXPAND years, if needed
+    ftrg <- expand(ftrg, year=args$mys)[, ac(args$mys)]
+  } else {
     # REPLICATE for iters and years
     ftrg <- rep(rep(ftrg, args$it)[seq(args$it)], length(args$mys))
   }
 
 	# create control object
-  ctrl <- fwdControl(year=seq(ay + mlag, ay + frq), quant="fbar", value=c(ftrg))
+  ctrl <- fwdControl(year=args$mys, quant="fbar", value=c(ftrg),
+    minAge=ages[1], maxAge=ages[2])
 
 	# return
 	list(ctrl=ctrl, tracking=tracking)
