@@ -9,7 +9,7 @@
 globalVariables(c(".", "ay", "iy", "mys", "bufflow", "buffup", "data_lag",
   "dy", "frq", "fy", "lim", "management_lag", "min", "sloperatio", "..iter",
   "..year", "x", "y", "i", "j", "J", "k", "metric", "nsqy", "object", "qname", 
-  "trigger"))
+  "trigger", "y0", "enptarget"))
 
 # debug, undebug {{{
 
