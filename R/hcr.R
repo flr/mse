@@ -296,7 +296,7 @@ plot_hockeystick.hcr <- function(args, obs=NULL,
     annotate("segment", x=trigger, xend=trigger, y=0, yend=target,
       linetype=2) +
     # HCR line
-    geom_line(size=1)
+    geom_line(linewidth=1)
 
   # ADD labels
   if(!is.null(labels)) {
