@@ -140,7 +140,7 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
 #'   args=list(y0=2000, iy=2020, dy=2021, dys=2021, frq=1), tracking=FLQuant())
 
 sampling.oem <- function(stk, deviances, observations, stability=1,
-  wts=TRUE, args, tracking) {
+  wts=TRUE, eps=.Machine$double.eps, args, tracking) {
 
   spread(args)
   dys <- ac(dys)
@@ -167,7 +167,7 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
     # APPLY deviances and ASSIGN to stk slots in dys
     for(i in names(deviances$stk)) {
       slot(stk, i)[, dys] <-
-      do.call(i, list(object=stk))[, dys] %*% deviances$stk[[i]][, dys] + 1e-8
+      do.call(i, list(object=stk))[, dys] %*% deviances$stk[[i]][, dys] + eps
     }
 
     # COMPUTE aggregated slots
