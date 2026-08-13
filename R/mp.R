@@ -558,8 +558,6 @@ setMethod("goFish", signature(om="FLom"),
       # ADD hcrpars to ctrl.hcr
       if(exists("hcrpars")) {
         ctrl.hcr$hcrpars <- hcrpars
-        #hcrplist <- as(hcrpars, 'list')
-        #ctrl.hcr[names(hcrplist)] <- hcrplist
       }
 
       ctrl.hcr$ioval <- list(iv=list(t1=flsval, t2=flqsval), 
@@ -948,7 +946,6 @@ setMethod("goFish", signature(om="FLombf"),
       ctrl.phcr$args <- args
       ctrl.phcr$ind <- ind
       ctrl.phcr$tracking <- tracking
-      if(exists("hcrpars")) ctrl.phcr$hcrpars <- hcrpars
       ctrl.phcr$ioval <- list(iv=list(t1=flssval), ov=list(t1=flpval))
       ctrl.phcr$step <- "phcr"
       
