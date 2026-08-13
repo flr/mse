@@ -10,6 +10,7 @@ sampling.oem(
   observations,
   stability = 1,
   wts = TRUE,
+  eps = .Machine$double.eps,
   args,
   tracking
 )
