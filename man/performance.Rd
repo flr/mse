@@ -78,9 +78,9 @@ with a formula and metadata (name, desc). See Details.}
 
 \item{refpts}{Reference points for calculations, typically an \code{FLPar} object.
 Defaults to the reference points held by inputs that contain them. For
-\code{FLmses} and lists, a supplied \code{FLPar} applies to every member, while
-a named list supplies one object per member. \code{FLQuants} defaults to an
-empty \code{FLPar()}.}
+\code{FLmses} and lists, a supplied \code{FLPar} applies to every member, while a
+named list supplies one object per member. \code{FLQuants} defaults to an empty
+\code{FLPar()}.}
 
 \item{years}{Years on which statistics should be computed. Can be:
 \itemize{
@@ -116,21 +116,15 @@ distributions across iterations. If NULL (default), returns mean values.}
 lists or FLStocks. Defaults to 1 (sequential).}
 }
 \value{
-A \code{data.table} containing computed performance statistics with the
-following columns, and in this order:
+A \code{data.table} containing computed performance statistics with columns:
 \itemize{
-\item \code{om} - Operating model name (character)
-\item \code{biol} - Biological stock identifier (character)
-\item \code{mp} - Management procedure identifier (character)
-\item \code{year} - Year (integer)
-\item \code{statistic} - Statistic name/code (character)
-\item \code{name} - Statistic full name (character)
-\item \code{iter} - Iteration number (integer)
-\item \code{data} - Statistic value (numeric)
-\item \code{type} - Run type (character)
-\item \code{run} - Run identifier (character)
-\item \code{label} - Optional label (character)
-\item \code{desc} - Description (character)
+\item statistic: Name of the computed statistic
+\item year: Year or period for which statistic was computed
+\item name: Display name of statistic
+\item desc: Description of statistic
+\item iter: Iteration number (or median/quantile if probs specified)
+\item data: The computed value
+\item om, type, run, mp: Identifiers for the analysis
 }
 }
 \description{
