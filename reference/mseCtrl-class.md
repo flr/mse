@@ -107,7 +107,7 @@ ctl
 #> Method:
 #> function (stk, args, alpha) 
 #> ssb(stk) * alpha
-#> <environment: 0x5556623bd418>
+#> <environment: 0x561f03c5c820>
 #> attr(,".name")
 #> [1] "NULL"
 #> Arguments:
@@ -117,7 +117,7 @@ ctl
 method(ctl)
 #> function (stk, args, alpha) 
 #> ssb(stk) * alpha
-#> <environment: 0x5556623bd418>
+#> <environment: 0x561f03c5c820>
 #> attr(,".name")
 #> [1] "NULL"
 method(ctl) <- function(stk, args, beta) ssb(stk) * beta

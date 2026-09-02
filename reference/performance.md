@@ -35,6 +35,7 @@ performance(
 # S4 method for class 'FLombf'
 performance(
   x,
+  refpts = FLCore::refpts(x),
   statistics = mse::statistics[c("C", "F", "HR", "SB")],
   metrics = NULL,
   om = name(x),
@@ -44,9 +45,10 @@ performance(
 # S4 method for class 'FLmse'
 performance(
   x,
+  refpts = FLCore::refpts(x),
   statistics = .validStatistics(om(x)),
   metrics = NULL,
-  years = dimnames(om(x))$year,
+  years = dimnames(om(x))$year[-1],
   om = name(x@om),
   type = "MP",
   run = "1",
@@ -55,10 +57,10 @@ performance(
 )
 
 # S4 method for class 'FLmses'
-performance(x, type = NULL, ...)
+performance(x, type = NULL, refpts = NULL, ...)
 
 # S4 method for class 'list'
-performance(x, statistics, refpts = FLPar(), years = "missing", ...)
+performance(x, statistics, refpts = NULL, years = "missing", ...)
 
 # S4 method for class 'FLStock'
 performance(
@@ -88,7 +90,10 @@ performance(x, statistics, ...)
 - refpts:
 
   Reference points for calculations, typically an `FLPar` object.
-  Defaults to `FLPar()` (empty).
+  Defaults to the reference points held by inputs that contain them. For
+  `FLmses` and lists, a supplied `FLPar` applies to every member, while
+  a named list supplies one object per member. `FLQuants` defaults to an
+  empty `FLPar()`.
 
 - years:
 
@@ -205,61 +210,61 @@ data(plesim)
 x <- metrics(om)
 performance(x, statistics=statistics[c("SB", "SBMSY", "F", "FMSY")],
   refpts=refpts(om), om="ple", run="r00", type="test")
-#>            om           mp  year statistic     name   iter         data   type
-#>        <char>       <char> <num>    <char>   <char> <char>        <num> <char>
-#>     1:    ple ple_test_r00  1961        SB   SB (t)      1 39511.679303   test
-#>     2:    ple ple_test_r00  1961        SB   SB (t)     10 39511.679303   test
-#>     3:    ple ple_test_r00  1961        SB   SB (t)    100 39511.679303   test
-#>     4:    ple ple_test_r00  1961        SB   SB (t)     11 39511.679303   test
-#>     5:    ple ple_test_r00  1961        SB   SB (t)     12 39511.679303   test
-#>    ---                                                                        
-#> 37996:    ple ple_test_r00  2055      FMSY F/F[MSY]     95     4.301398   test
-#> 37997:    ple ple_test_r00  2055      FMSY F/F[MSY]     96     4.301398   test
-#> 37998:    ple ple_test_r00  2055      FMSY F/F[MSY]     97     4.301398   test
-#> 37999:    ple ple_test_r00  2055      FMSY F/F[MSY]     98     4.301398   test
-#> 38000:    ple ple_test_r00  2055      FMSY F/F[MSY]     99     4.301398   test
-#>           run                               desc
-#>        <char>                             <char>
-#>     1:    r00                    Spawner biomass
-#>     2:    r00                    Spawner biomass
-#>     3:    r00                    Spawner biomass
-#>     4:    r00                    Spawner biomass
-#>     5:    r00                    Spawner biomass
-#>    ---                                          
-#> 37996:    r00 Fishing mortality relative to FMSY
-#> 37997:    r00 Fishing mortality relative to FMSY
-#> 37998:    r00 Fishing mortality relative to FMSY
-#> 37999:    r00 Fishing mortality relative to FMSY
-#> 38000:    r00 Fishing mortality relative to FMSY
+#>            om   biol           mp  year statistic     name  iter         data
+#>        <char> <char>       <char> <int>    <char>   <char> <int>        <num>
+#>     1:    ple   <NA> ple_test_r00  1961        SB   SB (t)     1 39511.679303
+#>     2:    ple   <NA> ple_test_r00  1961        SB   SB (t)    10 39511.679303
+#>     3:    ple   <NA> ple_test_r00  1961        SB   SB (t)   100 39511.679303
+#>     4:    ple   <NA> ple_test_r00  1961        SB   SB (t)    11 39511.679303
+#>     5:    ple   <NA> ple_test_r00  1961        SB   SB (t)    12 39511.679303
+#>    ---                                                                       
+#> 37996:    ple   <NA> ple_test_r00  2055      FMSY F/F[MSY]    95     4.301398
+#> 37997:    ple   <NA> ple_test_r00  2055      FMSY F/F[MSY]    96     4.301398
+#> 37998:    ple   <NA> ple_test_r00  2055      FMSY F/F[MSY]    97     4.301398
+#> 37999:    ple   <NA> ple_test_r00  2055      FMSY F/F[MSY]    98     4.301398
+#> 38000:    ple   <NA> ple_test_r00  2055      FMSY F/F[MSY]    99     4.301398
+#>          type    run                               desc
+#>        <char> <char>                             <char>
+#>     1:   test    r00                    Spawner biomass
+#>     2:   test    r00                    Spawner biomass
+#>     3:   test    r00                    Spawner biomass
+#>     4:   test    r00                    Spawner biomass
+#>     5:   test    r00                    Spawner biomass
+#>    ---                                                 
+#> 37996:   test    r00 Fishing mortality relative to FMSY
+#> 37997:   test    r00 Fishing mortality relative to FMSY
+#> 37998:   test    r00 Fishing mortality relative to FMSY
+#> 37999:   test    r00 Fishing mortality relative to FMSY
+#> 38000:   test    r00 Fishing mortality relative to FMSY
 # Compute on OM, name taken from slot
 performance(om, statistics=statistics[c("SB", "SBMSY", "F", "FMSY")],
   run="r00", type="test")
-#>            om           mp  year statistic     name   iter         data   type
-#>        <char>       <char> <num>    <char>   <char> <char>        <num> <char>
-#>     1:    PLE PLE_test_r00  1961        SB   SB (t)      1 39511.679303   test
-#>     2:    PLE PLE_test_r00  1961        SB   SB (t)     10 39511.679303   test
-#>     3:    PLE PLE_test_r00  1961        SB   SB (t)    100 39511.679303   test
-#>     4:    PLE PLE_test_r00  1961        SB   SB (t)     11 39511.679303   test
-#>     5:    PLE PLE_test_r00  1961        SB   SB (t)     12 39511.679303   test
-#>    ---                                                                        
-#> 37996:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     95     4.301398   test
-#> 37997:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     96     4.301398   test
-#> 37998:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     97     4.301398   test
-#> 37999:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     98     4.301398   test
-#> 38000:    PLE PLE_test_r00  2055      FMSY F/F[MSY]     99     4.301398   test
-#>           run                               desc
-#>        <char>                             <char>
-#>     1:    r00                    Spawner biomass
-#>     2:    r00                    Spawner biomass
-#>     3:    r00                    Spawner biomass
-#>     4:    r00                    Spawner biomass
-#>     5:    r00                    Spawner biomass
-#>    ---                                          
-#> 37996:    r00 Fishing mortality relative to FMSY
-#> 37997:    r00 Fishing mortality relative to FMSY
-#> 37998:    r00 Fishing mortality relative to FMSY
-#> 37999:    r00 Fishing mortality relative to FMSY
-#> 38000:    r00 Fishing mortality relative to FMSY
+#>            om   biol           mp  year statistic     name  iter         data
+#>        <char> <char>       <char> <int>    <char>   <char> <int>        <num>
+#>     1:    PLE        PLE_test_r00  1961        SB   SB (t)     1 39511.679303
+#>     2:    PLE        PLE_test_r00  1961        SB   SB (t)    10 39511.679303
+#>     3:    PLE        PLE_test_r00  1961        SB   SB (t)   100 39511.679303
+#>     4:    PLE        PLE_test_r00  1961        SB   SB (t)    11 39511.679303
+#>     5:    PLE        PLE_test_r00  1961        SB   SB (t)    12 39511.679303
+#>    ---                                                                       
+#> 37996:    PLE        PLE_test_r00  2055      FMSY F/F[MSY]    95     4.301398
+#> 37997:    PLE        PLE_test_r00  2055      FMSY F/F[MSY]    96     4.301398
+#> 37998:    PLE        PLE_test_r00  2055      FMSY F/F[MSY]    97     4.301398
+#> 37999:    PLE        PLE_test_r00  2055      FMSY F/F[MSY]    98     4.301398
+#> 38000:    PLE        PLE_test_r00  2055      FMSY F/F[MSY]    99     4.301398
+#>          type    run                               desc
+#>        <char> <char>                             <char>
+#>     1:   test    r00                    Spawner biomass
+#>     2:   test    r00                    Spawner biomass
+#>     3:   test    r00                    Spawner biomass
+#>     4:   test    r00                    Spawner biomass
+#>     5:   test    r00                    Spawner biomass
+#>    ---                                                 
+#> 37996:   test    r00 Fishing mortality relative to FMSY
+#> 37997:   test    r00 Fishing mortality relative to FMSY
+#> 37998:   test    r00 Fishing mortality relative to FMSY
+#> 37999:   test    r00 Fishing mortality relative to FMSY
+#> 38000:   test    r00 Fishing mortality relative to FMSY
 # Setup an example MSE
 control <- mpCtrl(list(
   est = mseCtrl(method=perfect.sa),
@@ -270,59 +275,59 @@ mse <- mp(om, ctrl=control, args=list(iy=2025, fy=2030))
 # Compute performance using all default statistics, data(statistics)
 performance(mse, run="r00", type="test")
 #> Key: <mp, type, statistic, year>
-#>           om           mp  year statistic      name   iter     data   type
-#>       <char>       <char> <num>    <char>    <char> <char>    <num> <char>
-#>    1:    PLE PLE_test_r00  2025         C     C (t)      1 1261.108   test
-#>    2:    PLE PLE_test_r00  2025         C     C (t)     10 1303.160   test
-#>    3:    PLE PLE_test_r00  2025         C     C (t)    100 1703.979   test
-#>    4:    PLE PLE_test_r00  2025         C     C (t)     11 1402.612   test
-#>    5:    PLE PLE_test_r00  2025         C     C (t)     12 1453.531   test
-#>   ---                                                                     
-#> 7880:    PLE PLE_test_r00  2026    yellow P(Yellow)      1    0.890   test
-#> 7881:    PLE PLE_test_r00  2027    yellow P(Yellow)      1    0.870   test
-#> 7882:    PLE PLE_test_r00  2028    yellow P(Yellow)      1    0.780   test
-#> 7883:    PLE PLE_test_r00  2029    yellow P(Yellow)      1    0.740   test
-#> 7884:    PLE PLE_test_r00  2030    yellow P(Yellow)      1    0.720   test
-#>          run                                         desc
-#>       <char>                                       <char>
-#>    1:    r00                                        Catch
-#>    2:    r00                                        Catch
-#>    3:    r00                                        Catch
-#>    4:    r00                                        Catch
-#>    5:    r00                                        Catch
-#>   ---                                                    
-#> 7880:    r00 Probability of being in Kobe yellow quadrant
-#> 7881:    r00 Probability of being in Kobe yellow quadrant
-#> 7882:    r00 Probability of being in Kobe yellow quadrant
-#> 7883:    r00 Probability of being in Kobe yellow quadrant
-#> 7884:    r00 Probability of being in Kobe yellow quadrant
+#>           om   biol           mp  year statistic      name  iter     data
+#>       <char> <char>       <char> <int>    <char>    <char> <int>    <num>
+#>    1:    PLE        PLE_test_r00  2025         C     C (t)     1 1261.108
+#>    2:    PLE        PLE_test_r00  2025         C     C (t)    10 1303.160
+#>    3:    PLE        PLE_test_r00  2025         C     C (t)   100 1703.979
+#>    4:    PLE        PLE_test_r00  2025         C     C (t)    11 1402.612
+#>    5:    PLE        PLE_test_r00  2025         C     C (t)    12 1453.531
+#>   ---                                                                    
+#> 7880:    PLE        PLE_test_r00  2026    yellow P(Yellow)     1    0.890
+#> 7881:    PLE        PLE_test_r00  2027    yellow P(Yellow)     1    0.870
+#> 7882:    PLE        PLE_test_r00  2028    yellow P(Yellow)     1    0.780
+#> 7883:    PLE        PLE_test_r00  2029    yellow P(Yellow)     1    0.740
+#> 7884:    PLE        PLE_test_r00  2030    yellow P(Yellow)     1    0.720
+#>         type    run                                         desc
+#>       <char> <char>                                       <char>
+#>    1:   test    r00                                        Catch
+#>    2:   test    r00                                        Catch
+#>    3:   test    r00                                        Catch
+#>    4:   test    r00                                        Catch
+#>    5:   test    r00                                        Catch
+#>   ---                                                           
+#> 7880:   test    r00 Probability of being in Kobe yellow quadrant
+#> 7881:   test    r00 Probability of being in Kobe yellow quadrant
+#> 7882:   test    r00 Probability of being in Kobe yellow quadrant
+#> 7883:   test    r00 Probability of being in Kobe yellow quadrant
+#> 7884:   test    r00 Probability of being in Kobe yellow quadrant
 # or select a few of them
 performance(mse, statistics=statistics[c("SBMSY", "FMSY")], run="r00", type="test")
 #> Key: <mp, type, statistic, year>
-#>           om           mp  year statistic       name   iter      data   type
-#>       <char>       <char> <num>    <char>     <char> <char>     <num> <char>
-#>    1:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]      1 1.2704782   test
-#>    2:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]     10 1.6370809   test
-#>    3:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]    100 1.2342225   test
-#>    4:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]     11 1.4703439   test
-#>    5:    PLE PLE_test_r00  2025      FMSY   F/F[MSY]     12 1.5022282   test
-#>   ---                                                                       
-#> 1196:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     95 0.6511697   test
-#> 1197:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     96 0.7036977   test
-#> 1198:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     97 0.9568992   test
-#> 1199:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     98 1.1840236   test
-#> 1200:    PLE PLE_test_r00  2030     SBMSY SB/SB[MSY]     99 0.9837542   test
-#>          run                               desc
-#>       <char>                             <char>
-#>    1:    r00 Fishing mortality relative to FMSY
-#>    2:    r00 Fishing mortality relative to FMSY
-#>    3:    r00 Fishing mortality relative to FMSY
-#>    4:    r00 Fishing mortality relative to FMSY
-#>    5:    r00 Fishing mortality relative to FMSY
-#>   ---                                          
-#> 1196:    r00 Spawnwer biomass relative to SBMSY
-#> 1197:    r00 Spawnwer biomass relative to SBMSY
-#> 1198:    r00 Spawnwer biomass relative to SBMSY
-#> 1199:    r00 Spawnwer biomass relative to SBMSY
-#> 1200:    r00 Spawnwer biomass relative to SBMSY
+#>           om   biol           mp  year statistic       name  iter      data
+#>       <char> <char>       <char> <int>    <char>     <char> <int>     <num>
+#>    1:    PLE        PLE_test_r00  2025      FMSY   F/F[MSY]     1 1.2704782
+#>    2:    PLE        PLE_test_r00  2025      FMSY   F/F[MSY]    10 1.6370809
+#>    3:    PLE        PLE_test_r00  2025      FMSY   F/F[MSY]   100 1.2342225
+#>    4:    PLE        PLE_test_r00  2025      FMSY   F/F[MSY]    11 1.4703439
+#>    5:    PLE        PLE_test_r00  2025      FMSY   F/F[MSY]    12 1.5022282
+#>   ---                                                                      
+#> 1196:    PLE        PLE_test_r00  2030     SBMSY SB/SB[MSY]    95 0.6511697
+#> 1197:    PLE        PLE_test_r00  2030     SBMSY SB/SB[MSY]    96 0.7036977
+#> 1198:    PLE        PLE_test_r00  2030     SBMSY SB/SB[MSY]    97 0.9568992
+#> 1199:    PLE        PLE_test_r00  2030     SBMSY SB/SB[MSY]    98 1.1840236
+#> 1200:    PLE        PLE_test_r00  2030     SBMSY SB/SB[MSY]    99 0.9837542
+#>         type    run                               desc
+#>       <char> <char>                             <char>
+#>    1:   test    r00 Fishing mortality relative to FMSY
+#>    2:   test    r00 Fishing mortality relative to FMSY
+#>    3:   test    r00 Fishing mortality relative to FMSY
+#>    4:   test    r00 Fishing mortality relative to FMSY
+#>    5:   test    r00 Fishing mortality relative to FMSY
+#>   ---                                                 
+#> 1196:   test    r00 Spawnwer biomass relative to SBMSY
+#> 1197:   test    r00 Spawnwer biomass relative to SBMSY
+#> 1198:   test    r00 Spawnwer biomass relative to SBMSY
+#> 1199:   test    r00 Spawnwer biomass relative to SBMSY
+#> 1200:   test    r00 Spawnwer biomass relative to SBMSY
 ```

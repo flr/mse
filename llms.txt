@@ -107,10 +107,10 @@ You are welcome to:
   : Debugging mse modules
 
 - [`fixedC.hcr()`](https://flrproject.org/mse/reference/fixedC.hcr.md) :
-  A fixed target C
+  Fixed Catch Harvest Control Rule
 
 - [`fixedF.hcr()`](https://flrproject.org/mse/reference/fixedF.hcr.md) :
-  A fixed target F
+  Fixed Fishing Mortality Harvest Control Rule
 
 - [`fwd.om()`](https://flrproject.org/mse/reference/fwd.om.md) : A
   method to project the operating model (OM)

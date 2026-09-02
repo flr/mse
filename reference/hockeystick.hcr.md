@@ -140,10 +140,6 @@ ctrl <- mpCtrl(est = mseCtrl(method=perfect.sa),
     output="fbar", target=0.18)))
 
 plot_hockeystick.hcr(ctrl)
-#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-#> ℹ Please use `linewidth` instead.
-#> ℹ The deprecated feature was likely used in the mse package.
-#>   Please report the issue at <https://github.com/flr/mse/issues>.
 
 
 # Sets up a 40:10 HCR mpCtrl using hockeystick(fbar~depletion)
