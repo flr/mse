@@ -1,6 +1,11 @@
 
 # mse 2.4.13
 
+## BUG FIXES
+
+- refpts is now correctly handled in performance(), with correct defaults.
+- performance table has standard column names, order and type enforced.
+
 # mse 2.4.10
 
 ## NEW FEATURES
