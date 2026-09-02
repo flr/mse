@@ -203,6 +203,18 @@ test_that("performance(FLmse) with default statistics", {
   expect_true(nrow(result) > 0)
 })
 
+test_that("performance(FLmse) accepts reference point overrides", {
+  alternate <- refpts(flmse)
+  alternate["FMSY"] <- alternate["FMSY"] * 2
+
+  result <- performance(flmse, statistics=statistics["FMSY"],
+    refpts=alternate)
+
+  expect_s3_class(result, "data.table")
+  expect_equal(result$data,
+    performance(flmse, statistics=statistics["FMSY"])$data / 2)
+})
+
 test_that("performance(FLmse) with metrics", {
   result <- performance(flmse, statistics=statistics['green'],
     run="r00", type="test", metrics=list(SB=ssb, F=fbar))
@@ -240,6 +252,18 @@ test_that("performance(FLmses) with default statistics", {
   
   expect_s3_class(result, "data.table")
   # expect_true(nrow(result) > 0)
+})
+
+test_that("performance(FLmses) accepts shared reference point overrides", {
+  alternate <- refpts(flmse)
+  alternate["FMSY"] <- alternate["FMSY"] * 2
+
+  result <- performance(flmses, statistics=statistics["FMSY"],
+    refpts=alternate)
+
+  expect_s3_class(result, "data.table")
+  expect_equal(result$data,
+    performance(flmses, statistics=statistics["FMSY"])$data / 2)
 })
 # }}}
 
@@ -287,6 +311,19 @@ test_that("performance(list(FLmses)) handles multiple FLmses objects", {
   
   expect_s3_class(result, "data.table")
   # expect_true(nrow(result) > 0)
+})
+
+test_that("performance(list(FLmses)) accepts per-element reference points", {
+  alternate <- refpts(flmse)
+  alternate["FMSY"] <- alternate["FMSY"] * 2
+  x <- list(A=flmses, B=flmses)
+
+  result <- performance(x, statistics=statistics["FMSY"],
+    refpts=list(A=alternate, B=alternate))
+
+  expect_s3_class(result, "data.table")
+  expect_equal(result$data,
+    performance(x, statistics=statistics["FMSY"])$data / 2)
 })
 # }}}
 
