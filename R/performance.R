@@ -5,7 +5,7 @@
 # Author: Iago Mosqueira (EC JRC) <iago.mosqueira@ec.europa.eu>
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
- 
+
 globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
   "season", "area", "i.type", "..type"))
 
@@ -38,15 +38,79 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
   return(statistics[valid])
 }
 
-# . setOrder
-.setOrder <- function(res) {
+# Standardize performance data.table column order and types.
+# Missing standard columns are added while non-standard columns are preserved.
+# @param x A data.table to standardize
+# @param add_missing Logical, if TRUE adds missing standard columns with NA
+# @return The standardized data.table (modified by reference)
 
-  standard <- c('om', 'biol', 'mp', 'year', 'statistic', 'name', 'iter',
-    'data', 'type', 'run', 'label', 'desc')
+.standardizeDT <- function(x, add_missing = TRUE) {
 
-  present <- intersect(standard, colnames(res))
+  # RETURN early if no rows
+  if(nrow(x) == 0)
+    return(invisible(x))
 
-  setcolorder(res, present)
+  # DEFINE standard columns and their types
+  standard_cols <- c('om', 'biol', 'mp', 'year', 'statistic', 'name', 'iter',
+    'data', 'type', 'run', 'desc')
+  standard_types <- list(
+    om = "character",
+    biol = "character",
+    mp = "character",
+    year = "integer",
+    statistic = "character",
+    name = "character",
+    iter = "integer",
+    data = "numeric",
+    type = "character",
+    run = "character",
+    desc = "character"
+  )
+
+  # ADD missing standard columns if requested
+  if(add_missing) {
+    missing_cols <- setdiff(standard_cols, colnames(x))
+    if(length(missing_cols) > 0) {
+      for(col in missing_cols) {
+        type <- standard_types[[col]]
+        if(type == "integer")
+          set(x, j = col, value = NA_integer_)
+        else if(type == "numeric")
+          set(x, j = col, value = NA_real_)
+        else
+          set(x, j = col, value = NA_character_)
+      }
+    }
+  }
+
+  # CONVERT types for present standard columns
+  for(col in intersect(names(standard_types), colnames(x))) {
+    target_type <- standard_types[[col]]
+
+    if(target_type == "integer" && !is.integer(x[[col]])) {
+      set(x, j = col, value = as.integer(x[[col]]))
+    } else if(target_type == "numeric" && !is.numeric(x[[col]])) {
+      set(x, j = col, value = as.numeric(x[[col]]))
+    } else if(target_type == "character" && !is.character(x[[col]])) {
+      # CONVERT factors to character
+      if(is.factor(x[[col]]))
+        set(x, j = col, value = as.character(x[[col]]))
+    }
+  }
+
+  # FACTOR character columns (except standard ones that should stay character)
+  factor_exclude <- c('om', 'biol', 'mp', 'type', 'run', 'statistic', 'name',
+    'desc')
+  chr_cols <- names(x)[sapply(x, is.character) & !names(x) %in% factor_exclude]
+  if(length(chr_cols) > 0)
+    x[, (chr_cols) := lapply(.SD, as.factor), .SDcols=chr_cols]
+
+  # SET column order: standard columns first, then extra columns
+  present_standard <- intersect(standard_cols, colnames(x))
+  extra_cols <- setdiff(colnames(x), standard_cols)
+  setcolorder(x, c(present_standard, extra_cols))
+
+  return(invisible(x))
 } 
 
 # .merge, twist y and merge to x
@@ -149,14 +213,20 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
 #'   lists or FLStocks. Defaults to 1 (sequential).
 #' @param ... Additional arguments passed through (e.g., custom metrics, tracking data).
 #'
-#' @return A `data.table` containing computed performance statistics with columns:
-#'   - statistic: Name of the computed statistic
-#'   - year: Year or period for which statistic was computed
-#'   - name: Display name of statistic
-#'   - desc: Description of statistic
-#'   - iter: Iteration number (or median/quantile if probs specified)
-#'   - data: The computed value
-#'   - om, type, run, mp: Identifiers for the analysis
+#' @return A `data.table` containing computed performance statistics with the
+#'    following columns, and in this order:
+#'    - `om` - Operating model name (character)
+#'    - `biol` - Biological stock identifier (character)
+#'    - `mp` - Management procedure identifier (character)
+#'    - `year` - Year (integer)
+#'    - `statistic` - Statistic name/code (character)
+#'    - `name` - Statistic full name (character)
+#'    - `iter` - Iteration number (integer)
+#'    - `data` - Statistic value (numeric)
+#'    - `type` - Run type (character)
+#'    -  `run` - Run identifier (character)
+#'    -  `label` - Optional label (character)
+#'    -  `desc` - Description (character)
 #'
 #' @seealso
 #' [statistics], [refpts()], [metrics()]
@@ -287,8 +357,8 @@ setMethod("performance", signature(x="FLQuants"),
     # CREATE and ASSIGN cols
     set(res, j=c('om', 'type', 'run', 'mp'), value=list(om, type, run, mp))
 
-    # SET to standard colorder
-    .setOrder(res) 
+    # STANDARDIZE columns
+    .standardizeDT(res)
 
     return(res[])
   }
@@ -320,9 +390,10 @@ setMethod("performance", signature(x="FLo"),
 
     # COMPUTE on metrics
     res <- performance(metrics, refpts=refpts, statistics=statistics, om=om, ...)
+    res[, biol := name(stock(x))]
 
-    # SET to standard colorder
-    .setOrder(res) 
+    # STANDARDIZE columns
+    .standardizeDT(res)
 
     return(res[])
   }
@@ -348,12 +419,15 @@ setMethod("performance", signature(x="FLombf"),
       om <- NULL
 
     # COMPUTE
-    res <- rbindlist(lapply(setNames(nm=names(metrics)), function(i) 
-      performance(metrics[[i]], refpts=x@refpts[[i]], statistics=statistics,
-        om=om, ...)), idcol="biol")
+    res <- rbindlist(lapply(setNames(nm=names(metrics)), function(i) {
+      res <- performance(metrics[[i]], refpts=x@refpts[[i]],
+        statistics=statistics, om=om, ...)
+      res[, biol := NULL]
+      res
+    }), idcol="biol")
 
-    # SET to standard colorder
-    .setOrder(res) 
+    # STANDARDIZE columns
+    .standardizeDT(res)
  
     return(res)
   }
@@ -377,7 +451,7 @@ setMethod("performance", signature(x="FLombf"),
 
 setMethod("performance", signature(x="FLmse"),
   function(x, statistics=.validStatistics(om(x)), metrics=NULL, 
-    years=dimnames(om(x))$year, om=name(x@om), type="MP", run="1",
+    years=dimnames(om(x))$year[-1], om=name(x@om), type="MP", run="1",
     control=FALSE, ...) {
 
     # GET arguments (extra metrics)
@@ -390,7 +464,8 @@ setMethod("performance", signature(x="FLmse"),
     res <- attr(x, 'performance')
     
     if(missing(statistics) & !is.null(res)) {
-
+      if(is(om(x), "FLom"))
+        res[, biol := name(stock(om(x)))]
       return(res[])
 
     } else {
@@ -446,8 +521,8 @@ setMethod("performance", signature(x="FLmse"),
 
       # CALL performance(metrics)
       res <- do.call(performance, c(list(x=mets, statistics=statistics,
-        refpts=refpts(x)), hcrargs, tracks, years=years,
-        om=unname(name(x@om)), type=type, run=run))
+        refpts=refpts(x)), hcrargs, tracks, list(years=years,
+        om=unname(name(x@om)), type=type, run=run)))
 
       # NAME mp if  possible
       if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
@@ -484,16 +559,11 @@ setMethod("performance", signature(x="FLmse"),
       # SET key
       setkeyv(res, c("mp", "type", "statistic", "year"))
 
-      # SET column order
-      if(is(x@om, "FLombf")) 
-        setcolorder(res, c("om", "biol", "statistic", "name", "desc", "year",
-          "iter", "data", "type", "run", "mp"))
-      else
-        setcolorder(res, c("om", "statistic", "name", "desc", "year",
-          "iter", "data", "type", "run", "mp"))
+      if(is(om(x), "FLom"))
+        res[, biol := name(stock(om(x)))]
 
-      # SET to standard colorder
-      .setOrder(res) 
+      # STANDARDIZE columns
+      .standardizeDT(res)
 
       return(res[])
     }
@@ -502,7 +572,7 @@ setMethod("performance", signature(x="FLmse"),
 
 setReplaceMethod('performance', signature(x='FLmse', value="data.frame"),
   function(x, value){
-    attr(x, "performance") <- .compactDT(value)
+    attr(x, "performance") <- .standardizeDT(data.table(value))
     return(x)
 })
 
@@ -562,7 +632,7 @@ setMethod("performance", signature(x="FLmses"),
         if(!"mp" %in% colnames(res) & all(c("type", "run") %in% colnames(res)))
           res[, mp:=paste(om, type, run, sep="_")]
 
-        return(res)
+        return(res[])
       }
     }
   }
@@ -572,7 +642,7 @@ setMethod("performance", signature(x="FLmses"),
 
 setReplaceMethod('performance', signature(x='FLmses', value="data.frame"),
   function(x, value){
-    slot(x, 'performance') <- .compactDT(data.table(value))
+    slot(x, 'performance') <- .standardizeDT(data.table(value))
     return(x)
 })
 
@@ -617,9 +687,12 @@ setMethod("performance", signature(x="list"),
 
       # CALL performance(FLQuants)
       res <- rbindlist(Map(function(x, y) {
-        performance(x, statistics=statistics, refpts=y, ...)
+        res <- performance(x, statistics=statistics, refpts=y, ...)
+        res[, biol := NULL]
+        res
       }, x=x, y=refpts), idcol='biol')
-      
+
+      .standardizeDT(res)
       return(res[])
     }
  
@@ -679,8 +752,8 @@ setMethod("performance", signature(x="FLStock"),
     # COMPUTE
     res <- performance(flqs, statistics=statistics, ...)
 
-    # SET to standard colorder
-    .setOrder(res) 
+    # STANDARDIZE columns
+    .standardizeDT(res)
 
     return(res[])
   }
@@ -694,11 +767,13 @@ setMethod("performance", signature(x="FLStock"),
 setMethod("performance", signature(x="FLStocks"),
   function(x, statistics, ...) {
 
-    res <- rbindlist(lapply(x, performance,
-      statistics=statistics, ...), idcol='biol')
-    
+    res <- rbindlist(lapply(x, function(i) {
+      res <- performance(i, statistics=statistics, ...)
+      res[, biol := NULL]
+      res
+    }), idcol='biol')
+
+    .standardizeDT(res)
     return(res[]) 
   })
 # }}}
-
-

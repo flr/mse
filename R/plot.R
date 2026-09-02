@@ -8,13 +8,13 @@
 
 # FLo {{{
 setMethod("plot", signature(x="FLo", y="missing"),
-  function(x, ..., metrics=list(Rec=rec, SSB=ssb, Catch=catch, F=fbar)) {
+  function(x, ..., metrics=list(Rec=rec, SSB=ssb, Catch=catch, F=fbar), window=TRUE) {
 
     args <- list(...)
 
     # IF args, plot list
     if(length(args) >= 1)
-      return(plot(x, args, metrics=metrics))
+      return(plot(x, args, metrics=metrics, window=window))
 
     # COMPUTE metrics
     mets <- do.call("metrics", list(object=x, metrics=metrics))
@@ -26,7 +26,8 @@ setMethod("plot", signature(x="FLo", y="missing"),
 
 # FLo, FLo {{{
 setMethod("plot", signature(x="FLo", y="FLo"),
-  function(x, y, ..., metrics=list(Rec=rec, SSB=ssb, Catch=catch, F=fbar)) {
+  function(x, y, ..., metrics=list(Rec=rec, SSB=ssb, Catch=catch, F=fbar),
+    names=LETTERS[seq(length(fqs))]) {
 
     # GET all args
     args <- c(list(x, y), list(...))
@@ -36,6 +37,8 @@ setMethod("plot", signature(x="FLo", y="FLo"),
 
     # CALL metrics
     fqs <- lapply(args[idx], function(x) metrics(stock(x), metrics=metrics))
+
+    names(fqs) <- names
 
     plotListFLQuants(fqs)
   }
