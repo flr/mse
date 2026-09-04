@@ -61,7 +61,6 @@ Collate:
   'iem.R'
   'fb.R'
   'tm.R'
-  'om.R'
   'statistics.R'
 License: EUPL
 LazyLoad: true

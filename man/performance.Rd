@@ -108,12 +108,6 @@ Defaults to last year of input if omitted.
 
 \item{control}{Logical. For FLmse input, include HCR control arguments in output?
 Defaults to FALSE.}
-
-\item{probs}{Optional numeric vector of quantiles (0-1) to compute on statistic
-distributions across iterations. If NULL (default), returns mean values.}
-
-\item{mc.cores}{Integer. Number of cores for parallel processing when handling
-lists or FLStocks. Defaults to 1 (sequential).}
 }
 \value{
 A \code{data.table} containing computed performance statistics with columns:
@@ -122,7 +116,7 @@ A \code{data.table} containing computed performance statistics with columns:
 \item year: Year or period for which statistic was computed
 \item name: Display name of statistic
 \item desc: Description of statistic
-\item iter: Iteration number (or median/quantile if probs specified)
+\item iter: Iteration number (or 1 if statistic computes a probability)
 \item data: The computed value
 \item om, type, run, mp: Identifiers for the analysis
 }

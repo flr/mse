@@ -215,16 +215,12 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
 #'   - A vector of years to use
 #'   - A named list of year vectors (names become year labels in output)
 #'   Defaults to last year of input if omitted.
-#' @param probs Optional numeric vector of quantiles (0-1) to compute on statistic
-#'   distributions across iterations. If NULL (default), returns mean values.
 #' @param om Optional name for the operating model.
 #' @param type Optional name for the MP type.
 #' @param run Optional name for the model run.
 #' @param mp Optional combined MP name. Auto-generated if not provided.
 #' @param control Logical. For FLmse input, include HCR control arguments in output?
 #'   Defaults to FALSE.
-#' @param mc.cores Integer. Number of cores for parallel processing when handling
-#'   lists or FLStocks. Defaults to 1 (sequential).
 #' @param ... Additional arguments passed through (e.g., custom metrics, tracking data).
 #'
 #' @return A `data.table` containing computed performance statistics with columns:
@@ -232,7 +228,7 @@ globalVariables(c(".", "data", "mp", "om", "run", "statistic", "age", "unit",
 #'   - year: Year or period for which statistic was computed
 #'   - name: Display name of statistic
 #'   - desc: Description of statistic
-#'   - iter: Iteration number (or median/quantile if probs specified)
+#'   - iter: Iteration number (or 1 if statistic computes a probability)
 #'   - data: The computed value
 #'   - om, type, run, mp: Identifiers for the analysis
 #'
