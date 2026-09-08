@@ -700,10 +700,11 @@ setMethod("performance", signature(x="list"),
 
     # - list(FLQuants), handle early before checking years
     if(all(unlist(lapply(x, is, 'FLQuants')))) {
-      
+
       # SET years default from first element if missing
-      if(missing(years))
+      if(missing(years)) {
         years <- seq(dims(x[[1]][[1]])$minyear + 1, dims(x[[1]][[1]])$maxyear)
+      }
       
       # SET list of refpts
       if(is.null(refpts))
@@ -714,7 +715,8 @@ setMethod("performance", signature(x="list"),
 
       # CALL performance(FLQuants)
       res <- rbindlist(Map(function(x, y) {
-        res <- performance(x, statistics=statistics, refpts=y, ...)
+        res <- performance(x, statistics=statistics, refpts=y, 
+          years=years, ...)
         res[, biol := NULL]
         res
       }, x=x, y=refpts), idcol='biol')
