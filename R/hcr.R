@@ -456,7 +456,7 @@ fixedC.hcr <- function(stk, ctrg, args, tracking){
   }
 
 	# create control object
-  ctrl <- fwdControl(year=args$mys, quant="fbar", value=c(ctrg))
+  ctrl <- fwdControl(year=args$mys, quant="catch", value=c(ctrg))
 
 	# return
 	list(ctrl=ctrl, tracking=tracking)
