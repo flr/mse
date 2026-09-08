@@ -58,9 +58,10 @@
 #' # Plot tuned MP
 #' plot(om, tun)
 
-tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
-  tune, prob=0.5, tol=0.01, maxit=12, years=ac(seq(args$iy + 1, args$fy - 1)),
-  verbose=TRUE, window=TRUE, ...) {
+tunebisect <- function(om, oem=NULL, iem=NULL, control,
+  statistic, metrics=NULL, args, tune, prob=0.5,
+  tol=0.01, maxit=12, years=ac(seq(args$iy + 1, args$fy - 1)),
+  parallel=TRUE, verbose=TRUE, window=TRUE, ...) {
 
   # CALL recursively if multiple prob
   if(length(prob) > 1) {
@@ -118,11 +119,11 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     message(paste0("[1] ", names(tune), ": ",
       unlist(cmin$hcr@args[names(tune)])))
 
-  rmin <- mp(om, oem=oem, ctrl=cmin, args=args, scenario=paste0("min"),
-    verbose=FALSE, window=window)
+  rmin <- mp(om, oem=oem, iem=iem, ctrl=cmin, args=args, 
+    scenario=paste0("min"), parallel=parallel, verbose=FALSE, window=window)
 
   pmin <- performance(rmin, metrics=metrics, statistics=statistic,
-    years=list(unlist(years)), ...)[year %in% years, mean(data, na.rm=TRUE)]
+    years=list(unlist(years)), ...)[, mean(data, na.rm=TRUE)]
 
   obmin <- pmin - prob
 
@@ -146,11 +147,11 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
     message(paste0("[2] ", names(tune), ": ",
       unlist(cmax$hcr@args[names(tune)])))
 
-  rmax <- mp(om, oem=oem, ctrl=cmax, args=args, scenario=paste0("max"),
-    verbose=FALSE, window=window)
+  rmax <- mp(om, oem=oem, iem=iem, ctrl=cmax, args=args,
+    scenario=paste0("max"), parallel=parallel, verbose=FALSE, window=window)
   
   pmax <- performance(rmax, metrics=metrics, statistics=statistic,
-    years=list(unlist(years)), ...)[year %in% years, mean(data, na.rm=TRUE)]
+    years=list(unlist(years)), ...)[, mean(data, na.rm=TRUE)]
 
   obmax <- pmax - prob
 
@@ -186,11 +187,11 @@ tunebisect <- function(om, oem=NULL, control, statistic, metrics=NULL, args,
       message(paste0("[", count + 2, "] ", names(tune), ": ",
         format(unlist(cmid$hcr@args[names(tune)]), digits=3)))
 
-    rmid <- mp(om, oem=oem, ctrl=cmid, args=args, scenario=paste0("mid"),
-      verbose=FALSE, window=window)
+    rmid <- mp(om, oem=oem, iem=iem, ctrl=cmid, args=args,
+      scenario=paste0("mid"), parallel=parallel, verbose=FALSE, window=window)
 
     pmid <- performance(rmid, metrics=metrics, statistics=statistic,
-      years=list(unlist(years)), ...)[year %in% years, mean(data, na.rm=TRUE)]
+      years=list(unlist(years)), ...)[, mean(data, na.rm=TRUE)]
 
     obmid <- pmid - prob
 
