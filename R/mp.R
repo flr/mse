@@ -814,15 +814,26 @@ setMethod("goFish", signature(om="FLombf"),
     stk0 <- FLStocks(lapply(o.out, "[[", "stk"))
     idx0 <- lapply(o.out, "[[", "idx")
 
-    # WARNING: MERGE observations
-    if(!args$stock %in% bns & length(args$stock) == 1) {
+    # SIMPLIFY or SUBSET observations
+    if(length(bns) > 1 & length(args$stock) == 1) {
+      # SELECT bns
+      if(args$stock %in% bns) {
 
-      # TODO: USE store observations$stk
-      stk0 <- FLStocks(Reduce("+", stk0))
-      names(stk0) <- args$stock
+        stk0 <- stk0[bns]
+        idx0 <- idx0[bns]
 
-      idx0 <- list(FLIndices(Reduce("c", idx0)))
-      names(idx0) <- args$stock
+      # MERGE
+      } else {
+
+        stk0 <- FLStocks(Reduce("+", stk0))
+        names(stk0) <- args$stock
+
+        idx0 <- list(FLIndices(Reduce("c", idx0)))
+        names(idx0) <- args$stock
+
+        observations(oem)[args$stock] <- list(
+          stk=stk0[[1]], idx=idx0)
+      }
     }
 
     # EXTRACT tracking
