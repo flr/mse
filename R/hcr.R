@@ -179,10 +179,34 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
 
 # plot_hockeystick.hcr {{{
 
-#' @rdname hochestick.hcr
-#' @details
+#' Plot a hockey-stick harvest control rule
 #'
-#' @params
+#' Plots the shape of a hockey-stick HCR, as implemented by `hockeystick.hcr`,
+#' from a set of arguments or an `mseCtrl`/`mpCtrl` object.
+#'
+#' @details
+#' The plot shows the control variable (`output`) against the stock metric,
+#' with dashed lines and labels marking the `lim`, `trigger`, `min`, `target`
+#' and, when set, `drop` reference points. If `obs` is given, an FLStock, the
+#' historical trajectory of metric and output is added to the plot. If
+#' `kobe = TRUE`, a Kobe-style background of red, yellow and green zones is
+#' added, computed with respect to `xtarget`, the actual target value on the
+#' metric axis (e.g. Btarget), which defaults to the `trigger` value.
+#'
+#' @param args A list of HCR arguments (as used by `hockeystick.hcr`), or an
+#' `mseCtrl` or `mpCtrl` object from which those arguments are extracted.
+#' @param obs An optional FLStock from which historical values of `metric` and
+#' `output` are computed and added to the plot.
+#' @param kobe If `TRUE`, a Kobe-style colour background (red/yellow/green) is
+#' added to the plot, logical.
+#' @param xtarget The actual target value on the metric axis (e.g. Btarget),
+#' used to draw the Kobe background, numeric. Defaults to `args$trigger`.
+#' @param alpha Transparency level applied to the Kobe background polygons, numeric.
+#' @param xlim Upper limit of the x-axis (metric), numeric. Defaults to 1.50 times `trigger`.
+#' @param labels A named character vector of labels for `lim`, `trigger`, `min`,
+#' `target` and `drop`, used to annotate the plot. Set to `NULL` to omit labels.
+#'
+#' @return A ggplot object.
 #' @examples
 #' data(ple4)
 #'
