@@ -111,10 +111,22 @@ setMethod("plot", signature(x="FLom", y="list"),
 
 # FLombf {{{
 setMethod("plot", signature(x="FLombf", y="missing"),
-  function(x, ...) {
+  function(x, ..., metrics=NULL) {
     
     # GET extra args
     args <- list(...)
+
+    # IF metrics given, PLOT per-biol FLQuants of computed metrics
+    if(!is.null(metrics)) {
+
+      # DISPATCH comparison plot if extra (FLmse/FLombf) args present
+      if(length(args) >= 1)
+        return(plot(x, args, metrics=metrics))
+
+      mets <- metrics(x, metrics=metrics)
+
+      return(plotListFLQuants(mets))
+    }
 
     # DISPATCH if args are not FLmse
     if(length(args) == 0) {
@@ -180,7 +192,34 @@ setMethod("plot", signature(x="FLombf", y="FLmse"),
 
 # FLombf, list, ... {{{
 setMethod("plot", signature(x="FLombf", y="list"),
-  function(x, y, window=TRUE, ...) {
+  function(x, y, window=TRUE, ..., metrics=NULL) {
+
+    # IF metrics given, PLOT per-biol comparison of computed metrics
+    if(!is.null(metrics)) {
+
+      # WINDOW om to common range across comparison objects
+      if(isTRUE(window))
+        maxyear <- min(unlist(lapply(y, function(i) dims(i)$minyear)))
+      else if(is.numeric(window))
+        maxyear <- window
+      else
+        maxyear <- min(unlist(lapply(y, function(i) dims(i)$maxyear)))
+
+      x <- window(x, end=maxyear)
+
+      # COMPUTE metrics for om and each comparison object, keyed by biol
+      mets <- lapply(c(list(OM=x), y), metrics, metrics=metrics)
+
+      # RESHAPE as biol -> (group -> FLQuants)
+      bnames <- names(mets[[1]])
+      plots <- lapply(setNames(nm=bnames), function(bn)
+        plotListFLQuants(lapply(mets, "[[", bn)))
+
+      if(length(plots) == 1)
+        return(plots[[1]])
+
+      return(Reduce("|", plots))
+    }
 
     # EXTRACT stock(om) as FLStocks
     oms <- stock(x)

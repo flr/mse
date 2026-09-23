@@ -808,11 +808,58 @@ setMethod("metrics", signature(object="FLombf", metrics="missing"),
 setMethod("metrics", signature(object="FLombf", metrics="list"),
   function(object, metrics, names=NULL) {
 
-    # LAPPLY over metrics
-    res <- lapply(metrics, function(x) {
-      # TODO: HANDLE formulas
-      do.call(x, list(object))
-    })
+    isform <- unlist(lapply(metrics, is, "formula"))
+
+    res <- vector(mode="list", length=length(metrics))
+    names(res) <- names(metrics)
+
+    # NON-FORMULA: call function(object), FLQuants keyed by biol
+    if(any(!isform)) {
+      res[!isform] <- lapply(metrics[!isform], function(x)
+          do.call(x, list(object)))
+    }
+
+    # FORMULA, e.g. SBMSY=~ssb/SBMSY: refpts, or function on object
+    if(any(isform)) {
+
+      bnames <- names(biols(object))
+
+      # GET refpts FLPar for a given biol, single FLPar is shared by all
+      rps <- slot(object, "refpts")
+
+      getrp <- function(bn)
+        if(length(rps) == 1) rps[[1]] else rps[[bn]]
+
+      res[isform] <- lapply(metrics[isform], function(fx) {
+
+        expr <- fx[[length(fx)]]
+        vars <- all.vars(expr)
+
+        # IDENTIFY refpts names, valid for any biol
+        rpnames <- unique(unlist(lapply(bnames, function(bn)
+          dimnames(getrp(bn))$params)))
+
+        isrp <- vars %in% rpnames
+        funs <- vars[!isrp]
+
+        # CALL metric functions (e.g. ssb, fbar) on object, FLQuants by biol
+        fqs <- setNames(lapply(funs, function(f) do.call(f, list(object))),
+          funs)
+
+        FLQuants(setNames(lapply(bnames, function(bn) {
+
+          rp <- getrp(bn)
+
+          # EXTRACT this biol's series for each called function
+          mets <- setNames(lapply(fqs, '[[', bn), names(fqs))
+
+          # SUBSET refpts, as FLPar, to KEEP units and iter matching
+          refs <- setNames(lapply(vars[isrp], function(v) rp[v]), vars[isrp])
+
+          eval(expr, c(mets, refs))
+        }), bnames))
+      })
+    }
 
     # RESHAPE as biol$metric
     res <- lapply(setNames(nm=names(res[[1]])), function(x)

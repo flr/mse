@@ -717,7 +717,44 @@ setMethod("metrics", signature(object="FLom", metrics="NULL"),
 
 setMethod("metrics", signature(object="FLom", metrics="list"),
   function(object, metrics) {
-    FLQuants(metrics(stock(object), metrics))
+
+    # SPLIT formula (e.g. SBMSY=~ssb/SBMSY) from function/character elements
+    isform <- unlist(lapply(metrics, is, "formula"))
+
+    res <- vector(mode="list", length=length(metrics))
+    names(res) <- names(metrics)
+
+    # DELEGATE non-formula elements to FLStock method
+    if(any(!isform))
+      res[!isform] <- metrics(stock(object), metrics[!isform])
+
+    # PARSE formula elements, referencing metric functions and/or refpts
+    if(any(isform)) {
+
+      rp <- refpts(object)
+      rpnames <- dimnames(rp)$params
+
+      res[isform] <- lapply(metrics[isform], function(x) {
+
+        expr <- x[[length(x)]]
+        vars <- all.vars(expr)
+
+        # IDENTIFY refpts vs. metric function names
+        isrp <- vars %in% rpnames
+        funs <- vars[!isrp]
+
+        # CALL metric functions on stock(object)
+        mets <- setNames(lapply(funs, function(f) do.call(f,
+          list(stock(object)))), funs)
+
+        # SUBSET refpts, as FLPar, to KEEP units and iter matching
+        refs <- setNames(lapply(vars[isrp], function(v) rp[v]), vars[isrp])
+
+        eval(expr, c(mets, refs))
+      })
+    }
+
+    return(FLQuants(res))
 })
 # }}}
 
