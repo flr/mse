@@ -7,7 +7,6 @@
 #
 # Distributed under the terms of the European Union Public Licence (EUPL) V.1.1.
 
-
 # mp {{{
 
 #' mp executes a single run of a Management Procedure
@@ -232,9 +231,11 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
   } else {
     missingoem <- FALSE
   }
-  
-    # RUN goFish
 
+  # SETUP progressor
+  p <- progressor(steps=(length(vy) + 1) * cores, enable = progress)
+
+  # RUN goFish
   if(isTRUE(parallel) & cores > 1) {
 
     # SPLIT iters along cores
@@ -264,7 +265,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
           ctrl= iter(ctrl, j),
           args=c(args[!names(args) %in% "it"], it=length(j)),
           verbose=verbose,
-          progress=progress,
+          p=p,
           .DEBUG=.DEBUG)
 
         out <- do.call(goFish, call0)
@@ -275,7 +276,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
         out
       }
     } else {
-      
+
       call0 <- list(
         om = om,
         oem = oem,
@@ -286,7 +287,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
         ctrl=ctrl,
         args=args,
         verbose=verbose,
-        progress=progress,
+        p=p,
         .DEBUG=.DEBUG)
 
       out <- do.call(goFish, call0)
@@ -370,7 +371,7 @@ mp <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
 setMethod("goFish", signature(om="FLom"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
-    verbose, progress, .DEBUG) {
+    verbose, p, .DEBUG) {
 
   # ARGUMENTS
   it <- args$it     # number of iterations
@@ -391,8 +392,6 @@ setMethod("goFish", signature(om="FLom"),
   # COPY ctrl
   ctrl0 <- ctrl
   
-  p <- progressor(steps=length(vy) + 1, enable = progress)
-
   # go fish!
 
   for(i in vy) {
@@ -708,7 +707,7 @@ setMethod("goFish", signature(om="FLom"),
 
 setMethod("goFish", signature(om="FLombf"),
   function(om, fb, projection, oem, iem, tracking, ctrl, args,
-    verbose, progress, .DEBUG) {
+    verbose, p, .DEBUG) {
 
   # CONSTANT args
   it <- args$it     # number of iterations
@@ -736,9 +735,6 @@ setMethod("goFish", signature(om="FLombf"),
   # SET default oem deviances
   if(length(deviances(oem)) == 0)
     deviances(oem) <- rep(list(NULL), length(biols(om)))
-
-  # SET progressor
-  p <- progressor(steps=length(vy) + 1, enable = progress)
 
   # Go FISH!
   for(i in vy) {
@@ -1396,7 +1392,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
       # CALL mp, parallel left to work along MPs
       run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
-         progress=progress, verbose=FALSE)
+         p=p, verbose=FALSE)
 
       # RETURN performance
       if(perf) {
