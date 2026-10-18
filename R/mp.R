@@ -770,7 +770,7 @@ setMethod("goFish", signature(om="FLombf"),
     # years for status quo computations 
     sqy <- args$sqy <- ac(seq(ay - nsqy - dlag + 1, dy))
 
-    # TRACK om
+    # TRACK om ay
     track(tracking, "F.om", ay) <- window(lapply(fbar(om),
       function(x) seasonMeans(unitMeans(x))), start=ay, end=ay)
     track(tracking, "B.om", ay) <- window(lapply(tsb(om),

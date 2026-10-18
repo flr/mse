@@ -138,17 +138,18 @@ hockeystick.hcr <- function(stk, ind, target, trigger, lim=0, min=0, drop=0,
       pre <- FLQuant(c(initial), iter=args$it)
     # OR previous decision,
     } else {
-      pre <- tracking[metric == 'hcr' & year == ay - 1 & biol == bname, data]
+      pre <- tracking[metric == 'hcr' & year == ay - management_lag &
+        biol == bname, data]
     }
   }
   
   # APPLY limits, always or if met < trigger
   if(!is.null(dupp)) {
     if(all) {
-    out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
+      out[out > pre * dupp] <- pre[out > pre * dupp] * dupp
     } else {
-    out[out > pre * dupp & met < trigger] <- pre[out > pre * dupp & met <
-      trigger] * dupp
+      out[out > pre * dupp & met < trigger] <- pre[out > pre * dupp & met <
+        trigger] * dupp
     }
   }
 
