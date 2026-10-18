@@ -1295,7 +1295,8 @@ setMethod("goFish", signature(om="FLombf"),
 #' @author Iago Mosqueira (WMR)
 
 mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
-  statistics=NULL, metrics=NULL, type=character(1), names=NULL, parallel=TRUE,
+  statistics=NULL, metrics=NULL, type=character(1), names=NULL,
+  progress=handlers(global = NA), parallel=TRUE,
   perf=!is.null(statistics), ...) {
 
   # GET ... arguments
@@ -1367,38 +1368,32 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     " argument sets.")
 
   # LOOP over values
-  if(parallel & nbrOfWorkers() > 1) {
+  # PARALLEL over MPs if workers >= options, else serial with parallel mp()
+  if(parallel & nbrOfWorkers() > 1 & nbrOfWorkers() >= largs) {
 
     message("Running on ", nbrOfWorkers(), " nodes.")
 
-    # IF cores for all runs, progress by MP
-    if(largs >= nbrOfWorkers()) {
-      p <- progressor(steps=largs)
-      progress <- FALSE
-    } else {
-      progress <- TRUE
-    }
+    p <- progressor(steps=largs)
 
     res <- foreach(i = seq(largs), .errorhandling="pass", .inorder=FALSE,
       .options.future=list(globals=structure(TRUE, add=c("control", "module",
-      "mopts", "om", "oem", "iem", "args"), seed=seed))) %dofuture% {
+      "mopts", "om", "oem", "iem", "args", "p"), seed=seed))) %dofuture% {
 
       # MODIFY module args
       args(control[[module]])[names(mopts)] <- lapply(mopts, "[", i)
 
       # PROGRESS
-      if(!progress)
-        p(message = sprintf("MP: %i / %i", i, largs))
+      p(message = sprintf("MP: %i / %i", i, largs))
 
       # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=FALSE,
-         p=p, verbose=FALSE)
+      run <- mp(om, oem=oem, iem=iem, control=control, args=args,
+        parallel=FALSE, progress=FALSE, verbose=FALSE)
 
       # RETURN performance
       if(perf) {
         # COMPUTE performance
-        run <- performance(run, statistics=statistics, metrics=metrics, type=type,
-          run=names[i])
+        run <- performance(run, statistics=statistics, metrics=metrics,
+          type=type, run=names[i])
         # COMBINE with mopts
         run <- run[, cbind(.SD, as.data.table(lapply(mopts, "[", i)))]
       }
@@ -1414,7 +1409,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       args(control[[module]])[names(mopts)] <- lapply(mopts, '[', i)
 
       # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=TRUE,
+      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=parallel,
          verbose=FALSE, progress=TRUE)
 
       # RETURN performance
