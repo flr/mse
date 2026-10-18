@@ -391,8 +391,7 @@ setMethod("goFish", signature(om="FLom"),
   # COPY ctrl
   ctrl0 <- ctrl
   
-  if(progress)
-    p <- progressor(steps=length(vy) + 1)
+  p <- progressor(steps=length(vy) + 1, enable = progress)
 
   # go fish!
 
@@ -405,8 +404,7 @@ setMethod("goFish", signature(om="FLom"),
     stim <- Sys.time()
   
     # REPORT progress
-    if(progress)
-      p(message = sprintf("year: %s", i))
+    p(message = sprintf("year: %s", i))
 
     if(verbose){
       cat(i, " - ")
@@ -740,8 +738,7 @@ setMethod("goFish", signature(om="FLombf"),
     deviances(oem) <- rep(list(NULL), length(biols(om)))
 
   # SET progressor
-  if(progress)
-    p <- progressor(steps=length(vy) + 1)
+  p <- progressor(steps=length(vy) + 1, enable = progress)
 
   # Go FISH!
   for(i in vy) {
@@ -754,8 +751,7 @@ setMethod("goFish", signature(om="FLombf"),
     }
 
     # REPORT progress
-    if(progress)
-      p(message = sprintf("year: %s", i))
+    p(message = sprintf("year: %s", i))
    
     # time (start)
     stim <- Sys.time()
