@@ -126,6 +126,9 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
 #' @param stk An FLStock object as obtained by the call to *stock(om)*.
 #' @param deviances A named list of deviances, see Details.
 #' @param observations A named list of observations, see Details.
+#' @param stability Stability of the index survey, passed to *survey()*.
+#' @param wts Should the weights-at-age in the stock be updated?
+#' @param eps Small constant added to stock deviances.
 #' @param args Options and arguments passed on by *mp()*.
 #' @param tracking The tracking object.
 #' @return A named list with elements *stk*, *idx*, *observations* and *tracking*.
@@ -134,118 +137,108 @@ shortcut.oem <- function(stk, deviances, observations, args, tracking, ...) {
 #' @keywords function
 #' @examples
 #' data(plesim)
-# Generate samples from year 2000:2016
+#' # Generate samples from year 2000:2016
 #' sampling.oem(stock(om), deviances=deviances(oem),
 #'   observations=observations(oem),
 #'   args=list(y0=2000, iy=2020, dy=2021, dys=2021, frq=1), tracking=FLQuant())
 
 sampling.oem <- function(stk, deviances, observations, stability=1,
   wts=TRUE, eps=.Machine$double.eps, args, tracking) {
-
+  
   spread(args)
   dys <- ac(dys)
 
-  # CHECK inputs
-  # if(!any(!c("stk", "idx") %in% names(deviances)))
-  #  stop("deviances(oem) must have elements 'stk' or 'idx'.")
-
+  # REQUIRE observations
   if(any(!c("stk", "idx") %in% names(observations)))
     stop("observations(oem) must have elements 'stk' and 'idx'.")
-
-  # TODO: GENERATE length samples from OM: catch and indices, BUT needs selex
-  # - invALK
-  # - lenSamples
 
   # SUBSET year range
   stk <- window(stk, start=y0, end=dy, extend=FALSE)
   obs <- window(observations$stk, start=y0, end=dy, extend=FALSE)
- 
-  # --- STK
+
+  # --- STK: apply deviances to the years in dys and recompute aggregates
 
   if(!is.null(deviances$stk)) {
-
-    # APPLY deviances and ASSIGN to stk slots in dys
     for(i in names(deviances$stk)) {
-      slot(stk, i)[, dys] <-
-      do.call(i, list(object=stk))[, dys] %*% deviances$stk[[i]][, dys] + eps
+      slot(stk, i)[, dys] <- do.call(i, list(object=stk))[, dys] %*%
+        deviances$stk[[i]][, dys] + eps
     }
 
-    # COMPUTE aggregated slots
-    landings(stk)[, dys] <- computeLandings(stk[, dys])
-    discards(stk)[, dys] <- computeDiscards(stk[, dys])
-    catch(stk)[, dys] <- computeCatch(stk[, dys])
-  }
+    # RECOMPUTE aggregated slots
+    pert <- names(deviances$stk)
 
-  # STORE for shortcut 
-  # observations$stk[, dys] <- stk[, dys]
-  
-  # --- IDX
-
-  # EXTRACT observations
-  idx <- observations$idx
-  # CHOOSE indices to be updated (maxyear > dy)
-  upi <- unlist(lapply(idx, function(x) unname(dims(x)$maxyear) > dy))
-
-  if(is.null(deviances$idx) | length(deviances$idx) == 0) {
-    deviances$idx <- lapply(observations$idx, function(x) index.q(x) %=% 1)
-  }
-
-  # APPLY survey() to stk + index (x), devs.q (y), stability(z)
-  idx[upi] <- Map(function(x, y, z) {
-
-    dys <- intersect(dys, dimnames(y)$year)
-
-    # CREATE survey obs
-    res <- survey(stk[, dys], x[, dys], sel=sel.pattern(x)[, dys],
-      index.q=index.q(x)[, dys] %*% y[, dys], stability=z)
-
-    # ENSURE no zeroes coming, maybe from high Fs
-    if(sum(index(res)[, dys]) == 0)
-      index(res)[, dys] <- sqrt(.Machine$double.eps)
-
-    # SET 0s to min / 2
-    index(res)[index(res) == 0] <- c(min(index(res)[index(res) > 0] / 2))
+    if(any(c("landings.n", "landings.wt") %in% pert))
+      landings(stk)[, dys] <- computeLandings(stk[, dys])
     
-    # ASSIGN observations, ONLY if index not available
-    if(dy > iy)
-      x[, dys] <- res
- 
-    return(window(x, end=dy))
-
-  }, x=idx[upi], y=deviances$idx[upi], z=rep(stability, length(idx))[upi])
-
-  # ASSIGN idx to observations
-  for(i in seq_along(idx[upi])) {
-    observations$idx[upi][[i]][, dys] <- idx[upi][[i]][, dys]
+    if(any(c("discards.n", "discards.wt") %in% pert))
+      discards(stk)[, dys] <- computeDiscards(stk[, dys])
+    
+    # RECOMPUTE catch from landings + discards,
+    if(any(c("catch.n", "catch.wt") %in% pert))
+      catch(stk)[, dys] <- computeCatch(stk[, dys])
+    # or from catch.n
+    else
+      catch(stk)[, dys] <- computeCatch(stk[, dys], slot="all")
   }
 
-  # -- POST-PROCESS
-  
-  # CHECK dimensions to simplify, on catch.n for multi-fleet FLStock
-  simp <- dim(catch.n(observations$stk))[c(3, 4, 5)] !=
-    dim(catch.n(stk))[c(3, 4, 5)]
+  # --- IDX: only indices extending beyond dy are sampled
 
-  # SIMPLIFY stk to match dimensions of observations$stk
+  idx <- observations$idx
+  obs_idx <- observations$idx
+  
+  upi <- which(vapply(idx, function(x) dims(x)$maxyear > as.numeric(dy),
+    logical(1)))
+  
+  stability <- rep(stability, length.out=length(idx))
+
+  for(i in upi) {
+    x <- idx[[i]]
+    nm <- names(idx)[i]
+
+    # Index deviances matched by name, default to no deviation
+    y <- if(!is.null(nm) && !is.null(deviances$idx[[nm]]))
+      deviances$idx[[nm]] else index.q(x) %=% 1
+
+    xdys <- intersect(dys, dimnames(y)$year)
+
+    res <- survey(stk[, xdys], x[, xdys], sel=sel.pattern(x)[, xdys],
+      index.q=index.q(x)[, xdys] %*% y[, xdys], stability=stability[i])
+
+    # Avoid zero indices, e.g. from high Fs
+    if(sum(index(res)[, xdys]) == 0)
+      index(res)[, xdys] <- sqrt(.Machine$double.eps)
+    index(res)[index(res) == 0] <- min(index(res)[index(res) > 0] / 2)
+
+    if(dy > iy)
+      x[, xdys] <- res
+
+    idx[[i]] <- window(x, end=dy)
+    obs_idx[[i]][, dys] <- idx[[i]][, dys]
+  }
+
+  observations$idx <- obs_idx
+
+  # --- POST-PROCESS: simplify stk to the dimensions of observations$stk
+  
+  simp <- dim(catch.n(observations$stk))[3:5] != dim(catch.n(stk))[3:5]
+
   if(any(simp))
     stk <- simplify(stk, c("unit", "season", "area")[simp], harvest=FALSE)
- 
-  # UPDATE observations + stock.n & harvest
-  slots <- c("landings", "discards", "catch", "landings.n", "discards.n",
-    "catch.n", "stock.n", "harvest", 
-    "landings.wt", "discards.wt", "catch.wt", "stock.wt")
 
-  # UPDATE wts or only catches?
-  if(!wts) slots <- slots[1:8]
+  slots <- c("landings", "discards", "catch", "landings.n", "discards.n",
+    "catch.n", "stock.n", "harvest")
+  if(wts)
+    slots <- c(slots, "landings.wt", "discards.wt", "catch.wt", "stock.wt")
 
   for(i in slots)
     slot(obs, i)[, dys] <- slot(stk, i)[, dys]
 
   units(obs) <- units(stk)
-  
-  # STORE in OEM observations
-  observations$stk[,dys] <- obs[,dys]
 
-  # RETURN stk from obs, only update observed 'slots'
+  observations$stk[, dys] <- obs[, dys]
+
+  # RETURN
+  
   list(stk=obs, idx=idx, observations=observations, tracking=tracking)
 
 } # }}}
