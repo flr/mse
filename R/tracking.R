@@ -68,13 +68,19 @@ setReplaceMethod("track", signature(object="data.table", value="fwdControl"),
     # SUBSET first year
     value <- value[value$year == min(value$year),]
 
+    # SUBSET first unit
+    if (isTRUE(length(unique(value$unit)) > 1))
+      value <- value[value$unit == min(value$unit), ]
+
     # IF fisheries, merge by biol
     if(all(!is.na(value$fishery))) {
+
       # AGGREGATE
       if(value$quant[1] %in% c("catch", "landings", "discards", "effort"))
         value <- apply(iters(value), 2:3, sum, na.rm=TRUE)['value',]
       else
         value <- apply(iters(value), 2:3, mean, na.rm=TRUE)['value',]
+
     } else {
       value <- value$value
     }
