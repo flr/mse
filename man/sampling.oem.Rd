@@ -22,6 +22,12 @@ sampling.oem(
 
 \item{observations}{A named list of observations, see Details.}
 
+\item{stability}{Stability of the index survey, passed to \emph{survey()}.}
+
+\item{wts}{Should the weights-at-age in the stock be updated?}
+
+\item{eps}{Small constant added to stock deviances.}
+
 \item{args}{Options and arguments passed on by \emph{mp()}.}
 
 \item{tracking}{The tracking object.}
@@ -44,6 +50,7 @@ slot.
 }
 \examples{
 data(plesim)
+# Generate samples from year 2000:2016
 sampling.oem(stock(om), deviances=deviances(oem),
   observations=observations(oem),
   args=list(y0=2000, iy=2020, dy=2021, dys=2021, frq=1), tracking=FLQuant())
