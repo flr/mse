@@ -38,11 +38,11 @@ update: ## Change date in DESCRIPTION to last git commit date
 
 release: build docs ## build docs
 	
-build: README.md NEWS ## R CMD build
+build: README.md NEWS roxygen ## R CMD build
 	cd ..;\
 	R CMD build $(PKGSRC) --compact-vignettes
 
-buildNV: README.md NEWS  ## R CMD build --no-build-vignettes
+buildNV: README.md NEWS roxygen ## R CMD build --no-build-vignettes
 	cd ..;\
 	R CMD build $(PKGSRC) --no-build-vignettes
 
