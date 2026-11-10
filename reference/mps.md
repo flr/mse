@@ -22,6 +22,7 @@ mps(
   metrics = NULL,
   type = character(1),
   names = NULL,
+  progress = handlers(global = NA),
   parallel = TRUE,
   perf = !is.null(statistics),
   ...

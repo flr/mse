@@ -140,17 +140,6 @@ performance(x, statistics, ...)
   Logical. For FLmse input, include HCR control arguments in output?
   Defaults to FALSE.
 
-- probs:
-
-  Optional numeric vector of quantiles (0-1) to compute on statistic
-  distributions across iterations. If NULL (default), returns mean
-  values.
-
-- mc.cores:
-
-  Integer. Number of cores for parallel processing when handling lists
-  or FLStocks. Defaults to 1 (sequential).
-
 ## Value
 
 A `data.table` containing computed performance statistics with columns:
@@ -163,7 +152,7 @@ A `data.table` containing computed performance statistics with columns:
 
 - desc: Description of statistic
 
-- iter: Iteration number (or median/quantile if probs specified)
+- iter: Iteration number (or 1 if statistic computes a probability)
 
 - data: The computed value
 

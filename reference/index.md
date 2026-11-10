@@ -83,9 +83,6 @@
 - [`indicator.is()`](https://flrproject.org/mse/reference/indicator.is.md)
   : Indicator Implementation System Module
 
-- [`initiate()`](https://flrproject.org/mse/reference/initiate.md) :
-  Initializes a population for a given virgin biomass.
-
 - [`mp()`](https://flrproject.org/mse/reference/mp.md) : mp executes a
   single run of a Management Procedure
 
@@ -150,6 +147,9 @@
 
 - [`plesim`](https://flrproject.org/mse/reference/plesim.md) : FLom
   object
+
+- [`plot_hockeystick.hcr()`](https://flrproject.org/mse/reference/plot_hockeystick.hcr.md)
+  : Plot a hockey-stick harvest control rule
 
 - [`sampling.oem()`](https://flrproject.org/mse/reference/sampling.oem.md)
   : sampling.oem

@@ -1,5 +1,11 @@
 # Changelog
 
+## mse 2.4.14
+
+### BUG FIXES
+
+- years argument was not passed to performance(FLQuants) for some lists
+
 ## mse 2.4.13
 
 ### BUG FIXES

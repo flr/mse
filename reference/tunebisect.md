@@ -15,6 +15,7 @@ that obtains a 60% mean probability of SSB being above SSBMSY over the
 tunebisect(
   om,
   oem = NULL,
+  iem = NULL,
   control,
   statistic,
   metrics = NULL,
@@ -24,6 +25,7 @@ tunebisect(
   tol = 0.01,
   maxit = 12,
   years = ac(seq(args$iy + 1, args$fy - 1)),
+  parallel = TRUE,
   verbose = TRUE,
   window = TRUE,
   ...

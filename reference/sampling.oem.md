@@ -32,6 +32,18 @@ sampling.oem(
 
   A named list of observations, see Details.
 
+- stability:
+
+  Stability of the index survey, passed to *survey()*.
+
+- wts:
+
+  Should the weights-at-age in the stock be updated?
+
+- eps:
+
+  Small constant added to stock deviances.
+
 - args:
 
   Options and arguments passed on by *mp()*.
@@ -67,6 +79,7 @@ Iago Mosqueira (WUR) & Ernesto Jardim (MSC).
 
 ``` r
 data(plesim)
+# Generate samples from year 2000:2016
 sampling.oem(stock(om), deviances=deviances(oem),
   observations=observations(oem),
   args=list(y0=2000, iy=2020, dy=2021, dys=2021, frq=1), tracking=FLQuant())
