@@ -68,7 +68,7 @@ setReplaceMethod("track", signature(object="data.table", value="fwdControl"),
     # SUBSET first year
     value <- value[value$year == min(value$year),]
 
-    # SUBSET first unit
+    # SUBSET first unit TODO: general approach on multilines fwdControl
     if (isTRUE(length(unique(value$unit)) > 1))
       value <- value[value$unit == min(value$unit), ]
 

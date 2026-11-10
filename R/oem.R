@@ -220,25 +220,30 @@ sampling.oem <- function(stk, deviances, observations, stability=1,
 
   # --- POST-PROCESS: simplify stk to the dimensions of observations$stk
   
+  # IDENTIFY dimensions to simply
   simp <- dim(catch.n(observations$stk))[3:5] != dim(catch.n(stk))[3:5]
 
+  # SIMPLIFY
   if(any(simp))
     stk <- simplify(stk, c("unit", "season", "area")[simp], harvest=FALSE)
 
+  # NAME slots to copy
   slots <- c("landings", "discards", "catch", "landings.n", "discards.n",
     "catch.n", "stock.n", "harvest")
   if(wts)
     slots <- c(slots, "landings.wt", "discards.wt", "catch.wt", "stock.wt")
 
+  # COPY dys to obs
   for(i in slots)
     slot(obs, i)[, dys] <- slot(stk, i)[, dys]
 
+  # SET units
   units(obs) <- units(stk)
 
+  # STORE at observations
   observations$stk[, dys] <- obs[, dys]
 
   # RETURN
-  
   list(stk=obs, idx=idx, observations=observations, tracking=tracking)
 
 } # }}}
