@@ -68,13 +68,13 @@ tunebisect <- function(om, oem=NULL, iem=NULL, control,
 
     res <- (lapply(setNames(prob, nm=paste0("prob_", prob)), function(p) {
       message(paste0("Tuning for prob=", p))
-      tunebisect(om=om, oem=oem, control=control, statistic=statistic, metrics=metrics,
-      args=args, tune=tune, prob=p, tol=tol, maxit=maxit, years=years, 
-        verbose=verbose, ...)
+      tunebisect(om=om, oem=oem, control=control, statistic=statistic, 
+        metrics=metrics, args=args, tune=tune, prob=p, tol=tol,
+        maxit=maxit, years=years, verbose=verbose, ...)
     }))
 
     # WARN if not tuned
-    if(any(unlist(lapply(res, is, 'FLmses')))) {
+    if(any(!unlist(lapply(res, is, 'FLmses')))) {
       warning("Some tuning(s) did not converge, check individual results.")
 
       return(res)
@@ -83,6 +83,10 @@ tunebisect <- function(om, oem=NULL, iem=NULL, control,
       return(FLmses(res))
     }
   }
+
+  # ADD args$fy
+  if(is.null(args$fy))
+    args$fy <- dims(om)$maxyear
   
   # CHECK years
   if(!all(unique(unlist(years)) %in% seq(args$iy, args$fy)))
