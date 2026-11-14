@@ -589,7 +589,7 @@ setReplaceMethod('performance', signature(x='FLmse', value="data.frame"),
 #' @rdname performance
 
 setMethod("performance", signature(x="FLmses"),
-  function(x, type=NULL, refpts=NULL, ...) {
+  function(x, runs=names(x), type=NULL, refpts=NULL, ...) {
 
     args <- list(...)
     
@@ -602,8 +602,10 @@ setMethod("performance", signature(x="FLmses"),
     if(!"statistics" %in% names(args) & is.null(refpts) &
       nrow(slot(x, 'performance')) > 0) {
       return(slot(x, 'performance')[])
-    # COMPUTE
+
+    # or COMPUTE
     } else {
+
       # SET statistics if missing
       if(!"statistics" %in% names(args)) {
         args$statistics <- .validStatistics(om(x[[1]]))
@@ -620,12 +622,16 @@ setMethod("performance", signature(x="FLmses"),
 
       # CALL on each FLmse in FLmses
       } else {
+
+        if(length(runs) == 1)
+          runs <- paste(runs, names(x), sep="-")
+
         res <- rbindlist(Map(function(i, j){
           call <- c(list(x=i, run=j, om=name(om(i))), args)
           if(!is.null(refpts))
             call$refpts <- .refptsFor(refpts, j)
           do.call(performance, call)
-        }, i=x, j=names(x)), fill=TRUE)
+        }, i=x, j=runs), fill=TRUE)
 
         # ADD type
         if(!is.null(type)) {

@@ -55,7 +55,7 @@
   ...
 )
 
-\S4method{performance}{FLmses}(x, type = NULL, refpts = NULL, ...)
+\S4method{performance}{FLmses}(x, runs = names(x), type = NULL, refpts = NULL, ...)
 
 \S4method{performance}{list}(x, statistics, refpts = NULL, years = "missing", ...)
 

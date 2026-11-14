@@ -115,6 +115,9 @@ res <- mps(om, oem = oem, control = control, args = list(iy = 2021),
 # Run without performance statistics, returning FLmses
 res <- mps(om, oem = oem, control = control, args = list(iy = 2021),
   hcr = list(Ftarget = c(0.2, 0.3, 0.4)))
+# Modify more than one element of the hcr module
+res <- mps(om, oem = oem, control = control, args = list(iy = 2021),
+  hcr = list(Ftarget = c(0.2, 0.3, 0.4), Btrigger = c(5000, 10000, 20000)))
 }
 }
 \seealso{

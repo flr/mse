@@ -1291,6 +1291,9 @@ setMethod("goFish", signature(om="FLombf"),
 #' # Run without performance statistics, returning FLmses
 #' res <- mps(om, oem = oem, control = control, args = list(iy = 2021),
 #'   hcr = list(Ftarget = c(0.2, 0.3, 0.4)))
+#' # Modify more than one element of the hcr module
+#' res <- mps(om, oem = oem, control = control, args = list(iy = 2021),
+#'   hcr = list(Ftarget = c(0.2, 0.3, 0.4), Btrigger = c(5000, 10000, 20000)))
 #' }
 #' @author Iago Mosqueira (WMR)
 
@@ -1301,7 +1304,7 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # GET ... arguments
   opts <- list(...)
- 
+
   # ARE opts being given?
   if(length(opts) == 0) {
     return(FLmses(RUN=mp(om=om, oem=oem, iem=iem, control=control, args=args,
@@ -1322,7 +1325,10 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
    # CONVERT opts if by run to by arg
   .opts_by_arg <- function(x) {
     args <- unique(unlist(lapply(x, names)))
-    lapply(setNames(nm=args), function(a) unlist(lapply(x, `[[`, a)))
+    lapply(setNames(nm=args), function(a) {
+      v <- lapply(x, `[[`, a)
+      if(all(lengths(v) == 1)) unlist(v) else v
+    })
   }
 
   if(!all(names(opts[[1]]) %in% formalArgs(method(control[[module]])))) {
@@ -1350,7 +1356,8 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
 
   # CREATE standard names for single argument
   if(length(mopts) == 1)
-    onms <- paste(module, names(mopts)[1], round(mopts[[1]], 2), sep='_')
+    onms <- paste(module, names(mopts)[1],
+      if(is.list(mopts[[1]])) seq(largs) else round(mopts[[1]], 2), sep='_')
   else
     onms <- paste(paste(names(mopts), collapse='-'), seq(largs), sep='_')
   
@@ -1364,30 +1371,32 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
       names <- paste(names, onms, sep="-")
   }
 
-  message("Running mps() over module '", module, "' with ", largs,
-    " argument sets.")
-
   # LOOP over values
   # PARALLEL over MPs if workers >= options, else serial with parallel mp()
   if(parallel & nbrOfWorkers() > 1 & nbrOfWorkers() >= largs) {
 
-    message("Running on ", nbrOfWorkers(), " nodes.")
+    message("Running mps() over module '", module, "' with ", largs,
+      " argument sets, on ", nbrOfWorkers(), " nodes.")
 
-    p <- progressor(steps=largs)
+    # ONE shared bar: each run's mp() reports its years into it
+    nyrs <- if(!is.null(args$iy) && !is.null(args$fy))
+      length(seq(args$iy, args$fy)) else 1
+    p <- progressor(steps=largs * (nyrs + 1))
+
+    mp_p <- mp
+    environment(mp_p) <- list2env(list(progressor=function(...) p),
+      parent=environment(mp))
 
     res <- foreach(i = seq(largs), .errorhandling="pass", .inorder=FALSE,
       .options.future=list(globals=structure(TRUE, add=c("control", "module",
-      "mopts", "om", "oem", "iem", "args", "p"), seed=seed))) %dofuture% {
+      "mopts", "om", "oem", "iem", "args", "p", "mp_p"), seed=seed))) %dofuture% {
 
       # MODIFY module args
-      args(control[[module]])[names(mopts)] <- lapply(mopts, "[", i)
+      args(control[[module]])[names(mopts)] <- lapply(mopts, "[[", i)
 
-      # PROGRESS
-      p(message = sprintf("MP: %i / %i", i, largs))
-
-      # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, control=control, args=args,
-        parallel=FALSE, progress=FALSE, verbose=FALSE)
+      # CALL mp, reports by year into the shared progressor
+      run <- mp_p(om, oem=oem, iem=iem, control=control, args=args,
+        parallel=FALSE, progress=TRUE, verbose=FALSE)
 
       # RETURN performance
       if(perf) {
@@ -1401,16 +1410,22 @@ mps <- function(om, oem=NULL, iem=NULL, control=ctrl, ctrl=control, args,
     }
   } else {
 
+    message("Running mps() over module '", module, "' with ", largs,
+      " argument sets.")
+    p <- progressor(steps=largs)
+
     res <- lapply(seq(largs), function(i) {
 
-      message(paste("MP:", i))
 
       # MODIFY module args
-      args(control[[module]])[names(mopts)] <- lapply(mopts, '[', i)
+      args(control[[module]])[names(mopts)] <- lapply(mopts, '[[', i)
 
       # CALL mp, parallel left to work along MPs
-      run <- mp(om, oem=oem, iem=iem, control=control, args=args, parallel=parallel,
-         verbose=FALSE, progress=TRUE)
+      run <- mp(om, oem=oem, iem=iem, control=control, args=args, 
+        parallel=parallel, verbose=FALSE, progress=FALSE)
+
+      # PROGRESS
+      p(message = sprintf("MP: %i / %i", i, largs))
 
       # RETURN performance
       if(perf) {
